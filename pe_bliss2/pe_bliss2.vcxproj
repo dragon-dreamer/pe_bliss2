@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="address_converter.h" />
+    <ClInclude Include="bound_import\bound_import_directory_builder.h" />
+    <ClInclude Include="bound_import\bound_import_directory_loader.h" />
+    <ClInclude Include="bound_import\bound_library.h" />
+    <ClInclude Include="compid_database.h" />
+    <ClInclude Include="data_directories.h" />
+    <ClInclude Include="detail\bit_stream.h" />
+    <ClInclude Include="detail\bound_import\image_bound_import_descriptor.h" />
+    <ClInclude Include="detail\error_list.h" />
+    <ClInclude Include="detail\exceptions\image_runtime_function_entry.h" />
+    <ClInclude Include="detail\exports\image_export_directory.h" />
+    <ClInclude Include="detail\image_data_directory.h" />
+    <ClInclude Include="detail\image_dos_header.h" />
+    <ClInclude Include="detail\image_file_header.h" />
+    <ClInclude Include="detail\image_optional_header.h" />
+    <ClInclude Include="detail\image_section_header.h" />
+    <ClInclude Include="detail\imports\image_import_descriptor.h" />
+    <ClInclude Include="detail\concepts.h" />
+    <ClInclude Include="detail\load_config\image_load_config_directory.h" />
+    <ClInclude Include="detail\packed_byte_array.h" />
+    <ClInclude Include="detail\packed_byte_vector.h" />
+    <ClInclude Include="detail\packed_serialization.h" />
+    <ClInclude Include="detail\packed_c_string.h" />
+    <ClInclude Include="detail\packed_struct.h" />
+    <ClInclude Include="detail\relocations\image_base_relocation.h" />
+    <ClInclude Include="detail\packed_struct_base.h" />
+    <ClInclude Include="detail\tls\image_tls_directory.h" />
+    <ClInclude Include="dos_header.h" />
+    <ClInclude Include="dos_stub.h" />
+    <ClInclude Include="exceptions\arm64\arm64_exception_directory.h" />
+    <ClInclude Include="exceptions\arm64\arm64_exception_directory_loader.h" />
+    <ClInclude Include="exceptions\arm\arm_exception_directory.h" />
+    <ClInclude Include="exceptions\arm\arm_exception_directory_loader.h" />
+    <ClInclude Include="exceptions\arm_common\arm_common_exception_directory_loader.h" />
+    <ClInclude Include="exceptions\arm_common\arm_common_unwind_info.h" />
+    <ClInclude Include="exceptions\exception_directory.h" />
+    <ClInclude Include="exceptions\exception_directory_loader.h" />
+    <ClInclude Include="exceptions\x64\x64_exception_directory.h" />
+    <ClInclude Include="exceptions\x64\x64_exception_directory_loader.h" />
+    <ClInclude Include="exports\exported_address.h" />
+    <ClInclude Include="exports\export_directory.h" />
+    <ClInclude Include="exports\export_directory_builder.h" />
+    <ClInclude Include="exports\export_directory_loader.h" />
+    <ClInclude Include="file_header.h" />
+    <ClInclude Include="image.h" />
+    <ClInclude Include="image_builder.h" />
+    <ClInclude Include="image_loader.h" />
+    <ClInclude Include="image_signature.h" />
+    <ClInclude Include="imports\imported_address.h" />
+    <ClInclude Include="imports\import_directory.h" />
+    <ClInclude Include="imports\import_directory_builder.h" />
+    <ClInclude Include="imports\import_directory_loader.h" />
+    <ClInclude Include="load_config\load_config_directory.h" />
+    <ClInclude Include="load_config\load_config_directory_loader.h" />
+    <ClInclude Include="optional_header.h" />
+    <ClInclude Include="overlay.h" />
+    <ClInclude Include="pe_error.h" />
+    <ClInclude Include="pe_section_error.h" />
+    <ClInclude Include="pe_types.h" />
+    <ClInclude Include="relocations\base_relocation.h" />
+    <ClInclude Include="relocations\image_rebase.h" />
+    <ClInclude Include="relocations\relocation_entry.h" />
+    <ClInclude Include="relocations\relocation_directory_builder.h" />
+    <ClInclude Include="relocations\relocation_directory_loader.h" />
+    <ClInclude Include="rich_compid.h" />
+    <ClInclude Include="rich_header.h" />
+    <ClInclude Include="section_data.h" />
+    <ClInclude Include="section_header.h" />
+    <ClInclude Include="section_search.h" />
+    <ClInclude Include="section_table.h" />
+    <ClInclude Include="tls\tls_directory.h" />
+    <ClInclude Include="tls\tls_directory_builder.h" />
+    <ClInclude Include="tls\tls_directory_loader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="address_converter.cpp" />
+    <ClCompile Include="bound_import\bound_import_directory_builder.cpp" />
+    <ClCompile Include="bound_import\bound_import_directory_loader.cpp" />
+    <ClCompile Include="compid_database.cpp" />
+    <ClCompile Include="data_directories.cpp" />
+    <ClCompile Include="detail\packed_byte_array.cpp" />
+    <ClCompile Include="detail\packed_byte_vector.cpp" />
+    <ClCompile Include="detail\packed_c_string.cpp" />
+    <ClCompile Include="dos_header.cpp" />
+    <ClCompile Include="dos_stub.cpp" />
+    <ClCompile Include="exceptions\arm64\arm64_exception_directory.cpp" />
+    <ClCompile Include="exceptions\arm64\arm64_exception_directory_loader.cpp" />
+    <ClCompile Include="exceptions\arm\arm_exception_directory.cpp" />
+    <ClCompile Include="exceptions\arm\arm_exception_directory_loader.cpp" />
+    <ClCompile Include="exceptions\arm_common\arm_common_exception_directory_loader.cpp" />
+    <ClCompile Include="exceptions\arm_common\arm_common_unwind_info.cpp" />
+    <ClCompile Include="exceptions\exception_directory_loader.cpp" />
+    <ClCompile Include="exceptions\x64\x64_exception_directory.cpp" />
+    <ClCompile Include="exceptions\x64\x64_exception_directory_loader.cpp" />
+    <ClCompile Include="exports\exported_address.cpp" />
+    <ClCompile Include="exports\export_directory.cpp" />
+    <ClCompile Include="exports\export_directory_builder.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="exports\export_directory_loader.cpp" />
+    <ClCompile Include="file_header.cpp" />
+    <ClCompile Include="image.cpp" />
+    <ClCompile Include="image_builder.cpp" />
+    <ClCompile Include="image_loader.cpp" />
+    <ClCompile Include="image_signature.cpp" />
+    <ClCompile Include="imports\import_directory_builder.cpp">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="imports\import_directory_loader.cpp" />
+    <ClCompile Include="load_config\load_config_directory.cpp" />
+    <ClCompile Include="load_config\load_config_directory_loader.cpp" />
+    <ClCompile Include="optional_header.cpp" />
+    <ClCompile Include="relocations\image_rebase.cpp" />
+    <ClCompile Include="relocations\relocation_entry.cpp" />
+    <ClCompile Include="relocations\relocation_directory_builder.cpp" />
+    <ClCompile Include="relocations\relocation_directory_loader.cpp" />
+    <ClCompile Include="rich_header.cpp" />
+    <ClCompile Include="section_data.cpp" />
+    <ClCompile Include="section_header.cpp" />
+    <ClCompile Include="section_search.cpp" />
+    <ClCompile Include="section_table.cpp" />
+    <ClCompile Include="tls\tls_directory_builder.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="tls\tls_directory_loader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\buffers\buffers.vcxproj">
+      <Project>{5337cf3f-d0af-434f-9702-cc5e8a86251b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\utilities\utilities.vcxproj">
+      <Project>{5a33c151-ea42-431c-975f-ff1825af39ed}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{10f2febb-c268-4a1f-bb1b-3b2a4d856cad}</ProjectGuid>
+    <RootNamespace>pebliss2</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_77_0</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_77_0</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_77_0</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_77_0</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

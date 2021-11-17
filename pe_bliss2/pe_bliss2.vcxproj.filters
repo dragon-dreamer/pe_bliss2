@@ -1,0 +1,465 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\detail">
+      <UniqueIdentifier>{922c2acd-6cc8-44e0-9ad9-d9c0bd89a6a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\exports">
+      <UniqueIdentifier>{dfbe3e17-0927-49de-862e-36bcaec79dbb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\exports">
+      <UniqueIdentifier>{82f9ef32-df7c-433b-92c5-b3f47cef3533}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\exports">
+      <UniqueIdentifier>{057256f7-b2a2-4fe5-b206-03c887c05e16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\imports">
+      <UniqueIdentifier>{2ff03742-fb47-42c9-8da7-1828c61cdd76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\imports">
+      <UniqueIdentifier>{a6447ebf-1147-485b-b9ac-45491fa9002d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\imports">
+      <UniqueIdentifier>{4afe3552-3c40-4a7d-bebc-a1acc09adc2a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\bound_import">
+      <UniqueIdentifier>{5893f5fb-d098-4f94-aade-97ef39e52924}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\bound_import">
+      <UniqueIdentifier>{2926c489-56e2-4e4c-8a43-f1978c306e56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\bound_import">
+      <UniqueIdentifier>{9cc507b2-9db8-4810-b09b-20768ae22c21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\relocations">
+      <UniqueIdentifier>{0339cba9-f8fc-4abf-afd7-b8f2469e57fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\relocations">
+      <UniqueIdentifier>{bc3db527-4198-4ede-aa73-a7cfd4d87fac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\relocations">
+      <UniqueIdentifier>{0736cc8c-e19d-4dac-9e80-e7853512b1e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\tls">
+      <UniqueIdentifier>{5508cbac-d54f-46e1-a456-bbd7131a808c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\tls">
+      <UniqueIdentifier>{0b18807c-030f-43b8-8352-558b4eb7a799}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tls">
+      <UniqueIdentifier>{6e2af670-d31e-466f-a5be-c434d0f5f55f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\detail">
+      <UniqueIdentifier>{6bbc0cd7-c447-451b-b147-bd0e8ef9afa0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\load_config">
+      <UniqueIdentifier>{b3e17215-79a2-42d4-8860-4189c01a8cde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\load_config">
+      <UniqueIdentifier>{5955dbbb-60d7-46f3-8f2c-ba05aa1d2c0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\load_config">
+      <UniqueIdentifier>{f9b7f820-2c7c-4a15-8923-e155ee2bff93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\exceptions">
+      <UniqueIdentifier>{c94453e1-84d7-465a-a98d-583fea70e65e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\exceptions">
+      <UniqueIdentifier>{a5f94c68-33f0-4ff1-bc63-7e3d82951b8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\exceptions">
+      <UniqueIdentifier>{3a1cc9ed-69e1-4768-ae7f-03f13af46c48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\exceptions\x64">
+      <UniqueIdentifier>{3681656e-b53b-4b02-a9f5-c933d24fa199}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\exceptions\x64">
+      <UniqueIdentifier>{cde3dd61-c582-4bc1-bfd9-62fb15599bc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\exceptions\arm64">
+      <UniqueIdentifier>{5961f912-5b15-46a8-bde5-93f157e73f90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\exceptions\arm64">
+      <UniqueIdentifier>{c8df4a07-97c2-4345-9646-f7738aa5db80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\exceptions\arm">
+      <UniqueIdentifier>{dd0f8efd-202f-4640-b73f-521a3adb5d37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\exceptions\arm">
+      <UniqueIdentifier>{35f1f42b-5431-4f34-926d-40d93a93045e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\exceptions\arm_common">
+      <UniqueIdentifier>{beb6cfb7-deee-4c3a-962d-8bc413fc9e1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\exceptions\arm_common">
+      <UniqueIdentifier>{bbe0f243-df41-4f2e-abbd-79c27b668755}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="detail\packed_serialization.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\packed_struct.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\concepts.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="dos_header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rich_header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\image_dos_header.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="dos_stub.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="image_signature.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="compid_database.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rich_compid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\image_file_header.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="file_header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\image_optional_header.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="optional_header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\packed_struct_base.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\image_data_directory.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="data_directories.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="section_table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\image_section_header.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="section_header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="section_data.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="image_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_section_error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="image_builder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="address_converter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="section_search.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="overlay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="exports\exported_address.h">
+      <Filter>Header Files\exports</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\packed_c_string.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="exports\export_directory.h">
+      <Filter>Header Files\exports</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\exports\image_export_directory.h">
+      <Filter>Header Files\detail\exports</Filter>
+    </ClInclude>
+    <ClInclude Include="exports\export_directory_loader.h">
+      <Filter>Header Files\exports</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\error_list.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="pe_types.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="exports\export_directory_builder.h">
+      <Filter>Header Files\exports</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\imports\image_import_descriptor.h">
+      <Filter>Header Files\detail\imports</Filter>
+    </ClInclude>
+    <ClInclude Include="imports\imported_address.h">
+      <Filter>Header Files\imports</Filter>
+    </ClInclude>
+    <ClInclude Include="imports\import_directory.h">
+      <Filter>Header Files\imports</Filter>
+    </ClInclude>
+    <ClInclude Include="imports\import_directory_loader.h">
+      <Filter>Header Files\imports</Filter>
+    </ClInclude>
+    <ClInclude Include="imports\import_directory_builder.h">
+      <Filter>Header Files\imports</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\bound_import\image_bound_import_descriptor.h">
+      <Filter>Header Files\detail\bound_import</Filter>
+    </ClInclude>
+    <ClInclude Include="bound_import\bound_library.h">
+      <Filter>Header Files\bound_import</Filter>
+    </ClInclude>
+    <ClInclude Include="bound_import\bound_import_directory_loader.h">
+      <Filter>Header Files\bound_import</Filter>
+    </ClInclude>
+    <ClInclude Include="bound_import\bound_import_directory_builder.h">
+      <Filter>Header Files\bound_import</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\relocations\image_base_relocation.h">
+      <Filter>Header Files\detail\relocations</Filter>
+    </ClInclude>
+    <ClInclude Include="relocations\base_relocation.h">
+      <Filter>Header Files\relocations</Filter>
+    </ClInclude>
+    <ClInclude Include="relocations\relocation_entry.h">
+      <Filter>Header Files\relocations</Filter>
+    </ClInclude>
+    <ClInclude Include="relocations\relocation_directory_loader.h">
+      <Filter>Header Files\relocations</Filter>
+    </ClInclude>
+    <ClInclude Include="relocations\image_rebase.h">
+      <Filter>Header Files\relocations</Filter>
+    </ClInclude>
+    <ClInclude Include="relocations\relocation_directory_builder.h">
+      <Filter>Header Files\relocations</Filter>
+    </ClInclude>
+    <ClInclude Include="tls\tls_directory.h">
+      <Filter>Header Files\tls</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\tls\image_tls_directory.h">
+      <Filter>Header Files\detail\tls</Filter>
+    </ClInclude>
+    <ClInclude Include="tls\tls_directory_loader.h">
+      <Filter>Header Files\tls</Filter>
+    </ClInclude>
+    <ClInclude Include="tls\tls_directory_builder.h">
+      <Filter>Header Files\tls</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\load_config\image_load_config_directory.h">
+      <Filter>Header Files\detail\load_config</Filter>
+    </ClInclude>
+    <ClInclude Include="load_config\load_config_directory.h">
+      <Filter>Header Files\load_config</Filter>
+    </ClInclude>
+    <ClInclude Include="load_config\load_config_directory_loader.h">
+      <Filter>Header Files\load_config</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\packed_byte_array.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\packed_byte_vector.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\bit_stream.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\exceptions\image_runtime_function_entry.h">
+      <Filter>Header Files\detail\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\exception_directory.h">
+      <Filter>Header Files\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\x64\x64_exception_directory.h">
+      <Filter>Header Files\exceptions\x64</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\exception_directory_loader.h">
+      <Filter>Header Files\exceptions</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\x64\x64_exception_directory_loader.h">
+      <Filter>Header Files\exceptions\x64</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\arm64\arm64_exception_directory.h">
+      <Filter>Header Files\exceptions\arm64</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\arm64\arm64_exception_directory_loader.h">
+      <Filter>Header Files\exceptions\arm64</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\arm\arm_exception_directory.h">
+      <Filter>Header Files\exceptions\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\arm_common\arm_common_unwind_info.h">
+      <Filter>Header Files\exceptions\arm_common</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\arm\arm_exception_directory_loader.h">
+      <Filter>Header Files\exceptions\arm</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions\arm_common\arm_common_exception_directory_loader.h">
+      <Filter>Header Files\exceptions\arm_common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dos_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dos_stub.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rich_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="compid_database.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="image_signature.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="optional_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="file_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="data_directories.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="section_table.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="section_header.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="section_data.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="image_loader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="image_builder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="address_converter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="section_search.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="exports\export_directory_loader.cpp">
+      <Filter>Source Files\exports</Filter>
+    </ClCompile>
+    <ClCompile Include="exports\export_directory_builder.cpp">
+      <Filter>Source Files\exports</Filter>
+    </ClCompile>
+    <ClCompile Include="exports\export_directory.cpp">
+      <Filter>Source Files\exports</Filter>
+    </ClCompile>
+    <ClCompile Include="exports\exported_address.cpp">
+      <Filter>Source Files\exports</Filter>
+    </ClCompile>
+    <ClCompile Include="imports\import_directory_loader.cpp">
+      <Filter>Source Files\imports</Filter>
+    </ClCompile>
+    <ClCompile Include="imports\import_directory_builder.cpp">
+      <Filter>Source Files\imports</Filter>
+    </ClCompile>
+    <ClCompile Include="bound_import\bound_import_directory_loader.cpp">
+      <Filter>Source Files\bound_import</Filter>
+    </ClCompile>
+    <ClCompile Include="bound_import\bound_import_directory_builder.cpp">
+      <Filter>Source Files\bound_import</Filter>
+    </ClCompile>
+    <ClCompile Include="relocations\relocation_entry.cpp">
+      <Filter>Source Files\relocations</Filter>
+    </ClCompile>
+    <ClCompile Include="relocations\relocation_directory_loader.cpp">
+      <Filter>Source Files\relocations</Filter>
+    </ClCompile>
+    <ClCompile Include="relocations\image_rebase.cpp">
+      <Filter>Source Files\relocations</Filter>
+    </ClCompile>
+    <ClCompile Include="relocations\relocation_directory_builder.cpp">
+      <Filter>Source Files\relocations</Filter>
+    </ClCompile>
+    <ClCompile Include="tls\tls_directory_loader.cpp">
+      <Filter>Source Files\tls</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\packed_c_string.cpp">
+      <Filter>Source Files\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="tls\tls_directory_builder.cpp">
+      <Filter>Source Files\tls</Filter>
+    </ClCompile>
+    <ClCompile Include="load_config\load_config_directory.cpp">
+      <Filter>Source Files\load_config</Filter>
+    </ClCompile>
+    <ClCompile Include="load_config\load_config_directory_loader.cpp">
+      <Filter>Source Files\load_config</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\packed_byte_array.cpp">
+      <Filter>Source Files\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\packed_byte_vector.cpp">
+      <Filter>Source Files\detail</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\x64\x64_exception_directory.cpp">
+      <Filter>Source Files\exceptions\x64</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\exception_directory_loader.cpp">
+      <Filter>Source Files\exceptions</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\x64\x64_exception_directory_loader.cpp">
+      <Filter>Source Files\exceptions\x64</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\arm64\arm64_exception_directory.cpp">
+      <Filter>Source Files\exceptions\arm64</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\arm64\arm64_exception_directory_loader.cpp">
+      <Filter>Source Files\exceptions\arm64</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\arm\arm_exception_directory.cpp">
+      <Filter>Source Files\exceptions\arm</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\arm_common\arm_common_unwind_info.cpp">
+      <Filter>Source Files\exceptions\arm_common</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\arm\arm_exception_directory_loader.cpp">
+      <Filter>Source Files\exceptions\arm</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions\arm_common\arm_common_exception_directory_loader.cpp">
+      <Filter>Source Files\exceptions\arm_common</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

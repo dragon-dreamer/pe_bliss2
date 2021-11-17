@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\input">
+      <UniqueIdentifier>{950ede8c-53be-46f4-a6aa-aae4f4e8f1a4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\output">
+      <UniqueIdentifier>{d8f37f88-f842-49e4-9721-2dd6826010c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\input">
+      <UniqueIdentifier>{f5635d76-f0b3-4aa9-8b29-07f7675b3cb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\output">
+      <UniqueIdentifier>{370cd078-caa9-48a8-a798-5e280b4e44de}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="buffer_copy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="buffer_interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ref_buffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="input_buffer_interface.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="input_buffer_section.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="input_memory_buffer.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="input_stream_buffer.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="fixed_output_memory_buffer.h">
+      <Filter>Header Files\output</Filter>
+    </ClInclude>
+    <ClInclude Include="output_buffer_interface.h">
+      <Filter>Header Files\output</Filter>
+    </ClInclude>
+    <ClInclude Include="output_memory_buffer.h">
+      <Filter>Header Files\output</Filter>
+    </ClInclude>
+    <ClInclude Include="output_memory_ref_buffer.h">
+      <Filter>Header Files\output</Filter>
+    </ClInclude>
+    <ClInclude Include="output_stream_buffer.h">
+      <Filter>Header Files\output</Filter>
+    </ClInclude>
+    <ClInclude Include="input_container_buffer.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ref_buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="buffer_copy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fixed_output_memory_buffer.cpp">
+      <Filter>Source Files\output</Filter>
+    </ClCompile>
+    <ClCompile Include="input_buffer_section.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="input_memory_buffer.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="input_stream_buffer.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="output_memory_buffer.cpp">
+      <Filter>Source Files\output</Filter>
+    </ClCompile>
+    <ClCompile Include="output_memory_ref_buffer.cpp">
+      <Filter>Source Files\output</Filter>
+    </ClCompile>
+    <ClCompile Include="output_stream_buffer.cpp">
+      <Filter>Source Files\output</Filter>
+    </ClCompile>
+    <ClCompile Include="input_container_buffer.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

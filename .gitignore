@@ -1,0 +1,7 @@
+*.user
+Release
+Debug
+.vs
+documents
+tests
+x64
