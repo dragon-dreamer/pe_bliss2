@@ -31,6 +31,7 @@ The library is aimed at being able to provide as much information about the PE f
   - TLS (read/modify)
 - Address conversions (RVA/VA/file offsets).
 - Overlay at the end of file parsing.
+- Simple console dumper of PE/PE+ files (no extended configuration yet).
 
 The following features are planned:
 - Cross-platform compilation with CMake.
