@@ -1,10 +1,14 @@
 #pragma once
 
+#include <bit>
+#include <cassert>
 #include <concepts>
 #include <cstdint>
 #include <limits>
 
 #include "utilities/static_class.h"
+
+//TODO: check that std::byte size is equal to 8
 
 namespace utilities
 {
@@ -31,6 +35,7 @@ public:
 	[[nodiscard]]
 	static constexpr T align_down(T x, std::uint32_t align) noexcept
 	{
+		assert(std::has_single_bit(align) && "align must be power of 2");
 		return x & ~(static_cast<T>(align) - 1);
 	}
 
@@ -42,6 +47,7 @@ public:
 	[[nodiscard]]
 	static constexpr T align_up(T x, std::uint32_t align) noexcept
 	{
+		assert(std::has_single_bit(align) && "align must be power of 2");
 		return (x & static_cast<T>(align - 1)) ? align_down(x, align) + static_cast<T>(align) : x;
 	}
 

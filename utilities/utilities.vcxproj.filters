@@ -30,6 +30,9 @@
     <ClInclude Include="safe_uint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="scoped_guard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="generic_error.cpp">

@@ -12,8 +12,9 @@
 namespace utilities
 {
 
-template<std::unsigned_integral T> requires (!std::is_same_v<T, bool>)
-class safe_uint
+template<std::unsigned_integral T>
+	requires (!std::is_same_v<T, bool>)
+class [[nodiscard]] safe_uint
 {
 public:
 	using value_type = T;
