@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\tests">
+      <UniqueIdentifier>{e1a14868-eff0-4b4e-aa0a-b870a9c831c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\utilities">
+      <UniqueIdentifier>{f939127e-add8-42e2-949f-ed5361d1ec92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\buffers">
+      <UniqueIdentifier>{dfadbe09-adcb-4a3b-986e-f64fecc32aaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\pe_bliss2">
+      <UniqueIdentifier>{66b88b02-814d-4817-9697-431466b4ec28}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\googletest\googletest\src\gtest-all.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\googletest\googlemock\src\gmock-all.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\utilities\math_tests.cpp">
+      <Filter>Source Files\tests\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\utilities\scoped_guard_tests.cpp">
+      <Filter>Source Files\tests\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\utilities\static_class_tests.cpp">
+      <Filter>Source Files\tests\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\utilities\safe_uint_tests.cpp">
+      <Filter>Source Files\tests\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\buffers\input_memory_buffer_tests.cpp">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\buffers\input_container_buffer_tests.cpp">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\buffers\input_stream_buffer_tests.cpp">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\buffers\input_buffer_section_tests.cpp">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\buffers\output_memory_buffer_tests.cpp">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\buffers\output_memory_ref_buffer_tests.cpp">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\buffers\output_stream_buffer_tests.cpp">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\buffers\buffer_copy_tests.cpp">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\buffers\ref_buffer_tests.cpp">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\packed_reflection_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\packed_serialization_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\endian_convert_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\packed_struct_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\packed_c_string_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\packed_byte_array_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\packed_byte_vector_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\packed_utf16_string_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\error_list_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\bit_stream_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\pe_error_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\dos_stub_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\section_header_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\section_data_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\section_search_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\compid_database_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\data_directories_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\dos_header_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\optional_header_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\image_signature_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\file_header_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\rich_header_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tests\buffers\input_buffer_helpers.h">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\buffers\output_buffer_helpers.h">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\buffers\buffer_helpers.h">
+      <Filter>Source Files\tests\buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\pe_bliss2\test_structs.h">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\pe_bliss2\input_buffer_mock.h">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\pe_bliss2\output_buffer_mock.h">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\pe_bliss2\pe_error_helper.h">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

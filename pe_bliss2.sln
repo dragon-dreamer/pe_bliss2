@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31702.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pe_bliss2", "pe_bliss2\pe_bliss2.vcxproj", "{10F2FEBB-C268-4A1F-BB1B-3B2A4D856CAD}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utilities", "utilities\utilities.vcxproj", "{5A33C151-EA42-431C-975F-FF1825AF39ED}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "console_dumper", "console_dumper\console_dumper.vcxproj", "{8363258D-6488-4450-B485-59960BC4D9DD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tests", "tests\tests.vcxproj", "{D2608EA4-EAC6-482A-A5DB-517E03FD98EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,14 @@ Global
 		{8363258D-6488-4450-B485-59960BC4D9DD}.Release|x64.Build.0 = Release|x64
 		{8363258D-6488-4450-B485-59960BC4D9DD}.Release|x86.ActiveCfg = Release|Win32
 		{8363258D-6488-4450-B485-59960BC4D9DD}.Release|x86.Build.0 = Release|Win32
+		{D2608EA4-EAC6-482A-A5DB-517E03FD98EE}.Debug|x64.ActiveCfg = Debug|x64
+		{D2608EA4-EAC6-482A-A5DB-517E03FD98EE}.Debug|x64.Build.0 = Debug|x64
+		{D2608EA4-EAC6-482A-A5DB-517E03FD98EE}.Debug|x86.ActiveCfg = Debug|Win32
+		{D2608EA4-EAC6-482A-A5DB-517E03FD98EE}.Debug|x86.Build.0 = Debug|Win32
+		{D2608EA4-EAC6-482A-A5DB-517E03FD98EE}.Release|x64.ActiveCfg = Release|x64
+		{D2608EA4-EAC6-482A-A5DB-517E03FD98EE}.Release|x64.Build.0 = Release|x64
+		{D2608EA4-EAC6-482A-A5DB-517E03FD98EE}.Release|x86.ActiveCfg = Release|Win32
+		{D2608EA4-EAC6-482A-A5DB-517E03FD98EE}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

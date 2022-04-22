@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{d2608ea4-eac6-482a-a5db-517e03fd98ee}</ProjectGuid>
+    <RootNamespace>tests</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>
+      </ImageHasSafeExceptionHandlers>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ControlFlowGuard>Guard</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ControlFlowGuard>
+      </ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\external\googletest\googlemock\src\gmock-all.cc" />
+    <ClCompile Include="..\external\googletest\googletest\src\gtest-all.cc" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="tests\buffers\buffer_copy_tests.cpp" />
+    <ClCompile Include="tests\buffers\input_buffer_section_tests.cpp" />
+    <ClCompile Include="tests\buffers\input_container_buffer_tests.cpp" />
+    <ClCompile Include="tests\buffers\input_memory_buffer_tests.cpp" />
+    <ClCompile Include="tests\buffers\input_stream_buffer_tests.cpp" />
+    <ClCompile Include="tests\buffers\output_memory_buffer_tests.cpp" />
+    <ClCompile Include="tests\buffers\output_memory_ref_buffer_tests.cpp" />
+    <ClCompile Include="tests\buffers\output_stream_buffer_tests.cpp" />
+    <ClCompile Include="tests\buffers\ref_buffer_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\bit_stream_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\compid_database_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\data_directories_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\dos_header_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\dos_stub_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\endian_convert_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\error_list_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\file_header_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\image_signature_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\optional_header_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\packed_byte_array_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\packed_byte_vector_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\packed_c_string_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\packed_reflection_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\packed_serialization_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\packed_struct_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\packed_utf16_string_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\pe_error_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\rich_header_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\section_data_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\section_header_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\section_search_tests.cpp" />
+    <ClCompile Include="tests\utilities\math_tests.cpp" />
+    <ClCompile Include="tests\utilities\safe_uint_tests.cpp" />
+    <ClCompile Include="tests\utilities\scoped_guard_tests.cpp" />
+    <ClCompile Include="tests\utilities\static_class_tests.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\buffers\buffers.vcxproj">
+      <Project>{5337cf3f-d0af-434f-9702-cc5e8a86251b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\pe_bliss2\pe_bliss2.vcxproj">
+      <Project>{10f2febb-c268-4a1f-bb1b-3b2a4d856cad}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\utilities\utilities.vcxproj">
+      <Project>{5a33c151-ea42-431c-975f-ff1825af39ed}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tests\buffers\buffer_helpers.h" />
+    <ClInclude Include="tests\buffers\input_buffer_helpers.h" />
+    <ClInclude Include="tests\buffers\output_buffer_helpers.h" />
+    <ClInclude Include="tests\pe_bliss2\input_buffer_mock.h" />
+    <ClInclude Include="tests\pe_bliss2\output_buffer_mock.h" />
+    <ClInclude Include="tests\pe_bliss2\pe_error_helper.h" />
+    <ClInclude Include="tests\pe_bliss2\test_structs.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
