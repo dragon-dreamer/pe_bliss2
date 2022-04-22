@@ -6,7 +6,6 @@
 #include <system_error>
 #include <type_traits>
 #include <variant>
-#include <vector>
 
 #include "buffers/input_buffer_interface.h"
 #include "buffers/input_container_buffer.h"
@@ -24,7 +23,7 @@ enum class ref_buffer_errc
 
 std::error_code make_error_code(ref_buffer_errc) noexcept;
 
-class ref_buffer
+class [[nodiscard]] ref_buffer
 {
 public:
 	static constexpr auto npos = (std::numeric_limits<std::size_t>::max)();
@@ -68,7 +67,7 @@ private:
 	};
 
 private:
-	void read_buffer(input_buffer_interface& buf, std::size_t size, std::size_t pos);
+	void read_buffer(input_buffer_interface& buf);
 	std::size_t serialize_buffer(const input_buffer_ptr& buf, output_buffer_interface& buffer,
 		std::size_t offset, std::size_t size) const;
 

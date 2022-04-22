@@ -7,22 +7,22 @@
 #include <variant>
 
 #include "pe_bliss2/detail/concepts.h"
-#include "pe_bliss2/detail/error_list.h"
+#include "pe_bliss2/error_list.h"
 #include "pe_bliss2/detail/imports/image_import_descriptor.h"
-#include "pe_bliss2/detail/packed_c_string.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_c_string.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_types.h"
 
 namespace pe_bliss::imports
 {
 
-using optional_c_string = std::optional<pe_bliss::detail::packed_c_string>;
+using optional_c_string = std::optional<pe_bliss::packed_c_string>;
 
 template<detail::executable_pointer Va>
 class imported_function_address
 {
 public:
-	using optional_va_type = std::optional<detail::packed_struct<Va>>;
+	using optional_va_type = std::optional<packed_struct<Va>>;
 
 public:
 	[[nodiscard]]
@@ -76,7 +76,7 @@ private:
 template<detail::executable_pointer Va>
 class imported_function_ordinal_details
 	: public imported_function_ordinal<Va>
-	, public detail::error_list
+	, public error_list
 {
 };
 
@@ -84,9 +84,9 @@ template<detail::executable_pointer Va>
 class imported_function_hint_and_name : public imported_function_address<Va>
 {
 public:
-	using hint_type = detail::packed_struct<std::uint16_t>;
-	using name_type = detail::packed_c_string;
-	using bound_function_va = detail::packed_struct<Va>;
+	using hint_type = packed_struct<std::uint16_t>;
+	using name_type = packed_c_string;
+	using bound_function_va = packed_struct<Va>;
 
 public:
 	[[nodiscard]]
@@ -134,7 +134,7 @@ private:
 template<detail::executable_pointer Va>
 class imported_function_hint_and_name_details
 	: public imported_function_hint_and_name<Va>
-	, public detail::error_list
+	, public error_list
 {
 };
 
@@ -144,7 +144,7 @@ class imported_address
 {
 public:
 	using va_type = Va;
-	using packed_va_type = detail::packed_struct<va_type>;
+	using packed_va_type = packed_struct<va_type>;
 	using optional_va_type = std::optional<packed_va_type>;
 	
 	using ordinal_type = Ordinal;
@@ -200,7 +200,7 @@ template<detail::executable_pointer Va>
 class imported_address_details
 	: public imported_address<Va,
 		imported_function_ordinal_details<Va>, imported_function_hint_and_name_details<Va>>
-	, public detail::error_list
+	, public error_list
 {
 };
 

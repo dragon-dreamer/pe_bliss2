@@ -1,36 +1,42 @@
-#include "pe_bliss2/detail/packed_c_string.h"
+#include "pe_bliss2/packed_c_string.h"
 
 #include <cstddef>
+#include <string>
 
 #include "buffers/input_buffer_interface.h"
 #include "buffers/output_buffer_interface.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
 
-namespace pe_bliss::detail
+namespace pe_bliss
 {
 
 void packed_c_string::deserialize(buffers::input_buffer_interface& buf,
 	bool allow_virtual_memory)
 {
-	virtual_nullbyte_ = false;
-	value_.clear();
-	buffer_pos_ = buf.rpos();
-	absolute_offset_ = buffer_pos_ + buf.absolute_offset();
-	relative_offset_ = buffer_pos_ + buf.relative_offset();
+	buffers::serialized_data_state state(buf);
 
 	std::byte ch{};
-	std::byte nullbyte{};
-	while (buf.read(1, &ch))
+	static constexpr std::byte nullbyte{};
+	std::string value;
+	while (buf.read(sizeof(ch), &ch))
 	{
 		if (ch == nullbyte)
+		{
+			value_ = std::move(value);
+			state_ = state;
+			virtual_nullbyte_ = false;
 			return;
-		value_.push_back(std::to_integer<char>(ch));
+		}
+		value.push_back(std::to_integer<char>(ch));
 	}
 
-	virtual_nullbyte_ = true;
 	if (!allow_virtual_memory)
 		throw pe_error(utilities::generic_errc::buffer_overrun);
+
+	value_ = std::move(value);
+	virtual_nullbyte_ = true;
+	state_ = state;
 }
 
 std::size_t packed_c_string::serialize(buffers::output_buffer_interface& buf,
@@ -54,4 +60,4 @@ std::size_t packed_c_string::serialize(std::byte* buf,
 	return size;
 }
 
-} //namespace pe_bliss::detail
+} //namespace pe_bliss

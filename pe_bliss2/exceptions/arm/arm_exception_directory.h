@@ -9,11 +9,13 @@
 #include <utility>
 #include <variant>
 
-#include "pe_bliss2/detail/error_list.h"
+#include "pe_bliss2/error_list.h"
 #include "pe_bliss2/detail/exceptions/image_runtime_function_entry.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/exceptions/arm_common/arm_common_unwind_info.h"
 #include "pe_bliss2/pe_error.h"
+
+#include "utilities/static_class.h"
 
 namespace pe_bliss::exceptions::arm
 {
@@ -98,7 +100,7 @@ public:
 	void set_allocation_size(std::uint16_t size);
 };
 
-struct int_registers
+struct int_registers final : utilities::static_class
 {
 	enum value : std::uint16_t
 	{
@@ -119,7 +121,7 @@ struct int_registers
 	};
 };
 
-struct fp_registers
+struct fp_registers final : utilities::static_class
 {
 	enum value : std::uint16_t
 	{
@@ -592,9 +594,9 @@ template<typename... Bases>
 using exception_directory_base = arm_common::exception_directory_base<runtime_function_base, Bases...>;
 
 using runtime_function = runtime_function_base<>;
-using runtime_function_details = runtime_function_base<detail::error_list>;
+using runtime_function_details = runtime_function_base<error_list>;
 
 using exception_directory = exception_directory_base<>;
-using exception_directory_details = exception_directory_base<detail::error_list>;
+using exception_directory_details = exception_directory_base<error_list>;
 
 } //namespace pe_bliss::exceptions::arm

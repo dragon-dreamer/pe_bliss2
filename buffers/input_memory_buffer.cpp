@@ -42,7 +42,7 @@ void input_memory_buffer::advance_rpos(std::int32_t offset)
 
 void input_memory_buffer::set_rpos(std::size_t pos)
 {
-	if (pos >= size_)
+	if (pos > size_)
 		throw std::system_error(utilities::generic_errc::buffer_overrun);
 
 	pos_ = pos;

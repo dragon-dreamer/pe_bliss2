@@ -51,26 +51,19 @@ std::error_code make_error_code(ref_buffer_errc e) noexcept
 }
 
 ref_buffer::ref_buffer()
-	: buffer_(std::in_place_type<copied_buffer>, std::make_shared<input_container_buffer>())
+	: buffer_(std::in_place_type<copied_buffer>,
+		std::make_shared<input_container_buffer>())
 {
 }
 
 ref_buffer::ref_buffer(const ref_buffer& other)
 {
-	if (const auto* buf = std::get_if<copied_buffer>(&other.buffer_))
-	{
-		std::get<copied_buffer>(buffer_).buffer->get_container()
-			= buf->buffer->get_container();
-	}
-	else
-	{
-		buffer_ = other.buffer_;
-	}
+	*this = other;
 }
 
 ref_buffer& ref_buffer::operator=(const ref_buffer& other)
 {
-	if (const auto* buf = std::get_if<copied_buffer>(&other.buffer_))
+	if (const auto* buf = std::get_if<copied_buffer>(&other.buffer_); buf)
 	{
 		auto buf_copy = std::make_shared<input_container_buffer>(
 			buf->buffer->absolute_offset(), buf->buffer->relative_offset());
@@ -89,7 +82,7 @@ void ref_buffer::deserialize(const input_buffer_ptr& buffer, bool copy_memory)
 	assert(buffer);
 
 	if (copy_memory)
-		read_buffer(*buffer, buffer->size(), 0);
+		read_buffer(*buffer);
 	else
 		buffer_.emplace<buffer_ref>(buffer);
 }
@@ -138,9 +131,9 @@ void ref_buffer::serialize(output_buffer_interface& buffer) const
 	);
 }
 
-void ref_buffer::read_buffer(input_buffer_interface& buf,
-	std::size_t size, std::size_t pos)
+void ref_buffer::read_buffer(input_buffer_interface& buf)
 {
+	auto size = buf.size();
 	auto copied_buf = std::make_shared<input_container_buffer>(
 		buf.absolute_offset(), buf.relative_offset());
 	auto& container = copied_buf->get_container();
@@ -149,7 +142,7 @@ void ref_buffer::read_buffer(input_buffer_interface& buf,
 	if (!size)
 		return;
 
-	buf.set_rpos(pos);
+	buf.set_rpos(0u);
 	auto read_bytes = buf.read(container.size(), container.data());
 	if (read_bytes != container.size())
 		throw std::system_error(ref_buffer_errc::unable_to_read_data);
@@ -159,13 +152,14 @@ void ref_buffer::read_buffer(input_buffer_interface& buf,
 
 void ref_buffer::copy_referenced_buffer()
 {
-	if (auto ptr = std::get_if<buffer_ref>(&buffer_))
-		read_buffer(*ptr->buffer, ptr->buffer->size(), 0);
+	if (auto ptr = std::get_if<buffer_ref>(&buffer_); ptr)
+		read_buffer(*ptr->buffer);
 }
 
 input_buffer_ptr ref_buffer::data() const
 {
-	return std::visit([this](const auto& buf) -> input_buffer_ptr { return buf.buffer; }, buffer_);
+	return std::visit([this](const auto& buf)
+		-> input_buffer_ptr { return buf.buffer; }, buffer_);
 }
 
 ref_buffer::container_type& ref_buffer::copied_data()
@@ -176,7 +170,7 @@ ref_buffer::container_type& ref_buffer::copied_data()
 
 const ref_buffer::container_type& ref_buffer::copied_data() const
 {
-	if (const auto* buf = std::get_if<copied_buffer>(&buffer_))
+	if (const auto* buf = std::get_if<copied_buffer>(&buffer_); buf)
 		return buf->buffer->get_container();
 	else
 		throw std::system_error(ref_buffer_errc::data_is_not_copied);

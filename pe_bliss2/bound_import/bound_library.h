@@ -4,9 +4,9 @@
 #include <list>
 
 #include "pe_bliss2/detail/bound_import/image_bound_import_descriptor.h"
-#include "pe_bliss2/detail/error_list.h"
-#include "pe_bliss2/detail/packed_c_string.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/error_list.h"
+#include "pe_bliss2/packed_c_string.h"
+#include "pe_bliss2/packed_struct.h"
 
 namespace pe_bliss::detail::bound_import
 {
@@ -15,7 +15,7 @@ template<typename Descriptor>
 class bound_library_base
 {
 public:
-	using packed_descriptor_type = detail::packed_struct<Descriptor>;
+	using packed_descriptor_type = packed_struct<Descriptor>;
 
 public:
 	[[nodiscard]]
@@ -31,20 +31,20 @@ public:
 	}
 
 	[[nodiscard]]
-	const detail::packed_c_string& get_library_name() const noexcept
+	const packed_c_string& get_library_name() const noexcept
 	{
 		return library_name_;
 	}
 
 	[[nodiscard]]
-	detail::packed_c_string& get_library_name() noexcept
+	packed_c_string& get_library_name() noexcept
 	{
 		return library_name_;
 	}
 
 private:
 	packed_descriptor_type descriptor_;
-	detail::packed_c_string library_name_;
+	packed_c_string library_name_;
 };
 
 } //namespace pe_bliss::detail::bound_import
@@ -57,7 +57,7 @@ using bound_library_reference = detail::bound_import::bound_library_base<
 
 class bound_library_reference_details
 	: public bound_library_reference
-	, public detail::error_list
+	, public error_list
 {
 };
 
@@ -88,7 +88,7 @@ private:
 using bound_library = bound_library_base<bound_library_reference>;
 class bound_library_details
 	: public bound_library_base<bound_library_reference_details>
-	, public detail::error_list
+	, public error_list
 {
 };
 

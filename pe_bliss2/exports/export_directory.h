@@ -4,9 +4,9 @@
 #include <string_view>
 #include <utility>
 
-#include "pe_bliss2/detail/error_list.h"
-#include "pe_bliss2/detail/packed_c_string.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/error_list.h"
+#include "pe_bliss2/packed_c_string.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/exports/image_export_directory.h"
 #include "pe_bliss2/exports/exported_address.h"
 #include "pe_bliss2/pe_types.h"
@@ -23,7 +23,7 @@ template<typename ExportedAddressList>
 class export_directory_base
 {
 public:
-	using packed_descriptor_type = detail::packed_struct<detail::exports::image_export_directory>;
+	using packed_descriptor_type = packed_struct<detail::exports::image_export_directory>;
 	using export_list_type = ExportedAddressList;
 	using exported_address_type = export_list_type::value_type;
 
@@ -39,13 +39,13 @@ public:
 	}
 
 	[[nodiscard]]
-	detail::packed_c_string& get_library_name() noexcept
+	packed_c_string& get_library_name() noexcept
 	{
 		return library_name_;
 	}
 
 	[[nodiscard]]
-	const detail::packed_c_string& get_library_name() const noexcept
+	const packed_c_string& get_library_name() const noexcept
 	{
 		return library_name_;
 	}
@@ -94,7 +94,7 @@ public:
 
 private:
 	packed_descriptor_type descriptor_;
-	detail::packed_c_string library_name_;
+	packed_c_string library_name_;
 	export_list_type exported_addresses_;
 };
 
@@ -102,7 +102,7 @@ using export_directory = export_directory_base<std::list<exported_address>>;
 
 class export_directory_details
 	: public export_directory_base<std::list<exported_address_details>>
-	, public detail::error_list
+	, public error_list
 {
 };
 

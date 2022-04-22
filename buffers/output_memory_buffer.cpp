@@ -1,5 +1,6 @@
 #include "buffers/output_memory_buffer.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <system_error>
 
@@ -16,7 +17,10 @@ std::size_t output_memory_buffer::size()
 
 void output_memory_buffer::write(std::size_t count, const std::byte* data)
 {
-	data_.insert(data_.cbegin() + pos_, data, data + count);
+	if (pos_ + count > data_.size())
+		data_.resize(pos_ + count);
+
+	std::copy(data, data + count, data_.data() + pos_);
 	pos_ += count;
 }
 
@@ -25,8 +29,8 @@ void output_memory_buffer::set_wpos(std::size_t pos)
 	if (pos >= data_.max_size())
 		throw std::system_error(utilities::generic_errc::buffer_overrun);
 
-	if (pos >= data_.size())
-		data_.resize(pos + 1);
+	if (pos > data_.size())
+		data_.resize(pos);
 
 	pos_ = pos;
 }

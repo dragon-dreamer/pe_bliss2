@@ -7,7 +7,7 @@
 #include <variant>
 
 #include "pe_bliss2/image.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/exceptions/exception_directory.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
@@ -92,7 +92,7 @@ void load_extended_unwind_record(const image& instance, const LoaderOptions& opt
 	auto last_rva = current_rva + byte_count;
 	while (current_rva < last_rva)
 	{
-		detail::packed_struct<std::byte> first_byte;
+		packed_struct<std::byte> first_byte;
 		current_rva += instance.struct_from_rva(current_rva.value(),
 			first_byte, options.include_headers, options.allow_virtual_data).packed_size;
 

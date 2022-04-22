@@ -32,7 +32,8 @@ void dump_section_characteristics(formatter& fmt, const pe_bliss::section_header
 
 void dump_section_name(formatter& fmt, const pe_bliss::section_header& header)
 {
-	fmt.print_string(header.get_name().c_str());
+	//TODO: can have nullbytes in the middle
+	fmt.print_string(std::string(header.get_name()).c_str());
 }
 
 void dump_section_header(formatter& fmt, const pe_bliss::section_header& header)

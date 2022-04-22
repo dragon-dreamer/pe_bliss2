@@ -8,7 +8,7 @@
 #include "buffers/output_buffer_interface.h"
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/data_directories.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
 #include "pe_bliss2/image.h"
 #include "utilities/generic_error.h"
@@ -96,7 +96,7 @@ std::uint32_t build_new_impl(buffers::output_buffer_interface& buf, Directory& r
 	assert(options.directory_rva);
 
 	auto base_wpos = buf.wpos();
-	detail::packed_struct<std::uint16_t> param;
+	packed_struct<std::uint16_t> param;
 	relocation_entry absolute;
 	for (auto& basereloc : relocs)
 	{

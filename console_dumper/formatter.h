@@ -20,10 +20,10 @@
 
 #include "buffers/input_buffer_interface.h"
 #include "buffers/input_memory_buffer.h"
-#include "pe_bliss2/detail/error_list.h"
-#include "pe_bliss2/detail/packed_byte_array.h"
-#include "pe_bliss2/detail/packed_byte_vector.h"
-#include "pe_bliss2/detail/packed_c_string.h"
+#include "pe_bliss2/error_list.h"
+#include "pe_bliss2/packed_byte_array.h"
+#include "pe_bliss2/packed_byte_vector.h"
+#include "pe_bliss2/packed_c_string.h"
 
 struct value_info
 {
@@ -148,6 +148,12 @@ public:
 	template<typename PackedValue>
 	void print_offsets(const PackedValue& value)
 	{
+		print_offsets(value.get_state().absolute_offset(),
+			value.get_state().relative_offset());
+	}
+
+	void print_offsets(const buffers::input_buffer_interface & value)
+	{
 		print_offsets(value.absolute_offset(), value.relative_offset());
 	}
 	
@@ -198,9 +204,9 @@ public:
 		}
 	}
 
-	void print_packed_string(const pe_bliss::detail::packed_c_string& str)
+	void print_packed_string(const pe_bliss::packed_c_string& str)
 	{
-		if (str.value().empty() && !str.absolute_offset())
+		if (str.value().empty() && !str.get_state().absolute_offset())
 			return;
 
 		print_offsets(str);
@@ -305,14 +311,14 @@ public:
 		format_array_names(obj.get(), infos, max_name_length, formatted_names, field_index);
 
 		field_index = 0;
-		std::size_t abs_offset = obj.absolute_offset();
-		std::size_t rel_offset = obj.relative_offset();
+		std::size_t abs_offset = obj.get_state().absolute_offset();
+		std::size_t rel_offset = obj.get_state().relative_offset();
 		print_structure_impl(obj.get(), infos, formatted_names, max_name_length,
 			max_field_offset, field_index, abs_offset, rel_offset);
 		stream_ << '\n';
 	}
 
-	void print_errors(const pe_bliss::detail::error_list& errors)
+	void print_errors(const pe_bliss::error_list& errors)
 	{
 		if (errors.get_errors().empty())
 			return;
@@ -332,28 +338,28 @@ public:
 
 	template<std::size_t MaxSize>
 	void print_bytes(const char* structure_name,
-		const pe_bliss::detail::packed_byte_array<MaxSize>& data,
+		const pe_bliss::packed_byte_array<MaxSize>& data,
 		std::size_t max_length = 16 * 10)
 	{
 		if (!data.physical_size())
 			return;
 
 		buffers::input_memory_buffer buf(data.value().data(), data.physical_size());
-		buf.set_absolute_offset(data.absolute_offset());
-		buf.set_relative_offset(data.relative_offset());
+		buf.set_absolute_offset(data.get_state().absolute_offset());
+		buf.set_relative_offset(data.get_state().relative_offset());
 		print_bytes(structure_name, buf, max_length);
 	}
 
 	void print_bytes(const char* structure_name,
-		const pe_bliss::detail::packed_byte_vector& data,
+		const pe_bliss::packed_byte_vector& data,
 		std::size_t max_length = 16 * 10)
 	{
 		if (!data.physical_size())
 			return;
 
 		buffers::input_memory_buffer buf(data.value().data(), data.physical_size());
-		buf.set_absolute_offset(data.absolute_offset());
-		buf.set_relative_offset(data.relative_offset());
+		buf.set_absolute_offset(data.get_state().absolute_offset());
+		buf.set_relative_offset(data.get_state().relative_offset());
 		print_bytes(structure_name, buf, max_length);
 	}
 
@@ -379,7 +385,8 @@ public:
 			while (length)
 			{
 				std::byte data{};
-				buf.read(1u, &data);
+				if (buf.read(1u, &data) != sizeof(data))
+					data = {};
 				stream_ << std::hex << std::setw(2) << std::setfill('0')
 					<< std::to_integer<std::uint32_t>(data) << ' ';
 				--length;

@@ -48,9 +48,6 @@
     <ClInclude Include="input_stream_buffer.h">
       <Filter>Header Files\input</Filter>
     </ClInclude>
-    <ClInclude Include="fixed_output_memory_buffer.h">
-      <Filter>Header Files\output</Filter>
-    </ClInclude>
     <ClInclude Include="output_buffer_interface.h">
       <Filter>Header Files\output</Filter>
     </ClInclude>
@@ -66,6 +63,9 @@
     <ClInclude Include="input_container_buffer.h">
       <Filter>Header Files\input</Filter>
     </ClInclude>
+    <ClInclude Include="input_buffer_state.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ref_buffer.cpp">
@@ -73,9 +73,6 @@
     </ClCompile>
     <ClCompile Include="buffer_copy.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="fixed_output_memory_buffer.cpp">
-      <Filter>Source Files\output</Filter>
     </ClCompile>
     <ClCompile Include="input_buffer_section.cpp">
       <Filter>Source Files\input</Filter>
@@ -96,6 +93,9 @@
       <Filter>Source Files\output</Filter>
     </ClCompile>
     <ClCompile Include="input_container_buffer.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="input_buffer_state.cpp">
       <Filter>Source Files\input</Filter>
     </ClCompile>
   </ItemGroup>

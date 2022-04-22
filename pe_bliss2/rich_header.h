@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <utility>
 
+#include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/dos_header.h"
 #include "pe_bliss2/dos_stub.h"
 #include "pe_bliss2/rich_compid.h"
@@ -19,7 +20,7 @@ enum class rich_header_errc
 	invalid_rich_header_offset = 1
 };
 
-struct rich_header_serialization_options
+struct [[nodiscard]] rich_header_serialization_options
 {
 	bool allow_dos_stub_buffer_extension = false;
 	bool recalculate_checksum = true;
@@ -28,7 +29,7 @@ struct rich_header_serialization_options
 
 std::error_code make_error_code(rich_header_errc) noexcept;
 
-class rich_header
+class [[nodiscard]] rich_header
 {
 public:
 	using compid_list = std::list<rich_compid>;
@@ -96,9 +97,10 @@ private:
 	std::size_t decode_checksum(const std::vector<std::byte>& data) noexcept;
 
 private:
-	static constexpr std::uint32_t dans_signature = 0x536E6144;
-	static constexpr std::uint32_t compid_alignment = 16;
-	static constexpr auto rich_compid_size = detail::packed_serialization<>::get_type_size<rich_compid>();
+	static constexpr std::uint32_t dans_signature = 0x536e6144u;
+	static constexpr std::uint32_t compid_alignment = 16u;
+	static constexpr auto rich_compid_size
+		= detail::packed_reflection::get_type_size<rich_compid>();
 
 private:
 	std::uint32_t checksum_ = 0;

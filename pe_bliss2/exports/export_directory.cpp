@@ -85,7 +85,7 @@ typename export_directory_base<ExportedAddressList>::exported_address_type&
 		std::string_view name, rva_type rva)
 {
 	auto& sym = add(rva_ordinal, rva);
-	sym.get_names().emplace_back().get_name() = name;
+	sym.get_names().emplace_back().get_name() = std::string(name);
 	return sym;
 }
 
@@ -105,7 +105,7 @@ typename export_directory_base<ExportedAddressList>::exported_address_type&
 		std::string_view name, std::string_view forwarded_name)
 {
 	auto& sym = add(rva_ordinal, name, 0u);
-	sym.get_forwarded_name() = forwarded_name;
+	sym.get_forwarded_name() = std::string(forwarded_name);
 	return sym;
 }
 

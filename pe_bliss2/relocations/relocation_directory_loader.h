@@ -4,8 +4,7 @@
 #include <system_error>
 #include <type_traits>
 
-#include "pe_bliss2/data_directories.h"
-#include "pe_bliss2/detail/error_list.h"
+#include "pe_bliss2/error_list.h"
 #include "pe_bliss2/relocations/base_relocation.h"
 
 namespace pe_bliss
@@ -34,7 +33,7 @@ struct loader_options
 struct relocation_directory
 {
 	base_relocation_details_list relocations;
-	detail::error_list errors;
+	error_list errors;
 };
 
 std::optional<relocation_directory> load(const image& instance,

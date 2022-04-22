@@ -1,5 +1,6 @@
 #include "pe_bliss2/dos_header.h"
 
+#include <exception>
 #include <system_error>
 
 #include "pe_bliss2/pe_error.h"
@@ -17,14 +18,17 @@ struct dos_header_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
+		using enum pe_bliss::dos_header_errc;
 		switch (static_cast<pe_bliss::dos_header_errc>(ev))
 		{
-		case pe_bliss::dos_header_errc::invalid_dos_header_signature:
+		case invalid_dos_header_signature:
 			return "Invalid DOS header signature";
-		case pe_bliss::dos_header_errc::unaligned_e_lfanew:
+		case unaligned_e_lfanew:
 			return "PE header signature is not DWORD-aligned";
-		case pe_bliss::dos_header_errc::invalid_e_lfanew:
+		case invalid_e_lfanew:
 			return "Too big or too small e_lfanew value";
+		case unable_to_read_dos_header:
+			return "Unable to read DOS header";
 		default:
 			return {};
 		}
@@ -43,7 +47,28 @@ std::error_code make_error_code(dos_header_errc e) noexcept
 	return { static_cast<int>(e), dos_header_error_category_instance };
 }
 
-pe_error_wrapper dos_header::validate(const dos_header_validation_options& options) const noexcept
+void dos_header::deserialize(buffers::input_buffer_interface& buf,
+	bool allow_virtual_memory)
+{
+	try
+	{
+		base_struct().deserialize(buf, allow_virtual_memory);
+	}
+	catch (...)
+	{
+		std::throw_with_nested(pe_error(
+			dos_header_errc::unable_to_read_dos_header));
+	}
+}
+
+void dos_header::serialize(buffers::output_buffer_interface& buf,
+	bool write_virtual_part) const
+{
+	base_struct().serialize(buf, write_virtual_part);
+}
+
+pe_error_wrapper dos_header::validate(
+	const dos_header_validation_options& options) const noexcept
 {
 	pe_error_wrapper result;
 	if (options.validate_magic && (result = validate_magic()))

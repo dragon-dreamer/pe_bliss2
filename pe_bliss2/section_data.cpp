@@ -1,5 +1,6 @@
 #include "pe_bliss2/section_data.h"
 
+#include <cstddef>
 #include <memory>
 
 #include "buffers/input_buffer_section.h"
@@ -17,11 +18,6 @@ void section_data::deserialize(const section_header& header,
 	const section_data_load_options& options)
 {
 	auto raw_size = header.get_raw_size(options.section_alignment);
-	if (!raw_size)
-	{
-		buffer_.deserialize(std::make_shared<buffers::input_buffer_section>(buffer, 0, 0), true);
-		return;
-	}
 
 	utilities::safe_uint<std::size_t> buffer_pos(options.image_loaded_to_memory
 		? header.base_struct()->virtual_address
@@ -31,42 +27,7 @@ void section_data::deserialize(const section_header& header,
 	auto buffer_section = std::make_shared<buffers::input_buffer_section>(
 		buffer, buffer_pos.value(), raw_size);
 	buffer_section->set_relative_offset(0);
-	buffer_.deserialize(buffer_section, options.copy_memory);
-}
-
-void section_data::serialize(buffers::output_buffer_interface& buffer) const
-{
-	buffer_.serialize(buffer);
-}
-
-void section_data::copy_referenced_buffer()
-{
-	buffer_.copy_referenced_buffer();
-}
-
-buffers::input_buffer_ptr section_data::data() const
-{
-	return buffer_.data();
-}
-
-buffers::ref_buffer::container_type& section_data::copied_data()
-{
-	return buffer_.copied_data();
-}
-
-const buffers::ref_buffer::container_type& section_data::copied_data() const
-{
-	return buffer_.copied_data();
-}
-
-bool section_data::empty() const noexcept
-{
-	return buffer_.empty();
-}
-
-std::size_t section_data::size() const noexcept
-{
-	return buffer_.size();
+	ref_buffer::deserialize(buffer_section, options.copy_memory);
 }
 
 } //namespace pe_bliss

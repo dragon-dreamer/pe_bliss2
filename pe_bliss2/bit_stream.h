@@ -10,24 +10,26 @@
 
 #include "utilities/generic_error.h"
 
-namespace pe_bliss::detail
+namespace pe_bliss
 {
 
 template<typename Container>
-class bit_stream
+class [[nodiscard]] bit_stream
 {
 public:
-	static constexpr std::size_t element_bit_count
-		= sizeof(typename Container::value_type) * CHAR_BIT;
-	using underlying_type = std::conditional_t<
+	using underlying_type = typename std::conditional_t<
 		std::is_enum_v<typename Container::value_type>,
-		std::underlying_type_t<typename Container::value_type>,
-		typename Container::value_type>;
+		std::underlying_type<typename Container::value_type>,
+		std::type_identity<typename Container::value_type>>::type;
+	static_assert(std::is_unsigned_v<underlying_type>);
+	static constexpr std::size_t element_bit_count
+		= sizeof(underlying_type) * CHAR_BIT;
 
 public:
-	explicit bit_stream(Container& container) noexcept
+	explicit bit_stream(Container& container)
+		noexcept(noexcept(container.size()))
 		: container_(container)
-		, bit_count_(container.size() * CHAR_BIT)
+		, bit_count_(container.size() * element_bit_count)
 	{
 	}
 
@@ -35,22 +37,26 @@ public:
 	[[nodiscard]]
 	T read(std::size_t count)
 	{
+		using longer_type = std::conditional_t<
+			(sizeof(underlying_type) > sizeof(T)),
+			underlying_type, T>;
+
 		if (count > bit_count_ - pos_ || count > sizeof(T) * CHAR_BIT)
 			throw std::system_error(utilities::generic_errc::buffer_overrun);
 
-		std::uint32_t result{};
+		T result{};
 		auto initial_count = count;
-		get_remaining_value_bits(result, count, initial_count);
+		get_remaining_value_bits<longer_type>(result, count, initial_count);
 
 		for (std::size_t i = 0, len = count / element_bit_count; i != len; ++i)
 		{
-			result |= static_cast<std::uint32_t>(container_[pos_ / element_bit_count])
+			result |= static_cast<longer_type>(container_[pos_ / element_bit_count])
 				<< (initial_count - count);
 			pos_ += element_bit_count;
 			count -= element_bit_count;
 		}
 
-		get_remaining_value_bits(result, count, initial_count);
+		get_remaining_value_bits<longer_type>(result, count, initial_count);
 		return result;
 	}
 
@@ -66,18 +72,16 @@ public:
 		return bit_count_;
 	}
 
-	void set_pos(std::size_t pos) noexcept
+	void set_pos(std::size_t pos)
 	{
+		if (pos > bit_count_)
+			throw std::system_error(utilities::generic_errc::buffer_overrun);
 		pos_ = pos;
 	}
 
-	void set_bit_count(std::size_t bit_count) noexcept
-	{
-		bit_count_ = bit_count;
-	}
-
 private:
-	void get_remaining_value_bits(std::uint32_t& result,
+	template<typename LongerType, typename T>
+	void get_remaining_value_bits(T& result,
 		std::size_t& count, std::size_t initial_count)
 		noexcept(noexcept(container_[0]))
 	{
@@ -91,10 +95,14 @@ private:
 
 		remaining_bits = (std::min)(remaining_bits, count);
 
-		auto bit_mask = (1u << remaining_bits) - 1u;
+		static constexpr auto max_bits = static_cast<std::size_t>(
+			std::numeric_limits<LongerType>::digits);
+		auto bit_mask = remaining_bits == max_bits
+			? LongerType(-1)
+			: (LongerType(1u) << remaining_bits) - LongerType(1u);
 		bit_mask <<= used_bits;
 
-		auto byte = static_cast<underlying_type>(container_[pos_ / element_bit_count]);
+		auto byte = static_cast<LongerType>(container_[pos_ / element_bit_count]);
 		result |= ((byte & bit_mask) >> used_bits) << (initial_count - count);
 
 		count -= remaining_bits;
@@ -107,4 +115,4 @@ private:
 	std::size_t pos_ = 0;
 };
 
-} //namespace pe_bliss::detail
+} //namespace pe_bliss

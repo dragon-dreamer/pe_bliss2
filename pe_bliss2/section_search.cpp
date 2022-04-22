@@ -1,14 +1,19 @@
 #include "pe_bliss2/section_search.h"
 
+#include <cstdint>
+#include <limits>
+
 #include "pe_bliss2/pe_error.h"
+#include "pe_bliss2/pe_types.h"
+#include "pe_bliss2/section_header.h"
 #include "utilities/generic_error.h"
 #include "utilities/math.h"
-#include "utilities/safe_uint.h"
 
 namespace pe_bliss::section_search
 {
 
-by_raw_offset::by_raw_offset(std::uint32_t raw_offset, std::uint32_t section_alignment,
+by_raw_offset::by_raw_offset(std::uint32_t raw_offset,
+	std::uint32_t section_alignment,
 	std::uint32_t data_size)
 	: raw_offset_(raw_offset)
 	, section_alignment_(section_alignment)
@@ -18,12 +23,16 @@ by_raw_offset::by_raw_offset(std::uint32_t raw_offset, std::uint32_t section_ali
 		throw pe_error(utilities::generic_errc::integer_overflow);
 }
 
-bool by_raw_offset::operator()(const section_header& header) const
+bool by_raw_offset::operator()(const section_header& header) const noexcept
 {
 	auto start_offset = header.get_pointer_to_raw_data();
-	utilities::safe_uint end_offset(start_offset);
-	end_offset += header.get_raw_size(section_alignment_);
-	return raw_offset_ >= start_offset && (raw_offset_ + data_size_ <= end_offset.value());
+	auto end_offset = start_offset;
+	if (!utilities::math::add_if_safe(end_offset,
+		header.get_raw_size(section_alignment_)))
+	{
+		end_offset = (std::numeric_limits<std::uint32_t>::max)();
+	}
+	return raw_offset_ >= start_offset && (raw_offset_ + data_size_ <= end_offset);
 }
 
 by_rva::by_rva(rva_type rva, std::uint32_t section_alignment,
@@ -36,15 +45,19 @@ by_rva::by_rva(rva_type rva, std::uint32_t section_alignment,
 		throw pe_error(utilities::generic_errc::integer_overflow);
 }
 
-bool by_rva::operator()(const section_header& header) const
+bool by_rva::operator()(const section_header& header) const noexcept
 {
 	auto start_rva = header.get_rva();
-	utilities::safe_uint end_rva(start_rva);
-	end_rva += header.get_virtual_size(section_alignment_);
-	return rva_ >= start_rva && (rva_ + data_size_ <= end_rva.value());
+	auto end_rva = start_rva;
+	if (!utilities::math::add_if_safe(end_rva,
+		header.get_virtual_size(section_alignment_)))
+	{
+		end_rva = (std::numeric_limits<rva_type>::max)();
+	}
+	return rva_ >= start_rva && (rva_ + data_size_ <= end_rva);
 }
 
-by_pointer::by_pointer(const section_header* ptr)
+by_pointer::by_pointer(const section_header* ptr) noexcept
 	: ptr_(ptr)
 {
 }

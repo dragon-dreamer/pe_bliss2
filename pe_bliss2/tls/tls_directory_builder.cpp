@@ -13,7 +13,6 @@
 #include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/data_directories.h"
 #include "pe_bliss2/detail/concepts.h"
-#include "pe_bliss2/detail/packed_struct.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"

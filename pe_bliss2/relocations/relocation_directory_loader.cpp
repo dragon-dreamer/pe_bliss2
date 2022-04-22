@@ -19,7 +19,7 @@ struct relocation_directory_loader_error_category : std::error_category
 {
 	const char* name() const noexcept override
 	{
-		return "import_directory_loader";
+		return "relocation_directory_loader";
 	}
 
 	std::string message(int ev) const override

@@ -20,14 +20,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="address_converter.h" />
+    <ClInclude Include="bit_stream.h" />
     <ClInclude Include="bound_import\bound_import_directory_builder.h" />
     <ClInclude Include="bound_import\bound_import_directory_loader.h" />
     <ClInclude Include="bound_import\bound_library.h" />
     <ClInclude Include="compid_database.h" />
     <ClInclude Include="data_directories.h" />
-    <ClInclude Include="detail\bit_stream.h" />
     <ClInclude Include="detail\bound_import\image_bound_import_descriptor.h" />
-    <ClInclude Include="detail\error_list.h" />
+    <ClInclude Include="detail\endian_convert.h" />
     <ClInclude Include="detail\exceptions\image_runtime_function_entry.h" />
     <ClInclude Include="detail\exports\image_export_directory.h" />
     <ClInclude Include="detail\image_data_directory.h" />
@@ -38,16 +38,15 @@
     <ClInclude Include="detail\imports\image_import_descriptor.h" />
     <ClInclude Include="detail\concepts.h" />
     <ClInclude Include="detail\load_config\image_load_config_directory.h" />
-    <ClInclude Include="detail\packed_byte_array.h" />
-    <ClInclude Include="detail\packed_byte_vector.h" />
+    <ClInclude Include="detail\packed_reflection.h" />
     <ClInclude Include="detail\packed_serialization.h" />
-    <ClInclude Include="detail\packed_c_string.h" />
-    <ClInclude Include="detail\packed_struct.h" />
     <ClInclude Include="detail\relocations\image_base_relocation.h" />
     <ClInclude Include="detail\packed_struct_base.h" />
+    <ClInclude Include="detail\resources\image_resource_directory.h" />
     <ClInclude Include="detail\tls\image_tls_directory.h" />
     <ClInclude Include="dos_header.h" />
     <ClInclude Include="dos_stub.h" />
+    <ClInclude Include="error_list.h" />
     <ClInclude Include="exceptions\arm64\arm64_exception_directory.h" />
     <ClInclude Include="exceptions\arm64\arm64_exception_directory_loader.h" />
     <ClInclude Include="exceptions\arm\arm_exception_directory.h" />
@@ -75,6 +74,11 @@
     <ClInclude Include="load_config\load_config_directory_loader.h" />
     <ClInclude Include="optional_header.h" />
     <ClInclude Include="overlay.h" />
+    <ClInclude Include="packed_byte_array.h" />
+    <ClInclude Include="packed_byte_vector.h" />
+    <ClInclude Include="packed_c_string.h" />
+    <ClInclude Include="packed_struct.h" />
+    <ClInclude Include="packed_utf16_string.h" />
     <ClInclude Include="pe_error.h" />
     <ClInclude Include="pe_section_error.h" />
     <ClInclude Include="pe_types.h" />
@@ -83,6 +87,8 @@
     <ClInclude Include="relocations\relocation_entry.h" />
     <ClInclude Include="relocations\relocation_directory_builder.h" />
     <ClInclude Include="relocations\relocation_directory_loader.h" />
+    <ClInclude Include="resources\resource_directory.h" />
+    <ClInclude Include="resources\resource_directory_loader.h" />
     <ClInclude Include="rich_compid.h" />
     <ClInclude Include="rich_header.h" />
     <ClInclude Include="section_data.h" />
@@ -99,11 +105,9 @@
     <ClCompile Include="bound_import\bound_import_directory_loader.cpp" />
     <ClCompile Include="compid_database.cpp" />
     <ClCompile Include="data_directories.cpp" />
-    <ClCompile Include="detail\packed_byte_array.cpp" />
-    <ClCompile Include="detail\packed_byte_vector.cpp" />
-    <ClCompile Include="detail\packed_c_string.cpp" />
     <ClCompile Include="dos_header.cpp" />
     <ClCompile Include="dos_stub.cpp" />
+    <ClCompile Include="error_list.cpp" />
     <ClCompile Include="exceptions\arm64\arm64_exception_directory.cpp" />
     <ClCompile Include="exceptions\arm64\arm64_exception_directory_loader.cpp" />
     <ClCompile Include="exceptions\arm\arm_exception_directory.cpp" />
@@ -153,10 +157,16 @@
     <ClCompile Include="load_config\load_config_directory.cpp" />
     <ClCompile Include="load_config\load_config_directory_loader.cpp" />
     <ClCompile Include="optional_header.cpp" />
+    <ClCompile Include="packed_byte_array.cpp" />
+    <ClCompile Include="packed_byte_vector.cpp" />
+    <ClCompile Include="packed_c_string.cpp" />
+    <ClCompile Include="packed_utf16_string.cpp" />
+    <ClCompile Include="pe_section_error.cpp" />
     <ClCompile Include="relocations\image_rebase.cpp" />
     <ClCompile Include="relocations\relocation_entry.cpp" />
     <ClCompile Include="relocations\relocation_directory_builder.cpp" />
     <ClCompile Include="relocations\relocation_directory_loader.cpp" />
+    <ClCompile Include="resources\resource_directory_loader.cpp" />
     <ClCompile Include="rich_header.cpp" />
     <ClCompile Include="section_data.cpp" />
     <ClCompile Include="section_header.cpp" />
@@ -193,26 +203,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -254,6 +264,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_77_0</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -271,6 +282,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_77_0</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -287,7 +299,8 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_77_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -305,6 +318,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_77_0</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>

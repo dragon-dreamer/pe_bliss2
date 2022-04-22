@@ -9,6 +9,12 @@
 #include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/pe_error.h"
 
+namespace buffers
+{
+class input_buffer_interface;
+class output_buffer_interface;
+} //namespace buffers
+
 namespace pe_bliss
 {
 
@@ -16,7 +22,8 @@ enum class dos_header_errc
 {
 	invalid_dos_header_signature = 1,
 	unaligned_e_lfanew,
-	invalid_e_lfanew
+	invalid_e_lfanew,
+	unable_to_read_dos_header
 };
 
 struct dos_header_validation_options
@@ -27,7 +34,6 @@ struct dos_header_validation_options
 
 std::error_code make_error_code(dos_header_errc) noexcept;
 
-//When deserializing, buffer should point to the start of the image
 class dos_header : public detail::packed_struct_base<detail::image_dos_header>
 {
 public:
@@ -39,8 +45,16 @@ public:
 	static constexpr std::uint32_t max_e_lfanew = 10485760; //10 Mb
 
 public:
+	//When deserializing, buffer should point to the start of the image
+	void deserialize(buffers::input_buffer_interface& buf,
+		bool allow_virtual_memory = false);
+	void serialize(buffers::output_buffer_interface& buf,
+		bool write_virtual_part = true) const;
+
+public:
 	[[nodiscard]]
-	pe_error_wrapper validate(const dos_header_validation_options& options) const noexcept;
+	pe_error_wrapper validate(
+		const dos_header_validation_options& options) const noexcept;
 	[[nodiscard]]
 	pe_error_wrapper validate_magic() const noexcept;
 	[[nodiscard]]

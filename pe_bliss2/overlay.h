@@ -5,8 +5,6 @@
 namespace pe_bliss
 {
 
-class overlay : public buffers::ref_buffer
-{
-};
+using overlay = buffers::ref_buffer;
 
 } //namespace pe_bliss

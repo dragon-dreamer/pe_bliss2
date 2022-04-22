@@ -235,7 +235,7 @@ void load_impl(const image& instance, const loader_options& options,
 	rva_type current_descriptor_rva, std::list<imported_library_details<Va>>& import_list,
 	Directory& directory)
 {
-	detail::packed_struct<Va> thunk;
+	packed_struct<Va> thunk;
 	while ((current_descriptor_rva = load_library(
 		instance, options, current_descriptor_rva, import_list, directory)))
 	{

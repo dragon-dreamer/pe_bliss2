@@ -3,8 +3,8 @@
 #include <cstdint>
 #include <list>
 
-#include "pe_bliss2/detail/error_list.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/error_list.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
 #include "pe_bliss2/relocations/relocation_entry.h"
 
@@ -16,7 +16,7 @@ class base_relocation_base
 {
 public:
 	using entry_list_type = std::list<RelocationEntry>;
-	using packed_descriptor_type = detail::packed_struct<detail::relocations::image_base_relocation>;
+	using packed_descriptor_type = packed_struct<detail::relocations::image_base_relocation>;
 
 public:
 	[[nodiscard]]
@@ -52,7 +52,7 @@ using base_relocation = base_relocation_base<relocation_entry>;
 
 class base_relocation_details
 	: public base_relocation_base<relocation_entry_details>
-	, public detail::error_list
+	, public error_list
 {
 };
 

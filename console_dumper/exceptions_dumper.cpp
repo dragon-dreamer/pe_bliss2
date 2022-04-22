@@ -70,9 +70,12 @@ const char* opcode_id_to_string(pe_bliss::exceptions::x64::opcode_id opcode_id) 
 	case set_fpreg: return "SET_FPREG";
 	case save_nonvol: return "SAVE_NONVOL";
 	case save_nonvol_far: return "SAVE_NONVOL_FAR";
+	case epilog: return "EPILOG";
+	case spare: return "SPARE";
 	case save_xmm128: return "SAVE_XMM128";
 	case save_xmm128_far: return "SAVE_XMM128_FAR";
 	case push_machframe: return "PUSH_MACHFRAME";
+	case set_fpreg_large: return "SET_FPREG_LARGE";
 	default: return "Unknown";
 	}
 }
@@ -162,7 +165,7 @@ void dump_unwind_code(formatter& fmt, const opcode_with_allocation_size auto& op
 	fmt.print_field_name("Allocation size");
 	fmt.get_stream() << ": ";
 	fmt.print_value(opcode.get_allocation_size(), true);
-	fmt.get_stream() << '\n';
+	fmt.get_stream() << "\n\n";
 }
 
 void dump_unwind_code(formatter& fmt, const opcode_with_stack_offset auto& opcode)
@@ -170,7 +173,7 @@ void dump_unwind_code(formatter& fmt, const opcode_with_stack_offset auto& opcod
 	fmt.print_field_name("Stack offset");
 	fmt.get_stream() << ": ";
 	fmt.print_value(opcode.get_stack_offset(), true);
-	fmt.get_stream() << '\n';
+	fmt.get_stream() << "\n\n";
 }
 
 void dump_unwind_code(formatter& fmt, const pe_bliss::exceptions::x64::push_machframe& opcode)
@@ -182,7 +185,7 @@ void dump_unwind_code(formatter& fmt, const pe_bliss::exceptions::x64::push_mach
 	fmt.print_field_name("RSP decrement");
 	fmt.get_stream() << ": ";
 	fmt.print_value(opcode.get_rsp_decrement(), true);
-	fmt.get_stream() << '\n';
+	fmt.get_stream() << "\n\n";
 }
 
 void dump_runtime_function(formatter& fmt, const pe_bliss::exceptions::x64::runtime_function_details& func,
@@ -225,7 +228,6 @@ void dump_runtime_function(formatter& fmt, const pe_bliss::exceptions::x64::runt
 				value_info{"node"}
 			});
 			dump_unwind_code(fmt, opcode);
-			fmt.get_stream() << '\n';
 		}, opcode_variant);
 	}
 

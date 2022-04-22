@@ -9,7 +9,7 @@
 #include "buffers/output_buffer_interface.h"
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/data_directories.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/data_directories.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/pe_types.h"
@@ -84,7 +84,7 @@ utilities::safe_uint<rva_type> build_new_functions_impl(buffers::output_buffer_i
 	{
 		while (prev_ordinal < symbol.get_rva_ordinal())
 		{
-			detail::packed_struct<rva_type>{}.serialize(buf, true);
+			packed_struct<rva_type>{}.serialize(buf, true);
 			++prev_ordinal;
 		}
 		prev_ordinal = symbol.get_rva_ordinal() + 1;
@@ -108,7 +108,7 @@ utilities::safe_uint<rva_type> build_new_functions_impl(buffers::output_buffer_i
 }
 
 template<typename Directory>
-utilities::safe_uint<rva_type> build_new_names_impl(buffers::output_buffer_interface& buf,
+void build_new_names_impl(buffers::output_buffer_interface& buf,
 	Directory& directory, utilities::safe_uint<rva_type> current_rva)
 {
 	auto& descriptor = directory.get_descriptor();
@@ -116,7 +116,7 @@ utilities::safe_uint<rva_type> build_new_names_impl(buffers::output_buffer_inter
 	if (directory.get_export_list().empty())
 	{
 		descriptor->address_of_names = current_rva.value();
-		return current_rva;
+		return;
 	}
 
 	auto symbol_names = sort_symbols(directory.get_export_list());
@@ -137,8 +137,6 @@ utilities::safe_uint<rva_type> build_new_names_impl(buffers::output_buffer_inter
 
 	for (const auto& sym : symbol_names)
 		sym.name->get_name()->serialize(buf, true);
-
-	return current_rva;
 }
 
 template<typename Directory>

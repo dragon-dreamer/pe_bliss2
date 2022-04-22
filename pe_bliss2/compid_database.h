@@ -3,11 +3,12 @@
 #include <cstdint>
 
 #include "pe_bliss2/rich_compid.h"
+#include "utilities/static_class.h"
 
 namespace pe_bliss
 {
 
-class compid_database
+class compid_database : utilities::static_class
 {
 public:
 	enum class tool_type
@@ -131,14 +132,23 @@ public:
 		visual_studio_2022_17_0_0_preview5_0,
 		visual_studio_2022_17_0_0_preview7_0,
 		visual_studio_2022_17_1_0_preview1_0,
+		visual_studio_2022_17_1_0_preview2_0,
+		visual_studio_2022_17_1_0_preview3_0,
+		visual_studio_2022_17_1_0_preview5_0,
+		visual_studio_2022_17_1_1 = visual_studio_2022_17_1_0_preview5_0,
+		visual_studio_2022_17_2_0_preview1_0,
+		visual_studio_2022_17_2_0_preview2_1,
+		visual_studio_2022_17_2_0_preview3_0,
 		unmarked_object,
 		unknown
 	};
 
-	struct product_type_info
+	struct [[nodiscard]] product_type_info
 	{
 		product_type type = product_type::unknown;
 		bool exact = true;
+		friend bool operator==(const product_type_info&,
+			const product_type_info&) noexcept = default;
 	};
 
 	[[nodiscard]]

@@ -11,6 +11,7 @@
 #include <tuple>
 
 #include "pe_bliss2/detail/image_dos_header.h"
+#include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/detail/packed_serialization.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/math.h"
@@ -23,7 +24,7 @@ struct rich_header_error_category : std::error_category
 {
 	const char* name() const noexcept override
 	{
-		return "image_signature";
+		return "rich_header";
 	}
 
 	std::string message(int ev) const override
@@ -144,7 +145,7 @@ std::uint32_t rich_header::calculate_checksum(const dos_stub::dos_stub_data_type
 
 	static constexpr auto dos_header_data_size = std::tuple_size_v<decltype(dos_header_data)>;
 	static_assert((dos_header_data_size % sizeof(std::uint32_t)) == 0);
-	static constexpr auto e_lfanew_offset = detail::packed_serialization<>
+	static constexpr auto e_lfanew_offset = detail::packed_reflection
 		::get_field_offset<&detail::image_dos_header::e_lfanew>();
 
 	std::uint32_t checksum = static_cast<std::uint32_t>(dos_header_data_size + rich_header_offset);

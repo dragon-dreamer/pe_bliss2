@@ -2,11 +2,13 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <system_error>
+#include <type_traits>
 #include <vector>
 
 #include "pe_bliss2/detail/image_data_directory.h"
-#include "pe_bliss2/detail/packed_serialization.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/detail/packed_reflection.h"
+#include "pe_bliss2/packed_struct.h"
 
 namespace buffers
 {
@@ -17,13 +19,20 @@ class output_buffer_interface;
 namespace pe_bliss
 {
 
-class data_directories
+enum class data_directories_errc
+{
+	unable_to_read_data_directory = 1
+};
+
+std::error_code make_error_code(data_directories_errc) noexcept;
+
+class [[nodiscard]] data_directories
 {
 public:
-	static constexpr auto directory_packed_size = detail::packed_serialization<>
-		::template get_type_size<detail::image_data_directory>();
+	static constexpr auto directory_packed_size = detail::packed_reflection
+		::get_type_size<detail::image_data_directory>();
 
-	using base_struct_type = detail::packed_struct<detail::image_data_directory>;
+	using base_struct_type = packed_struct<detail::image_data_directory>;
 	using directories_list = std::vector<base_struct_type>;
 
 public:
@@ -175,3 +184,9 @@ private:
 };
 
 } //namespace pe_bliss
+
+namespace std
+{
+template<>
+struct is_error_code_enum<pe_bliss::data_directories_errc> : true_type {};
+} //namespace std

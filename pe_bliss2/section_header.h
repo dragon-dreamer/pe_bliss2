@@ -1,20 +1,28 @@
 #pragma once
 
 #include <cstdint>
-#include <string>
+#include <string_view>
 
 #include "pe_bliss2/detail/image_section_header.h"
 #include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/pe_types.h"
 
+#include "utilities/static_class.h"
+
+namespace buffers
+{
+class input_buffer_interface;
+class output_buffer_interface;
+} //namespace buffers
+
 namespace pe_bliss
 {
 
-//When deserializing, buf should point to the image_section_header structure
-class section_header : public detail::packed_struct_base<detail::image_section_header>
+class [[nodiscard]] section_header
+	: public detail::packed_struct_base<detail::image_section_header>
 {
 public:
-	struct characteristics
+	struct characteristics final : utilities::static_class
 	{
 		enum value : std::uint32_t
 		{
@@ -36,14 +44,19 @@ public:
 	static constexpr std::uint32_t two_gb_size = 1024u * 1024u * 1024u * 2u;
 
 public:
+	//When deserializing, buf should point to the image_section_header structure
+	void deserialize(buffers::input_buffer_interface& buf,
+		bool allow_virtual_memory = false);
+	void serialize(buffers::output_buffer_interface& buf,
+		bool write_virtual_part = true) const;
+
+public:
 	[[nodiscard]]
-	std::string get_name() const;
+	std::string_view get_name() const noexcept;
+	section_header& set_name(std::string_view name);
 
 	[[nodiscard]]
-	characteristics::value get_characteristics() const noexcept
-	{
-		return static_cast<characteristics::value>(base_struct()->characteristics);
-	}
+	characteristics::value get_characteristics() const noexcept;
 
 	[[nodiscard]]
 	std::uint32_t get_raw_size(std::uint32_t section_alignment) const noexcept;
@@ -58,7 +71,7 @@ public:
 
 public:
 	[[nodiscard]]
-	bool check_raw_size() const noexcept;
+	bool check_raw_size(std::uint32_t section_alignment) const noexcept;
 	[[nodiscard]]
 	bool check_virtual_size() const noexcept;
 	[[nodiscard]]
@@ -94,9 +107,14 @@ public:
 	section_header& set_discardable(bool discardable) noexcept;
 	section_header& set_non_pageable(bool non_pageable) noexcept;
 	section_header& set_non_cacheable(bool non_cacheable) noexcept;
+	section_header& set_characteristics(characteristics::value value) noexcept;
 
 public:
-	void set_virtual_size(std::uint32_t virtual_size);
+	section_header& set_virtual_size(std::uint32_t virtual_size);
+	section_header& set_raw_size(std::uint32_t raw_size) noexcept;
+	section_header& set_pointer_to_raw_data(
+		std::uint32_t pointer_to_raw_data) noexcept;
+	section_header& set_rva(std::uint32_t rva) noexcept;
 
 public:
 	[[nodiscard]]

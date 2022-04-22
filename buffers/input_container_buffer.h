@@ -9,7 +9,7 @@
 namespace buffers
 {
 
-class input_container_buffer : public input_buffer_interface
+class [[nodiscard]] input_container_buffer : public input_buffer_interface
 {
 public:
 	using container_type = std::vector<std::byte>;
@@ -33,6 +33,16 @@ public:
 	virtual std::size_t absolute_offset() const noexcept override;
 	[[nodiscard]]
 	virtual std::size_t relative_offset() const noexcept override;
+	
+	void set_absolute_offset(std::size_t absolute_offset) noexcept
+	{
+		absolute_offset_ = absolute_offset;
+	}
+
+	void set_relative_offset(std::size_t relative_offset) noexcept
+	{
+		relative_offset_ = relative_offset;
+	}
 
 	[[nodiscard]]
 	container_type& get_container() noexcept

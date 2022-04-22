@@ -8,7 +8,7 @@
 namespace
 {
 
-struct dos_stob_error_category : std::error_category
+struct dos_stub_error_category : std::error_category
 {
 	const char* name() const noexcept override
 	{
@@ -27,7 +27,7 @@ struct dos_stob_error_category : std::error_category
 	}
 };
 
-const dos_stob_error_category dos_stob_error_category_instance;
+const dos_stub_error_category dos_stub_error_category_instance;
 
 } //namespace
 
@@ -36,7 +36,7 @@ namespace pe_bliss
 
 std::error_code make_error_code(dos_stub_errc e) noexcept
 {
-	return { static_cast<int>(e), dos_stob_error_category_instance };
+	return { static_cast<int>(e), dos_stub_error_category_instance };
 }
 
 void dos_stub::deserialize(buffers::input_buffer_interface& buf, std::size_t e_lfanew)

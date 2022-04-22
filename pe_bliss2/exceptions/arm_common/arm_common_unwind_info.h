@@ -11,8 +11,8 @@
 
 #include "boost/endian/conversion.hpp"
 
-#include "pe_bliss2/detail/packed_byte_array.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_byte_array.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
 
@@ -44,7 +44,7 @@ template<bool HasCondition>
 class epilog_info
 {
 public:
-	using descriptor_type = detail::packed_struct<std::uint32_t>;
+	using descriptor_type = packed_struct<std::uint32_t>;
 	using epilog_start_index_type = std::conditional_t<HasCondition, std::uint8_t, std::uint16_t>;
 
 public:
@@ -106,7 +106,7 @@ template<std::size_t Length>
 class unwind_code_common
 {
 public:
-	using descriptor_type = detail::packed_byte_array<Length>;
+	using descriptor_type = packed_byte_array<Length>;
 
 public:
 	static constexpr auto length = Length;
@@ -228,7 +228,7 @@ class runtime_function_base
 	: public Bases...
 {
 public:
-	using descriptor_type = detail::packed_struct<RuntimeFunctionEntry>;
+	using descriptor_type = packed_struct<RuntimeFunctionEntry>;
 	using unwind_info_type = std::variant<std::monostate, PackedUnwindData, ExtendedUnwindRecord>;
 
 public:
@@ -271,7 +271,7 @@ template<typename EpilogInfo, typename UnwindRecordOptions>
 class extended_unwind_record
 {
 public:
-	using main_header_type = detail::packed_struct<std::uint32_t>;
+	using main_header_type = packed_struct<std::uint32_t>;
 	//A list of information about epilog scopes, packed one to a word,
 	//comes after the header and optional extended header.
 	//They're stored in order of increasing starting offset.
@@ -282,7 +282,7 @@ public:
 
 	//XXX: there is some additional compiler-specific unwind data after the handler RVA.
 	//dumpbin outputs it, but it is undocumented.
-	using exception_handler_rva_type = detail::packed_struct<std::uint32_t>;
+	using exception_handler_rva_type = packed_struct<std::uint32_t>;
 
 public:
 	static constexpr auto function_length_multiplier = UnwindRecordOptions::function_length_multiplier;

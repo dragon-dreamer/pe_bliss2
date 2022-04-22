@@ -8,8 +8,8 @@
 #include "buffers/ref_buffer.h"
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/detail/tls/image_tls_directory.h"
-#include "pe_bliss2/detail/error_list.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/error_list.h"
+#include "pe_bliss2/packed_struct.h"
 
 namespace pe_bliss::tls
 {
@@ -19,10 +19,10 @@ class tls_directory_base
 {
 public:
 	using va_type = decltype(Directory::address_of_callbacks);
-	using packed_descriptor_type = detail::packed_struct<Directory>;
+	using packed_descriptor_type = packed_struct<Directory>;
 
 	using index_type = std::uint32_t;
-	using callback_type = detail::packed_struct<va_type>;
+	using callback_type = packed_struct<va_type>;
 	using callback_list_type = std::list<callback_type>;
 
 public:
@@ -77,7 +77,7 @@ private:
 template<typename Directory>
 class tls_directory_details_base
 	: public tls_directory_base<Directory>
-	, public detail::error_list
+	, public error_list
 {
 public:
 	using tls_directory_base<Directory>::tls_directory_base;

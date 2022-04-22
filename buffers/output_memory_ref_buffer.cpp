@@ -26,7 +26,7 @@ void output_memory_ref_buffer::write(std::size_t count, const std::byte* data)
 
 void output_memory_ref_buffer::set_wpos(std::size_t pos)
 {
-	if (pos >= size_)
+	if (pos > size_)
 		throw std::system_error(utilities::generic_errc::buffer_overrun);
 
 	pos_ = pos;

@@ -12,10 +12,9 @@
 #include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/data_directories.h"
 #include "pe_bliss2/detail/concepts.h"
-#include "pe_bliss2/detail/packed_c_string.h"
-#include "pe_bliss2/detail/packed_byte_array.h"
-#include "pe_bliss2/detail/packed_byte_vector.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_byte_array.h"
+#include "pe_bliss2/packed_byte_vector.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/dos_header.h"
 #include "pe_bliss2/dos_stub.h"
 #include "pe_bliss2/image_signature.h"
@@ -30,6 +29,15 @@
 
 namespace pe_bliss
 {
+
+class packed_c_string;
+class packed_utf16_string;
+namespace detail
+{
+template<typename T>
+concept packed_string_type = std::is_same_v<T, packed_utf16_string>
+	|| std::is_same_v<T, packed_c_string>;
+} //namespace detail
 
 enum class image_errc
 {
@@ -268,36 +276,42 @@ public:
 		bool include_headers = false);
 
 public:
+	template<detail::packed_string_type PackedString = packed_c_string>
 	[[nodiscard]]
-	detail::packed_c_string string_from_rva(rva_type rva,
+	PackedString string_from_rva(rva_type rva,
 		bool include_headers = false, bool allow_virtual_data = false) const;
-	void string_from_rva(rva_type rva, detail::packed_c_string& str,
+	template<detail::packed_string_type PackedString = packed_c_string>
+	void string_from_rva(rva_type rva, PackedString& str,
 		bool include_headers = false, bool allow_virtual_data = false) const;
 
+	template<detail::packed_string_type PackedString = packed_c_string>
 	[[nodiscard]]
-	detail::packed_c_string string_from_va(std::uint32_t va,
+	PackedString string_from_va(std::uint32_t va,
 		bool include_headers = false, bool allow_virtual_data = false) const;
-	void string_from_va(std::uint32_t va, detail::packed_c_string& str,
+	template<detail::packed_string_type PackedString = packed_c_string>
+	void string_from_va(std::uint32_t va, PackedString& str,
 		bool include_headers = false, bool allow_virtual_data = false) const;
 
+	template<detail::packed_string_type PackedString = packed_c_string>
 	[[nodiscard]]
-	detail::packed_c_string string_from_va(std::uint64_t va,
+	PackedString string_from_va(std::uint64_t va,
 		bool include_headers = false, bool allow_virtual_data = false) const;
-	void string_from_va(std::uint64_t va, detail::packed_c_string& str,
+	template<detail::packed_string_type PackedString = packed_c_string>
+	void string_from_va(std::uint64_t va, PackedString& str,
 		bool include_headers = false, bool allow_virtual_data = false) const;
 
 public:
 	template<std::size_t MaxSize>
-	detail::packed_byte_array<MaxSize> byte_array_from_rva(rva_type rva,
+	packed_byte_array<MaxSize> byte_array_from_rva(rva_type rva,
 		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
 	{
-		detail::packed_byte_array<MaxSize> result;
+		packed_byte_array<MaxSize> result;
 		byte_array_from_rva(rva, result, size, include_headers, allow_virtual_data);
 		return result;
 	}
 
 	template<std::size_t MaxSize>
-	void byte_array_from_rva(rva_type rva, detail::packed_byte_array<MaxSize>& arr,
+	void byte_array_from_rva(rva_type rva, packed_byte_array<MaxSize>& arr,
 		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
 	{
 		auto buf = section_data_from_rva(rva, size, include_headers, allow_virtual_data);
@@ -305,7 +319,7 @@ public:
 	}
 
 	template<detail::executable_pointer Va, std::size_t MaxSize>
-	detail::packed_byte_array<MaxSize> byte_array_from_va(Va va,
+	packed_byte_array<MaxSize> byte_array_from_va(Va va,
 		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
 	{
 		return byte_array_from_rva(address_converter(*this).va_to_rva(va),
@@ -313,7 +327,7 @@ public:
 	}
 
 	template<detail::executable_pointer Va, std::size_t MaxSize>
-	void byte_array_from_va(Va va, detail::packed_byte_array<MaxSize>& arr,
+	void byte_array_from_va(Va va, packed_byte_array<MaxSize>& arr,
 		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
 	{
 		byte_array_from_rva(address_converter(*this).va_to_rva(va), arr, size,
@@ -321,13 +335,13 @@ public:
 	}
 
 public:
-	detail::packed_byte_vector byte_vector_from_rva(rva_type rva,
+	packed_byte_vector byte_vector_from_rva(rva_type rva,
 		std::uint32_t size, bool include_headers, bool allow_virtual_data) const;
-	void byte_vector_from_rva(rva_type rva, detail::packed_byte_vector& arr,
+	void byte_vector_from_rva(rva_type rva, packed_byte_vector& arr,
 		std::uint32_t size, bool include_headers, bool allow_virtual_data) const;
 
 	template<detail::executable_pointer Va>
-	detail::packed_byte_vector byte_vector_from_va(Va va,
+	packed_byte_vector byte_vector_from_va(Va va,
 		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
 	{
 		return byte_vector_from_rva(address_converter(*this).va_to_rva(va),
@@ -335,7 +349,7 @@ public:
 	}
 
 	template<detail::executable_pointer Va>
-	void byte_vector_from_va(Va va, detail::packed_byte_vector& arr,
+	void byte_vector_from_va(Va va, packed_byte_vector& arr,
 		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
 	{
 		byte_vector_from_rva(address_converter(*this).va_to_rva(va), arr, size,
@@ -345,10 +359,10 @@ public:
 public:
 	template<detail::standard_layout T>
 	[[nodiscard]]
-	detail::packed_struct<T> struct_from_rva(uint32_t rva, bool include_headers = false,
+	packed_struct<T> struct_from_rva(uint32_t rva, bool include_headers = false,
 		bool allow_virtual_data = false) const
 	{
-		detail::packed_struct<T> value{};
+		packed_struct<T> value{};
 		auto buf = section_data_from_rva(rva,
 			value.packed_size, include_headers, allow_virtual_data);
 		value.deserialize(*buf, allow_virtual_data);
@@ -357,10 +371,10 @@ public:
 
 	template<detail::standard_layout T, detail::executable_pointer Va>
 	[[nodiscard]]
-	detail::packed_struct<T> struct_from_va(Va va, bool include_headers = false,
+	packed_struct<T> struct_from_va(Va va, bool include_headers = false,
 		bool allow_virtual_data = false) const
 	{
-		detail::packed_struct<T> value{};
+		packed_struct<T> value{};
 		auto buf = section_data_from_va(va,
 			value.packed_size, include_headers, allow_virtual_data);
 		value.deserialize(*buf, allow_virtual_data);
@@ -368,7 +382,7 @@ public:
 	}
 
 	template<detail::standard_layout T>
-	detail::packed_struct<T>& struct_from_rva(uint32_t rva, detail::packed_struct<T>& value,
+	packed_struct<T>& struct_from_rva(uint32_t rva, packed_struct<T>& value,
 		bool include_headers = false, bool allow_virtual_data = false) const
 	{
 		auto buf = section_data_from_rva(rva,
@@ -378,7 +392,7 @@ public:
 	}
 
 	template<detail::executable_pointer Va, detail::standard_layout T>
-	detail::packed_struct<T>& struct_from_va(Va va, detail::packed_struct<T>& value,
+	packed_struct<T>& struct_from_va(Va va, packed_struct<T>& value,
 		bool include_headers = false, bool allow_virtual_data = false) const
 	{
 		auto buf = section_data_from_va(va,
@@ -389,7 +403,7 @@ public:
 
 public:
 	template<detail::standard_layout T>
-	rva_type struct_to_rva(uint32_t rva, const detail::packed_struct<T>& value,
+	rva_type struct_to_rva(uint32_t rva, const packed_struct<T>& value,
 		bool include_headers = false, bool write_virtual_part = false,
 		bool cut_if_does_not_fit = false)
 	{
@@ -409,7 +423,7 @@ public:
 	}
 
 	template<detail::executable_pointer Va, detail::standard_layout T>
-	Va struct_to_va(Va va, const detail::packed_struct<T>& value,
+	Va struct_to_va(Va va, const packed_struct<T>& value,
 		bool include_headers = false, bool write_virtual_part = false,
 		bool cut_if_does_not_fit = false)
 	{
@@ -432,7 +446,7 @@ public:
 	rva_type struct_to_rva(uint32_t rva, const T& value, bool include_headers = false,
 		bool cut_if_does_not_fit = false)
 	{
-		detail::packed_struct wrapper(value);
+		packed_struct wrapper(value);
 		return struct_to_rva(rva, wrapper, include_headers, true, cut_if_does_not_fit);
 	}
 
@@ -440,13 +454,13 @@ public:
 	Va struct_to_va(Va va, const T& value, bool include_headers = false,
 		bool cut_if_does_not_fit = false)
 	{
-		detail::packed_struct wrapper(value);
+		packed_struct wrapper(value);
 		return struct_to_va(va, wrapper, include_headers, true, cut_if_does_not_fit);
 	}
 
 public:
 	template<detail::standard_layout T>
-	rva_type struct_to_file_offset(const detail::packed_struct<T>& value,
+	rva_type struct_to_file_offset(const packed_struct<T>& value,
 		bool include_headers = false, bool write_virtual_part = false)
 	{
 		return struct_to_rva(absolute_offset_to_rva(value),
@@ -454,15 +468,19 @@ public:
 	}
 
 public:
-	rva_type string_to_rva(rva_type rva, const detail::packed_c_string& str,
+	template<detail::packed_string_type PackedString = packed_c_string>
+	rva_type string_to_rva(rva_type rva, const PackedString& str,
 		bool include_headers = false, bool write_virtual_part = false);
-	std::uint32_t string_to_va(std::uint32_t va, const detail::packed_c_string& str,
+	template<detail::packed_string_type PackedString = packed_c_string>
+	std::uint32_t string_to_va(std::uint32_t va, const PackedString& str,
 		bool include_headers = false, bool write_virtual_part = false);
-	std::uint64_t string_to_va(std::uint64_t va, const detail::packed_c_string& str,
+	template<detail::packed_string_type PackedString = packed_c_string>
+	std::uint64_t string_to_va(std::uint64_t va, const PackedString& str,
 		bool include_headers = false, bool write_virtual_part = false);
 
 public:
-	rva_type string_to_file_offset(const detail::packed_c_string& str,
+	template<detail::packed_string_type PackedString = packed_c_string>
+	rva_type string_to_file_offset(const PackedString& str,
 		bool include_headers = false, bool write_virtual_part = false);
 
 public:
@@ -527,9 +545,11 @@ public:
 	rva_type absolute_offset_to_rva(const PackedStruct& obj) const
 	{
 		utilities::safe_uint<std::uint32_t> offset;
-		offset += obj.absolute_offset();
+		offset += obj.get_state().absolute_offset();
 		return file_offset_to_rva(offset.value());
 	}
+
+	rva_type absolute_offset_to_rva(const buffers::input_buffer_interface& buf) const;
 
 public:
 	void update_number_of_sections();

@@ -5,7 +5,7 @@
 #include <system_error>
 
 #include "pe_bliss2/data_directories.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/pe_types.h"
 
@@ -51,7 +51,7 @@ Directory load_impl(const image& instance, const loader_options& options)
 	if (descriptor->address_of_callbacks)
 	{
 		using va_type = typename Directory::va_type;
-		detail::packed_struct<va_type> callback_va{};
+		packed_struct<va_type> callback_va{};
 		while ((callback_va = instance.struct_from_va<va_type>(descriptor->address_of_callbacks,
 			options.include_headers, options.allow_virtual_data)).get())
 		{

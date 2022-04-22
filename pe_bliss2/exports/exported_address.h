@@ -6,18 +6,18 @@
 #include <string>
 #include <utility>
 
-#include "pe_bliss2/detail/error_list.h"
-#include "pe_bliss2/detail/packed_c_string.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/error_list.h"
+#include "pe_bliss2/packed_c_string.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_types.h"
 
 namespace pe_bliss::exports
 {
 
 using ordinal_type = std::uint16_t;
-using packed_ordinal_type = detail::packed_struct<ordinal_type>;
-using packed_rva_type = detail::packed_struct<rva_type>;
-using optional_c_string = std::optional<pe_bliss::detail::packed_c_string>;
+using packed_ordinal_type = packed_struct<ordinal_type>;
+using packed_rva_type = packed_struct<rva_type>;
+using optional_c_string = std::optional<packed_c_string>;
 
 class exported_name
 {
@@ -74,7 +74,7 @@ private:
 	packed_ordinal_type name_ordinal_{};
 };
 
-class exported_name_details : public exported_name, public detail::error_list
+class exported_name_details : public exported_name, public error_list
 {
 public:
 	using exported_name::exported_name;
@@ -102,13 +102,13 @@ public:
 	}
 
 	[[nodiscard]]
-	detail::packed_struct<rva_type>& get_rva() noexcept
+	packed_struct<rva_type>& get_rva() noexcept
 	{
 		return rva_;
 	}
 
 	[[nodiscard]]
-	const detail::packed_struct<rva_type>& get_rva() const noexcept
+	const packed_struct<rva_type>& get_rva() const noexcept
 	{
 		return rva_;
 	}
@@ -139,7 +139,7 @@ public:
 
 private:
 	ordinal_type rva_ordinal_{};
-	detail::packed_struct<rva_type> rva_{};
+	packed_struct<rva_type> rva_{};
 	ExportedNameList names_;
 	optional_c_string forwarded_name_;
 };
@@ -148,7 +148,7 @@ using exported_address = exported_address_base<exported_name_list>;
 
 class exported_address_details
 	: public exported_address_base<exported_name_details_list>
-	, public detail::error_list
+	, public error_list
 {
 };
 

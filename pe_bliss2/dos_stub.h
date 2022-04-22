@@ -20,14 +20,16 @@ enum class dos_stub_errc
 
 std::error_code make_error_code(dos_stub_errc) noexcept;
 
-class dos_stub
+//When deserializing, buf should point to the beginning of the DOS stub
+class [[nodiscard]] dos_stub
 {
 public:
 	using dos_stub_data_type = std::vector<std::byte>;
 
 public:
 	//When deserializing, buf should point to DOS stub start (right after DOS header)
-	void deserialize(buffers::input_buffer_interface& buf, std::size_t e_lfanew);
+	void deserialize(buffers::input_buffer_interface& buf,
+		std::size_t e_lfanew);
 
 	[[nodiscard]] dos_stub_data_type& data() noexcept
 	{

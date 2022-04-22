@@ -5,7 +5,7 @@
 #include <system_error>
 #include <tuple>
 
-#include "pe_bliss2/detail/packed_serialization.h"
+#include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/pe_error.h"
 
 namespace
@@ -15,7 +15,7 @@ struct load_config_error_category : std::error_category
 {
 	const char* name() const noexcept override
 	{
-		return "file_header";
+		return "load_config";
 	}
 
 	std::string message(int ev) const override
@@ -55,18 +55,18 @@ using namespace pe_bliss::load_config;
 
 template<typename Descriptor>
 constexpr std::array field_offsets{
-	detail::packed_serialization<>::get_field_offset<&Descriptor::structured_exceptions>(),
-	detail::packed_serialization<>::get_field_offset<&Descriptor::cf_guard>(),
-	detail::packed_serialization<>::get_field_offset<&Descriptor::code_integrity>(),
-	detail::packed_serialization<>::get_field_offset<&Descriptor::cf_guard_ex>(),
-	detail::packed_serialization<>::get_field_offset<&Descriptor::hybrid_pe>(),
-	detail::packed_serialization<>::get_field_offset<&Descriptor::rf_guard>(),
-	detail::packed_serialization<>::get_field_offset<&Descriptor::rf_guard_ex>(),
-	detail::packed_serialization<>::get_field_offset<&Descriptor::enclave>(),
-	detail::packed_serialization<>::get_field_offset<&Descriptor::volatile_metadata>(),
-	detail::packed_serialization<>::get_field_offset<&Descriptor::guard_exception_handling>(),
-	detail::packed_serialization<>::get_field_offset<&Descriptor::extended_flow_guard>(),
-	detail::packed_serialization<>::get_field_offset<&Descriptor::mode>()
+	detail::packed_reflection::get_field_offset<&Descriptor::structured_exceptions>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::cf_guard>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::code_integrity>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::cf_guard_ex>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::hybrid_pe>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::rf_guard>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::rf_guard_ex>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::enclave>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::volatile_metadata>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::guard_exception_handling>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::extended_flow_guard>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::mode>()
 };
 
 constexpr std::array versions{
@@ -267,8 +267,8 @@ std::int32_t arm64x_dynamic_relocation_add_delta_base<Bases...>::get_delta() con
 
 template class load_config_directory_impl<detail::load_config::image_load_config_directory32>;
 template class load_config_directory_impl<detail::load_config::image_load_config_directory64>;
-template class load_config_directory_impl<detail::load_config::image_load_config_directory32, detail::error_list>;
-template class load_config_directory_impl<detail::load_config::image_load_config_directory64, detail::error_list>;
+template class load_config_directory_impl<detail::load_config::image_load_config_directory32, error_list>;
+template class load_config_directory_impl<detail::load_config::image_load_config_directory64, error_list>;
 
 const char* version_to_min_required_windows_version(version value) noexcept
 {
@@ -300,17 +300,17 @@ std::uint32_t chpe_x86_metadata_base<Bases...>::get_metadata_size() const noexce
 
 	if (version <= 1u)
 	{
-		return detail::packed_serialization<>::get_field_offset<
+		return detail::packed_reflection::get_field_offset<
 			&detail::load_config::image_chpe_metadata_x86::compiler_iat_pointer>();
 	}
 
 	if (version == 2u)
 	{
-		return detail::packed_serialization<>::get_field_offset<
+		return detail::packed_reflection::get_field_offset<
 			&detail::load_config::image_chpe_metadata_x86::wow_a64_rdtsc_function_pointer>();
 	}
 
-	return detail::packed_serialization<>::get_type_size<
+	return detail::packed_reflection::get_type_size<
 		detail::load_config::image_chpe_metadata_x86>();
 }
 
@@ -351,8 +351,8 @@ void epilogue_branch_descriptor::set_disp_size(std::uint8_t disp_size)
 }
 
 template class chpe_x86_metadata_base<>;
-template class chpe_x86_metadata_base<detail::error_list>;
+template class chpe_x86_metadata_base<error_list>;
 template class arm64x_dynamic_relocation_add_delta_base<>;
-template class arm64x_dynamic_relocation_add_delta_base<detail::error_list>;
+template class arm64x_dynamic_relocation_add_delta_base<error_list>;
 
 } //namespace pe_bliss::load_config

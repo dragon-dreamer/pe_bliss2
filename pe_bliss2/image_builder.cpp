@@ -50,7 +50,7 @@ void image_builder::build(const image& instance, const image_builder_options& op
 
 	auto buffer_start_pos = buffer.wpos();
 	const auto& dos_hdr = instance.get_dos_header().base_struct();
-	auto image_start_pos = dos_hdr.buffer_pos();
+	auto image_start_pos = dos_hdr.get_state().buffer_pos();
 	dos_hdr.serialize(buffer, true);
 
 	if (options.rebuild_rich_header)
@@ -71,8 +71,8 @@ void image_builder::build(const image& instance, const image_builder_options& op
 		buffer.write(dos_stub.size(), dos_stub.data());
 	}
 
-	instance.get_image_signature().base_struct().serialize(buffer, options.write_structure_virtual_parts);
-	instance.get_file_header().base_struct().serialize(buffer, options.write_structure_virtual_parts);
+	instance.get_image_signature().serialize(buffer, options.write_structure_virtual_parts);
+	instance.get_file_header().serialize(buffer, options.write_structure_virtual_parts);
 	instance.get_optional_header().serialize(buffer, options.write_structure_virtual_parts);
 	instance.get_data_directories().serialize(buffer, options.write_structure_virtual_parts);
 

@@ -9,9 +9,8 @@
 
 #include <boost/endian/conversion.hpp>
 
-#include "pe_bliss2/detail/error_list.h"
+#include "pe_bliss2/error_list.h"
 #include "pe_bliss2/detail/exceptions/image_runtime_function_entry.h"
-#include "pe_bliss2/detail/packed_struct.h"
 #include "pe_bliss2/exceptions/arm_common/arm_common_unwind_info.h"
 
 namespace pe_bliss::exceptions::arm64
@@ -557,9 +556,9 @@ template<typename... Bases>
 using exception_directory_base = arm_common::exception_directory_base<runtime_function_base, Bases...>;
 
 using runtime_function = runtime_function_base<>;
-using runtime_function_details = runtime_function_base<detail::error_list>;
+using runtime_function_details = runtime_function_base<error_list>;
 
 using exception_directory = exception_directory_base<>;
-using exception_directory_details = exception_directory_base<detail::error_list>;
+using exception_directory_details = exception_directory_base<error_list>;
 
 } //namespace pe_bliss::exceptions::arm64

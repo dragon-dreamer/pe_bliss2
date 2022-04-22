@@ -14,13 +14,20 @@ namespace buffers
 {
 
 input_buffer_section::input_buffer_section(input_buffer_ptr buf,
-	std::size_t offset, std::size_t size) noexcept
+	std::size_t offset, std::size_t size)
 	: buf_(std::move(buf))
 	, offset_(offset)
 	, size_(size)
 	, pos_(0)
 {
-	assert(buf_ || !size_);
+	assert(!!buf_);
+
+	auto max_offset = offset;
+	if (!utilities::math::add_if_safe(max_offset, size))
+		throw std::system_error(utilities::generic_errc::integer_overflow);
+	if (max_offset > buf_->size())
+		throw std::system_error(utilities::generic_errc::buffer_overrun);
+
 	parent_absolute_offset_ = buf_->absolute_offset();
 	relative_offset_ = offset_ + buf_->relative_offset();
 }
@@ -54,7 +61,7 @@ std::size_t input_buffer_section::read(std::size_t count, std::byte* data)
 
 void input_buffer_section::set_rpos(std::size_t pos)
 {
-	if (pos >= size_)
+	if (pos > size_)
 		throw std::system_error(utilities::generic_errc::buffer_overrun);
 
 	pos_ = pos;

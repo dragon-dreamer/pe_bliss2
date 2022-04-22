@@ -11,6 +11,8 @@
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/detail/image_file_header.h"
+#include "pe_bliss2/packed_c_string.h"
+#include "pe_bliss2/packed_utf16_string.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
 #include "utilities/math.h"
@@ -406,48 +408,94 @@ image::section_const_ref image::section_from_reference(
 		get_section_table(), get_section_data_list());
 }
 
-detail::packed_c_string image::string_from_rva(rva_type rva,
+template<detail::packed_string_type PackedString>
+PackedString image::string_from_rva(rva_type rva,
 	bool include_headers, bool allow_virtual_data) const
 {
-	detail::packed_c_string result;
+	PackedString result;
 	string_from_rva(rva, result, include_headers, allow_virtual_data);
 	return result;
 }
 
-void image::string_from_rva(rva_type rva, detail::packed_c_string& str,
+template<detail::packed_string_type PackedString>
+void image::string_from_rva(rva_type rva, PackedString& str,
 	bool include_headers, bool allow_virtual_data) const
 {
 	auto buf = section_data_from_rva(rva, include_headers);
 	str.deserialize(*buf, allow_virtual_data);
 }
 
-detail::packed_c_string image::string_from_va(std::uint32_t va,
+template<detail::packed_string_type PackedString>
+PackedString image::string_from_va(std::uint32_t va,
 	bool include_headers, bool allow_virtual_data) const
 {
-	return string_from_rva(address_converter(*this).va_to_rva(va),
+	return string_from_rva<PackedString>(
+		address_converter(*this).va_to_rva(va),
 		include_headers, allow_virtual_data);
 }
 
-void image::string_from_va(std::uint32_t va, detail::packed_c_string& str,
+template<detail::packed_string_type PackedString>
+void image::string_from_va(std::uint32_t va, PackedString& str,
 	bool include_headers, bool allow_virtual_data) const
 {
 	string_from_rva(address_converter(*this).va_to_rva(va), str,
 		include_headers, allow_virtual_data);
 }
 
-detail::packed_c_string image::string_from_va(std::uint64_t va,
+template<detail::packed_string_type PackedString>
+PackedString image::string_from_va(std::uint64_t va,
 	bool include_headers, bool allow_virtual_data) const
 {
-	return string_from_rva(address_converter(*this).va_to_rva(va),
+	return string_from_rva<PackedString>(
+		address_converter(*this).va_to_rva(va),
 		include_headers, allow_virtual_data);
 }
 
-void image::string_from_va(std::uint64_t va, detail::packed_c_string& str,
+template<detail::packed_string_type PackedString>
+void image::string_from_va(std::uint64_t va, PackedString& str,
 	bool include_headers, bool allow_virtual_data) const
 {
 	string_from_rva(address_converter(*this).va_to_rva(va), str,
 		include_headers, allow_virtual_data);
 }
+
+template packed_c_string image::string_from_rva<
+	packed_c_string>(rva_type rva,
+	bool include_headers, bool allow_virtual_data) const;
+template void image::string_from_rva<
+	packed_c_string>(rva_type rva, packed_c_string& str,
+	bool include_headers, bool allow_virtual_data) const;
+template packed_c_string image::string_from_va<
+	packed_c_string>(std::uint32_t va,
+	bool include_headers, bool allow_virtual_data) const;
+template void image::string_from_va<
+	packed_c_string>(std::uint32_t va, packed_c_string& str,
+	bool include_headers, bool allow_virtual_data) const;
+template packed_c_string image::string_from_va<
+	packed_c_string>(std::uint64_t va,
+	bool include_headers, bool allow_virtual_data) const;
+template void image::string_from_va<
+	packed_c_string>(std::uint64_t va, packed_c_string& str,
+	bool include_headers, bool allow_virtual_data) const;
+
+template packed_utf16_string image::string_from_rva<
+	packed_utf16_string>(rva_type rva,
+		bool include_headers, bool allow_virtual_data) const;
+template void image::string_from_rva<
+	packed_utf16_string>(rva_type rva, packed_utf16_string& str,
+		bool include_headers, bool allow_virtual_data) const;
+template packed_utf16_string image::string_from_va<
+	packed_utf16_string>(std::uint32_t va,
+		bool include_headers, bool allow_virtual_data) const;
+template void image::string_from_va<
+	packed_utf16_string>(std::uint32_t va, packed_utf16_string& str,
+		bool include_headers, bool allow_virtual_data) const;
+template packed_utf16_string image::string_from_va<
+	packed_utf16_string>(std::uint64_t va,
+		bool include_headers, bool allow_virtual_data) const;
+template void image::string_from_va<
+	packed_utf16_string>(std::uint64_t va, packed_utf16_string& str,
+		bool include_headers, bool allow_virtual_data) const;
 
 buffers::input_buffer_ptr image::section_data_from_rva(rva_type rva,
 	bool include_headers) const
@@ -504,13 +552,15 @@ std::span<std::byte> image::section_data_from_va(std::uint64_t va,
 	return section_data_from_rva(address_converter(*this).va_to_rva(va), include_headers);
 }
 
-rva_type image::string_to_file_offset(const detail::packed_c_string& str,
+template<detail::packed_string_type PackedString>
+rva_type image::string_to_file_offset(const PackedString& str,
 	bool include_headers, bool write_virtual_part)
 {
 	return string_to_rva(absolute_offset_to_rva(str), str, include_headers, write_virtual_part);
 }
 
-rva_type image::string_to_rva(rva_type rva, const detail::packed_c_string& str,
+template<detail::packed_string_type PackedString>
+rva_type image::string_to_rva(rva_type rva, const PackedString& str,
 	bool include_headers, bool write_virtual_part)
 {
 	if (str.value().empty() && str.is_virtual() && !write_virtual_part)
@@ -521,7 +571,8 @@ rva_type image::string_to_rva(rva_type rva, const detail::packed_c_string& str,
 		str.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
 }
 
-std::uint32_t image::string_to_va(std::uint32_t va, const detail::packed_c_string& str,
+template<detail::packed_string_type PackedString>
+std::uint32_t image::string_to_va(std::uint32_t va, const PackedString& str,
 	bool include_headers, bool write_virtual_part)
 {
 	if (str.value().empty() && str.is_virtual() && !write_virtual_part)
@@ -532,7 +583,8 @@ std::uint32_t image::string_to_va(std::uint32_t va, const detail::packed_c_strin
 		str.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
 }
 
-std::uint64_t image::string_to_va(std::uint64_t va, const detail::packed_c_string& str,
+template<detail::packed_string_type PackedString>
+std::uint64_t image::string_to_va(std::uint64_t va, const PackedString& str,
 	bool include_headers, bool write_virtual_part)
 {
 	if (str.value().empty() && str.is_virtual() && !write_virtual_part)
@@ -542,6 +594,32 @@ std::uint64_t image::string_to_va(std::uint64_t va, const detail::packed_c_strin
 	return va + static_cast<std::uint64_t>(
 		str.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
 }
+
+template rva_type image::string_to_rva<packed_c_string>(
+	rva_type rva, const packed_c_string& str,
+	bool include_headers, bool write_virtual_part);
+template std::uint32_t image::string_to_va<packed_c_string>(
+	std::uint32_t va, const packed_c_string& str,
+	bool include_headers, bool write_virtual_part);
+template std::uint64_t image::string_to_va<packed_c_string>(
+	std::uint64_t va, const packed_c_string& str,
+	bool include_headers, bool write_virtual_part);
+template rva_type image::string_to_file_offset<packed_c_string>(
+	const packed_c_string& str,
+	bool include_headers, bool write_virtual_part);
+
+template rva_type image::string_to_rva<packed_utf16_string>(
+	rva_type rva, const packed_utf16_string& str,
+	bool include_headers, bool write_virtual_part);
+template std::uint32_t image::string_to_va<packed_utf16_string>(
+	std::uint32_t va, const packed_utf16_string& str,
+	bool include_headers, bool write_virtual_part);
+template std::uint64_t image::string_to_va<packed_utf16_string>(
+	std::uint64_t va, const packed_utf16_string& str,
+	bool include_headers, bool write_virtual_part);
+template rva_type image::string_to_file_offset<packed_utf16_string>(
+	const packed_utf16_string& str,
+	bool include_headers, bool write_virtual_part);
 
 rva_type image::buffer_to_rva(rva_type rva, const buffers::ref_buffer& buf,
 	bool include_headers)
@@ -585,19 +663,26 @@ rva_type image::buffer_to_file_offset(const buffers::ref_buffer& buf,
 	return buffer_to_rva(absolute_offset_to_rva(*buf.data()), buf, include_headers);
 }
 
-detail::packed_byte_vector image::byte_vector_from_rva(rva_type rva,
+packed_byte_vector image::byte_vector_from_rva(rva_type rva,
 	std::uint32_t size, bool include_headers, bool allow_virtual_data) const
 {
-	detail::packed_byte_vector result;
+	packed_byte_vector result;
 	byte_vector_from_rva(rva, result, size, include_headers, allow_virtual_data);
 	return result;
 }
 
-void image::byte_vector_from_rva(rva_type rva, detail::packed_byte_vector& arr,
+void image::byte_vector_from_rva(rva_type rva, packed_byte_vector& arr,
 	std::uint32_t size, bool include_headers, bool allow_virtual_data) const
 {
 	auto buf = section_data_from_rva(rva, size, include_headers, allow_virtual_data);
 	arr.deserialize(*buf, size, allow_virtual_data);
+}
+
+rva_type image::absolute_offset_to_rva(const buffers::input_buffer_interface& buf) const
+{
+	utilities::safe_uint<std::uint32_t> offset;
+	offset += buf.absolute_offset();
+	return file_offset_to_rva(offset.value());
 }
 
 /*

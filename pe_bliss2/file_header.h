@@ -8,20 +8,29 @@
 #include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/pe_error.h"
 
+#include "utilities/static_class.h"
+
+namespace buffers
+{
+class input_buffer_interface;
+class output_buffer_interface;
+} //namespace buffers
+
 namespace pe_bliss
 {
 
 enum class file_header_errc
 {
-	invalid_size_of_optional_header = 1
+	invalid_size_of_optional_header = 1,
+	unable_to_read_file_header
 };
 
 std::error_code make_error_code(file_header_errc) noexcept;
 
 class optional_header;
 
-//When deserializing, buffer should point to the file header (next field after image signature)
-class file_header : public detail::packed_struct_base<detail::image_file_header>
+class [[nodiscard]] file_header
+	: public detail::packed_struct_base<detail::image_file_header>
 {
 public:
 	enum class machine_type : std::uint16_t
@@ -70,7 +79,7 @@ public:
 		//amd64 + hybrid_metadata_pointer = CHPEv2 - both x64 and Arm64 in single binary
 	};
 
-	struct characteristics
+	struct characteristics final : utilities::static_class
 	{
 		enum value : std::uint16_t
 		{
@@ -93,6 +102,14 @@ public:
 	};
 
 public:
+	//When deserializing, buffer should point to the file header
+	//(next field after image signature)
+	void deserialize(buffers::input_buffer_interface& buf,
+		bool allow_virtual_memory = false);
+	void serialize(buffers::output_buffer_interface& buf,
+		bool write_virtual_part = true) const;
+
+public:
 	[[nodiscard]]
 	machine_type get_machine_type() const noexcept
 	{
@@ -102,7 +119,8 @@ public:
 	[[nodiscard]]
 	characteristics::value get_characteristics() const noexcept
 	{
-		return static_cast<characteristics::value>(base_struct()->characteristics);
+		return static_cast<characteristics::value>(
+			base_struct()->characteristics);
 	}
 
 	void set_machine_type(machine_type type) noexcept
@@ -120,8 +138,10 @@ public:
 		return static_cast<bool>(get_characteristics() & characteristics::dll);
 	}
 
+public:
 	[[nodiscard]]
-	pe_error_wrapper validate_size_of_optional_header(const optional_header& hdr) const noexcept;
+	pe_error_wrapper validate_size_of_optional_header(
+		const optional_header& hdr) const noexcept;
 };
 
 } //namespace pe_bliss

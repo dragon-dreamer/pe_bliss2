@@ -9,8 +9,8 @@
 #include <variant>
 
 #include "pe_bliss2/detail/load_config/image_load_config_directory.h"
-#include "pe_bliss2/detail/packed_serialization.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/detail/packed_reflection.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/image.h"
 #include "utilities/math.h"
 #include "utilities/safe_uint.h"
@@ -142,7 +142,7 @@ void load_lock_prefix_table(const image& instance,
 
 	auto& table = directory.get_lock_prefix_table().emplace().get_prefix_va_list();
 	using va_type = typename Directory::lock_prefix_table_type::value_type::pointer_type;
-	detail::packed_struct<va_type> lock_prefix_va;
+	packed_struct<va_type> lock_prefix_va;
 	while (instance.struct_from_va(lock_prefix_table_va.value(), lock_prefix_va,
 		options.include_headers, options.allow_virtual_data).get())
 	{
@@ -169,7 +169,7 @@ void load_safeseh_handler_table(const image& instance,
 		return;
 
 	auto& table = directory.get_safeseh_handler_table().emplace().get_handler_list();
-	detail::packed_struct<rva_type> handler_rva;
+	packed_struct<rva_type> handler_rva;
 	auto count = directory.get_descriptor()->structured_exceptions.se_handler_count;
 
 	auto handlers_size = static_cast<std::uint64_t>(count) * handler_rva.packed_size;
@@ -422,11 +422,11 @@ void load_chpe_metadata(const image& instance,
 	{
 	case 0:
 	case 1:
-		metadata_size = detail::packed_serialization<>::get_field_offset<
+		metadata_size = detail::packed_reflection::get_field_offset<
 			&chpe_x86_metadata::metadata_type::value_type::compiler_iat_pointer>();
 		break;
 	case 2:
-		metadata_size = detail::packed_serialization<>::get_field_offset<
+		metadata_size = detail::packed_reflection::get_field_offset<
 			&chpe_x86_metadata::metadata_type::value_type::wow_a64_rdtsc_function_pointer>();
 		break;
 	default: // >= 3

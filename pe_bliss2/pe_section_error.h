@@ -2,21 +2,18 @@
 
 #include <cstddef>
 #include <string>
+#include <system_error>
 
 #include "pe_bliss2/pe_error.h"
 
 namespace pe_bliss
 {
 
-class pe_section_error : public pe_error
+class [[nodiscard]] pe_section_error : public pe_error
 {
 public:
-	pe_section_error(std::error_code ec, std::size_t section_index, const std::string& section_name)
-		: pe_error(ec)
-		, section_index_(section_index)
-		, section_name_(section_name)
-	{
-	}
+	pe_section_error(std::error_code ec,
+		std::size_t section_index, std::string section_name);
 
 	[[nodiscard]] std::size_t get_section_index() const noexcept
 	{

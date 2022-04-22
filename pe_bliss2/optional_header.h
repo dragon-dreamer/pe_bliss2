@@ -7,9 +7,11 @@
 #include <variant>
 
 #include "pe_bliss2/detail/image_optional_header.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
+
+#include "utilities/static_class.h"
 
 namespace buffers
 {
@@ -34,27 +36,34 @@ enum class optional_header_errc
 	invalid_size_of_heap,
 	invalid_size_of_stack,
 	invalid_size_of_headers,
-	no_base_of_data_field
+	no_base_of_data_field,
+	unable_to_read_optional_header
 };
 
 std::error_code make_error_code(optional_header_errc) noexcept;
 
-struct optional_header_validation_options
+// validate() method does not validate image base, there is
+// a separate validate_image_base() method which should be used.
+struct [[nodiscard]] optional_header_validation_options
 {
+	//TODO: sometimes check_***, sometimes validate_***, make names similar
 	bool check_address_of_entry_point = true;
 	bool check_alignments = true;
 	bool check_subsystem_version = true;
 	bool check_size_of_heap = true;
 	bool check_size_of_stack = true;
-	bool check_size_of_headers = true; //sometimes is check, sometimes validate, make names similar
+	bool check_size_of_headers = true;
 };
 
-class optional_header
+class [[nodiscard]] optional_header
 {
 public:
-	using optional_header_32 = detail::packed_struct<detail::image_optional_header_32>;
-	using optional_header_64 = detail::packed_struct<detail::image_optional_header_64>;
-	using base_struct_type = std::variant<optional_header_32, optional_header_64>;
+	using optional_header_32_type = packed_struct<
+		detail::image_optional_header_32>;
+	using optional_header_64_type = packed_struct<
+		detail::image_optional_header_64>;
+	using base_struct_type = std::variant<
+		optional_header_32_type, optional_header_64_type>;
 
 public:
 	using magic_type = std::uint16_t;
@@ -83,7 +92,7 @@ public:
 		xbox_code_catalog = 17
 	};
 
-	struct dll_characteristics
+	struct dll_characteristics final : utilities::static_class
 	{
 		enum value : std::uint16_t
 		{
@@ -108,11 +117,15 @@ public:
 	static constexpr std::uint32_t max_number_of_rva_and_sizes = 16;
 	static constexpr std::uint32_t minimum_file_alignment = 0x200;
 	static constexpr std::uint32_t minimum_section_alignment = 0x1000;
+	static constexpr std::uint16_t min_major_subsystem_version = 3u;
+	static constexpr std::uint16_t min_minor_subsystem_version = 10u;
 
 public:
 	//When deserializing, buf should point to optional header start (magic field)
-	void deserialize(buffers::input_buffer_interface& buf, bool allow_virtual_memory = false);
-	void serialize(buffers::output_buffer_interface& buf, bool write_virtual_part = true) const;
+	void deserialize(buffers::input_buffer_interface& buf,
+		bool allow_virtual_memory = false);
+	void serialize(buffers::output_buffer_interface& buf,
+		bool write_virtual_part = true) const;
 
 	[[nodiscard]]
 	std::uint32_t get_number_of_rva_and_sizes() const noexcept;
@@ -145,7 +158,8 @@ public:
 	[[nodiscard]]
 	dll_characteristics::value get_dll_characteristics() const noexcept
 	{
-		return static_cast<dll_characteristics::value>(get_raw_dll_characteristics());
+		return static_cast<dll_characteristics::value>(
+			get_raw_dll_characteristics());
 	}
 
 	[[nodiscard]]
@@ -167,17 +181,17 @@ public:
 	}
 
 	template<typename Func>
-	auto access(Func&& func) const
+	decltype(auto) access(Func&& func) const
 	{
-		return std::visit([func = std::forward<Func>(func)](const auto& obj) {
-			return func(obj.get()); }, header_);
+		return std::visit([func = std::forward<Func>(func)](const auto& obj) mutable {
+			return std::forward<Func>(func)(obj.get()); }, header_);
 	}
 
 	template<typename Func>
-	auto access(Func&& func)
+	decltype(auto) access(Func&& func)
 	{
-		return std::visit([func = std::forward<Func>(func)](auto& obj) {
-			return func(obj.get()); }, header_);
+		return std::visit([func = std::forward<Func>(func)](auto& obj) mutable {
+			return std::forward<Func>(func)(obj.get()); }, header_);
 	}
 
 	[[nodiscard]]

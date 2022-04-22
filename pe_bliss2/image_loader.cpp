@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include <cstdint>
+#include <string>
 
 #include "buffers/input_buffer_section.h"
 #include "pe_bliss2/dos_header.h"
@@ -23,25 +24,25 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 	instance.set_loaded_to_memory(options.image_loaded_to_memory);
 
 	auto& dos_hdr = instance.get_dos_header();
-	dos_hdr.base_struct().deserialize(*buffer, options.allow_virtual_headers);
+	dos_hdr.deserialize(*buffer, options.allow_virtual_headers);
 	dos_hdr.validate(options.dos_header_validation).throw_on_error();
 
 	instance.get_dos_stub().deserialize(*buffer, dos_hdr.base_struct()->e_lfanew);
 	if (options.load_rich_header)
 		instance.get_rich_header().deserialize(instance.get_dos_stub().data());
 
-	std::size_t pe_headers_start = dos_hdr.base_struct().buffer_pos();
+	std::size_t pe_headers_start = dos_hdr.base_struct().get_state().buffer_pos();
 	if (!utilities::math::add_if_safe<std::size_t>(pe_headers_start, dos_hdr.base_struct()->e_lfanew))
 		throw pe_error(dos_header_errc::invalid_e_lfanew);
 
 	buffer->set_rpos(pe_headers_start);
 
-	instance.get_image_signature().base_struct().deserialize(*buffer, options.allow_virtual_headers);
+	instance.get_image_signature().deserialize(*buffer, options.allow_virtual_headers);
 	instance.get_image_signature().validate().throw_on_error();
 
 	auto& file_hdr = instance.get_file_header();
 	auto& optional_hdr = instance.get_optional_header();
-	file_hdr.base_struct().deserialize(*buffer, options.allow_virtual_headers);
+	file_hdr.deserialize(*buffer, options.allow_virtual_headers);
 	optional_hdr.deserialize(*buffer, options.allow_virtual_headers);
 	file_hdr.validate_size_of_optional_header(optional_hdr).throw_on_error();
 	optional_hdr.validate(options.optional_header_validation,
@@ -64,7 +65,7 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 			.section_alignment = optional_hdr.get_raw_section_alignment(),
 			.copy_memory = options.eager_section_data_copy,
 			.image_loaded_to_memory = options.image_loaded_to_memory,
-			.image_start_buffer_pos = dos_hdr.base_struct().buffer_pos()
+			.image_start_buffer_pos = dos_hdr.base_struct().get_state().buffer_pos()
 		};
 
 		pe_error_wrapper result;
@@ -73,7 +74,7 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 			end = section_tbl.get_section_headers().cend(); it != end; ++it, ++section_index)
 		{
 			if ((result = section_tbl.validate_section_header(optional_hdr, it)))
-				throw pe_section_error(result, section_index, it->get_name());
+				throw pe_section_error(result, section_index, std::string(it->get_name()));
 		}
 
 		if (options.load_section_data)
@@ -81,6 +82,7 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 			for (auto it = section_tbl.get_section_headers().cbegin(),
 				end = section_tbl.get_section_headers().cend(); it != end; ++it)
 			{
+				//TODO: may throw - catch?
 				sections.emplace_back().deserialize(*it, buffer, load_opts);
 			}
 		}
@@ -113,7 +115,7 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 	//TODO: make dos, file, optional and other headers reference this data instead of copying its parts
 	if (options.load_full_headers_buffer)
 	{
-		auto start_pos = dos_hdr.base_struct().buffer_pos();
+		auto start_pos = dos_hdr.base_struct().get_state().buffer_pos();
 		auto size = optional_hdr.get_raw_size_of_headers();
 		buffer->set_rpos(start_pos);
 		instance.get_full_headers_buffer().deserialize(

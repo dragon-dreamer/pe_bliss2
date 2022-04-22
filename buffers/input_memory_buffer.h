@@ -8,7 +8,7 @@
 namespace buffers
 {
 
-class input_memory_buffer : public input_buffer_interface
+class [[nodiscard]] input_memory_buffer : public input_buffer_interface
 {
 public:
 	input_memory_buffer(const std::byte* memory, std::size_t size) noexcept;

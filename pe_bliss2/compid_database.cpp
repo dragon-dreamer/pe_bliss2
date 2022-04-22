@@ -331,6 +331,12 @@ constexpr std::array products
 	product_mapping{ 0x0ff, 30704, product_type::visual_studio_2022_17_0_0_preview5_0 },
 	product_mapping{ 0x0ff, 30705, product_type::visual_studio_2022_17_0_0_preview7_0 },
 	product_mapping{ 0x0ff, 30818, product_type::visual_studio_2022_17_1_0_preview1_0 },
+	product_mapping{ 0x0ff, 30919, product_type::visual_studio_2022_17_1_0_preview2_0 },
+	product_mapping{ 0x0ff, 31103, product_type::visual_studio_2022_17_1_0_preview3_0 },
+	product_mapping{ 0x0ff, 31104, product_type::visual_studio_2022_17_1_0_preview5_0 },
+	product_mapping{ 0x0ff, 31114, product_type::visual_studio_2022_17_2_0_preview1_0 },
+	product_mapping{ 0x0ff, 31302, product_type::visual_studio_2022_17_2_0_preview2_1 },
+	product_mapping{ 0x0ff, 31326, product_type::visual_studio_2022_17_2_0_preview3_0 },
 	product_mapping{ 0x100, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x100, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x100, 23918, product_type::visual_studio_2015_update2 },
@@ -402,6 +408,12 @@ constexpr std::array products
 	product_mapping{ 0x100, 30704, product_type::visual_studio_2022_17_0_0_preview5_0 },
 	product_mapping{ 0x100, 30705, product_type::visual_studio_2022_17_0_0_preview7_0 },
 	product_mapping{ 0x100, 30818, product_type::visual_studio_2022_17_1_0_preview1_0 },
+	product_mapping{ 0x100, 30919, product_type::visual_studio_2022_17_1_0_preview2_0 },
+	product_mapping{ 0x100, 31103, product_type::visual_studio_2022_17_1_0_preview3_0 },
+	product_mapping{ 0x100, 31104, product_type::visual_studio_2022_17_1_0_preview5_0 },
+	product_mapping{ 0x100, 31114, product_type::visual_studio_2022_17_2_0_preview1_0 },
+	product_mapping{ 0x100, 31302, product_type::visual_studio_2022_17_2_0_preview2_1 },
+	product_mapping{ 0x100, 31326, product_type::visual_studio_2022_17_2_0_preview3_0 },
 	product_mapping{ 0x101, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x101, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x101, 23918, product_type::visual_studio_2015_update2 },
@@ -473,6 +485,12 @@ constexpr std::array products
 	product_mapping{ 0x101, 30704, product_type::visual_studio_2022_17_0_0_preview5_0 },
 	product_mapping{ 0x101, 30705, product_type::visual_studio_2022_17_0_0_preview7_0 },
 	product_mapping{ 0x101, 30818, product_type::visual_studio_2022_17_1_0_preview1_0 },
+	product_mapping{ 0x101, 30919, product_type::visual_studio_2022_17_1_0_preview2_0 },
+	product_mapping{ 0x101, 31103, product_type::visual_studio_2022_17_1_0_preview3_0 },
+	product_mapping{ 0x101, 31104, product_type::visual_studio_2022_17_1_0_preview5_0 },
+	product_mapping{ 0x101, 31114, product_type::visual_studio_2022_17_2_0_preview1_0 },
+	product_mapping{ 0x101, 31302, product_type::visual_studio_2022_17_2_0_preview2_1 },
+	product_mapping{ 0x101, 31326, product_type::visual_studio_2022_17_2_0_preview3_0 },
 	product_mapping{ 0x102, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x102, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x102, 23918, product_type::visual_studio_2015_update2 },
@@ -544,6 +562,12 @@ constexpr std::array products
 	product_mapping{ 0x102, 30704, product_type::visual_studio_2022_17_0_0_preview5_0 },
 	product_mapping{ 0x102, 30705, product_type::visual_studio_2022_17_0_0_preview7_0 },
 	product_mapping{ 0x102, 30818, product_type::visual_studio_2022_17_1_0_preview1_0 },
+	product_mapping{ 0x102, 30919, product_type::visual_studio_2022_17_1_0_preview2_0 },
+	product_mapping{ 0x102, 31103, product_type::visual_studio_2022_17_1_0_preview3_0 },
+	product_mapping{ 0x102, 31104, product_type::visual_studio_2022_17_1_0_preview5_0 },
+	product_mapping{ 0x102, 31114, product_type::visual_studio_2022_17_2_0_preview1_0 },
+	product_mapping{ 0x102, 31302, product_type::visual_studio_2022_17_2_0_preview2_1 },
+	product_mapping{ 0x102, 31326, product_type::visual_studio_2022_17_2_0_preview3_0 },
 	product_mapping{ 0x103, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x103, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x103, 23918, product_type::visual_studio_2015_update2 },
@@ -614,6 +638,12 @@ constexpr std::array products
 	product_mapping{ 0x103, 30704, product_type::visual_studio_2022_17_0_0_preview5_0 },
 	product_mapping{ 0x103, 30705, product_type::visual_studio_2022_17_0_0_preview7_0 },
 	product_mapping{ 0x103, 30818, product_type::visual_studio_2022_17_1_0_preview1_0 },
+	product_mapping{ 0x103, 30919, product_type::visual_studio_2022_17_1_0_preview2_0 },
+	product_mapping{ 0x103, 31103, product_type::visual_studio_2022_17_1_0_preview3_0 },
+	product_mapping{ 0x103, 31104, product_type::visual_studio_2022_17_1_0_preview5_0 },
+	product_mapping{ 0x103, 31114, product_type::visual_studio_2022_17_2_0_preview1_0 },
+	product_mapping{ 0x103, 31302, product_type::visual_studio_2022_17_2_0_preview2_1 },
+	product_mapping{ 0x103, 31326, product_type::visual_studio_2022_17_2_0_preview3_0 },
 	product_mapping{ 0x104, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x104, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x104, 23918, product_type::visual_studio_2015_update2 },
@@ -685,6 +715,12 @@ constexpr std::array products
 	product_mapping{ 0x104, 30704, product_type::visual_studio_2022_17_0_0_preview5_0 },
 	product_mapping{ 0x104, 30705, product_type::visual_studio_2022_17_0_0_preview7_0 },
 	product_mapping{ 0x104, 30818, product_type::visual_studio_2022_17_1_0_preview1_0 },
+	product_mapping{ 0x104, 30919, product_type::visual_studio_2022_17_1_0_preview2_0 },
+	product_mapping{ 0x104, 31103, product_type::visual_studio_2022_17_1_0_preview3_0 },
+	product_mapping{ 0x104, 31104, product_type::visual_studio_2022_17_1_0_preview5_0 },
+	product_mapping{ 0x104, 31114, product_type::visual_studio_2022_17_2_0_preview1_0 },
+	product_mapping{ 0x104, 31302, product_type::visual_studio_2022_17_2_0_preview2_1 },
+	product_mapping{ 0x104, 31326, product_type::visual_studio_2022_17_2_0_preview3_0 },
 	product_mapping{ 0x105, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x105, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x105, 23918, product_type::visual_studio_2015_update2 },
@@ -755,7 +791,13 @@ constexpr std::array products
 	product_mapping{ 0x105, 30528, product_type::visual_studio_2022_17_0_0_preview4_0 },
 	product_mapping{ 0x105, 30704, product_type::visual_studio_2022_17_0_0_preview5_0 },
 	product_mapping{ 0x105, 30705, product_type::visual_studio_2022_17_0_0_preview7_0 },
-	product_mapping{ 0x105, 30818, product_type::visual_studio_2022_17_1_0_preview1_0 }
+	product_mapping{ 0x105, 30818, product_type::visual_studio_2022_17_1_0_preview1_0 },
+	product_mapping{ 0x105, 30919, product_type::visual_studio_2022_17_1_0_preview2_0 },
+	product_mapping{ 0x105, 31103, product_type::visual_studio_2022_17_1_0_preview3_0 },
+	product_mapping{ 0x105, 31104, product_type::visual_studio_2022_17_1_0_preview5_0 },
+	product_mapping{ 0x105, 31114, product_type::visual_studio_2022_17_2_0_preview1_0 },
+	product_mapping{ 0x105, 31302, product_type::visual_studio_2022_17_2_0_preview2_1 },
+	product_mapping{ 0x105, 31326, product_type::visual_studio_2022_17_2_0_preview3_0 }
 };
 
 static_assert(std::is_sorted(products.cbegin(), products.cend()),
@@ -981,6 +1023,12 @@ const char* compid_database::product_type_to_string(product_type type) noexcept
 	case visual_studio_2022_17_0_0_preview5_0: return "Visual Studio 2019 17.0.0 Preview 5.0";
 	case visual_studio_2022_17_0_0_preview7_0: return "Visual Studio 2019 17.0.0 Preview 7.0";
 	case visual_studio_2022_17_1_0_preview1_0: return "Visual Studio 2019 17.1.0 Preview 1.0";
+	case visual_studio_2022_17_1_0_preview2_0: return "Visual Studio 2019 17.1.0 Preview 2.0";
+	case visual_studio_2022_17_1_0_preview3_0: return "Visual Studio 2019 17.1.0 Preview 3.0";
+	case visual_studio_2022_17_1_0_preview5_0: return "Visual Studio 2019 17.1.0 Preview 5.0";
+	case visual_studio_2022_17_2_0_preview1_0: return "Visual Studio 2019 17.2.0 Preview 1.0";
+	case visual_studio_2022_17_2_0_preview2_1: return "Visual Studio 2019 17.2.0 Preview 2.1";
+	case visual_studio_2022_17_2_0_preview3_0: return "Visual Studio 2019 17.2.0 Preview 3.0";
 	case unmarked_object: return "Unmarked object";
 	default: return "Unknown";
 	}

@@ -66,7 +66,7 @@ void dump_optional_header(formatter& fmt,
 {
 	fmt.print_structure_name("Magic");
 	fmt.get_stream() << ' ';
-	fmt.print_absolute_offset(value.absolute_offset()
+	fmt.print_absolute_offset(value.get_state().absolute_offset()
 		- sizeof(pe_bliss::optional_header::magic_type));
 	fmt.get_stream() << " (";
 	fmt.print_string(header.get_magic() == pe_bliss::optional_header::magic::pe32

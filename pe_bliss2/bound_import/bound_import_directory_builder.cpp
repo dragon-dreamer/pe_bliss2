@@ -8,7 +8,7 @@
 #include "buffers/output_buffer_interface.h"
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/data_directories.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"

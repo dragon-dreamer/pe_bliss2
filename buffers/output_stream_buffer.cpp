@@ -1,6 +1,9 @@
 #include "buffers/output_stream_buffer.h"
 
+#include <cstddef>
 #include <ostream>
+
+#include "utilities/scoped_guard.h"
 
 namespace buffers
 {
@@ -15,11 +18,11 @@ output_stream_buffer::output_stream_buffer(std::ostream& stream)
 std::size_t output_stream_buffer::size()
 {
     stream_.clear();
-    auto old_pos = stream_.tellp();
+    utilities::scoped_guard guard([this, old_pos = stream_.tellp()]{
+        stream_.seekp(old_pos);
+    });
     stream_.seekp(0, std::ios_base::end);
-    auto result = stream_.tellp();
-    stream_.seekp(old_pos);
-    return static_cast<std::size_t>(result);
+    return static_cast<std::size_t>(stream_.tellp());
 }
 
 void output_stream_buffer::write(std::size_t count, const std::byte* data)
@@ -30,13 +33,29 @@ void output_stream_buffer::write(std::size_t count, const std::byte* data)
 void output_stream_buffer::advance_wpos(std::int32_t offset)
 {
     stream_.clear();
-    stream_.seekp(offset, std::ios_base::cur);
+    try
+    {
+        stream_.seekp(offset, std::ios_base::cur);
+    }
+    catch (...)
+    {
+        stream_.clear();
+        throw;
+    }
 }
 
 void output_stream_buffer::set_wpos(std::size_t pos)
 {
     stream_.clear();
-    stream_.seekp(pos, std::ios_base::beg);
+    try
+    {
+        stream_.seekp(pos, std::ios_base::beg);
+    }
+    catch (...)
+    {
+        stream_.clear();
+        throw;
+    }
 }
 
 std::size_t output_stream_buffer::wpos()

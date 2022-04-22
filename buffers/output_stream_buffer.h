@@ -9,7 +9,7 @@
 namespace buffers
 {
 
-class output_stream_buffer : public output_buffer_interface
+class [[nodiscard]] output_stream_buffer : public output_buffer_interface
 {
 public:
 	explicit output_stream_buffer(std::ostream& stream);
@@ -22,6 +22,16 @@ public:
 	virtual void advance_wpos(std::int32_t offset) override;
 	[[nodiscard]]
 	virtual std::size_t wpos() override;
+
+	[[nodiscard]] std::ostream& get_stream() noexcept
+	{
+		return stream_;
+	}
+
+	[[nodiscard]] const std::ostream& get_stream() const noexcept
+	{
+		return stream_;
+	}
 
 private:
 	std::ostream& stream_;

@@ -3,7 +3,7 @@
 #include <list>
 #include <variant>
 
-#include "pe_bliss2/detail/error_list.h"
+#include "pe_bliss2/error_list.h"
 #include "pe_bliss2/exceptions/x64/x64_exception_directory.h"
 #include "pe_bliss2/exceptions/arm/arm_exception_directory.h"
 #include "pe_bliss2/exceptions/arm64/arm64_exception_directory.h"
@@ -41,6 +41,6 @@ private:
 };
 
 using exception_directory = exception_directory_base<>;
-using exception_directory_details = exception_directory_base<detail::error_list>;
+using exception_directory_details = exception_directory_base<error_list>;
 
 } //namespace pe_bliss::exceptions

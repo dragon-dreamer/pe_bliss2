@@ -8,11 +8,11 @@
 namespace buffers
 {
 
-class input_buffer_section : public input_buffer_interface
+class [[nodiscard]] input_buffer_section : public input_buffer_interface
 {
 public:
 	input_buffer_section(input_buffer_ptr buf,
-		std::size_t offset, std::size_t size) noexcept;
+		std::size_t offset, std::size_t size);
 
 	input_buffer_section(const input_buffer_section&) noexcept = default;
 	input_buffer_section(input_buffer_section&&) noexcept = default;
@@ -49,6 +49,7 @@ private:
 };
 
 [[nodiscard]]
-input_buffer_ptr reduce(const input_buffer_ptr& buf, std::size_t offset, std::size_t size);
+input_buffer_ptr reduce(const input_buffer_ptr& buf,
+	std::size_t offset, std::size_t size);
 
 } //namespace buffers

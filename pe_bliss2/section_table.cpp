@@ -26,34 +26,37 @@ struct section_table_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
+		using enum pe_bliss::section_table_errc;
 		switch (static_cast<pe_bliss::section_table_errc>(ev))
 		{
-		case pe_bliss::section_table_errc::invalid_section_raw_size:
+		case invalid_section_raw_size:
 			return "Invalid section physical size";
-		case pe_bliss::section_table_errc::invalid_section_virtual_size:
+		case invalid_section_virtual_size:
 			return "Invalid section virtual size";
-		case pe_bliss::section_table_errc::invalid_section_raw_address:
+		case invalid_section_raw_address:
 			return "Invalid section physical address";
-		case pe_bliss::section_table_errc::invalid_section_raw_size_alignment:
+		case invalid_section_raw_size_alignment:
 			return "Invalid section physical size alignment";
-		case pe_bliss::section_table_errc::invalid_section_raw_address_alignment:
+		case invalid_section_raw_address_alignment:
 			return "Invalid section physical address alignment";
-		case pe_bliss::section_table_errc::raw_section_size_overflow:
+		case raw_section_size_overflow:
 			return "Raw section size overflows";
-		case pe_bliss::section_table_errc::virtual_section_size_overflow:
+		case virtual_section_size_overflow:
 			return "Virtual section size overflows";
-		case pe_bliss::section_table_errc::invalid_section_virtual_address_alignment:
+		case invalid_section_virtual_address_alignment:
 			return "Invalid section virtual address alignment";
-		case pe_bliss::section_table_errc::virtual_gap_between_sections:
+		case virtual_gap_between_sections:
 			return "Virtual gap between sections";
-		case pe_bliss::section_table_errc::invalid_section_low_alignment:
+		case invalid_section_low_alignment:
 			return "Invalid section alignment for low-aligned image";
-		case pe_bliss::section_table_errc::virtual_gap_between_headers_and_first_section:
+		case virtual_gap_between_headers_and_first_section:
 			return "Virtual gap between headers and first section";
-		case pe_bliss::section_table_errc::invalid_size_of_image:
+		case invalid_size_of_image:
 			return "Invalid size of image";
-		case pe_bliss::section_table_errc::unable_to_read_section_table:
+		case unable_to_read_section_table:
 			return "Unable to read section table";
+		case invalid_section_offset:
+			return "Invalid offset within section";
 		default:
 			return {};
 		}
@@ -94,12 +97,15 @@ void section_table::deserialize(buffers::input_buffer_interface& buf,
 	bool is_virtual = false;
 	for (std::uint16_t i = 0; i != number_of_sections; ++i)
 	{
-		headers_.emplace_back();
+		auto& header = headers_.emplace_back();
 		if (!is_virtual)
 		{
-			auto& header = headers_.back();
-			header.base_struct().deserialize(buf, allow_virtual_memory);
+			header.deserialize(buf, allow_virtual_memory);
 			is_virtual = header.base_struct().is_virtual();
+		}
+		else
+		{
+			header.base_struct().set_physical_size(0u);
 		}
 	}
 }
@@ -108,13 +114,14 @@ void section_table::serialize(buffers::output_buffer_interface& buf,
 	bool write_virtual_part) const
 {
 	for (const auto& header : headers_)
-		header.base_struct().serialize(buf, write_virtual_part);
+		header.serialize(buf, write_virtual_part);
 }
 
 pe_error_wrapper section_table::validate_section_header(
 	const optional_header& oh, header_list::const_iterator header) const noexcept
 {
-	if (!header->check_raw_size())
+	auto section_alignment = oh.get_raw_section_alignment();
+	if (!header->check_raw_size(section_alignment))
 		return section_table_errc::invalid_section_raw_size;
 
 	if (!header->check_virtual_size())
@@ -123,10 +130,9 @@ pe_error_wrapper section_table::validate_section_header(
 	if (!header->check_raw_address())
 		return section_table_errc::invalid_section_raw_address;
 
-	auto section_alignment = oh.get_raw_section_alignment();
 	auto file_alignment = oh.get_raw_file_alignment();
 	if (!header->check_raw_size_alignment(section_alignment, file_alignment,
-		header == headers_.cend()))
+		header == std::prev(headers_.cend())))
 	{
 		return section_table_errc::invalid_section_raw_size_alignment;
 	}

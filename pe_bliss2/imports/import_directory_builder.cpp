@@ -12,7 +12,7 @@
 #include "buffers/output_buffer_interface.h"
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/detail/concepts.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/image.h"
 #include "utilities/safe_uint.h"
 
@@ -258,7 +258,7 @@ safe_rva_type build_address_tables(buffers::output_buffer_interface& buf,
 	std::list<ImportedLibrary<Va>>& libraries,
 	safe_rva_type strings_rva, safe_rva_type thunk_rva)
 {
-	detail::packed_struct<Va> thunk;
+	packed_struct<Va> thunk;
 	for (auto& library : libraries)
 	{
 		bool has_lookup = library.has_lookup_table();
@@ -318,7 +318,7 @@ safe_rva_type build_lookup_tables(buffers::output_buffer_interface& buf,
 	std::list<ImportedLibrary<Va>>& libraries,
 	safe_rva_type strings_rva, safe_rva_type thunk_rva)
 {
-	detail::packed_struct<Va> thunk;
+	packed_struct<Va> thunk;
 	for (auto& library : libraries)
 	{
 		if (!library.has_lookup_table())
@@ -426,7 +426,7 @@ build_result build_new_impl(buffers::output_buffer_interface& buf,
 		library.get_descriptor().serialize(buf, true);
 
 	//Terminator
-	detail::packed_struct<detail::imports::image_import_descriptor>{}.serialize(buf, true);
+	packed_struct<detail::imports::image_import_descriptor>{}.serialize(buf, true);
 	result.descriptors_size = static_cast<std::uint32_t>((libraries.size() + 1u)
 		* ImportedLibrary<Va>::packed_descriptor_type::packed_size);
 

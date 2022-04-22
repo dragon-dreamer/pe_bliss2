@@ -31,7 +31,8 @@ enum class section_table_errc
 	invalid_section_low_alignment,
 	virtual_gap_between_headers_and_first_section,
 	invalid_size_of_image,
-	unable_to_read_section_table
+	unable_to_read_section_table,
+	invalid_section_offset
 };
 
 std::error_code make_error_code(section_table_errc) noexcept;

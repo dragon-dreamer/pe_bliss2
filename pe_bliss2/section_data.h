@@ -16,7 +16,7 @@ namespace pe_bliss
 
 class section_header;
 
-struct section_data_load_options
+struct [[nodiscard]] section_data_load_options
 {
 	std::uint32_t section_alignment = 0;
 	bool copy_memory = true;
@@ -24,30 +24,21 @@ struct section_data_load_options
 	std::size_t image_start_buffer_pos = 0;
 };
 
-class section_data
+// When deserializing, buffer pos may be anything. Buffer is repositioned
+// using section_data_load_options values.
+class [[nodiscard]] section_data : private buffers::ref_buffer
 {
 public:
+	using ref_buffer::serialize;
+	using ref_buffer::data;
+	using ref_buffer::copied_data;
+	using ref_buffer::copy_referenced_buffer;
+	using ref_buffer::empty;
+	using ref_buffer::size;
+
 	void deserialize(const section_header& header,
 		const buffers::input_buffer_ptr& buffer,
 		const section_data_load_options& options);
-	void serialize(buffers::output_buffer_interface& buffer) const;
-	
-	[[nodiscard]]
-	buffers::input_buffer_ptr data() const;
-
-	[[nodiscard]]
-	buffers::ref_buffer::container_type& copied_data();
-
-	[[nodiscard]]
-	const buffers::ref_buffer::container_type& copied_data() const;
-
-	void copy_referenced_buffer();
-
-	[[nodiscard]] bool empty() const noexcept;
-	[[nodiscard]] std::size_t size() const noexcept;
-
-private:
-	buffers::ref_buffer buffer_;
 };
 
 } //namespace pe_bliss

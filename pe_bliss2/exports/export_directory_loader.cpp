@@ -148,7 +148,7 @@ auto load_names(const image& instance, const loader_options& options, export_dir
 			auto name_rva = instance.struct_from_rva<rva_type>(address_of_names.value(),
 				options.include_headers, options.allow_virtual_data);
 
-			detail::packed_c_string name;
+			packed_c_string name;
 			bool name_read = false;
 			try
 			{

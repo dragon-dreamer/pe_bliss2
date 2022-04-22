@@ -61,9 +61,6 @@
     <Filter Include="Source Files\tls">
       <UniqueIdentifier>{6e2af670-d31e-466f-a5be-c434d0f5f55f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\detail">
-      <UniqueIdentifier>{6bbc0cd7-c447-451b-b147-bd0e8ef9afa0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\detail\load_config">
       <UniqueIdentifier>{b3e17215-79a2-42d4-8860-4189c01a8cde}</UniqueIdentifier>
     </Filter>
@@ -106,12 +103,18 @@
     <Filter Include="Source Files\exceptions\arm_common">
       <UniqueIdentifier>{bbe0f243-df41-4f2e-abbd-79c27b668755}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\resources">
+      <UniqueIdentifier>{01df840d-e67d-4c16-8717-363b9b46edb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\resources">
+      <UniqueIdentifier>{855309f2-60dd-4754-9671-7cf4252150ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\resources">
+      <UniqueIdentifier>{718dfe86-006a-45e7-bcd2-9f5c5b61f44e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detail\packed_serialization.h">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="detail\packed_struct.h">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
     <ClInclude Include="detail\concepts.h">
@@ -198,9 +201,6 @@
     <ClInclude Include="exports\exported_address.h">
       <Filter>Header Files\exports</Filter>
     </ClInclude>
-    <ClInclude Include="detail\packed_c_string.h">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
     <ClInclude Include="exports\export_directory.h">
       <Filter>Header Files\exports</Filter>
     </ClInclude>
@@ -209,9 +209,6 @@
     </ClInclude>
     <ClInclude Include="exports\export_directory_loader.h">
       <Filter>Header Files\exports</Filter>
-    </ClInclude>
-    <ClInclude Include="detail\error_list.h">
-      <Filter>Header Files\detail</Filter>
     </ClInclude>
     <ClInclude Include="pe_types.h">
       <Filter>Header Files</Filter>
@@ -285,15 +282,6 @@
     <ClInclude Include="load_config\load_config_directory_loader.h">
       <Filter>Header Files\load_config</Filter>
     </ClInclude>
-    <ClInclude Include="detail\packed_byte_array.h">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="detail\packed_byte_vector.h">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="detail\bit_stream.h">
-      <Filter>Header Files\detail</Filter>
-    </ClInclude>
     <ClInclude Include="detail\exceptions\image_runtime_function_entry.h">
       <Filter>Header Files\detail\exceptions</Filter>
     </ClInclude>
@@ -326,6 +314,42 @@
     </ClInclude>
     <ClInclude Include="exceptions\arm_common\arm_common_exception_directory_loader.h">
       <Filter>Header Files\exceptions\arm_common</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\resources\image_resource_directory.h">
+      <Filter>Header Files\detail\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\resource_directory.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\resource_directory_loader.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\packed_reflection.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\endian_convert.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="packed_struct.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="packed_c_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="packed_byte_array.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="packed_byte_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="packed_utf16_string.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="error_list.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bit_stream.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -416,9 +440,6 @@
     <ClCompile Include="tls\tls_directory_loader.cpp">
       <Filter>Source Files\tls</Filter>
     </ClCompile>
-    <ClCompile Include="detail\packed_c_string.cpp">
-      <Filter>Source Files\detail</Filter>
-    </ClCompile>
     <ClCompile Include="tls\tls_directory_builder.cpp">
       <Filter>Source Files\tls</Filter>
     </ClCompile>
@@ -427,12 +448,6 @@
     </ClCompile>
     <ClCompile Include="load_config\load_config_directory_loader.cpp">
       <Filter>Source Files\load_config</Filter>
-    </ClCompile>
-    <ClCompile Include="detail\packed_byte_array.cpp">
-      <Filter>Source Files\detail</Filter>
-    </ClCompile>
-    <ClCompile Include="detail\packed_byte_vector.cpp">
-      <Filter>Source Files\detail</Filter>
     </ClCompile>
     <ClCompile Include="exceptions\x64\x64_exception_directory.cpp">
       <Filter>Source Files\exceptions\x64</Filter>
@@ -460,6 +475,27 @@
     </ClCompile>
     <ClCompile Include="exceptions\arm_common\arm_common_exception_directory_loader.cpp">
       <Filter>Source Files\exceptions\arm_common</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\resource_directory_loader.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="packed_c_string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="packed_byte_array.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="packed_byte_vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="packed_utf16_string.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="error_list.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pe_section_error.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

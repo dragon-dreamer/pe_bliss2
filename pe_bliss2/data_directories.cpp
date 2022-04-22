@@ -2,13 +2,49 @@
 
 #include <algorithm>
 #include <array>
+#include <exception>
 #include <iterator>
+#include <string>
+#include <system_error>
+
+#include "pe_bliss2/pe_error.h"
 
 #include "buffers/input_buffer_interface.h"
 #include "buffers/output_buffer_interface.h"
 
+namespace
+{
+
+struct data_directories_error_category : std::error_category
+{
+	const char* name() const noexcept override
+	{
+		return "dos_stub";
+	}
+
+	std::string message(int ev) const override
+	{
+		switch (static_cast<pe_bliss::data_directories_errc>(ev))
+		{
+		case pe_bliss::data_directories_errc::unable_to_read_data_directory:
+			return "Unable to read data directory";
+		default:
+			return {};
+		}
+	}
+};
+
+const data_directories_error_category data_directories_error_category_instance;
+
+} //namespace
+
 namespace pe_bliss
 {
+
+std::error_code make_error_code(data_directories_errc e) noexcept
+{
+	return { static_cast<int>(e), data_directories_error_category_instance };
+}
 
 void data_directories::deserialize(buffers::input_buffer_interface& buf,
 	std::uint32_t number_of_rva_and_sizes, bool allow_virtual_memory)
@@ -20,7 +56,16 @@ void data_directories::deserialize(buffers::input_buffer_interface& buf,
 	directories_.resize(number_of_rva_and_sizes);
 	for (std::uint32_t i = 0; i != number_of_rva_and_sizes; ++i)
 	{
-		directories_[i].deserialize(buf, allow_virtual_memory);
+		try
+		{
+			directories_[i].deserialize(buf, allow_virtual_memory);
+		}
+		catch (...)
+		{
+			std::throw_with_nested(pe_error(
+				data_directories_errc::unable_to_read_data_directory));
+		}
+
 		if (directories_[i].is_virtual())
 			break;
 	}

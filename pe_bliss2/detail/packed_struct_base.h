@@ -2,7 +2,7 @@
 
 #include <boost/endian/conversion.hpp>
 
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/packed_struct.h"
 
 namespace pe_bliss::detail
 {
@@ -13,7 +13,7 @@ class packed_struct_base
 {
 public:
 	using underlying_struct_type = Struct;
-	using packed_struct_type = typename detail::packed_struct<Struct>;
+	using packed_struct_type = typename packed_struct<Struct>;
 
 public:
 	[[nodiscard]]

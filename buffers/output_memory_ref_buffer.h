@@ -10,7 +10,7 @@
 namespace buffers
 {
 
-class output_memory_ref_buffer : public output_buffer_interface
+class [[nodiscard]] output_memory_ref_buffer : public output_buffer_interface
 {
 public:
 	output_memory_ref_buffer(std::byte* data, std::size_t size) noexcept

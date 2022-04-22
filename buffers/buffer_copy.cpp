@@ -11,18 +11,21 @@
 namespace buffers
 {
 
-void copy(input_buffer_interface& from,
+std::size_t copy(input_buffer_interface& from,
 	output_buffer_interface& to, std::size_t size)
 {
 	static constexpr std::size_t temp_buffer_size = 512;
 	std::array<std::byte, temp_buffer_size> temp;
-	while (size)
+	auto initial_size = size;
+	auto count = size;
+	while (size && count)
 	{
-		auto count = (std::min)(size, temp_buffer_size);
-		from.read(count, temp.data());
+		count = (std::min)(size, temp_buffer_size);
+		count = from.read(count, temp.data());
 		to.write(count, temp.data());
 		size -= count;
 	}
+	return initial_size - size;
 }
 
 } //namespace buffers

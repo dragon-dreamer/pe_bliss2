@@ -6,7 +6,7 @@
 
 #include "buffers/input_buffer_interface.h"
 #include "buffers/output_buffer_interface.h"
-#include "pe_bliss2/detail/packed_serialization.h"
+#include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/variant_helpers.h"
 
@@ -51,6 +51,8 @@ struct optional_header_error_category : std::error_category
 			return "Invalid size of headers";
 		case no_base_of_data_field:
 			return "PE64 optional header does not have BaseOfData field";
+		case unable_to_read_optional_header:
+			return "Unable to read optional header";
 		default:
 			return {};
 		}
@@ -69,26 +71,43 @@ std::error_code make_error_code(optional_header_errc e) noexcept
 	return { static_cast<int>(e), optional_header_error_category_instance };
 }
 
-void optional_header::deserialize(buffers::input_buffer_interface& buf, bool allow_virtual_memory)
+void optional_header::deserialize(buffers::input_buffer_interface& buf,
+	bool allow_virtual_memory)
 {
-	detail::packed_struct<std::uint16_t> magic_value;
-	magic_value.deserialize(buf, false);
+	packed_struct<std::uint16_t> magic_value;
+	try
+	{
+		magic_value.deserialize(buf, false);
+	}
+	catch (...)
+	{
+		std::throw_with_nested(pe_error(
+			optional_header_errc::unable_to_read_optional_header));
+	}
 	if (magic_value.get() == static_cast<uint16_t>(magic::pe32))
-		initialize_with<optional_header_32>();
+		initialize_with<optional_header_32_type>();
 	else if (magic_value.get() == static_cast<uint16_t>(magic::pe64))
-		initialize_with<optional_header_64>();
+		initialize_with<optional_header_64_type>();
 	else
 		throw pe_error(optional_header_errc::invalid_pe_magic);
 
-	std::visit([&buf, allow_virtual_memory] (auto& obj) {
-		obj.deserialize(buf, allow_virtual_memory);
-	}, header_);
+	try
+	{
+		std::visit([&buf, allow_virtual_memory](auto& obj) {
+			obj.deserialize(buf, allow_virtual_memory);
+		}, header_);
+	}
+	catch (...)
+	{
+		std::throw_with_nested(pe_error(
+			optional_header_errc::unable_to_read_optional_header));
+	}
 }
 
 void optional_header::serialize(buffers::output_buffer_interface& buf,
 	bool write_virtual_part) const
 {
-	detail::packed_struct magic_value(static_cast<magic_type>(get_magic()));
+	packed_struct magic_value(static_cast<magic_type>(get_magic()));
 	magic_value.serialize(buf, true);
 	std::visit([&buf, write_virtual_part] (const auto& obj) {
 		obj.serialize(buf, write_virtual_part);
@@ -97,7 +116,8 @@ void optional_header::serialize(buffers::output_buffer_interface& buf,
 
 std::uint32_t optional_header::get_number_of_rva_and_sizes() const noexcept
 {
-	return (std::min)(access([] (auto& obj) { return obj.number_of_rva_and_sizes; }),
+	return (std::min)(access([] (auto& obj) {
+		return obj.number_of_rva_and_sizes; }),
 		max_number_of_rva_and_sizes);
 }
 
@@ -105,7 +125,8 @@ std::uint32_t optional_header::get_size_of_structure() const noexcept
 {
 	return sizeof(magic_type) + access([] (const auto& value) {
 		return static_cast<std::uint32_t>(
-			detail::packed_serialization<>::get_type_size<std::remove_cvref_t<decltype(value)>>());
+			detail::packed_reflection::get_type_size<
+				std::remove_cvref_t<decltype(value)>>());
 	});
 }
 
@@ -116,7 +137,8 @@ bool optional_header::is_low_alignment() const noexcept
 		&& file_alignment >= 1 && file_alignment <= 0x800;
 }
 
-pe_error_wrapper optional_header::validate_address_of_entry_point(bool is_dll) const noexcept
+pe_error_wrapper optional_header::validate_address_of_entry_point(
+	bool is_dll) const noexcept
 {
 	auto entry_point = get_raw_address_of_entry_point();
 	if (!entry_point && !is_dll)
@@ -126,16 +148,19 @@ pe_error_wrapper optional_header::validate_address_of_entry_point(bool is_dll) c
 	return {};
 }
 
-pe_error_wrapper optional_header::validate_image_base(bool has_relocations) const noexcept
+pe_error_wrapper optional_header::validate_image_base(
+	bool has_relocations) const noexcept
 {
 	static constexpr std::uint32_t image_base_multiple = 0x10000u;
 	static constexpr std::uint64_t max_nonreloc_image_base = 0x80000000u;
 
+	//Can be zero under WinXP
 	if (get_raw_image_base() % image_base_multiple)
 		return optional_header_errc::unaligned_image_base;
 	if (!has_relocations)
 	{
-		std::uint64_t image_base_sum = get_raw_image_base() + get_raw_size_of_image();
+		std::uint64_t image_base_sum = get_raw_image_base()
+			+ get_raw_size_of_image();
 		if (image_base_sum >= max_nonreloc_image_base)
 			return optional_header_errc::too_large_image_base;
 	}
@@ -152,8 +177,11 @@ pe_error_wrapper optional_header::validate_file_alignment() const noexcept
 
 	if (!is_low_alignment())
 	{
-		if (file_alignment < minimum_file_alignment || file_alignment > section_alignment)
+		if (file_alignment < minimum_file_alignment
+			|| file_alignment > section_alignment)
+		{
 			return optional_header_errc::file_alignment_out_of_range;
+		}
 	}
 	return {};
 }
@@ -168,8 +196,11 @@ pe_error_wrapper optional_header::validate_section_alignment() const noexcept
 
 	if (!is_low_alignment())
 	{
-		if (section_alignment < minimum_section_alignment || file_alignment > section_alignment)
+		if (section_alignment < minimum_section_alignment
+			|| file_alignment > section_alignment)
+		{
 			return optional_header_errc::section_alignment_out_of_range;
+		}
 	}
 	return {};
 }
@@ -181,8 +212,12 @@ pe_error_wrapper optional_header::validate_subsystem_version() const noexcept
 	auto major_subsystem_version = get_raw_major_subsystem_version();
 	auto minor_subsystem_version = get_raw_minor_subsystem_version();
 
-	if (major_subsystem_version < 3 || (major_subsystem_version == 3 && minor_subsystem_version < 10))
+	if (major_subsystem_version < min_major_subsystem_version
+		|| (major_subsystem_version == min_major_subsystem_version
+			&& minor_subsystem_version < min_minor_subsystem_version))
+	{
 		return optional_header_errc::too_low_subsystem_version;
+	}
 
 	return {};
 }
@@ -203,8 +238,11 @@ pe_error_wrapper optional_header::validate_size_of_stack() const noexcept
 
 pe_error_wrapper optional_header::validate_size_of_headers() const noexcept
 {
-	if(get_raw_section_alignment() < get_raw_size_of_headers())
+	if (!is_low_alignment() && get_raw_section_alignment()
+		< get_raw_size_of_headers())
+	{
 		return optional_header_errc::invalid_size_of_headers;
+	}
 	if (get_raw_size_of_image() < get_raw_size_of_headers())
 		return optional_header_errc::invalid_size_of_headers;
 	return {};
@@ -214,8 +252,11 @@ pe_error_wrapper optional_header::validate(const optional_header_validation_opti
 	bool is_dll) const noexcept
 {
 	pe_error_wrapper result;
-	if (options.check_address_of_entry_point && (result = validate_address_of_entry_point(is_dll)))
+	if (options.check_address_of_entry_point
+		&& (result = validate_address_of_entry_point(is_dll)))
+	{
 		return result;
+	}
 
 	if (options.check_alignments)
 	{
@@ -232,7 +273,7 @@ pe_error_wrapper optional_header::validate(const optional_header_validation_opti
 	if (options.check_size_of_heap && (result = validate_size_of_heap()))
 		return result;
 
-	if (options.check_size_of_stack && (result = validate_size_of_heap()))
+	if (options.check_size_of_stack && (result = validate_size_of_stack()))
 		return result;
 
 	if (options.check_size_of_headers && (result = validate_size_of_headers()))
@@ -288,7 +329,8 @@ std::uint32_t optional_header::get_raw_base_of_data() const
 
 std::uint64_t optional_header::get_raw_image_base() const noexcept
 {
-	return access([] (const auto& obj) { return static_cast<std::uint64_t>(obj.image_base); });
+	return access([] (const auto& obj) {
+		return static_cast<std::uint64_t>(obj.image_base); });
 }
 
 std::uint32_t optional_header::get_raw_section_alignment() const noexcept
@@ -303,12 +345,14 @@ std::uint32_t optional_header::get_raw_file_alignment() const noexcept
 
 std::uint16_t optional_header::get_raw_major_operating_system_version() const noexcept
 {
-	return access([] (const auto& obj) { return obj.major_operating_system_version; });
+	return access([] (const auto& obj) {
+		return obj.major_operating_system_version; });
 }
 
 std::uint16_t optional_header::get_raw_minor_operating_system_version() const noexcept
 {
-	return access([] (const auto& obj) { return obj.minor_operating_system_version; });
+	return access([] (const auto& obj) {
+		return obj.minor_operating_system_version; });
 }
 
 std::uint16_t optional_header::get_raw_major_image_version() const noexcept
@@ -363,22 +407,26 @@ std::uint16_t optional_header::get_raw_dll_characteristics() const noexcept
 
 std::uint64_t optional_header::get_raw_size_of_stack_reserve() const noexcept
 {
-	return access([] (const auto& obj) { return static_cast<std::uint64_t>(obj.size_of_stack_reserve); });
+	return access([] (const auto& obj) {
+		return static_cast<std::uint64_t>(obj.size_of_stack_reserve); });
 }
 
 std::uint64_t optional_header::get_raw_size_of_stack_commit() const noexcept
 {
-	return access([] (const auto& obj) { return static_cast<std::uint64_t>(obj.size_of_stack_commit); });
+	return access([] (const auto& obj) {
+		return static_cast<std::uint64_t>(obj.size_of_stack_commit); });
 }
 
 std::uint64_t optional_header::get_raw_size_of_heap_reserve() const noexcept
 {
-	return access([] (const auto& obj) { return static_cast<std::uint64_t>(obj.size_of_heap_reserve); });
+	return access([] (const auto& obj) {
+		return static_cast<std::uint64_t>(obj.size_of_heap_reserve); });
 }
 
 std::uint64_t optional_header::get_raw_size_of_heap_commit() const noexcept
 {
-	return access([] (const auto& obj) { return static_cast<std::uint64_t>(obj.size_of_heap_commit); });
+	return access([] (const auto& obj) {
+		return static_cast<std::uint64_t>(obj.size_of_heap_commit); });
 }
 
 std::uint32_t optional_header::get_raw_loader_flags() const noexcept
@@ -406,14 +454,18 @@ void optional_header::set_raw_size_of_code(std::uint32_t size) noexcept
 	access([size] (auto& obj) { obj.size_of_code = size; });
 }
 
-void optional_header::set_raw_size_of_initialized_data(std::uint32_t size) noexcept
+void optional_header::set_raw_size_of_initialized_data(
+	std::uint32_t size) noexcept
 {
-	access([size] (auto& obj) { obj.size_of_initialized_data = size; });
+	access([size] (auto& obj) {
+		obj.size_of_initialized_data = size; });
 }
 
-void optional_header::set_raw_size_of_uninitialized_data(std::uint32_t size) noexcept
+void optional_header::set_raw_size_of_uninitialized_data(
+	std::uint32_t size) noexcept
 {
-	access([size] (auto& obj) { obj.size_of_uninitialized_data = size; });
+	access([size] (auto& obj) {
+		obj.size_of_uninitialized_data = size; });
 }
 
 void optional_header::set_raw_address_of_entry_point(rva_type address) noexcept
@@ -438,7 +490,8 @@ void optional_header::set_raw_base_of_data(std::uint32_t base)
 
 void optional_header::set_raw_image_base(std::uint64_t base) noexcept
 {
-	access([base] (auto& obj) { obj.image_base = static_cast<decltype(obj.image_base)>(base); });
+	access([base] (auto& obj) { obj.image_base =
+		static_cast<decltype(obj.image_base)>(base); });
 }
 
 void optional_header::set_raw_section_alignment(std::uint32_t alignment) noexcept
@@ -451,14 +504,18 @@ void optional_header::set_raw_file_alignment(std::uint32_t alignment) noexcept
 	access([alignment] (auto& obj) { obj.file_alignment = alignment; });
 }
 
-void optional_header::set_raw_major_operating_system_version(std::uint16_t version) noexcept
+void optional_header::set_raw_major_operating_system_version(
+	std::uint16_t version) noexcept
 {
-	access([version] (auto& obj) { obj.major_operating_system_version = version; });
+	access([version] (auto& obj) {
+		obj.major_operating_system_version = version; });
 }
 
-void optional_header::set_raw_minor_operating_system_version(std::uint16_t version) noexcept
+void optional_header::set_raw_minor_operating_system_version(
+	std::uint16_t version) noexcept
 {
-	access([version] (auto& obj) { obj.minor_operating_system_version = version; });
+	access([version] (auto& obj) {
+		obj.minor_operating_system_version = version; });
 }
 
 void optional_header::set_raw_major_image_version(std::uint16_t version) noexcept
@@ -471,14 +528,18 @@ void optional_header::set_raw_minor_image_version(std::uint16_t version) noexcep
 	access([version] (auto& obj) { obj.minor_image_version = version; });
 }
 
-void optional_header::set_raw_major_subsystem_version(std::uint16_t version) noexcept
+void optional_header::set_raw_major_subsystem_version(
+	std::uint16_t version) noexcept
 {
-	access([version] (auto& obj) { obj.major_subsystem_version = version; });
+	access([version] (auto& obj) {
+		obj.major_subsystem_version = version; });
 }
 
-void optional_header::set_raw_minor_subsystem_version(std::uint16_t version) noexcept
+void optional_header::set_raw_minor_subsystem_version(
+	std::uint16_t version) noexcept
 {
-	access([version] (auto& obj) { obj.minor_subsystem_version = version; });
+	access([version] (auto& obj) {
+		obj.minor_subsystem_version = version; });
 }
 
 void optional_header::set_raw_win32_version_value(std::uint32_t version) noexcept
@@ -506,9 +567,11 @@ void optional_header::set_raw_subsystem(std::uint16_t subsystem) noexcept
 	access([subsystem] (auto& obj) { obj.subsystem = subsystem; });
 }
 
-void optional_header::set_raw_dll_characteristics(std::uint16_t characteristics) noexcept
+void optional_header::set_raw_dll_characteristics(
+	std::uint16_t characteristics) noexcept
 {
-	access([characteristics] (auto& obj) { obj.dll_characteristics = characteristics; });
+	access([characteristics] (auto& obj) {
+		obj.dll_characteristics = characteristics; });
 }
 
 void optional_header::set_raw_size_of_stack_reserve(std::uint64_t size) noexcept
@@ -540,9 +603,11 @@ void optional_header::set_raw_loader_flags(std::uint32_t flags) noexcept
 	access([flags] (auto& obj) { obj.loader_flags = flags; });
 }
 
-void optional_header::set_raw_number_of_rva_and_sizes(std::uint32_t number) noexcept
+void optional_header::set_raw_number_of_rva_and_sizes(
+	std::uint32_t number) noexcept
 {
-	access([number] (auto& obj) { obj.number_of_rva_and_sizes = number; });
+	access([number] (auto& obj) {
+		obj.number_of_rva_and_sizes = number; });
 }
 
 } //namespace pe_bliss

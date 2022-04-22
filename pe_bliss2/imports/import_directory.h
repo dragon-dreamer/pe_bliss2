@@ -5,9 +5,9 @@
 #include <variant>
 
 #include "pe_bliss2/detail/concepts.h"
-#include "pe_bliss2/detail/error_list.h"
-#include "pe_bliss2/detail/packed_c_string.h"
-#include "pe_bliss2/detail/packed_struct.h"
+#include "pe_bliss2/error_list.h"
+#include "pe_bliss2/packed_c_string.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/imports/image_import_descriptor.h"
 #include "pe_bliss2/imports/imported_address.h"
 
@@ -21,7 +21,7 @@ class imported_library_base
 {
 public:
 	using imported_address_list = ImportedAddressList;
-	using packed_descriptor_type = detail::packed_struct<detail::imports::image_import_descriptor>;
+	using packed_descriptor_type = packed_struct<detail::imports::image_import_descriptor>;
 
 public:
 	[[nodiscard]]
@@ -54,13 +54,13 @@ public:
 
 public:
 	[[nodiscard]]
-	const detail::packed_c_string& get_library_name() const noexcept
+	const packed_c_string& get_library_name() const noexcept
 	{
 		return library_name_;
 	}
 
 	[[nodiscard]]
-	detail::packed_c_string& get_library_name() noexcept
+	packed_c_string& get_library_name() noexcept
 	{
 		return library_name_;
 	}
@@ -91,7 +91,7 @@ public:
 
 public:
 	packed_descriptor_type descriptor_;
-	detail::packed_c_string library_name_;
+	packed_c_string library_name_;
 	imported_address_list imports_;
 };
 
@@ -103,7 +103,7 @@ class imported_library : public imported_library_base<imported_address_list<Va>>
 template<detail::executable_pointer Va>
 class imported_library_details
 	: public imported_library_base<imported_address_details_list<Va>>
-	, public detail::error_list
+	, public error_list
 {
 };
 
@@ -134,7 +134,7 @@ private:
 using import_directory = import_directory_base<imported_library>;
 class import_directory_details
 	: public import_directory_base<imported_library_details>
-	, public detail::error_list
+	, public error_list
 {
 };
 

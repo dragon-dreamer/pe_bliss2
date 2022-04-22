@@ -10,10 +10,10 @@
 namespace buffers
 {
 
-class input_stream_buffer : public input_buffer_interface
+class [[nodiscard]] input_stream_buffer : public input_buffer_interface
 {
 public:
-	explicit input_stream_buffer(const std::shared_ptr<std::istream>& stream);
+	explicit input_stream_buffer(std::shared_ptr<std::istream> stream);
 
 	[[nodiscard]]
 	virtual std::size_t size() override;
@@ -36,6 +36,11 @@ public:
 	virtual std::size_t relative_offset() const noexcept override
 	{
 		return 0;
+	}
+
+	[[nodiscard]] const std::shared_ptr<std::istream>& get_stream() const noexcept
+	{
+		return stream_;
 	}
 
 private:
