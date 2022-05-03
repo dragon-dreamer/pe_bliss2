@@ -95,9 +95,16 @@ std::size_t input_buffer_section::absolute_offset() const noexcept
 	return offset_ + parent_absolute_offset_;
 }
 
-input_buffer_ptr reduce(const input_buffer_ptr& buf, std::size_t offset, std::size_t size)
+input_buffer_ptr reduce(const input_buffer_ptr& buf,
+	std::size_t offset, std::size_t size)
 {
 	return std::make_shared<input_buffer_section>(buf, offset, size);
+}
+
+input_buffer_ptr reduce(const input_buffer_ptr& buf,
+	std::size_t offset)
+{
+	return reduce(buf, offset, buf->size() - offset);
 }
 
 } //namespace buffers

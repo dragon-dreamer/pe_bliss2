@@ -52,4 +52,8 @@ private:
 input_buffer_ptr reduce(const input_buffer_ptr& buf,
 	std::size_t offset, std::size_t size);
 
+[[nodiscard]]
+input_buffer_ptr reduce(const input_buffer_ptr& buf,
+	std::size_t offset);
+
 } //namespace buffers
