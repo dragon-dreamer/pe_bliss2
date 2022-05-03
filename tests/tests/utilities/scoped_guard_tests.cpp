@@ -42,3 +42,24 @@ TEST(ScopedGuardTests, ScopedGuardThrowTest)
 
 	EXPECT_THROW(guard_throw(), std::runtime_error);
 }
+
+TEST(ScopedGuardTests, GuardReleaseTest)
+{
+	int value = 0;
+	auto lambda = [&value]() noexcept { value = 1; };
+
+	{
+		utilities::releasable_scoped_guard g(lambda);
+		EXPECT_EQ(value, 0);
+	}
+	EXPECT_EQ(value, 1);
+
+	value = 0;
+
+	{
+		utilities::releasable_scoped_guard g(lambda);
+		g.release();
+		EXPECT_EQ(value, 0);
+	}
+	EXPECT_EQ(value, 0);
+}
