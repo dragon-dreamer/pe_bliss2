@@ -9,8 +9,10 @@
 
 #include "pe_bliss2/section_header.h"
 #include "pe_bliss2/section_data.h"
+#include "pe_bliss2/section_table.h"
 
 #include "tests/tests/pe_bliss2/input_buffer_mock.h"
+#include "tests/tests/pe_bliss2/pe_error_helper.h"
 
 using namespace ::testing;
 
@@ -156,12 +158,14 @@ TEST(SectionDataTests, DeserializeTooSmallTest)
 		55u, absolute_offset, relative_offset);
 
 	pe_bliss::section_data data;
-	EXPECT_THROW(data.deserialize(create_section_header(), buffer_mock, {
+	expect_throw_pe_error([&]() {
+		data.deserialize(create_section_header(), buffer_mock, {
 		.section_alignment = 128u,
 		.copy_memory = true,
 		.image_loaded_to_memory = false,
 		.image_start_buffer_pos = image_start_buffer_pos
-	}), std::system_error);
+			});
+	}, pe_bliss::section_table_errc::unable_to_read_section_data);
 }
 
 TEST(SectionDataTests, DeserializeIntOverflowTest)
@@ -172,10 +176,12 @@ TEST(SectionDataTests, DeserializeIntOverflowTest)
 
 	auto header = create_section_header();
 	pe_bliss::section_data data;
-	EXPECT_THROW(data.deserialize(create_section_header(), buffer_mock, {
+	expect_throw_pe_error([&]() {
+		data.deserialize(create_section_header(), buffer_mock, {
 		.section_alignment = 128u,
 		.copy_memory = true,
 		.image_loaded_to_memory = false,
 		.image_start_buffer_pos = (std::numeric_limits<std::size_t>::max)() - 3u
-	}), std::system_error);
+			});
+	}, pe_bliss::section_table_errc::unable_to_read_section_data);
 }

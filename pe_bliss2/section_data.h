@@ -6,11 +6,6 @@
 #include "buffers/input_buffer_interface.h"
 #include "buffers/ref_buffer.h"
 
-namespace buffers
-{
-class output_buffer_interface;
-} //namespace buffers
-
 namespace pe_bliss
 {
 

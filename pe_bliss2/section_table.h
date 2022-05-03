@@ -17,6 +17,7 @@ class output_buffer_interface;
 namespace pe_bliss
 {
 
+//TODO: move to separate file (used by several classes)
 enum class section_table_errc
 {
 	invalid_section_raw_size = 1,
@@ -32,7 +33,8 @@ enum class section_table_errc
 	virtual_gap_between_headers_and_first_section,
 	invalid_size_of_image,
 	unable_to_read_section_table,
-	invalid_section_offset
+	invalid_section_offset,
+	unable_to_read_section_data
 };
 
 std::error_code make_error_code(section_table_errc) noexcept;

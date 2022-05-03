@@ -57,6 +57,8 @@ struct section_table_error_category : std::error_category
 			return "Unable to read section table";
 		case invalid_section_offset:
 			return "Invalid offset within section";
+		case unable_to_read_section_data:
+			return "Unable to read section data";
 		default:
 			return {};
 		}
