@@ -8,7 +8,7 @@
 
 #include "utilities/static_class.h"
 
-//TODO: check that std::byte size is equal to 8
+//TODO: check that std::byte size is equal to 8 bits
 
 namespace utilities
 {
@@ -20,11 +20,18 @@ public:
 	*   @param value Value
 	*   @param boundary Boundary
 	*   @return True if value is aligned */
+	template<std::size_t Boundary, std::integral T>
+	[[nodiscard]]
+	static constexpr bool is_aligned(T value) noexcept
+	{
+		return !(value % Boundary);
+	}
+
 	template<std::integral Boundary, std::integral T>
 	[[nodiscard]]
 	static constexpr bool is_aligned(T value) noexcept
 	{
-		return !(value % sizeof(Boundary));
+		return is_aligned<sizeof(Boundary)>(value);
 	}
 
 	/** Helper function to align an integer down.
