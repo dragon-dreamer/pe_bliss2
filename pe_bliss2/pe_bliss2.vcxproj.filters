@@ -112,6 +112,21 @@
     <Filter Include="Header Files\detail\resources">
       <UniqueIdentifier>{718dfe86-006a-45e7-bcd2-9f5c5b61f44e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\detail">
+      <UniqueIdentifier>{beebc20d-8329-47c1-909e-789db4eb0956}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\rich">
+      <UniqueIdentifier>{83080f75-0e8e-4685-95a8-79bdda0525d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\rich">
+      <UniqueIdentifier>{31f7b197-600a-4a04-ac7e-29c1663d6139}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\detail\rich">
+      <UniqueIdentifier>{e2b44682-2dae-454f-ada5-272ade1b4df9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\rich">
+      <UniqueIdentifier>{065a1b06-6b5e-4014-ac0f-3442ad6d8301}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detail\packed_serialization.h">
@@ -126,9 +141,6 @@
     <ClInclude Include="pe_error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rich_header.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="detail\image_dos_header.h">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
@@ -136,12 +148,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="image_signature.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="compid_database.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="rich_compid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="detail\image_file_header.h">
@@ -351,18 +357,33 @@
     <ClInclude Include="bit_stream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="detail\rich\rich_header_utils.h">
+      <Filter>Header Files\detail\rich</Filter>
+    </ClInclude>
+    <ClInclude Include="rich\rich_header.h">
+      <Filter>Header Files\rich</Filter>
+    </ClInclude>
+    <ClInclude Include="rich\rich_compid.h">
+      <Filter>Header Files\rich</Filter>
+    </ClInclude>
+    <ClInclude Include="rich\compid_database.h">
+      <Filter>Header Files\rich</Filter>
+    </ClInclude>
+    <ClInclude Include="rich\rich_header_loader.h">
+      <Filter>Header Files\rich</Filter>
+    </ClInclude>
+    <ClInclude Include="rich\rich_header_builder.h">
+      <Filter>Header Files\rich</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\packed_buffer_serialization.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dos_header.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dos_stub.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="rich_header.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="compid_database.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="image_signature.cpp">
@@ -496,6 +517,24 @@
     </ClCompile>
     <ClCompile Include="pe_section_error.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="detail\rich\rich_header_utils.cpp">
+      <Filter>Source Files\detail\rich</Filter>
+    </ClCompile>
+    <ClCompile Include="rich\rich_header_loader.cpp">
+      <Filter>Source Files\rich</Filter>
+    </ClCompile>
+    <ClCompile Include="rich\compid_database.cpp">
+      <Filter>Source Files\rich</Filter>
+    </ClCompile>
+    <ClCompile Include="rich\rich_header.cpp">
+      <Filter>Source Files\rich</Filter>
+    </ClCompile>
+    <ClCompile Include="rich\rich_compid.cpp">
+      <Filter>Source Files\rich</Filter>
+    </ClCompile>
+    <ClCompile Include="rich\rich_header_builder.cpp">
+      <Filter>Source Files\rich</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

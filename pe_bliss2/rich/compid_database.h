@@ -2,10 +2,10 @@
 
 #include <cstdint>
 
-#include "pe_bliss2/rich_compid.h"
+#include "pe_bliss2/rich/rich_compid.h"
 #include "utilities/static_class.h"
 
-namespace pe_bliss
+namespace pe_bliss::rich
 {
 
 class compid_database : utilities::static_class
@@ -139,6 +139,7 @@ public:
 		visual_studio_2022_17_2_0_preview1_0,
 		visual_studio_2022_17_2_0_preview2_1,
 		visual_studio_2022_17_2_0_preview3_0,
+		visual_studio_2022_17_2_0_preview5_0,
 		unmarked_object,
 		unknown
 	};
@@ -164,4 +165,4 @@ public:
 	static const char* tool_type_to_string(tool_type type) noexcept;
 };
 
-} //namespace pe_bliss
+} //namespace pe_bliss::rich

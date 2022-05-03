@@ -318,6 +318,13 @@ public:
 		stream_ << '\n';
 	}
 
+	void print_errors(std::error_code ec)
+	{
+		pe_bliss::error_list errors;
+		errors.add_error(ec);
+		print_errors(errors);
+	}
+
 	void print_errors(const pe_bliss::error_list& errors)
 	{
 		if (errors.get_errors().empty())

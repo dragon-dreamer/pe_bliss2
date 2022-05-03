@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <compare>
 
-namespace pe_bliss
+namespace pe_bliss::rich
 {
 
 class [[nodiscard]] rich_compid
@@ -18,4 +18,7 @@ public:
 		const rich_compid&) noexcept = default;
 };
 
-} //namespace pe_bliss
+[[nodiscard]]
+std::uint32_t get_checksum(const rich_compid& compid) noexcept;
+
+} //namespace pe_bliss::rich

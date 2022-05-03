@@ -3,9 +3,9 @@
 #include <limits>
 #include <string_view>
 
-#include "pe_bliss2/compid_database.h"
+#include "pe_bliss2/rich/compid_database.h"
 
-using namespace pe_bliss;
+using namespace pe_bliss::rich;
 
 TEST(CompidDatabaseTests, ProductTypeToNameTest)
 {
@@ -14,7 +14,7 @@ TEST(CompidDatabaseTests, ProductTypeToNameTest)
 		"Visual Studio 1997 SP3");
 	EXPECT_EQ(std::string_view(compid_database::product_type_to_string(
 		compid_database::product_type::visual_studio_2022_17_2_0_preview2_1)),
-		"Visual Studio 2019 17.2.0 Preview 2.1");
+		"Visual Studio 2022 17.2.0 Preview 2.1");
 	EXPECT_EQ(std::string_view(compid_database::product_type_to_string(
 		compid_database::product_type::unknown)), "Unknown");
 	EXPECT_EQ(std::string_view(compid_database::product_type_to_string(

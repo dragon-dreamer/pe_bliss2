@@ -53,24 +53,7 @@ void image_builder::build(const image& instance, const image_builder_options& op
 	auto image_start_pos = dos_hdr.get_state().buffer_pos();
 	dos_hdr.serialize(buffer, true);
 
-	if (options.rebuild_rich_header)
-	{
-		auto dos_stub = instance.get_dos_stub().data();
-		auto rich_header = instance.get_rich_header();
-		rich_header.serialize(instance.get_dos_header(), dos_stub, {
-			.allow_dos_stub_buffer_extension = false,
-			.recalculate_checksum = options.recalculate_rich_header_checksum,
-			.dos_stub_offset = options.rich_header_dos_stub_offset.value_or(
-				rich_header.dos_stub_offset())
-		});
-		buffer.write(dos_stub.size(), dos_stub.data());
-	}
-	else
-	{
-		const auto& dos_stub = instance.get_dos_stub().data();
-		buffer.write(dos_stub.size(), dos_stub.data());
-	}
-
+	instance.get_dos_stub().serialize(buffer);
 	instance.get_image_signature().serialize(buffer, options.write_structure_virtual_parts);
 	instance.get_file_header().serialize(buffer, options.write_structure_virtual_parts);
 	instance.get_optional_header().serialize(buffer, options.write_structure_virtual_parts);

@@ -26,8 +26,6 @@ struct image_builder_options
 {
 	bool keep_structure_offsets = true;
 	bool write_structure_virtual_parts = true;
-	bool rebuild_rich_header = true;
-	bool recalculate_rich_header_checksum = true;
 	bool fill_full_headers_data_gaps = true;
 	std::optional<std::size_t> rich_header_dos_stub_offset;
 };

@@ -22,7 +22,6 @@
 #include "pe_bliss2/optional_header.h"
 #include "pe_bliss2/overlay.h"
 #include "pe_bliss2/pe_types.h"
-#include "pe_bliss2/rich_header.h"
 #include "pe_bliss2/section_table.h"
 #include "pe_bliss2/section_data.h"
 #include "utilities/safe_uint.h"
@@ -72,16 +71,6 @@ public:
 	[[nodiscard]] const dos_stub& get_dos_stub() const noexcept
 	{
 		return dos_stub_;
-	}
-
-	[[nodiscard]] rich_header& get_rich_header() noexcept
-	{
-		return rich_header_;
-	}
-
-	[[nodiscard]] const rich_header& get_rich_header() const noexcept
-	{
-		return rich_header_;
 	}
 
 	[[nodiscard]] image_signature& get_image_signature() noexcept
@@ -562,7 +551,6 @@ private:
 	bool loaded_to_memory_ = false;
 	dos_header dos_header_;
 	dos_stub dos_stub_;
-	rich_header rich_header_;
 	image_signature image_signature_;
 	file_header file_header_;
 	optional_header optional_header_;

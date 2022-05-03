@@ -27,9 +27,10 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 	dos_hdr.deserialize(*buffer, options.allow_virtual_headers);
 	dos_hdr.validate(options.dos_header_validation).throw_on_error();
 
-	instance.get_dos_stub().deserialize(*buffer, dos_hdr.base_struct()->e_lfanew);
-	if (options.load_rich_header)
-		instance.get_rich_header().deserialize(instance.get_dos_stub().data());
+	instance.get_dos_stub().deserialize(buffer, {
+		.copy_memory = options.eager_dos_stub_data_copy,
+		.e_lfanew = dos_hdr.base_struct()->e_lfanew
+	});
 
 	std::size_t pe_headers_start = dos_hdr.base_struct().get_state().buffer_pos();
 	if (!utilities::math::add_if_safe<std::size_t>(pe_headers_start, dos_hdr.base_struct()->e_lfanew))
@@ -116,7 +117,7 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 	if (options.load_full_headers_buffer)
 	{
 		auto start_pos = dos_hdr.base_struct().get_state().buffer_pos();
-		auto size = optional_hdr.get_raw_size_of_headers();
+		auto size = optional_hdr.get_raw_size_of_headers(); //TODO may be invalid
 		buffer->set_rpos(start_pos);
 		instance.get_full_headers_buffer().deserialize(
 			std::make_shared<buffers::input_buffer_section>(buffer, start_pos, size),

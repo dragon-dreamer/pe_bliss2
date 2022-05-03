@@ -23,11 +23,12 @@
 //TODO: configuration flags, output options
 void dump_pe(const pe_bliss::image& image)
 {
-	escape_sequence_color_provider color_provider;
+	//escape_sequence_color_provider color_provider;
+	empty_color_provider color_provider;
 	formatter fmt(color_provider, std::cout, std::cerr);
 	dump_dos_header(fmt, image.get_dos_header());
 	dump_dos_stub(fmt, image.get_dos_stub());
-	dump_rich_data(fmt, image.get_dos_stub(), image.get_rich_header());
+	dump_rich_data(fmt, image);
 	dump_file_signature(fmt, image.get_image_signature());
 	dump_file_header(fmt, image.get_file_header());
 	dump_optional_header(fmt, image.get_optional_header());

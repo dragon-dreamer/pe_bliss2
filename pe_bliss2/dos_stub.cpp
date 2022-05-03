@@ -1,8 +1,10 @@
 #include "pe_bliss2/dos_stub.h"
 
+#include <exception>
+#include <memory>
 #include <system_error>
 
-#include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_section.h"
 #include "pe_bliss2/pe_error.h"
 
 namespace
@@ -39,19 +41,22 @@ std::error_code make_error_code(dos_stub_errc e) noexcept
 	return { static_cast<int>(e), dos_stub_error_category_instance };
 }
 
-void dos_stub::deserialize(buffers::input_buffer_interface& buf, std::size_t e_lfanew)
+void dos_stub::deserialize(const buffers::input_buffer_ptr& buffer,
+	const dos_stub_load_options& options)
 {
-	buffer_pos_ = buf.rpos();
-
-	if (e_lfanew <= buffer_pos_)
+	try
 	{
-		data_.clear();
-		return;
+		auto buffer_pos = buffer->rpos();
+		auto buffer_section = std::make_shared<buffers::input_buffer_section>(
+			buffer, buffer_pos,
+			options.e_lfanew <= buffer_pos ? 0u : options.e_lfanew - buffer_pos);
+		buffer_section->set_relative_offset(0);
+		ref_buffer::deserialize(buffer_section, options.copy_memory);
 	}
-
-	data_.resize(e_lfanew - buffer_pos_);
-	if (buf.read(data_.size(), data_.data()) != data_.size())
-		throw pe_error(dos_stub_errc::unable_to_read_dos_stub);
+	catch (...)
+	{
+		std::throw_with_nested(pe_error(dos_stub_errc::unable_to_read_dos_stub));
+	}
 }
 
 } //namespace pe_bliss

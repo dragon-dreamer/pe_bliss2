@@ -12,12 +12,12 @@ namespace pe_bliss
 struct image_load_options
 {
 	bool allow_virtual_headers = false;
-	bool load_rich_header = true;
 	bool validate_sections = true;
 	bool load_section_data = true;
 	bool validate_size_of_image = true;
 	bool image_loaded_to_memory = false;
 	bool eager_section_data_copy = false;
+	bool eager_dos_stub_data_copy = false;
 	bool validate_image_base = true;
 	bool load_overlay = true;
 	bool eager_overlay_data_copy = false;

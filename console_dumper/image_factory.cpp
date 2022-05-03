@@ -9,7 +9,9 @@
 pe_bliss::image load_image(const char* filename,
 	const pe_bliss::image_load_options& options)
 {
-	auto pe_file = std::make_shared<std::ifstream>(filename, std::ios::in | std::ios::binary);
+	auto pe_file = std::make_shared<std::ifstream>(
+		filename, std::ios::in | std::ios::binary);
 	pe_file->exceptions(std::ios::badbit);
-	return pe_bliss::image_loader::load(std::make_shared<buffers::input_stream_buffer>(pe_file), options);
+	return pe_bliss::image_loader::load(
+		std::make_shared<buffers::input_stream_buffer>(pe_file), options);
 }

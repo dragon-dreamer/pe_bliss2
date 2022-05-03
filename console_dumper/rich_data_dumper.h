@@ -4,9 +4,7 @@ class formatter;
 
 namespace pe_bliss
 {
-class dos_stub;
-class rich_header;
+class image;
 } //namespace pe_bliss
 
-void dump_rich_data(formatter& fmt, const pe_bliss::dos_stub& stub,
-	const pe_bliss::rich_header& header);
+void dump_rich_data(formatter& fmt, const pe_bliss::image& image);
