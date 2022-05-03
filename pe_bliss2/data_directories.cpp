@@ -19,7 +19,7 @@ struct data_directories_error_category : std::error_category
 {
 	const char* name() const noexcept override
 	{
-		return "dos_stub";
+		return "data_directories";
 	}
 
 	std::string message(int ev) const override
