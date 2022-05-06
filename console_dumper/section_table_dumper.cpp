@@ -6,16 +6,17 @@
 
 #include "formatter.h"
 
-#include "pe_bliss2/section_header.h"
-#include "pe_bliss2/section_table.h"
+#include "pe_bliss2/section/section_header.h"
+#include "pe_bliss2/section/section_table.h"
 
 namespace
 {
 
-void dump_section_characteristics(formatter& fmt, const pe_bliss::section_header& header,
+void dump_section_characteristics(formatter& fmt,
+	const pe_bliss::section::section_header& header,
 	std::size_t left_padding)
 {
-	using enum pe_bliss::section_header::characteristics::value;
+	using enum pe_bliss::section::section_header::characteristics::value;
 	fmt.print_flags(header.get_characteristics(), left_padding, {
 		{ mem_discardable, "MEM_DISCARDABLE" },
 		{ mem_not_cached, "MEM_NOT_CACHED" },
@@ -30,13 +31,13 @@ void dump_section_characteristics(formatter& fmt, const pe_bliss::section_header
 	});
 }
 
-void dump_section_name(formatter& fmt, const pe_bliss::section_header& header)
+void dump_section_name(formatter& fmt, const pe_bliss::section::section_header& header)
 {
 	//TODO: can have nullbytes in the middle
 	fmt.print_string(std::string(header.get_name()).c_str());
 }
 
-void dump_section_header(formatter& fmt, const pe_bliss::section_header& header)
+void dump_section_header(formatter& fmt, const pe_bliss::section::section_header& header)
 {
 	fmt.print_structure("Section header", header.base_struct(), std::array{
 		value_info{"name", true,
@@ -56,7 +57,7 @@ void dump_section_header(formatter& fmt, const pe_bliss::section_header& header)
 
 } //namespace
 
-void dump_section_table(formatter& fmt, const pe_bliss::section_table& table)
+void dump_section_table(formatter& fmt, const pe_bliss::section::section_table& table)
 {
 	if (table.get_section_headers().empty())
 		return;

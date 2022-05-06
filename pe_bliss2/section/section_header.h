@@ -15,7 +15,7 @@ class input_buffer_interface;
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss
+namespace pe_bliss::section
 {
 
 class [[nodiscard]] section_header
@@ -125,4 +125,4 @@ private:
 	void toggle_characteristic(bool toggle, std::uint32_t flag) noexcept;
 };
 
-} //namespace pe_bliss
+} //namespace pe_bliss::section

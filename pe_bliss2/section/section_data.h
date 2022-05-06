@@ -6,7 +6,7 @@
 #include "buffers/input_buffer_interface.h"
 #include "buffers/ref_buffer.h"
 
-namespace pe_bliss
+namespace pe_bliss::section
 {
 
 class section_header;
@@ -36,4 +36,4 @@ public:
 		const section_data_load_options& options);
 };
 
-} //namespace pe_bliss
+} //namespace pe_bliss::section

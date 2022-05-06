@@ -7,8 +7,8 @@
 #include "buffers/input_buffer_section.h"
 #include "pe_bliss2/dos_header.h"
 #include "pe_bliss2/pe_error.h"
-#include "pe_bliss2/pe_section_error.h"
-#include "pe_bliss2/section_data.h"
+#include "pe_bliss2/section/pe_section_error.h"
+#include "pe_bliss2/section/section_data.h"
 #include "utilities/math.h"
 
 namespace pe_bliss
@@ -62,7 +62,7 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 	if (options.validate_sections)
 	{
 		auto& sections = instance.get_section_data_list();
-		section_data_load_options load_opts{
+		section::section_data_load_options load_opts{
 			.section_alignment = optional_hdr.get_raw_section_alignment(),
 			.copy_memory = options.eager_section_data_copy,
 			.image_loaded_to_memory = options.image_loaded_to_memory,
@@ -75,7 +75,7 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 			end = section_tbl.get_section_headers().cend(); it != end; ++it, ++section_index)
 		{
 			if ((result = section_tbl.validate_section_header(optional_hdr, it)))
-				throw pe_section_error(result, section_index, std::string(it->get_name()));
+				throw section::pe_section_error(result, section_index, std::string(it->get_name()));
 		}
 
 		if (options.load_section_data)

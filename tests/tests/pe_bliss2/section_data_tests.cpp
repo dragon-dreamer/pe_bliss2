@@ -7,14 +7,15 @@
 #include <memory>
 #include <system_error>
 
-#include "pe_bliss2/section_header.h"
-#include "pe_bliss2/section_data.h"
-#include "pe_bliss2/section_table.h"
+#include "pe_bliss2/section/section_header.h"
+#include "pe_bliss2/section/section_data.h"
+#include "pe_bliss2/section/section_table.h"
 
 #include "tests/tests/pe_bliss2/input_buffer_mock.h"
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
 using namespace ::testing;
+using namespace pe_bliss::section;
 
 namespace
 {
@@ -53,7 +54,7 @@ auto create_buffer_mock(std::size_t size, std::size_t initial_rpos,
 }
 
 static constexpr auto pointer_to_raw_data
-= pe_bliss::section_header::max_raw_address_rounded_to_0 + 1u;
+	= pe_bliss::section::section_header::max_raw_address_rounded_to_0 + 1u;
 static constexpr std::size_t raw_size = 128u;
 static constexpr std::size_t image_start_buffer_pos = 123u;
 static constexpr std::size_t absolute_offset = 11u;
@@ -61,13 +62,13 @@ static constexpr std::size_t relative_offset = 15u;
 
 auto create_section_header()
 {
-	pe_bliss::section_header header;
+	section_header header;
 	header.set_pointer_to_raw_data(pointer_to_raw_data);
 	header.set_raw_size(raw_size);
 	return header;
 }
 
-void check_buffer(const pe_bliss::section_data& data)
+void check_buffer(const section_data& data)
 {
 	EXPECT_EQ(data.data()->size(), raw_size);
 	EXPECT_EQ(data.data()->absolute_offset(), absolute_offset
@@ -87,7 +88,7 @@ TEST(SectionDataTests, DeserializeNoCopyTest)
 	EXPECT_CALL(*buffer_mock, advance_rpos(_)).Times(0);
 	EXPECT_CALL(*buffer_mock, read(_, _)).Times(0);
 
-	pe_bliss::section_data data;
+	section_data data;
 	data.deserialize(create_section_header(), buffer_mock, {
 		.section_alignment = 128u,
 		.copy_memory = false,
@@ -116,7 +117,7 @@ TEST(SectionDataTests, DeserializeCopyTest)
 	EXPECT_CALL(*buffer_mock, advance_rpos(_)).Times(0);
 	EXPECT_CALL(*buffer_mock, read(raw_size, _));
 
-	pe_bliss::section_data data;
+	section_data data;
 	data.deserialize(create_section_header(), buffer_mock, {
 		.section_alignment = 128u,
 		.copy_memory = true,
@@ -141,7 +142,7 @@ TEST(SectionDataTests, DeserializeLoadedTest)
 
 	auto header = create_section_header();
 	header.set_rva(rva);
-	pe_bliss::section_data data;
+	section_data data;
 	data.deserialize(header, buffer_mock, {
 		.section_alignment = 128u,
 		.copy_memory = true,
@@ -157,7 +158,7 @@ TEST(SectionDataTests, DeserializeTooSmallTest)
 	auto buffer_mock = create_buffer_mock(raw_size,
 		55u, absolute_offset, relative_offset);
 
-	pe_bliss::section_data data;
+	section_data data;
 	expect_throw_pe_error([&]() {
 		data.deserialize(create_section_header(), buffer_mock, {
 		.section_alignment = 128u,
@@ -165,7 +166,7 @@ TEST(SectionDataTests, DeserializeTooSmallTest)
 		.image_loaded_to_memory = false,
 		.image_start_buffer_pos = image_start_buffer_pos
 			});
-	}, pe_bliss::section_table_errc::unable_to_read_section_data);
+	}, section_table_errc::unable_to_read_section_data);
 }
 
 TEST(SectionDataTests, DeserializeIntOverflowTest)
@@ -175,7 +176,7 @@ TEST(SectionDataTests, DeserializeIntOverflowTest)
 		55u, absolute_offset, relative_offset);
 
 	auto header = create_section_header();
-	pe_bliss::section_data data;
+	section_data data;
 	expect_throw_pe_error([&]() {
 		data.deserialize(create_section_header(), buffer_mock, {
 		.section_alignment = 128u,
@@ -183,5 +184,5 @@ TEST(SectionDataTests, DeserializeIntOverflowTest)
 		.image_loaded_to_memory = false,
 		.image_start_buffer_pos = (std::numeric_limits<std::size_t>::max)() - 3u
 			});
-	}, pe_bliss::section_table_errc::unable_to_read_section_data);
+	}, section_table_errc::unable_to_read_section_data);
 }

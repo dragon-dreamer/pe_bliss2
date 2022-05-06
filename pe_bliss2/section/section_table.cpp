@@ -1,4 +1,4 @@
-#include "pe_bliss2/section_table.h"
+#include "pe_bliss2/section/section_table.h"
 
 #include <algorithm>
 #include <iterator>
@@ -11,7 +11,7 @@
 #include "pe_bliss2/file_header.h"
 #include "pe_bliss2/optional_header.h"
 #include "pe_bliss2/pe_error.h"
-#include "pe_bliss2/section_search.h"
+#include "pe_bliss2/section/section_search.h"
 #include "utilities/math.h"
 
 namespace
@@ -26,8 +26,8 @@ struct section_table_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
-		using enum pe_bliss::section_table_errc;
-		switch (static_cast<pe_bliss::section_table_errc>(ev))
+		using enum pe_bliss::section::section_table_errc;
+		switch (static_cast<pe_bliss::section::section_table_errc>(ev))
 		{
 		case invalid_section_raw_size:
 			return "Invalid section physical size";
@@ -69,7 +69,7 @@ const section_table_error_category section_table_error_category_instance;
 
 } //namespace
 
-namespace pe_bliss
+namespace pe_bliss::section
 {
 
 std::error_code make_error_code(section_table_errc e) noexcept
@@ -211,14 +211,14 @@ section_table::header_list::const_iterator section_table::by_rva(rva_type rva,
 	std::uint32_t section_alignment, std::uint32_t data_size) const
 {
 	return std::find_if(std::cbegin(headers_), std::cend(headers_),
-		section_search::by_rva(rva, section_alignment, data_size));
+		section::by_rva(rva, section_alignment, data_size));
 }
 
 section_table::header_list::iterator section_table::by_rva(rva_type rva,
 	std::uint32_t section_alignment, std::uint32_t data_size)
 {
 	return std::find_if(std::begin(headers_), std::end(headers_),
-		section_search::by_rva(rva, section_alignment, data_size));
+		section::by_rva(rva, section_alignment, data_size));
 }
 
 section_table::header_list::const_iterator section_table::by_raw_offset(
@@ -226,7 +226,7 @@ section_table::header_list::const_iterator section_table::by_raw_offset(
 	std::uint32_t section_alignment, std::uint32_t data_size) const
 {
 	return std::find_if(std::cbegin(headers_), std::cend(headers_),
-		section_search::by_raw_offset(raw_offset, section_alignment, data_size));
+		section::by_raw_offset(raw_offset, section_alignment, data_size));
 }
 
 section_table::header_list::iterator section_table::by_raw_offset(
@@ -234,21 +234,21 @@ section_table::header_list::iterator section_table::by_raw_offset(
 	std::uint32_t section_alignment, std::uint32_t data_size)
 {
 	return std::find_if(std::begin(headers_), std::end(headers_),
-		section_search::by_raw_offset(raw_offset, section_alignment, data_size));
+		section::by_raw_offset(raw_offset, section_alignment, data_size));
 }
 
 section_table::header_list::const_iterator section_table::by_reference(
 	const section_header& header) const noexcept
 {
 	return std::find_if(std::cbegin(headers_), std::cend(headers_),
-		section_search::by_pointer(&header));
+		section::by_pointer(&header));
 }
 
 section_table::header_list::iterator section_table::by_reference(
 	section_header& header) noexcept
 {
 	return std::find_if(std::begin(headers_), std::end(headers_),
-		section_search::by_pointer(&header));
+		section::by_pointer(&header));
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::section

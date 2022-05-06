@@ -81,7 +81,6 @@
     <ClInclude Include="packed_struct.h" />
     <ClInclude Include="packed_utf16_string.h" />
     <ClInclude Include="pe_error.h" />
-    <ClInclude Include="pe_section_error.h" />
     <ClInclude Include="pe_types.h" />
     <ClInclude Include="relocations\base_relocation.h" />
     <ClInclude Include="relocations\image_rebase.h" />
@@ -95,10 +94,11 @@
     <ClInclude Include="rich\rich_header.h" />
     <ClInclude Include="rich\rich_header_builder.h" />
     <ClInclude Include="rich\rich_header_loader.h" />
-    <ClInclude Include="section_data.h" />
-    <ClInclude Include="section_header.h" />
-    <ClInclude Include="section_search.h" />
-    <ClInclude Include="section_table.h" />
+    <ClInclude Include="section\pe_section_error.h" />
+    <ClInclude Include="section\section_data.h" />
+    <ClInclude Include="section\section_header.h" />
+    <ClInclude Include="section\section_search.h" />
+    <ClInclude Include="section\section_table.h" />
     <ClInclude Include="tls\tls_directory.h" />
     <ClInclude Include="tls\tls_directory_builder.h" />
     <ClInclude Include="tls\tls_directory_loader.h" />
@@ -165,7 +165,6 @@
     <ClCompile Include="packed_byte_vector.cpp" />
     <ClCompile Include="packed_c_string.cpp" />
     <ClCompile Include="packed_utf16_string.cpp" />
-    <ClCompile Include="pe_section_error.cpp" />
     <ClCompile Include="relocations\image_rebase.cpp" />
     <ClCompile Include="relocations\relocation_entry.cpp" />
     <ClCompile Include="relocations\relocation_directory_builder.cpp" />
@@ -176,10 +175,11 @@
     <ClCompile Include="rich\rich_header.cpp" />
     <ClCompile Include="rich\rich_header_builder.cpp" />
     <ClCompile Include="rich\rich_header_loader.cpp" />
-    <ClCompile Include="section_data.cpp" />
-    <ClCompile Include="section_header.cpp" />
-    <ClCompile Include="section_search.cpp" />
-    <ClCompile Include="section_table.cpp" />
+    <ClCompile Include="section\pe_section_error.cpp" />
+    <ClCompile Include="section\section_data.cpp" />
+    <ClCompile Include="section\section_header.cpp" />
+    <ClCompile Include="section\section_search.cpp" />
+    <ClCompile Include="section\section_table.cpp" />
     <ClCompile Include="tls\tls_directory_builder.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>
@@ -271,7 +271,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_77_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -289,7 +289,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_77_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -325,7 +325,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_77_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>

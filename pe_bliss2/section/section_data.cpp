@@ -1,4 +1,4 @@
-#include "pe_bliss2/section_data.h"
+#include "pe_bliss2/section/section_data.h"
 
 #include <cstddef>
 #include <exception>
@@ -6,13 +6,13 @@
 
 #include "buffers/input_buffer_section.h"
 #include "buffers/output_buffer_interface.h"
-#include "pe_bliss2/section_header.h"
-#include "pe_bliss2/section_table.h"
+#include "pe_bliss2/section/section_header.h"
+#include "pe_bliss2/section/section_table.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
 #include "utilities/safe_uint.h"
 
-namespace pe_bliss
+namespace pe_bliss::section
 {
 
 void section_data::deserialize(const section_header& header,
@@ -41,4 +41,4 @@ void section_data::deserialize(const section_header& header,
 	}
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::section

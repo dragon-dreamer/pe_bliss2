@@ -1,4 +1,4 @@
-#include "pe_bliss2/section_header.h"
+#include "pe_bliss2/section/section_header.h"
 
 #include <algorithm>
 #include <bit>
@@ -7,10 +7,10 @@
 #include <exception>
 
 #include "pe_bliss2/pe_error.h"
-#include "pe_bliss2/section_table.h"
+#include "pe_bliss2/section/section_table.h"
 #include "utilities/math.h"
 
-namespace pe_bliss
+namespace pe_bliss::section
 {
 
 void section_header::deserialize(buffers::input_buffer_interface& buf,
@@ -315,4 +315,4 @@ section_header& section_header::set_raw_size(std::uint32_t raw_size) noexcept
 	return *this;
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::section

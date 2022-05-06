@@ -127,6 +127,12 @@
     <Filter Include="Header Files\rich">
       <UniqueIdentifier>{065a1b06-6b5e-4014-ac0f-3442ad6d8301}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\section">
+      <UniqueIdentifier>{f50707f0-78bf-4325-ba8f-2e4bbbac05fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\section">
+      <UniqueIdentifier>{a56dfaf9-f8ff-4478-9da3-b4e9e56e3808}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detail\packed_serialization.h">
@@ -171,17 +177,8 @@
     <ClInclude Include="data_directories.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="section_table.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="detail\image_section_header.h">
       <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="section_header.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="section_data.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="image.h">
       <Filter>Header Files</Filter>
@@ -189,16 +186,10 @@
     <ClInclude Include="image_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pe_section_error.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="image_builder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="address_converter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="section_search.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="overlay.h">
@@ -378,6 +369,21 @@
     <ClInclude Include="detail\packed_buffer_serialization.h">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
+    <ClInclude Include="section\section_data.h">
+      <Filter>Header Files\section</Filter>
+    </ClInclude>
+    <ClInclude Include="section\section_header.h">
+      <Filter>Header Files\section</Filter>
+    </ClInclude>
+    <ClInclude Include="section\section_search.h">
+      <Filter>Header Files\section</Filter>
+    </ClInclude>
+    <ClInclude Include="section\section_table.h">
+      <Filter>Header Files\section</Filter>
+    </ClInclude>
+    <ClInclude Include="section\pe_section_error.h">
+      <Filter>Header Files\section</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dos_header.cpp">
@@ -398,15 +404,6 @@
     <ClCompile Include="data_directories.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="section_table.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="section_header.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="section_data.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="image_loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -417,9 +414,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="address_converter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="section_search.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="exports\export_directory_loader.cpp">
@@ -515,9 +509,6 @@
     <ClCompile Include="error_list.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pe_section_error.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="detail\rich\rich_header_utils.cpp">
       <Filter>Source Files\detail\rich</Filter>
     </ClCompile>
@@ -535,6 +526,21 @@
     </ClCompile>
     <ClCompile Include="rich\rich_header_builder.cpp">
       <Filter>Source Files\rich</Filter>
+    </ClCompile>
+    <ClCompile Include="section\section_data.cpp">
+      <Filter>Source Files\section</Filter>
+    </ClCompile>
+    <ClCompile Include="section\section_header.cpp">
+      <Filter>Source Files\section</Filter>
+    </ClCompile>
+    <ClCompile Include="section\section_search.cpp">
+      <Filter>Source Files\section</Filter>
+    </ClCompile>
+    <ClCompile Include="section\section_table.cpp">
+      <Filter>Source Files\section</Filter>
+    </ClCompile>
+    <ClCompile Include="section\pe_section_error.cpp">
+      <Filter>Source Files\section</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

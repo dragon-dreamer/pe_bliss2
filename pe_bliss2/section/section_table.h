@@ -6,7 +6,7 @@
 
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
-#include "pe_bliss2/section_header.h"
+#include "pe_bliss2/section/section_header.h"
 
 namespace buffers
 {
@@ -15,6 +15,12 @@ class output_buffer_interface;
 } //namespace buffers
 
 namespace pe_bliss
+{
+class file_header;
+class optional_header;
+} //namespace pe_bliss
+
+namespace pe_bliss::section
 {
 
 //TODO: move to separate file (used by several classes)
@@ -38,9 +44,6 @@ enum class section_table_errc
 };
 
 std::error_code make_error_code(section_table_errc) noexcept;
-
-class file_header;
-class optional_header;
 
 class section_table
 {
@@ -108,10 +111,10 @@ private:
 	std::size_t buffer_pos_ = 0;
 };
 
-} //namespace pe_bliss
+} //namespace pe_bliss::section
 
 namespace std
 {
 template<>
-struct is_error_code_enum<pe_bliss::section_table_errc> : true_type {};
+struct is_error_code_enum<pe_bliss::section::section_table_errc> : true_type {};
 } //namespace std

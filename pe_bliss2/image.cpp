@@ -395,14 +395,14 @@ std::uint32_t image::section_data_length_from_va(std::uint64_t va,
 }
 
 image::section_ref image::section_from_reference(
-	section_header& section_hdr) noexcept
+	section::section_header& section_hdr) noexcept
 {
 	return section_from_reference_impl<section_ref>(section_hdr,
 		get_section_table(), get_section_data_list());
 }
 
 image::section_const_ref image::section_from_reference(
-	const section_header& section_hdr) const noexcept
+	const section::section_header& section_hdr) const noexcept
 {
 	return section_from_reference_impl<section_const_ref>(section_hdr,
 		get_section_table(), get_section_data_list());

@@ -3,15 +3,15 @@
 #include <cstdint>
 #include <limits>
 
-#include "pe_bliss2/section_search.h"
-#include "pe_bliss2/section_header.h"
+#include "pe_bliss2/section/section_search.h"
+#include "pe_bliss2/section/section_header.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
 #include "utilities/generic_error.h"
 
 using namespace pe_bliss;
-using namespace pe_bliss::section_search;
+using namespace pe_bliss::section;
 
 namespace
 {

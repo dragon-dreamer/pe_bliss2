@@ -5,12 +5,12 @@
 
 #include "pe_bliss2/pe_types.h"
 
-namespace pe_bliss
+namespace pe_bliss::section
 {
 class section_header;
-} //namespace pe_bliss
+} //namespace pe_bliss::section
 
-namespace pe_bliss::section_search
+namespace pe_bliss::section
 {
 
 struct [[nodiscard]] by_raw_offset
@@ -57,4 +57,4 @@ private:
 	const section_header* ptr_;
 };
 
-} //namespace pe_bliss::section_search
+} //namespace pe_bliss::section

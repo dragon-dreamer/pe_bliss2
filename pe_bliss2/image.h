@@ -22,8 +22,8 @@
 #include "pe_bliss2/optional_header.h"
 #include "pe_bliss2/overlay.h"
 #include "pe_bliss2/pe_types.h"
-#include "pe_bliss2/section_table.h"
-#include "pe_bliss2/section_data.h"
+#include "pe_bliss2/section/section_table.h"
+#include "pe_bliss2/section/section_data.h"
 #include "utilities/safe_uint.h"
 
 namespace pe_bliss
@@ -50,7 +50,7 @@ std::error_code make_error_code(image_errc) noexcept;
 class image
 {
 public:
-	using section_data_list = std::list<section_data>;
+	using section_data_list = std::list<section::section_data>;
 
 public:
 	[[nodiscard]] dos_header& get_dos_header() noexcept
@@ -113,12 +113,12 @@ public:
 		return data_directories_;
 	}
 
-	[[nodiscard]] section_table& get_section_table() noexcept
+	[[nodiscard]] section::section_table& get_section_table() noexcept
 	{
 		return section_table_;
 	}
 
-	[[nodiscard]] const section_table& get_section_table() const noexcept
+	[[nodiscard]] const section::section_table& get_section_table() const noexcept
 	{
 		return section_table_;
 	}
@@ -169,15 +169,15 @@ public:
 
 public:
 	using section_ref = std::pair<
-		section_table::header_list::iterator, section_data_list::iterator>;
+		section::section_table::header_list::iterator, section_data_list::iterator>;
 	using section_const_ref = std::pair<
-		section_table::header_list::const_iterator, section_data_list::const_iterator>;
+		section::section_table::header_list::const_iterator, section_data_list::const_iterator>;
 
 public:
 	[[nodiscard]]
-	section_ref section_from_reference(section_header& section_hdr) noexcept;
+	section_ref section_from_reference(section::section_header& section_hdr) noexcept;
 	[[nodiscard]]
-	section_const_ref section_from_reference(const section_header& section_hdr) const noexcept;
+	section_const_ref section_from_reference(const section::section_header& section_hdr) const noexcept;
 
 public:
 	[[nodiscard]]
@@ -555,7 +555,7 @@ private:
 	file_header file_header_;
 	optional_header optional_header_;
 	data_directories data_directories_;
-	section_table section_table_;
+	section::section_table section_table_;
 	section_data_list section_list_;
 	overlay overlay_;
 	buffers::ref_buffer full_headers_buffer_;

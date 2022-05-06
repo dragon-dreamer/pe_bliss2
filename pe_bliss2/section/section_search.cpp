@@ -1,15 +1,15 @@
-#include "pe_bliss2/section_search.h"
+#include "pe_bliss2/section/section_search.h"
 
 #include <cstdint>
 #include <limits>
 
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
-#include "pe_bliss2/section_header.h"
+#include "pe_bliss2/section/section_header.h"
 #include "utilities/generic_error.h"
 #include "utilities/math.h"
 
-namespace pe_bliss::section_search
+namespace pe_bliss::section
 {
 
 by_raw_offset::by_raw_offset(std::uint32_t raw_offset,
@@ -67,4 +67,4 @@ bool by_pointer::operator()(const section_header& header) const noexcept
 	return &header == ptr_;
 }
 
-} //namespace pe_bliss::section_search
+} //namespace pe_bliss::section

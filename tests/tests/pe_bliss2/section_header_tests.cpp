@@ -5,19 +5,21 @@
 
 #include "buffers/input_memory_buffer.h"
 
-#include "pe_bliss2/section_header.h"
-#include "pe_bliss2/section_table.h"
+#include "pe_bliss2/section/section_header.h"
+#include "pe_bliss2/section/section_table.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
 #include "utilities/generic_error.h"
 
+using namespace pe_bliss::section;
+
 TEST(SectionHeaderTests, EmptySectionHeaderTest)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	EXPECT_TRUE(header.get_name().empty());
 	EXPECT_EQ(header.get_characteristics(),
-		pe_bliss::section_header::characteristics::value{});
+		section_header::characteristics::value{});
 	EXPECT_EQ(header.get_raw_size(512u), 0u);
 	EXPECT_EQ(header.get_virtual_size(512u), 0u);
 	EXPECT_EQ(header.get_pointer_to_raw_data(), 0u);
@@ -62,10 +64,10 @@ TEST(SectionHeaderTests, EmptySectionHeaderTest)
 
 	expect_throw_pe_error([&] {
 		(void)header.rva_from_section_offset(1, 512); },
-		pe_bliss::section_table_errc::invalid_section_offset);
+		section_table_errc::invalid_section_offset);
 
 	expect_throw_pe_error([&] { header.set_virtual_size(0); },
-		pe_bliss::section_table_errc::invalid_section_virtual_size);
+		section_table_errc::invalid_section_virtual_size);
 
 	EXPECT_NO_THROW(header.set_virtual_size(100));
 	EXPECT_TRUE(header.check_virtual_size());
@@ -74,14 +76,14 @@ TEST(SectionHeaderTests, EmptySectionHeaderTest)
 	EXPECT_EQ(header.get_virtual_size(64u), 128u);
 	expect_throw_pe_error([&] {
 		(void)header.rva_from_section_offset(101, 1u); },
-		pe_bliss::section_table_errc::invalid_section_offset);
+		section_table_errc::invalid_section_offset);
 	EXPECT_EQ(header.rva_from_section_offset(80, 2u), 80u);
 	EXPECT_EQ(header.rva_from_section_offset(123, 512), 123u);
 }
 
 TEST(SectionHeaderTests, SectionHeaderNameTest1)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	header.base_struct()->name[0] = static_cast<std::uint8_t>('a');
 	EXPECT_EQ(header.get_name(), "a");
 	header.base_struct()->name[std::size(header.base_struct()->name) - 1]
@@ -103,7 +105,7 @@ TEST(SectionHeaderTests, SectionHeaderNameTest1)
 
 TEST(SectionHeaderTests, SectionHeaderNameTest2)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	static constexpr const char name[] = "123\0456";
 	EXPECT_EQ(&header.set_name({ std::begin(name), std::size(name) - 1 }),
 		&header);
@@ -119,7 +121,7 @@ TEST(SectionHeaderTests, SectionHeaderNameTest2)
 
 TEST(SectionHeaderTests, CharacteristicsTest)
 {
-	pe_bliss::section_header header;
+	section_header header;
 
 	EXPECT_FALSE(header.is_writable());
 	EXPECT_FALSE(header.is_readable());
@@ -199,25 +201,25 @@ TEST(SectionHeaderTests, CharacteristicsTest)
 	EXPECT_TRUE(header.is_cacheable());
 
 	EXPECT_EQ(header.base_struct()->characteristics,
-		pe_bliss::section_header::characteristics::mem_write);
+		section_header::characteristics::mem_write);
 
 	EXPECT_EQ(header.get_characteristics(),
-		pe_bliss::section_header::characteristics::mem_write);
+		section_header::characteristics::mem_write);
 
 	static const auto characteristics =
-		static_cast<pe_bliss::section_header::characteristics::value>(
-			pe_bliss::section_header::characteristics::mem_write
-			| pe_bliss::section_header::characteristics::mem_read);
+		static_cast<section_header::characteristics::value>(
+			section_header::characteristics::mem_write
+			| section_header::characteristics::mem_read);
 	EXPECT_EQ(&header.set_characteristics(characteristics), &header);
 	EXPECT_EQ(header.get_characteristics(), characteristics);
 }
 
 TEST(SectionHeaderTests, VirtualSizeTest1)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	EXPECT_FALSE(header.check_virtual_size());
 	expect_throw_pe_error([&] { header.set_virtual_size(0u); },
-		pe_bliss::section_table_errc::invalid_section_virtual_size);
+		section_table_errc::invalid_section_virtual_size);
 	EXPECT_EQ(&header.set_virtual_size(123u), &header);
 	EXPECT_TRUE(header.empty());
 	EXPECT_EQ(header.get_virtual_size(0u), 123u);
@@ -234,7 +236,7 @@ TEST(SectionHeaderTests, VirtualSizeTest1)
 
 TEST(SectionHeaderTests, VirtualSizeTest2)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	EXPECT_EQ(&header.set_raw_size(123u), &header);
 	EXPECT_EQ(header.get_virtual_size(0u), 123u);
 	EXPECT_EQ(&header.set_virtual_size(0u), &header);
@@ -243,7 +245,7 @@ TEST(SectionHeaderTests, VirtualSizeTest2)
 
 TEST(SectionHeaderTests, RawSizeTest1)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	EXPECT_TRUE(header.check_raw_size(512u));
 	EXPECT_EQ(header.get_raw_size(0u), 0u);
 	EXPECT_TRUE(header.empty());
@@ -262,7 +264,7 @@ TEST(SectionHeaderTests, RawSizeTest1)
 
 TEST(SectionHeaderTests, RawSizeTest2)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	EXPECT_EQ(&header.set_raw_size(1000u), &header);
 	EXPECT_EQ(&header.set_virtual_size(500u), &header);
 	EXPECT_EQ(header.get_raw_size(512u), 512u);
@@ -270,7 +272,7 @@ TEST(SectionHeaderTests, RawSizeTest2)
 
 TEST(SectionHeaderTests, PointerToRawDataTest1)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	EXPECT_FALSE(header.check_raw_address());
 	EXPECT_EQ(&header.set_raw_size(1000u), &header);
 	EXPECT_EQ(&header.set_pointer_to_raw_data(128u), &header);
@@ -285,7 +287,7 @@ TEST(SectionHeaderTests, PointerToRawDataTest1)
 	EXPECT_TRUE(header.check_raw_size_alignment(512u, 512u, true));
 
 	EXPECT_EQ(&header.set_pointer_to_raw_data(
-		pe_bliss::section_header::max_raw_address_rounded_to_0 + 1), &header);
+		section_header::max_raw_address_rounded_to_0 + 1), &header);
 	EXPECT_FALSE(header.check_raw_address_alignment(0u));
 	EXPECT_TRUE(header.check_raw_address_alignment(1u));
 	EXPECT_TRUE(header.check_raw_address_alignment(64u));
@@ -294,7 +296,7 @@ TEST(SectionHeaderTests, PointerToRawDataTest1)
 
 TEST(SectionHeaderTests, PointerToRawDataTest2)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	EXPECT_EQ(&header.set_virtual_size(512u), &header);
 	EXPECT_TRUE(header.check_raw_address());
 	EXPECT_TRUE(header.check_raw_address_alignment(64u));
@@ -302,7 +304,7 @@ TEST(SectionHeaderTests, PointerToRawDataTest2)
 
 TEST(SectionHeaderTests, RvaTest)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	EXPECT_EQ(&header.set_rva(128u), &header);
 	EXPECT_EQ(header.get_rva(), 128u);
 	EXPECT_FALSE(header.check_virtual_address_alignment(123u));
@@ -313,7 +315,7 @@ TEST(SectionHeaderTests, RvaTest)
 
 TEST(SectionHeaderTests, LowAlignmentTest)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	EXPECT_EQ(&header.set_rva(128u), &header);
 	EXPECT_EQ(&header.set_pointer_to_raw_data(1024u), &header);
 	EXPECT_FALSE(header.check_low_alignment());
@@ -323,22 +325,22 @@ TEST(SectionHeaderTests, LowAlignmentTest)
 
 TEST(SectionHeaderTests, RvaFromSectionOffsetTest)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	header.set_virtual_size(512u);
 	header.set_rva(2048u);
 	EXPECT_EQ(header.rva_from_section_offset(2u, 512u), 2050u);
 	EXPECT_EQ(header.rva_from_section_offset(511u, 512u), 2559u);
 	expect_throw_pe_error([&] {
 		(void)header.rva_from_section_offset(512u, 512u); },
-		pe_bliss::section_table_errc::invalid_section_offset);
+		section_table_errc::invalid_section_offset);
 }
 
 TEST(SectionHeaderTests, DeserializeErrorTest)
 {
-	pe_bliss::section_header header;
+	section_header header;
 	buffers::input_memory_buffer buf(
 		reinterpret_cast<const std::byte*>(""), 0u);
 	expect_throw_pe_error(
 		[&header, &buf] { header.deserialize(buf, false); },
-		pe_bliss::section_table_errc::unable_to_read_section_table);
+		section_table_errc::unable_to_read_section_table);
 }

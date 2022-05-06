@@ -1,11 +1,11 @@
-#include "pe_bliss2/pe_section_error.h"
+#include "pe_bliss2/section/pe_section_error.h"
 
 #include <cstddef>
 #include <string>
 #include <system_error>
 #include <utility>
 
-namespace pe_bliss
+namespace pe_bliss::section
 {
 
 pe_section_error::pe_section_error(std::error_code ec,
@@ -16,4 +16,4 @@ pe_section_error::pe_section_error(std::error_code ec,
 {
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::section

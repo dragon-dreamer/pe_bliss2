@@ -6,7 +6,7 @@
 
 #include "pe_bliss2/pe_error.h"
 
-namespace pe_bliss
+namespace pe_bliss::section
 {
 
 class [[nodiscard]] pe_section_error : public pe_error
@@ -30,4 +30,4 @@ private:
 	std::string section_name_;
 };
 
-} //namespace pe_bliss
+} //namespace pe_bliss::section

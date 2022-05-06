@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 
 #include "pe_bliss2/pe_error.h"
-#include "pe_bliss2/pe_section_error.h"
+#include "pe_bliss2/section/pe_section_error.h"
 
 TEST(PeErrorTests, PeErrorTest)
 {
@@ -36,7 +36,7 @@ TEST(PeErrorTests, PeErrorWrapperTest2)
 
 TEST(PeErrorTests, PeSectionErrorTest)
 {
-	pe_bliss::pe_section_error err(std::io_errc::stream, 1u, "test");
+	pe_bliss::section::pe_section_error err(std::io_errc::stream, 1u, "test");
 	EXPECT_EQ(err.code(), std::io_errc::stream);
 	EXPECT_EQ(err.get_section_index(), 1u);
 	EXPECT_EQ(err.get_section_name(), "test");
