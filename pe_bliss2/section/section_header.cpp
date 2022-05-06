@@ -7,6 +7,7 @@
 #include <exception>
 
 #include "pe_bliss2/pe_error.h"
+#include "pe_bliss2/section/section_errc.h"
 #include "pe_bliss2/section/section_table.h"
 #include "utilities/math.h"
 
@@ -23,7 +24,7 @@ void section_header::deserialize(buffers::input_buffer_interface& buf,
 	catch (...)
 	{
 		std::throw_with_nested(pe_error(
-			section_table_errc::unable_to_read_section_table));
+			section_errc::unable_to_read_section_table));
 	}
 }
 
@@ -34,10 +35,11 @@ void section_header::serialize(buffers::output_buffer_interface& buf,
 }
 
 rva_type section_header::rva_from_section_offset(
-	std::uint32_t raw_offset_from_section_start, std::uint32_t section_alignment) const
+	std::uint32_t raw_offset_from_section_start,
+	std::uint32_t section_alignment) const
 {
 	if (raw_offset_from_section_start >= get_virtual_size(section_alignment))
-		throw pe_error(section_table_errc::invalid_section_offset);
+		throw pe_error(section_errc::invalid_section_offset);
 
 	return get_rva() + raw_offset_from_section_start;
 }
@@ -298,7 +300,7 @@ section_header& section_header::set_virtual_size(
 	if (!virtual_size)
 	{
 		if (empty())
-			throw pe_error(section_table_errc::invalid_section_virtual_size);
+			throw pe_error(section_errc::invalid_section_virtual_size);
 
 		base_struct()->virtual_size = base_struct()->size_of_raw_data;
 	}

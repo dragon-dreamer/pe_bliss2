@@ -5,6 +5,7 @@
 
 #include "buffers/input_memory_buffer.h"
 
+#include "pe_bliss2/section/section_errc.h"
 #include "pe_bliss2/section/section_header.h"
 #include "pe_bliss2/section/section_table.h"
 
@@ -64,10 +65,10 @@ TEST(SectionHeaderTests, EmptySectionHeaderTest)
 
 	expect_throw_pe_error([&] {
 		(void)header.rva_from_section_offset(1, 512); },
-		section_table_errc::invalid_section_offset);
+		section_errc::invalid_section_offset);
 
 	expect_throw_pe_error([&] { header.set_virtual_size(0); },
-		section_table_errc::invalid_section_virtual_size);
+		section_errc::invalid_section_virtual_size);
 
 	EXPECT_NO_THROW(header.set_virtual_size(100));
 	EXPECT_TRUE(header.check_virtual_size());
@@ -76,7 +77,7 @@ TEST(SectionHeaderTests, EmptySectionHeaderTest)
 	EXPECT_EQ(header.get_virtual_size(64u), 128u);
 	expect_throw_pe_error([&] {
 		(void)header.rva_from_section_offset(101, 1u); },
-		section_table_errc::invalid_section_offset);
+		section_errc::invalid_section_offset);
 	EXPECT_EQ(header.rva_from_section_offset(80, 2u), 80u);
 	EXPECT_EQ(header.rva_from_section_offset(123, 512), 123u);
 }
@@ -219,7 +220,7 @@ TEST(SectionHeaderTests, VirtualSizeTest1)
 	section_header header;
 	EXPECT_FALSE(header.check_virtual_size());
 	expect_throw_pe_error([&] { header.set_virtual_size(0u); },
-		section_table_errc::invalid_section_virtual_size);
+		section_errc::invalid_section_virtual_size);
 	EXPECT_EQ(&header.set_virtual_size(123u), &header);
 	EXPECT_TRUE(header.empty());
 	EXPECT_EQ(header.get_virtual_size(0u), 123u);
@@ -332,7 +333,7 @@ TEST(SectionHeaderTests, RvaFromSectionOffsetTest)
 	EXPECT_EQ(header.rva_from_section_offset(511u, 512u), 2559u);
 	expect_throw_pe_error([&] {
 		(void)header.rva_from_section_offset(512u, 512u); },
-		section_table_errc::invalid_section_offset);
+		section_errc::invalid_section_offset);
 }
 
 TEST(SectionHeaderTests, DeserializeErrorTest)
@@ -342,5 +343,5 @@ TEST(SectionHeaderTests, DeserializeErrorTest)
 		reinterpret_cast<const std::byte*>(""), 0u);
 	expect_throw_pe_error(
 		[&header, &buf] { header.deserialize(buf, false); },
-		section_table_errc::unable_to_read_section_table);
+		section_errc::unable_to_read_section_table);
 }

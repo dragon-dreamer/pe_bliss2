@@ -7,6 +7,7 @@
 #include <memory>
 #include <system_error>
 
+#include "pe_bliss2/section/section_errc.h"
 #include "pe_bliss2/section/section_header.h"
 #include "pe_bliss2/section/section_data.h"
 #include "pe_bliss2/section/section_table.h"
@@ -166,7 +167,7 @@ TEST(SectionDataTests, DeserializeTooSmallTest)
 		.image_loaded_to_memory = false,
 		.image_start_buffer_pos = image_start_buffer_pos
 			});
-	}, section_table_errc::unable_to_read_section_data);
+	}, section_errc::unable_to_read_section_data);
 }
 
 TEST(SectionDataTests, DeserializeIntOverflowTest)
@@ -184,5 +185,5 @@ TEST(SectionDataTests, DeserializeIntOverflowTest)
 		.image_loaded_to_memory = false,
 		.image_start_buffer_pos = (std::numeric_limits<std::size_t>::max)() - 3u
 			});
-	}, section_table_errc::unable_to_read_section_data);
+	}, section_errc::unable_to_read_section_data);
 }

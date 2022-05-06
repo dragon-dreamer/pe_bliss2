@@ -6,6 +6,7 @@
 
 #include "buffers/input_buffer_section.h"
 #include "buffers/output_buffer_interface.h"
+#include "pe_bliss2/section/section_errc.h"
 #include "pe_bliss2/section/section_header.h"
 #include "pe_bliss2/section/section_table.h"
 #include "pe_bliss2/pe_error.h"
@@ -37,7 +38,7 @@ void section_data::deserialize(const section_header& header,
 	catch (...)
 	{
 		std::throw_with_nested(pe_error(
-			section_table_errc::unable_to_read_section_data));
+			section_errc::unable_to_read_section_data));
 	}
 }
 

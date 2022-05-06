@@ -384,6 +384,9 @@
     <ClInclude Include="section\pe_section_error.h">
       <Filter>Header Files\section</Filter>
     </ClInclude>
+    <ClInclude Include="section\section_errc.h">
+      <Filter>Header Files\section</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dos_header.cpp">
@@ -540,6 +543,9 @@
       <Filter>Source Files\section</Filter>
     </ClCompile>
     <ClCompile Include="section\pe_section_error.cpp">
+      <Filter>Source Files\section</Filter>
+    </ClCompile>
+    <ClCompile Include="section\section_errc.cpp">
       <Filter>Source Files\section</Filter>
     </ClCompile>
   </ItemGroup>
