@@ -9,6 +9,7 @@
 
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/detail/image_data_directory.h"
+#include "pe_bliss2/detail/image_file_header.h"
 #include "pe_bliss2/file_header.h"
 #include "pe_bliss2/optional_header.h"
 #include "pe_bliss2/pe_error.h"
@@ -23,6 +24,8 @@ TEST(FileHeaderTests, EmptyTest)
 	EXPECT_EQ(header.get_characteristics(), 0u);
 	EXPECT_EQ(header.get_machine_type(),
 		static_cast<file_header::machine_type>(0u));
+	EXPECT_EQ(header.get_section_table_buffer_pos(),
+		detail::packed_reflection::get_type_size<detail::image_file_header>());
 }
 
 TEST(FileHeaderTests, GetSetTest)
@@ -34,6 +37,15 @@ TEST(FileHeaderTests, GetSetTest)
 	header.set_machine_type(file_header::machine_type::i386);
 	EXPECT_EQ(header.get_machine_type(),
 		file_header::machine_type::i386);
+}
+
+TEST(FileHeaderTests, SectionTableStartTest)
+{
+	file_header header;
+	header.base_struct()->size_of_optional_header = 0xe0u;
+	header.base_struct().get_state().set_buffer_pos(0x123u);
+	EXPECT_EQ(header.get_section_table_buffer_pos(), 0xe0u + 0x123u
+		+ detail::packed_reflection::get_type_size<detail::image_file_header>());
 }
 
 TEST(FileHeaderTests, DeserializeSerializeTest)

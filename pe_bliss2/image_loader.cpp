@@ -55,9 +55,10 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 	if (options.validate_image_base)
 		optional_hdr.validate_image_base(instance.has_relocation()).throw_on_error();
 
+	buffer->set_rpos(file_hdr.get_section_table_buffer_pos());
 	auto& section_tbl = instance.get_section_table();
-	section_tbl.deserialize(*buffer, file_hdr,
-		optional_hdr, options.allow_virtual_headers);
+	section_tbl.deserialize(*buffer, file_hdr.base_struct()->number_of_sections,
+		options.allow_virtual_headers);
 
 	if (options.validate_sections)
 	{

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <list>
 
 #include "pe_bliss2/pe_error.h"
@@ -14,23 +15,24 @@ class output_buffer_interface;
 
 namespace pe_bliss
 {
-class file_header;
 class optional_header;
 } //namespace pe_bliss
 
 namespace pe_bliss::section
 {
 
-class section_table
+class [[nodiscard]] section_table
 {
 public:
 	using header_list = std::list<section_header>;
 
 public:
-	//When deserializing, buf should point to the end of data directory structures
+	//When deserializing, buf should point to
+	//the section table start
 	void deserialize(buffers::input_buffer_interface& buf,
-		const file_header& fh, const optional_header& oh,
-		bool allow_virtual_memory = false);
+		std::uint16_t number_of_sections, bool allow_virtual_memory = false);
+	//When deserializing, buf should point to
+	//the section table start
 	void serialize(buffers::output_buffer_interface& buf,
 		bool write_virtual_part = true) const;
 
@@ -38,18 +40,28 @@ public:
 	pe_error_wrapper validate_section_header(const optional_header& oh,
 		header_list::const_iterator header) const noexcept;
 	[[nodiscard]]
-	pe_error_wrapper validate_section_headers(const optional_header& oh) const noexcept;
+	pe_error_wrapper validate_section_headers(
+		const optional_header& oh) const noexcept;
 	[[nodiscard]]
-	pe_error_wrapper validate_size_of_image(const optional_header& oh) const noexcept;
+	pe_error_wrapper validate_size_of_image(
+		const optional_header& oh) const noexcept;
 
 	[[nodiscard]]
-	header_list& get_section_headers() noexcept
+	header_list& get_section_headers() & noexcept
 	{
 		return headers_;
 	}
 
 	[[nodiscard]]
-	const header_list& get_section_headers() const noexcept
+	header_list get_section_headers() && noexcept
+	{
+		auto result = std::move(headers_);
+		headers_.clear();
+		return result;
+	}
+
+	[[nodiscard]]
+	const header_list& get_section_headers() const & noexcept
 	{
 		return headers_;
 	}
@@ -66,10 +78,12 @@ public:
 
 public:
 	[[nodiscard]]
-	header_list::const_iterator by_rva(rva_type rva, std::uint32_t section_alignment,
+	header_list::const_iterator by_rva(rva_type rva,
+		std::uint32_t section_alignment,
 		std::uint32_t data_size = 0) const;
 	[[nodiscard]]
-	header_list::iterator by_rva(rva_type rva, std::uint32_t section_alignment,
+	header_list::iterator by_rva(rva_type rva,
+		std::uint32_t section_alignment,
 		std::uint32_t data_size = 0);
 	[[nodiscard]]
 	header_list::const_iterator by_raw_offset(std::uint32_t raw_offset,
@@ -78,7 +92,8 @@ public:
 	header_list::iterator by_raw_offset(std::uint32_t raw_offset,
 		std::uint32_t section_alignment, std::uint32_t data_size = 0);
 	[[nodiscard]]
-	header_list::const_iterator by_reference(const section_header& header) const noexcept;
+	header_list::const_iterator by_reference(
+		const section_header& header) const noexcept;
 	[[nodiscard]]
 	header_list::iterator by_reference(section_header& header) noexcept;
 

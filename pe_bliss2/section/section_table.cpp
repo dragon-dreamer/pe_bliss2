@@ -18,23 +18,15 @@ namespace pe_bliss::section
 {
 
 void section_table::deserialize(buffers::input_buffer_interface& buf,
-	const file_header& fh, const optional_header& oh, bool allow_virtual_memory)
+	std::uint16_t number_of_sections, bool allow_virtual_memory)
 {
 	headers_.clear();
 	buffer_pos_ = 0;
 
-	auto number_of_sections = fh.base_struct()->number_of_sections;
 	if (!number_of_sections)
 		return;
 
-	std::int32_t size_of_optional_header = fh.base_struct()->size_of_optional_header;
-	std::int32_t full_optional_header_size = oh.get_size_of_structure()
-		+ oh.get_number_of_rva_and_sizes() * data_directories::base_struct_type::packed_size;
-	if (size_of_optional_header < full_optional_header_size)
-		throw pe_error(section_errc::unable_to_read_section_table);
-
-	buf.advance_rpos(size_of_optional_header - full_optional_header_size);
-	buffer_pos_ = buf.rpos() + buf.absolute_offset();
+	buffer_pos_ = buf.rpos();
 
 	bool is_virtual = false;
 	for (std::uint16_t i = 0; i != number_of_sections; ++i)

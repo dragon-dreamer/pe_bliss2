@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 #include <system_error>
 #include <type_traits>
@@ -115,6 +116,9 @@ public:
 	{
 		return static_cast<machine_type>(base_struct()->machine);
 	}
+
+	[[nodiscard]]
+	std::size_t get_section_table_buffer_pos() const noexcept;
 
 	[[nodiscard]]
 	characteristics::value get_characteristics() const noexcept

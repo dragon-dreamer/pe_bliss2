@@ -47,6 +47,14 @@ std::error_code make_error_code(file_header_errc e) noexcept
 	return { static_cast<int>(e), file_header_error_category_instance };
 }
 
+std::size_t file_header::get_section_table_buffer_pos() const noexcept
+{
+	static constexpr auto file_header_size
+		= detail::packed_reflection::get_type_size<detail::image_file_header>();
+	return base_struct()->size_of_optional_header + file_header_size
+		+ base_struct().get_state().buffer_pos();
+}
+
 void file_header::deserialize(buffers::input_buffer_interface& buf,
 	bool allow_virtual_memory)
 {
