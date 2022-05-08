@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <system_error>
 
-#include "pe_bliss2/data_directories.h"
+#include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/pe_error.h"
@@ -105,7 +105,7 @@ std::optional<relocation_directory> load(const image& instance, const loader_opt
 		return result;
 
 	const auto& reloc_dir_info = instance.get_data_directories().get_directory(
-		data_directories::directory_type::basereloc);
+		core::data_directories::directory_type::basereloc);
 
 	result.emplace();
 	auto& list = result->relocations;

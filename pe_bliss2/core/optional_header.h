@@ -19,7 +19,7 @@ class input_buffer_interface;
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss
+namespace pe_bliss::core
 {
 
 enum class optional_header_errc
@@ -312,10 +312,10 @@ private:
 	base_struct_type header_;
 };
 
-} //namespace pe_bliss::detail
+} //namespace pe_bliss::detail::core
 
 namespace std
 {
 template<>
-struct is_error_code_enum<pe_bliss::optional_header_errc> : true_type {};
+struct is_error_code_enum<pe_bliss::core::optional_header_errc> : true_type {};
 } //namespace std

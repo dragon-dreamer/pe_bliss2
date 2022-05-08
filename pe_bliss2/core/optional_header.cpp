@@ -1,4 +1,4 @@
-#include "pe_bliss2/optional_header.h"
+#include "pe_bliss2/core/optional_header.h"
 
 #include <algorithm>
 #include <bit>
@@ -22,8 +22,8 @@ struct optional_header_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
-		using enum pe_bliss::optional_header_errc;
-		switch (static_cast<pe_bliss::optional_header_errc>(ev))
+		using enum pe_bliss::core::optional_header_errc;
+		switch (static_cast<pe_bliss::core::optional_header_errc>(ev))
 		{
 		case invalid_pe_magic:
 			return "Invalid PE magic number";
@@ -63,7 +63,7 @@ const optional_header_error_category optional_header_error_category_instance;
 
 } //namespace
 
-namespace pe_bliss
+namespace pe_bliss::core
 {
 
 std::error_code make_error_code(optional_header_errc e) noexcept
@@ -610,4 +610,4 @@ void optional_header::set_raw_number_of_rva_and_sizes(
 		obj.number_of_rva_and_sizes = number; });
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::core

@@ -10,7 +10,7 @@
 #include "buffers/input_memory_buffer.h"
 #include "buffers/output_memory_buffer.h"
 
-#include "pe_bliss2/data_directories.h"
+#include "pe_bliss2/core/data_directories.h"
 
 #include "tests/tests/pe_bliss2/output_buffer_mock.h"
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
@@ -18,6 +18,7 @@
 #include "utilities/generic_error.h"
 
 using namespace pe_bliss;
+using namespace pe_bliss::core;
 
 TEST(DataDirectoriesTests, EmptyTest)
 {

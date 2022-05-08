@@ -5,7 +5,7 @@
 #include <system_error>
 #include <unordered_set>
 
-#include "pe_bliss2/data_directories.h"
+#include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/resources/image_resource_directory.h"
 #include "pe_bliss2/packed_utf16_string.h"
 #include "pe_bliss2/image.h"
@@ -310,7 +310,7 @@ std::optional<resource_directory_details> load(const image& instance,
 		return result;
 
 	const auto& resource_dir_info = instance.get_data_directories().get_directory(
-		data_directories::directory_type::resource);
+		core::data_directories::directory_type::resource);
 
 	result.emplace();
 

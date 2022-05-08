@@ -1,13 +1,13 @@
-#include "pe_bliss2/file_header.h"
+#include "pe_bliss2/core/file_header.h"
 
 #include <cstdint>
 #include <exception>
 #include <system_error>
 #include <type_traits>
 
+#include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/detail/image_data_directory.h"
 #include "pe_bliss2/detail/packed_reflection.h"
-#include "pe_bliss2/optional_header.h"
 #include "pe_bliss2/pe_error.h"
 
 namespace
@@ -22,8 +22,8 @@ struct file_header_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
-		using enum pe_bliss::file_header_errc;
-		switch (static_cast<pe_bliss::file_header_errc>(ev))
+		using enum pe_bliss::core::file_header_errc;
+		switch (static_cast<pe_bliss::core::file_header_errc>(ev))
 		{
 		case invalid_size_of_optional_header:
 			return "Invalid size of optional header";
@@ -39,7 +39,7 @@ const file_header_error_category file_header_error_category_instance;
 
 } //namespace
 
-namespace pe_bliss
+namespace pe_bliss::core
 {
 
 std::error_code make_error_code(file_header_errc e) noexcept
@@ -96,4 +96,4 @@ pe_error_wrapper file_header::validate_size_of_optional_header(
 	return {};
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::core

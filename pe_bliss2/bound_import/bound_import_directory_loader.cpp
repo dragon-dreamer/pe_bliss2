@@ -2,7 +2,7 @@
 
 #include <system_error>
 
-#include "pe_bliss2/data_directories.h"
+#include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/math.h"
@@ -92,7 +92,7 @@ std::optional<bound_library_details_list> load(const image& instance,
 		return result;
 
 	const auto& bound_import_dir_info = instance.get_data_directories().get_directory(
-		data_directories::directory_type::bound_import);
+		core::data_directories::directory_type::bound_import);
 
 	result.emplace();
 	auto& list = *result;

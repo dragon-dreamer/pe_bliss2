@@ -139,6 +139,12 @@
     <Filter Include="Source Files\dos">
       <UniqueIdentifier>{edd0e58a-9b5c-4d82-b4f3-52e151c6f326}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\core">
+      <UniqueIdentifier>{b323a0d6-a0dd-4be6-addb-9f4f596ea529}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{64deaa2c-1e16-4da7-bf06-ababa6fe07e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detail\packed_serialization.h">
@@ -153,29 +159,17 @@
     <ClInclude Include="detail\image_dos_header.h">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
-    <ClInclude Include="image_signature.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="detail\image_file_header.h">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
-    <ClInclude Include="file_header.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="detail\image_optional_header.h">
       <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="optional_header.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="detail\packed_struct_base.h">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
     <ClInclude Include="detail\image_data_directory.h">
       <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="data_directories.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="detail\image_section_header.h">
       <Filter>Header Files\detail</Filter>
@@ -390,29 +384,29 @@
     <ClInclude Include="dos\dos_stub.h">
       <Filter>Header Files\dos</Filter>
     </ClInclude>
-    <ClInclude Include="overlay.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="dos\dos_header_validator.h">
       <Filter>Header Files\dos</Filter>
     </ClInclude>
     <ClInclude Include="dos\dos_header_errc.h">
       <Filter>Header Files\dos</Filter>
     </ClInclude>
+    <ClInclude Include="core\data_directories.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\file_header.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\image_signature.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\optional_header.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\overlay.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="image_signature.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="optional_header.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="file_header.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="data_directories.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="image_loader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -565,6 +559,18 @@
     </ClCompile>
     <ClCompile Include="dos\dos_header_validator.cpp">
       <Filter>Source Files\dos</Filter>
+    </ClCompile>
+    <ClCompile Include="core\data_directories.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\file_header.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\image_signature.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\optional_header.cpp">
+      <Filter>Source Files\core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

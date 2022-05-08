@@ -19,13 +19,17 @@ enum class address_converter_errc
 std::error_code make_error_code(address_converter_errc) noexcept;
 
 class image;
+
+namespace core
+{
 class optional_header;
+} //namespace core
 
 class address_converter
 {
 public:
 	explicit address_converter(const image& instance) noexcept;
-	explicit address_converter(const optional_header& header) noexcept;
+	explicit address_converter(const core::optional_header& header) noexcept;
 	explicit address_converter(std::uint64_t image_base) noexcept;
 
 public:

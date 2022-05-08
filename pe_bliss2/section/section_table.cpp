@@ -6,8 +6,8 @@
 
 #include "buffers/input_buffer_interface.h"
 #include "buffers/output_buffer_interface.h"
-#include "pe_bliss2/data_directories.h"
-#include "pe_bliss2/optional_header.h"
+#include "pe_bliss2/core/data_directories.h"
+#include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/section/section_errc.h"
 #include "pe_bliss2/section/section_search.h"
@@ -51,7 +51,7 @@ void section_table::serialize(buffers::output_buffer_interface& buf,
 }
 
 pe_error_wrapper section_table::validate_section_header(
-	const optional_header& oh, header_list::const_iterator header) const noexcept
+	const core::optional_header& oh, header_list::const_iterator header) const noexcept
 {
 	auto section_alignment = oh.get_raw_section_alignment();
 	if (!header->check_raw_size(section_alignment))
@@ -110,7 +110,7 @@ pe_error_wrapper section_table::validate_section_header(
 }
 
 pe_error_wrapper section_table::validate_section_headers(
-	const optional_header& oh) const noexcept
+	const core::optional_header& oh) const noexcept
 {
 	pe_error_wrapper result;
 	for (auto it = headers_.cbegin(), end = headers_.cend(); it != end; ++it)
@@ -122,7 +122,7 @@ pe_error_wrapper section_table::validate_section_headers(
 }
 
 pe_error_wrapper section_table::validate_size_of_image(
-	const optional_header& oh) const noexcept
+	const core::optional_header& oh) const noexcept
 {
 	if (headers_.empty())
 		return {};

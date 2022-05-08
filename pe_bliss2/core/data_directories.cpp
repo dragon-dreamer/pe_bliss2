@@ -1,4 +1,4 @@
-#include "pe_bliss2/data_directories.h"
+#include "pe_bliss2/core/data_directories.h"
 
 #include <algorithm>
 #include <array>
@@ -24,9 +24,10 @@ struct data_directories_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
-		switch (static_cast<pe_bliss::data_directories_errc>(ev))
+		using enum pe_bliss::core::data_directories_errc;
+		switch (static_cast<pe_bliss::core::data_directories_errc>(ev))
 		{
-		case pe_bliss::data_directories_errc::unable_to_read_data_directory:
+		case unable_to_read_data_directory:
 			return "Unable to read data directory";
 		default:
 			return {};
@@ -38,7 +39,7 @@ const data_directories_error_category data_directories_error_category_instance;
 
 } //namespace
 
-namespace pe_bliss
+namespace pe_bliss::core
 {
 
 std::error_code make_error_code(data_directories_errc e) noexcept
@@ -96,4 +97,4 @@ std::uint32_t data_directories::strip_data_directories(std::uint32_t min_count)
 	return static_cast<std::uint32_t>(directories_.size());
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::core

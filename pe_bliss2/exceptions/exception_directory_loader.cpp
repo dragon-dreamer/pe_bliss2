@@ -3,7 +3,6 @@
 #include <string>
 #include <system_error>
 
-#include "pe_bliss2/file_header.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/exceptions/arm/arm_exception_directory_loader.h"
 #include "pe_bliss2/exceptions/arm64/arm64_exception_directory_loader.h"

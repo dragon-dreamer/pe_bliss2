@@ -70,8 +70,8 @@ void image_builder::build(const image& instance, const image_builder_options& op
 	else
 	{
 		std::uint32_t section_table_offset = dos_hdr->e_lfanew;
-		section_table_offset += image_signature::packed_struct_type::packed_size;
-		section_table_offset += file_header::packed_struct_type::packed_size;
+		section_table_offset += core::image_signature::packed_struct_type::packed_size;
+		section_table_offset += core::file_header::packed_struct_type::packed_size;
 		section_table_offset += instance.get_file_header().base_struct()->size_of_optional_header;
 		section_table_pos = section_table_offset - image_start_pos + buffer_start_pos;
 	}

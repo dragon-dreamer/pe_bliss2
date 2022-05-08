@@ -4,7 +4,7 @@
 #include <limits>
 #include <system_error>
 
-#include "pe_bliss2/data_directories.h"
+#include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/pe_types.h"
@@ -41,7 +41,7 @@ template<typename Directory>
 Directory load_impl(const image& instance, const loader_options& options)
 {
 	const auto& tls_dir_info = instance.get_data_directories().get_directory(
-		data_directories::directory_type::tls);
+		core::data_directories::directory_type::tls);
 
 	Directory directory;
 	auto& descriptor = directory.get_descriptor();

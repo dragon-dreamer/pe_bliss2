@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include "pe_bliss2/data_directories.h"
+#include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/exports/image_export_directory.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/pe_error.h"
@@ -57,7 +57,7 @@ void read_library_name(const image& instance,
 }
 
 void read_forwarded_name(const image& instance, const loader_options& options,
-	const data_directories::base_struct_type& export_dir_info,
+	const core::data_directories::base_struct_type& export_dir_info,
 	rva_type exported_addr, exported_address_details& exported_symbol)
 {
 	if (exported_addr >= export_dir_info->virtual_address
@@ -93,7 +93,7 @@ using ordinal_to_exported_address_map = std::vector<
 
 ordinal_to_exported_address_map load_addresses(
 	const image& instance, const loader_options& options,
-	const data_directories::base_struct_type& export_dir_info,
+	const core::data_directories::base_struct_type& export_dir_info,
 	export_directory_details& directory)
 {
 	auto& descriptor = directory.get_descriptor();
@@ -197,7 +197,7 @@ std::optional<export_directory_details> load(const image& instance,
 		return result;
 
 	const auto& export_dir_info = instance.get_data_directories().get_directory(
-		data_directories::directory_type::exports);
+		core::data_directories::directory_type::exports);
 
 	result.emplace();
 	auto& directory = *result;

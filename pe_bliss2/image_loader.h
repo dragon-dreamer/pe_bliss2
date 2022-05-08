@@ -1,9 +1,9 @@
 #pragma once
 
 #include "buffers/input_buffer_interface.h"
+#include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/dos/dos_header_validator.h"
 #include "pe_bliss2/image.h"
-#include "pe_bliss2/optional_header.h"
 #include "utilities/static_class.h"
 
 namespace pe_bliss
@@ -24,7 +24,7 @@ struct image_load_options
 	bool load_full_headers_buffer = true;
 	bool eager_full_headers_buffer_copy = false;
 	dos::dos_header_validation_options dos_header_validation{};
-	optional_header_validation_options optional_header_validation{};
+	core::optional_header_validation_options optional_header_validation{};
 };
 
 class image_loader : public utilities::static_class

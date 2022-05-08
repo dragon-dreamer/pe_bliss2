@@ -6,15 +6,15 @@
 
 #include "formatter.h"
 
-#include "pe_bliss2/file_header.h"
+#include "pe_bliss2/core/file_header.h"
 
 namespace
 {
 
 void dump_file_header_characteristics(formatter& fmt,
-	const pe_bliss::file_header& header, std::size_t left_padding)
+	const pe_bliss::core::file_header& header, std::size_t left_padding)
 {
-	using enum pe_bliss::file_header::characteristics::value;
+	using enum pe_bliss::core::file_header::characteristics::value;
 	fmt.print_flags(header.get_characteristics(), left_padding, {
 		{ relocs_stripped, "RELOCS_STRIPPED" },
 		{ executable_image, "EXECUTABLE_IMAGE" },
@@ -34,9 +34,9 @@ void dump_file_header_characteristics(formatter& fmt,
 	});
 }
 
-const char* machine_to_string(pe_bliss::file_header::machine_type machine)
+const char* machine_to_string(pe_bliss::core::file_header::machine_type machine)
 {
-	using enum pe_bliss::file_header::machine_type;
+	using enum pe_bliss::core::file_header::machine_type;
 	switch (machine)
 	{
 	case target_host: return "TARGET_HOST";
@@ -81,7 +81,7 @@ const char* machine_to_string(pe_bliss::file_header::machine_type machine)
 	}
 }
 
-void dump_file_header_machine(formatter& fmt, const pe_bliss::file_header& header)
+void dump_file_header_machine(formatter& fmt, const pe_bliss::core::file_header& header)
 {
 	fmt.get_stream() << '(';
 	fmt.print_string(machine_to_string(header.get_machine_type()));
@@ -90,7 +90,7 @@ void dump_file_header_machine(formatter& fmt, const pe_bliss::file_header& heade
 
 } //namespace
 
-void dump_file_header(formatter& fmt, const pe_bliss::file_header& header)
+void dump_file_header(formatter& fmt, const pe_bliss::core::file_header& header)
 {
 	fmt.print_structure("File header", header.base_struct(), std::array{
 		value_info{"machine", true, std::bind(

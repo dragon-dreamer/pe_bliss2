@@ -13,10 +13,10 @@ class input_buffer_interface;
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss
+namespace pe_bliss::core
 {
 class optional_header;
-} //namespace pe_bliss
+} //namespace pe_bliss::core
 
 namespace pe_bliss::section
 {
@@ -37,14 +37,14 @@ public:
 		bool write_virtual_part = true) const;
 
 	[[nodiscard]]
-	pe_error_wrapper validate_section_header(const optional_header& oh,
+	pe_error_wrapper validate_section_header(const core::optional_header& oh,
 		header_list::const_iterator header) const noexcept;
 	[[nodiscard]]
 	pe_error_wrapper validate_section_headers(
-		const optional_header& oh) const noexcept;
+		const core::optional_header& oh) const noexcept;
 	[[nodiscard]]
 	pe_error_wrapper validate_size_of_image(
-		const optional_header& oh) const noexcept;
+		const core::optional_header& oh) const noexcept;
 
 	[[nodiscard]]
 	header_list& get_section_headers() & noexcept

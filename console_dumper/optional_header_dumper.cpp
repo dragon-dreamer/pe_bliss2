@@ -7,14 +7,14 @@
 
 #include "formatter.h"
 
-#include "pe_bliss2/optional_header.h"
+#include "pe_bliss2/core/optional_header.h"
 
 namespace
 {
 
-const char* subsystem_to_string(pe_bliss::optional_header::subsystem value)
+const char* subsystem_to_string(pe_bliss::core::optional_header::subsystem value)
 {
-	using enum pe_bliss::optional_header::subsystem;
+	using enum pe_bliss::core::optional_header::subsystem;
 	switch (value)
 	{
 	case native: return "Native";
@@ -34,7 +34,8 @@ const char* subsystem_to_string(pe_bliss::optional_header::subsystem value)
 	}
 }
 
-void dump_optional_header_subsystem(formatter& fmt, const pe_bliss::optional_header& header)
+void dump_optional_header_subsystem(formatter& fmt,
+	const pe_bliss::core::optional_header& header)
 {
 	fmt.get_stream() << '(';
 	fmt.print_string(subsystem_to_string(header.get_subsystem()));
@@ -42,9 +43,9 @@ void dump_optional_header_subsystem(formatter& fmt, const pe_bliss::optional_hea
 }
 
 void dump_optional_header_dll_characteristics(formatter& fmt,
-	const pe_bliss::optional_header& header, std::size_t left_padding)
+	const pe_bliss::core::optional_header& header, std::size_t left_padding)
 {
-	using enum pe_bliss::optional_header::dll_characteristics::value;
+	using enum pe_bliss::core::optional_header::dll_characteristics::value;
 	fmt.print_flags(header.get_dll_characteristics(), left_padding, {
 		{ high_entropy_va, "HIGH_ENTROPY_VA" },
 		{ dynamic_base, "DYNAMIC_BASE" },
@@ -62,14 +63,14 @@ void dump_optional_header_dll_characteristics(formatter& fmt,
 
 template<typename Header>
 void dump_optional_header(formatter& fmt,
-	const pe_bliss::optional_header& header, const Header& value)
+	const pe_bliss::core::optional_header& header, const Header& value)
 {
 	fmt.print_structure_name("Magic");
 	fmt.get_stream() << ' ';
 	fmt.print_absolute_offset(value.get_state().absolute_offset()
-		- sizeof(pe_bliss::optional_header::magic_type));
+		- sizeof(pe_bliss::core::optional_header::magic_type));
 	fmt.get_stream() << " (";
-	fmt.print_string(header.get_magic() == pe_bliss::optional_header::magic::pe32
+	fmt.print_string(header.get_magic() == pe_bliss::core::optional_header::magic::pe32
 		? "PE" : "PE+");
 	fmt.get_stream() << ")\n\n";
 
@@ -81,7 +82,7 @@ void dump_optional_header(formatter& fmt,
 		value_info{"size_of_uninitialized_data"},
 		value_info{"address_of_entry_point"},
 		value_info{"base_of_code"},
-		value_info{header.get_magic() == pe_bliss::optional_header::magic::pe32
+		value_info{header.get_magic() == pe_bliss::core::optional_header::magic::pe32
 			? "base_of_data" : nullptr},
 		value_info{"image_base"},
 		value_info{"section_alignment"},
@@ -112,7 +113,8 @@ void dump_optional_header(formatter& fmt,
 
 } //namespace
 
-void dump_optional_header(formatter& fmt, const pe_bliss::optional_header& header)
+void dump_optional_header(formatter& fmt,
+	const pe_bliss::core::optional_header& header)
 {
 	std::visit([&fmt, &header] (const auto& value) {
 		dump_optional_header(fmt, header, value);

@@ -11,7 +11,7 @@
 #include "buffers/output_buffer_interface.h"
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/address_converter.h"
-#include "pe_bliss2/data_directories.h"
+#include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/pe_error.h"
@@ -53,7 +53,7 @@ void update_data_directory(image& instance, const builder_options& options, std:
 	if (options.update_data_directory)
 	{
 		auto& dir = instance.get_data_directories().get_directory(
-			data_directories::directory_type::tls);
+			core::data_directories::directory_type::tls);
 		dir->virtual_address = options.directory_rva;
 		dir->size = size;
 	}

@@ -10,13 +10,14 @@
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/detail/image_data_directory.h"
 #include "pe_bliss2/detail/image_file_header.h"
-#include "pe_bliss2/file_header.h"
-#include "pe_bliss2/optional_header.h"
+#include "pe_bliss2/core/file_header.h"
+#include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss;
+using namespace pe_bliss::core;
 
 TEST(FileHeaderTests, EmptyTest)
 {

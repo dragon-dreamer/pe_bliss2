@@ -4,8 +4,8 @@
 #include <limits>
 #include <system_error>
 
+#include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/image.h"
-#include "pe_bliss2/optional_header.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/math.h"
 #include "utilities/safe_uint.h"
@@ -22,9 +22,10 @@ struct address_converter_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
+		using enum pe_bliss::address_converter_errc;
 		switch (static_cast<pe_bliss::address_converter_errc>(ev))
 		{
-		case pe_bliss::address_converter_errc::address_conversion_overflow:
+		case address_conversion_overflow:
 			return "Address conversion overflows";
 		default:
 			return {};
@@ -73,7 +74,7 @@ address_converter::address_converter(const image& instance) noexcept
 {
 }
 
-address_converter::address_converter(const optional_header& header) noexcept
+address_converter::address_converter(const core::optional_header& header) noexcept
 	: address_converter(header.get_raw_image_base())
 {
 }

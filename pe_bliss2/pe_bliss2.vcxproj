@@ -24,7 +24,11 @@
     <ClInclude Include="bound_import\bound_import_directory_builder.h" />
     <ClInclude Include="bound_import\bound_import_directory_loader.h" />
     <ClInclude Include="bound_import\bound_library.h" />
-    <ClInclude Include="data_directories.h" />
+    <ClInclude Include="core\data_directories.h" />
+    <ClInclude Include="core\file_header.h" />
+    <ClInclude Include="core\image_signature.h" />
+    <ClInclude Include="core\optional_header.h" />
+    <ClInclude Include="core\overlay.h" />
     <ClInclude Include="detail\bound_import\image_bound_import_descriptor.h" />
     <ClInclude Include="detail\endian_convert.h" />
     <ClInclude Include="detail\exceptions\image_runtime_function_entry.h" />
@@ -64,19 +68,15 @@
     <ClInclude Include="exports\export_directory.h" />
     <ClInclude Include="exports\export_directory_builder.h" />
     <ClInclude Include="exports\export_directory_loader.h" />
-    <ClInclude Include="file_header.h" />
     <ClInclude Include="image.h" />
     <ClInclude Include="image_builder.h" />
     <ClInclude Include="image_loader.h" />
-    <ClInclude Include="image_signature.h" />
     <ClInclude Include="imports\imported_address.h" />
     <ClInclude Include="imports\import_directory.h" />
     <ClInclude Include="imports\import_directory_builder.h" />
     <ClInclude Include="imports\import_directory_loader.h" />
     <ClInclude Include="load_config\load_config_directory.h" />
     <ClInclude Include="load_config\load_config_directory_loader.h" />
-    <ClInclude Include="optional_header.h" />
-    <ClInclude Include="overlay.h" />
     <ClInclude Include="packed_byte_array.h" />
     <ClInclude Include="packed_byte_vector.h" />
     <ClInclude Include="packed_c_string.h" />
@@ -110,7 +110,10 @@
     <ClCompile Include="address_converter.cpp" />
     <ClCompile Include="bound_import\bound_import_directory_builder.cpp" />
     <ClCompile Include="bound_import\bound_import_directory_loader.cpp" />
-    <ClCompile Include="data_directories.cpp" />
+    <ClCompile Include="core\data_directories.cpp" />
+    <ClCompile Include="core\file_header.cpp" />
+    <ClCompile Include="core\image_signature.cpp" />
+    <ClCompile Include="core\optional_header.cpp" />
     <ClCompile Include="detail\rich\rich_header_utils.cpp" />
     <ClCompile Include="dos\dos_header.cpp" />
     <ClCompile Include="dos\dos_header_errc.cpp" />
@@ -139,11 +142,9 @@
       </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="exports\export_directory_loader.cpp" />
-    <ClCompile Include="file_header.cpp" />
     <ClCompile Include="image.cpp" />
     <ClCompile Include="image_builder.cpp" />
     <ClCompile Include="image_loader.cpp" />
-    <ClCompile Include="image_signature.cpp" />
     <ClCompile Include="imports\import_directory_builder.cpp">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </DeploymentContent>
@@ -165,7 +166,6 @@
     <ClCompile Include="imports\import_directory_loader.cpp" />
     <ClCompile Include="load_config\load_config_directory.cpp" />
     <ClCompile Include="load_config\load_config_directory_loader.cpp" />
-    <ClCompile Include="optional_header.cpp" />
     <ClCompile Include="packed_byte_array.cpp" />
     <ClCompile Include="packed_byte_vector.cpp" />
     <ClCompile Include="packed_c_string.cpp" />

@@ -4,7 +4,7 @@
 #include <system_error>
 #include <type_traits>
 
-#include "pe_bliss2/data_directories.h"
+#include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/imports/import_directory.h"
 
 namespace pe_bliss
@@ -35,7 +35,8 @@ struct loader_options
 {
 	bool include_headers = true;
 	bool allow_virtual_data = false;
-	data_directories::directory_type target_directory = data_directories::directory_type::imports;
+	core::data_directories::directory_type target_directory
+		= core::data_directories::directory_type::imports;
 };
 
 std::optional<import_directory_details> load(const image& instance,

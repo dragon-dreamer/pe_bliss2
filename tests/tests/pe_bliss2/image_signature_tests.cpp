@@ -7,12 +7,13 @@
 #include "buffers/input_memory_buffer.h"
 #include "buffers/output_memory_buffer.h"
 
-#include "pe_bliss2/image_signature.h"
+#include "pe_bliss2/core/image_signature.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss;
+using namespace pe_bliss::core;
 
 TEST(ImageSignatureTests, EmptyTest)
 {

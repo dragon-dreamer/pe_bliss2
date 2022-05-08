@@ -10,13 +10,14 @@
 #include "buffers/input_memory_buffer.h"
 #include "buffers/output_memory_buffer.h"
 
+#include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/detail/image_optional_header.h"
-#include "pe_bliss2/optional_header.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss;
+using namespace pe_bliss::core;
 
 namespace
 {

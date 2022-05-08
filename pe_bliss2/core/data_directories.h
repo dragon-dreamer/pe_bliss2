@@ -16,7 +16,7 @@ class input_buffer_interface;
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss
+namespace pe_bliss::core
 {
 
 enum class data_directories_errc
@@ -183,10 +183,10 @@ private:
 	directories_list directories_;
 };
 
-} //namespace pe_bliss
+} //namespace pe_bliss::core
 
 namespace std
 {
 template<>
-struct is_error_code_enum<pe_bliss::data_directories_errc> : true_type {};
+struct is_error_code_enum<pe_bliss::core::data_directories_errc> : true_type {};
 } //namespace std

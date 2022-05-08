@@ -10,17 +10,17 @@
 #include "buffers/input_buffer_interface.h"
 #include "buffers/ref_buffer.h"
 #include "pe_bliss2/address_converter.h"
-#include "pe_bliss2/data_directories.h"
+#include "pe_bliss2/core/data_directories.h"
+#include "pe_bliss2/core/file_header.h"
+#include "pe_bliss2/core/image_signature.h"
+#include "pe_bliss2/core/optional_header.h"
+#include "pe_bliss2/core/overlay.h"
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/packed_byte_array.h"
 #include "pe_bliss2/packed_byte_vector.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/dos/dos_stub.h"
-#include "pe_bliss2/image_signature.h"
-#include "pe_bliss2/file_header.h"
-#include "pe_bliss2/optional_header.h"
-#include "pe_bliss2/overlay.h"
 #include "pe_bliss2/pe_types.h"
 #include "pe_bliss2/section/section_table.h"
 #include "pe_bliss2/section/section_data.h"
@@ -73,42 +73,42 @@ public:
 		return dos_stub_;
 	}
 
-	[[nodiscard]] image_signature& get_image_signature() noexcept
+	[[nodiscard]] core::image_signature& get_image_signature() noexcept
 	{
 		return image_signature_;
 	}
 
-	[[nodiscard]] const image_signature& get_image_signature() const noexcept
+	[[nodiscard]] const core::image_signature& get_image_signature() const noexcept
 	{
 		return image_signature_;
 	}
 
-	[[nodiscard]] file_header& get_file_header() noexcept
+	[[nodiscard]] core::file_header& get_file_header() noexcept
 	{
 		return file_header_;
 	}
 
-	[[nodiscard]] const file_header& get_file_header() const noexcept
+	[[nodiscard]] const core::file_header& get_file_header() const noexcept
 	{
 		return file_header_;
 	}
 
-	[[nodiscard]] optional_header& get_optional_header() noexcept
+	[[nodiscard]] core::optional_header& get_optional_header() noexcept
 	{
 		return optional_header_;
 	}
 
-	[[nodiscard]] const optional_header& get_optional_header() const noexcept
+	[[nodiscard]] const core::optional_header& get_optional_header() const noexcept
 	{
 		return optional_header_;
 	}
 
-	[[nodiscard]] data_directories& get_data_directories() noexcept
+	[[nodiscard]] core::data_directories& get_data_directories() noexcept
 	{
 		return data_directories_;
 	}
 
-	[[nodiscard]] const data_directories& get_data_directories() const noexcept
+	[[nodiscard]] const core::data_directories& get_data_directories() const noexcept
 	{
 		return data_directories_;
 	}
@@ -133,12 +133,12 @@ public:
 		return section_list_;
 	}
 
-	[[nodiscard]] const overlay& get_overlay() const noexcept
+	[[nodiscard]] const core::overlay& get_overlay() const noexcept
 	{
 		return overlay_;
 	}
 
-	[[nodiscard]] overlay& get_overlay() noexcept
+	[[nodiscard]] core::overlay& get_overlay() noexcept
 	{
 		return overlay_;
 	}
@@ -201,9 +201,9 @@ public:
 		std::uint32_t data_size = 0) const;
 
 	[[nodiscard]]
-	section_ref section_from_directory(data_directories::directory_type directory);
+	section_ref section_from_directory(core::data_directories::directory_type directory);
 	[[nodiscard]]
-	section_const_ref section_from_directory(data_directories::directory_type directory) const;
+	section_const_ref section_from_directory(core::data_directories::directory_type directory) const;
 
 	[[nodiscard]]
 	section_ref section_from_file_offset(std::uint32_t offset,
@@ -551,13 +551,13 @@ private:
 	bool loaded_to_memory_ = false;
 	dos::dos_header dos_header_;
 	dos::dos_stub dos_stub_;
-	image_signature image_signature_;
-	file_header file_header_;
-	optional_header optional_header_;
-	data_directories data_directories_;
+	core::image_signature image_signature_;
+	core::file_header file_header_;
+	core::optional_header optional_header_;
+	core::data_directories data_directories_;
 	section::section_table section_table_;
 	section_data_list section_list_;
-	overlay overlay_;
+	core::overlay overlay_;
 	buffers::ref_buffer full_headers_buffer_;
 };
 

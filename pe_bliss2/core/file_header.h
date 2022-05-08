@@ -17,7 +17,7 @@ class input_buffer_interface;
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss
+namespace pe_bliss::core
 {
 
 enum class file_header_errc
@@ -148,10 +148,10 @@ public:
 		const optional_header& hdr) const noexcept;
 };
 
-} //namespace pe_bliss
+} //namespace pe_bliss::core
 
 namespace std
 {
 template<>
-struct is_error_code_enum<pe_bliss::file_header_errc> : true_type {};
+struct is_error_code_enum<pe_bliss::core::file_header_errc> : true_type {};
 } //namespace std

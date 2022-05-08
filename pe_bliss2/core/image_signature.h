@@ -13,7 +13,7 @@ class input_buffer_interface;
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss
+namespace pe_bliss::core
 {
 
 enum class image_signature_errc
@@ -57,10 +57,10 @@ public:
 	pe_error_wrapper validate() const noexcept;
 };
 
-} //namespace pe_bliss
+} //namespace pe_bliss::core
 
 namespace std
 {
 template<>
-struct is_error_code_enum<pe_bliss::image_signature_errc> : true_type {};
+struct is_error_code_enum<pe_bliss::core::image_signature_errc> : true_type {};
 } //namespace std

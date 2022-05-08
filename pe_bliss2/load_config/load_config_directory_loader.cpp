@@ -8,6 +8,9 @@
 #include <system_error>
 #include <variant>
 
+#include "pe_bliss2/core/data_directories.h"
+#include "pe_bliss2/core/file_header.h"
+#include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/detail/load_config/image_load_config_directory.h"
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/packed_struct.h"
@@ -161,7 +164,7 @@ void load_safeseh_handler_table(const image& instance,
 	if (!options.load_safeseh_handler_table)
 		return;
 
-	if (instance.get_optional_header().get_dll_characteristics() & optional_header::dll_characteristics::no_seh)
+	if (instance.get_optional_header().get_dll_characteristics() & core::optional_header::dll_characteristics::no_seh)
 		return;
 
 	auto safeseh_handler_table_va = directory.get_descriptor()->structured_exceptions.se_handler_table;
@@ -203,7 +206,7 @@ constexpr void load_safeseh_handler_table(
 bool has_cf_guard(const image& instance) noexcept
 {
 	return static_cast<bool>(instance.get_optional_header().get_dll_characteristics()
-		& optional_header::dll_characteristics::guard_cf);
+		& core::optional_header::dll_characteristics::guard_cf);
 }
 
 template<typename GuardFunction, typename Directory, typename Va, typename Table>
@@ -454,13 +457,13 @@ void load_chpe_metadata(const image& instance,
 		return;
 
 	auto machine = instance.get_file_header().get_machine_type();
-	if (machine == file_header::machine_type::arm64
-		|| machine == file_header::machine_type::amd64)
+	if (machine == core::file_header::machine_type::arm64
+		|| machine == core::file_header::machine_type::amd64)
 	{
 		load_chpe_metadata(instance, options, metadata_va,
 			directory.get_chpe_metadata().template emplace<chpe_arm64x_metadata_details>());
 	}
-	else if (machine == file_header::machine_type::chpe_x86)
+	else if (machine == core::file_header::machine_type::chpe_x86)
 	{
 		load_chpe_metadata(instance, options, metadata_va,
 			directory.get_chpe_metadata().template emplace<chpe_x86_metadata_details>());
@@ -1180,7 +1183,7 @@ void load_impl(const image& instance,
 	const loader_options& options, Directory& directory)
 {
 	const auto& load_config_dir_info = instance.get_data_directories().get_directory(
-		data_directories::directory_type::config);
+		core::data_directories::directory_type::config);
 
 	instance.struct_from_rva<std::uint32_t>(load_config_dir_info->virtual_address,
 		directory.get_size(), options.include_headers, options.allow_virtual_data);

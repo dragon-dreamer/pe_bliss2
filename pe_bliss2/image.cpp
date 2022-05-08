@@ -10,6 +10,7 @@
 #include "buffers/input_buffer_section.h"
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/address_converter.h"
+#include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/image_file_header.h"
 #include "pe_bliss2/packed_c_string.h"
 #include "pe_bliss2/packed_utf16_string.h"
@@ -102,12 +103,12 @@ std::error_code make_error_code(image_errc e) noexcept
 bool image::has_relocation() const noexcept
 {
 	return data_directories_.has_reloc()
-		&& !(file_header_.get_characteristics() & file_header::characteristics::relocs_stripped);
+		&& !(file_header_.get_characteristics() & core::file_header::characteristics::relocs_stripped);
 }
 
 bool image::is_64bit() const noexcept
 {
-	return optional_header_.get_magic() == optional_header::magic::pe64;
+	return optional_header_.get_magic() == core::optional_header::magic::pe64;
 }
 
 void image::update_number_of_sections()
@@ -123,7 +124,7 @@ void image::update_number_of_sections()
 
 void image::set_number_of_data_directories(std::uint32_t number)
 {
-	if (number > optional_header::max_number_of_rva_and_sizes)
+	if (number > core::optional_header::max_number_of_rva_and_sizes)
 		throw pe_error(image_errc::too_many_rva_and_sizes);
 
 	data_directories_.set_size(number);
@@ -177,7 +178,7 @@ image::section_const_ref image::section_from_va(std::uint64_t va,
 }
 
 image::section_ref image::section_from_directory(
-	data_directories::directory_type directory)
+	core::data_directories::directory_type directory)
 {
 	if (!data_directories_.has_directory(directory))
 		return { std::end(section_table_.get_section_headers()), std::end(section_list_) };
@@ -188,7 +189,7 @@ image::section_ref image::section_from_directory(
 }
 
 image::section_const_ref image::section_from_directory(
-	data_directories::directory_type directory) const
+	core::data_directories::directory_type directory) const
 {
 	if (!data_directories_.has_directory(directory))
 		return { std::cend(section_table_.get_section_headers()), std::cend(section_list_) };

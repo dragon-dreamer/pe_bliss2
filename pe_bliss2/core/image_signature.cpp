@@ -1,4 +1,4 @@
-#include "pe_bliss2/image_signature.h"
+#include "pe_bliss2/core/image_signature.h"
 
 #include <exception>
 #include <system_error>
@@ -17,8 +17,8 @@ struct image_signature_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
-		using enum pe_bliss::image_signature_errc;
-		switch (static_cast<pe_bliss::image_signature_errc>(ev))
+		using enum pe_bliss::core::image_signature_errc;
+		switch (static_cast<pe_bliss::core::image_signature_errc>(ev))
 		{
 		case invalid_pe_signature:
 			return "Invalid PE signature";
@@ -34,7 +34,7 @@ const image_signature_error_category image_signature_error_category_instance;
 
 } //namespace
 
-namespace pe_bliss
+namespace pe_bliss::core
 {
 
 std::error_code make_error_code(image_signature_errc e) noexcept
@@ -69,4 +69,4 @@ pe_error_wrapper image_signature::validate() const noexcept
 	return {};
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::core
