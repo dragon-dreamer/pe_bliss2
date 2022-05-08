@@ -18,6 +18,7 @@
 #include "section_table_dumper.h"
 #include "tls_dumper.h"
 
+#include "pe_bliss2/error_list.h"
 #include "pe_bliss2/image.h"
 
 //TODO: configuration flags, output options
@@ -50,11 +51,23 @@ int main(int argc, char* argv[]) try
 		return -1;
 	}
 	const char* filename = argv[1];
-	dump_pe(load_image(filename));
+
+	pe_bliss::error_list errs;
+	auto image = load_image(filename, {}, errs);
+	if (!image)
+	{
+		empty_color_provider color_provider;
+		formatter fmt(color_provider, std::cout, std::cerr);
+		fmt.print_errors(errs);
+		return -2;
+	}
+
+	dump_pe(*image);
 }
 catch (const std::system_error& e)
 {
 	std::cerr << "Error: " << e.code() << ", " << e.what() << "\n\n";
+	return -2;
 }
 catch (const std::exception& e)
 {
