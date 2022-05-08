@@ -5,9 +5,9 @@
 #include "color_provider.h"
 #include "formatter.h"
 
-#include "pe_bliss2/dos_stub.h"
+#include "pe_bliss2/dos/dos_stub.h"
 
-void dump_dos_stub(formatter& fmt, const pe_bliss::dos_stub& stub)
+void dump_dos_stub(formatter& fmt, const pe_bliss::dos::dos_stub& stub)
 {
 	fmt.print_structure_name("DOS stub");
 	fmt.get_stream() << ' ';

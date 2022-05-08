@@ -133,6 +133,12 @@
     <Filter Include="Source Files\section">
       <UniqueIdentifier>{a56dfaf9-f8ff-4478-9da3-b4e9e56e3808}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\dos">
+      <UniqueIdentifier>{62c289d4-aeca-4a06-b6ac-24223dd3f4b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dos">
+      <UniqueIdentifier>{edd0e58a-9b5c-4d82-b4f3-52e151c6f326}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detail\packed_serialization.h">
@@ -141,17 +147,11 @@
     <ClInclude Include="detail\concepts.h">
       <Filter>Header Files\detail</Filter>
     </ClInclude>
-    <ClInclude Include="dos_header.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="pe_error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="detail\image_dos_header.h">
       <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="dos_stub.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="image_signature.h">
       <Filter>Header Files</Filter>
@@ -190,9 +190,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="address_converter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="overlay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="exports\exported_address.h">
@@ -387,14 +384,17 @@
     <ClInclude Include="section\section_errc.h">
       <Filter>Header Files\section</Filter>
     </ClInclude>
+    <ClInclude Include="dos\dos_header.h">
+      <Filter>Header Files\dos</Filter>
+    </ClInclude>
+    <ClInclude Include="dos\dos_stub.h">
+      <Filter>Header Files\dos</Filter>
+    </ClInclude>
+    <ClInclude Include="overlay.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="dos_header.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="dos_stub.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="image_signature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -547,6 +547,12 @@
     </ClCompile>
     <ClCompile Include="section\section_errc.cpp">
       <Filter>Source Files\section</Filter>
+    </ClCompile>
+    <ClCompile Include="dos\dos_header.cpp">
+      <Filter>Source Files\dos</Filter>
+    </ClCompile>
+    <ClCompile Include="dos\dos_stub.cpp">
+      <Filter>Source Files\dos</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

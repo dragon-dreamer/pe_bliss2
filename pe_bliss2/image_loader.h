@@ -1,7 +1,7 @@
 #pragma once
 
 #include "buffers/input_buffer_interface.h"
-#include "pe_bliss2/dos_header.h"
+#include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/optional_header.h"
 #include "utilities/static_class.h"
@@ -23,7 +23,7 @@ struct image_load_options
 	bool eager_overlay_data_copy = false;
 	bool load_full_headers_buffer = true;
 	bool eager_full_headers_buffer_copy = false;
-	dos_header_validation_options dos_header_validation{};
+	dos::dos_header_validation_options dos_header_validation{};
 	optional_header_validation_options optional_header_validation{};
 };
 

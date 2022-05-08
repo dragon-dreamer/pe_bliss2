@@ -15,8 +15,8 @@
 #include "pe_bliss2/packed_byte_array.h"
 #include "pe_bliss2/packed_byte_vector.h"
 #include "pe_bliss2/packed_struct.h"
-#include "pe_bliss2/dos_header.h"
-#include "pe_bliss2/dos_stub.h"
+#include "pe_bliss2/dos/dos_header.h"
+#include "pe_bliss2/dos/dos_stub.h"
 #include "pe_bliss2/image_signature.h"
 #include "pe_bliss2/file_header.h"
 #include "pe_bliss2/optional_header.h"
@@ -53,22 +53,22 @@ public:
 	using section_data_list = std::list<section::section_data>;
 
 public:
-	[[nodiscard]] dos_header& get_dos_header() noexcept
+	[[nodiscard]] dos::dos_header& get_dos_header() noexcept
 	{
 		return dos_header_;
 	}
 
-	[[nodiscard]] const dos_header& get_dos_header() const noexcept
+	[[nodiscard]] const dos::dos_header& get_dos_header() const noexcept
 	{
 		return dos_header_;
 	}
 
-	[[nodiscard]] dos_stub& get_dos_stub() noexcept
+	[[nodiscard]] dos::dos_stub& get_dos_stub() noexcept
 	{
 		return dos_stub_;
 	}
 
-	[[nodiscard]] const dos_stub& get_dos_stub() const noexcept
+	[[nodiscard]] const dos::dos_stub& get_dos_stub() const noexcept
 	{
 		return dos_stub_;
 	}
@@ -549,8 +549,8 @@ public:
 
 private:
 	bool loaded_to_memory_ = false;
-	dos_header dos_header_;
-	dos_stub dos_stub_;
+	dos::dos_header dos_header_;
+	dos::dos_stub dos_stub_;
 	image_signature image_signature_;
 	file_header file_header_;
 	optional_header optional_header_;

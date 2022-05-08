@@ -15,7 +15,7 @@ class input_buffer_interface;
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss
+namespace pe_bliss::dos
 {
 
 enum class dos_header_errc
@@ -61,10 +61,10 @@ public:
 	pe_error_wrapper validate_e_lfanew() const noexcept;
 };
 
-} //namespace pe_bliss
+} //namespace pe_bliss::dos
 
 namespace std
 {
 template<>
-struct is_error_code_enum<pe_bliss::dos_header_errc> : true_type {};
+struct is_error_code_enum<pe_bliss::dos::dos_header_errc> : true_type {};
 } //namespace std

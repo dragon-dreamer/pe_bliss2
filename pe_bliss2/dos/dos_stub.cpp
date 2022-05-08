@@ -1,4 +1,4 @@
-#include "pe_bliss2/dos_stub.h"
+#include "pe_bliss2/dos/dos_stub.h"
 
 #include <exception>
 #include <memory>
@@ -19,9 +19,10 @@ struct dos_stub_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
-		switch (static_cast<pe_bliss::dos_stub_errc>(ev))
+		using enum pe_bliss::dos::dos_stub_errc;
+		switch (static_cast<pe_bliss::dos::dos_stub_errc>(ev))
 		{
-		case pe_bliss::dos_stub_errc::unable_to_read_dos_stub:
+		case unable_to_read_dos_stub:
 			return "Unable to read DOS stub and Rich header";
 		default:
 			return {};
@@ -33,7 +34,7 @@ const dos_stub_error_category dos_stub_error_category_instance;
 
 } //namespace
 
-namespace pe_bliss
+namespace pe_bliss::dos
 {
 
 std::error_code make_error_code(dos_stub_errc e) noexcept
@@ -59,4 +60,4 @@ void dos_stub::deserialize(const buffers::input_buffer_ptr& buffer,
 	}
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::dos

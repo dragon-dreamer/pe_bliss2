@@ -4,12 +4,13 @@
 
 #include "buffers/input_memory_buffer.h"
 
-#include "pe_bliss2/dos_header.h"
+#include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss;
+using namespace pe_bliss::dos;
 
 TEST(DosHeaderTests, EmptyTest)
 {

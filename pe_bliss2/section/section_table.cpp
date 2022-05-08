@@ -7,7 +7,6 @@
 #include "buffers/input_buffer_interface.h"
 #include "buffers/output_buffer_interface.h"
 #include "pe_bliss2/data_directories.h"
-#include "pe_bliss2/file_header.h"
 #include "pe_bliss2/optional_header.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/section/section_errc.h"

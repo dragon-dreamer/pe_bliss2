@@ -5,7 +5,7 @@
 #include <string>
 
 #include "buffers/input_buffer_section.h"
-#include "pe_bliss2/dos_header.h"
+#include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/section/pe_section_error.h"
 #include "pe_bliss2/section/section_data.h"
@@ -34,7 +34,7 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 
 	std::size_t pe_headers_start = dos_hdr.base_struct().get_state().buffer_pos();
 	if (!utilities::math::add_if_safe<std::size_t>(pe_headers_start, dos_hdr.base_struct()->e_lfanew))
-		throw pe_error(dos_header_errc::invalid_e_lfanew);
+		throw pe_error(dos::dos_header_errc::invalid_e_lfanew);
 
 	buffer->set_rpos(pe_headers_start);
 

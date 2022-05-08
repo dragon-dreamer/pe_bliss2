@@ -7,7 +7,7 @@
 #include "buffers/input_buffer_interface.h"
 #include "buffers/ref_buffer.h"
 
-namespace pe_bliss
+namespace pe_bliss::dos
 {
 
 enum class dos_stub_errc
@@ -39,10 +39,10 @@ public:
 		const dos_stub_load_options& options);
 };
 
-} //namespace pe_bliss
+} //namespace pe_bliss::dos
 
 namespace std
 {
 template<>
-struct is_error_code_enum<pe_bliss::dos_stub_errc> : true_type {};
+struct is_error_code_enum<pe_bliss::dos::dos_stub_errc> : true_type {};
 } //namespace std

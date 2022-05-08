@@ -1,4 +1,4 @@
-#include "pe_bliss2/dos_header.h"
+#include "pe_bliss2/dos/dos_header.h"
 
 #include <exception>
 #include <system_error>
@@ -18,8 +18,8 @@ struct dos_header_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
-		using enum pe_bliss::dos_header_errc;
-		switch (static_cast<pe_bliss::dos_header_errc>(ev))
+		using enum pe_bliss::dos::dos_header_errc;
+		switch (static_cast<pe_bliss::dos::dos_header_errc>(ev))
 		{
 		case invalid_dos_header_signature:
 			return "Invalid DOS header signature";
@@ -39,7 +39,7 @@ const dos_header_error_category dos_header_error_category_instance;
 
 } //namespace
 
-namespace pe_bliss
+namespace pe_bliss::dos
 {
 
 std::error_code make_error_code(dos_header_errc e) noexcept
@@ -100,4 +100,4 @@ pe_error_wrapper dos_header::validate_e_lfanew() const noexcept
 	return {};
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::dos

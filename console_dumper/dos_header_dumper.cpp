@@ -4,9 +4,9 @@
 
 #include "formatter.h"
 
-#include "pe_bliss2/dos_header.h"
+#include "pe_bliss2/dos/dos_header.h"
 
-void dump_dos_header(formatter& fmt, const pe_bliss::dos_header& header)
+void dump_dos_header(formatter& fmt, const pe_bliss::dos::dos_header& header)
 {
 	fmt.print_structure("DOS header", header.base_struct(), std::array{
 		value_info{"e_magic"},

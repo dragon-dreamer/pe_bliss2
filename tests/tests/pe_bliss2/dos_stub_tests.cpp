@@ -7,13 +7,15 @@
 #include "gtest/gtest.h"
 
 #include "buffers/input_memory_buffer.h"
-#include "pe_bliss2/dos_stub.h"
+#include "pe_bliss2/dos/dos_stub.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
+using namespace pe_bliss::dos;
+
 TEST(DosStubTests, EmptyDosStubTest)
 {
-	pe_bliss::dos_stub stub;
+	dos_stub stub;
 	EXPECT_TRUE(stub.empty());
 	EXPECT_EQ(stub.data()->absolute_offset(), 0u);
 	EXPECT_EQ(stub.data()->relative_offset(), 0u);
@@ -27,10 +29,10 @@ TEST(DosStubTests, DeserializeDosStubTest)
 
 	auto buffer = std::make_shared<buffers::input_memory_buffer>(data.data(), data.size());
 
-	pe_bliss::dos_stub stub;
+	dos_stub stub;
 	expect_throw_pe_error([&] { stub.deserialize(buffer, {
 		.e_lfanew = static_cast<std::uint32_t>(data.size() + 1u) }); },
-		pe_bliss::dos_stub_errc::unable_to_read_dos_stub);
+		dos_stub_errc::unable_to_read_dos_stub);
 
 	buffer->set_rpos(1u);
 	EXPECT_NO_THROW(stub.deserialize(buffer, {
