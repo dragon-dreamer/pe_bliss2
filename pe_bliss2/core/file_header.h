@@ -22,8 +22,7 @@ namespace pe_bliss::core
 
 enum class file_header_errc
 {
-	invalid_size_of_optional_header = 1,
-	unable_to_read_file_header
+	unable_to_read_file_header = 1
 };
 
 std::error_code make_error_code(file_header_errc) noexcept;

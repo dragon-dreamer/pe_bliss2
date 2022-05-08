@@ -6,6 +6,7 @@
 #include <type_traits>
 
 #include "pe_bliss2/core/optional_header.h"
+#include "pe_bliss2/core/optional_header_errc.h"
 #include "pe_bliss2/detail/image_data_directory.h"
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/pe_error.h"
@@ -25,8 +26,6 @@ struct file_header_error_category : std::error_category
 		using enum pe_bliss::core::file_header_errc;
 		switch (static_cast<pe_bliss::core::file_header_errc>(ev))
 		{
-		case invalid_size_of_optional_header:
-			return "Invalid size of optional header";
 		case unable_to_read_file_header:
 			return "Unable to read file header";
 		default:
@@ -90,7 +89,7 @@ pe_error_wrapper file_header::validate_size_of_optional_header(
 		< hdr.get_size_of_structure()
 		+ data_dir_size * hdr.get_number_of_rva_and_sizes())
 	{
-		return file_header_errc::invalid_size_of_optional_header;
+		return optional_header_errc::invalid_size_of_optional_header;
 	}
 
 	return {};

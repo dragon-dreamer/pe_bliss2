@@ -30,6 +30,7 @@
     <ClInclude Include="core\image_signature_errc.h" />
     <ClInclude Include="core\image_signature_validator.h" />
     <ClInclude Include="core\optional_header.h" />
+    <ClInclude Include="core\optional_header_errc.h" />
     <ClInclude Include="core\overlay.h" />
     <ClInclude Include="detail\bound_import\image_bound_import_descriptor.h" />
     <ClInclude Include="detail\endian_convert.h" />
@@ -118,6 +119,7 @@
     <ClCompile Include="core\image_signature_errc.cpp" />
     <ClCompile Include="core\image_signature_validator.cpp" />
     <ClCompile Include="core\optional_header.cpp" />
+    <ClCompile Include="core\optional_header_errc.cpp" />
     <ClCompile Include="detail\rich\rich_header_utils.cpp" />
     <ClCompile Include="dos\dos_header.cpp" />
     <ClCompile Include="dos\dos_header_errc.cpp" />

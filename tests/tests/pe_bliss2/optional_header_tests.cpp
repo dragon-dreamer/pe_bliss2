@@ -11,6 +11,7 @@
 #include "buffers/output_memory_buffer.h"
 
 #include "pe_bliss2/core/optional_header.h"
+#include "pe_bliss2/core/optional_header_errc.h"
 #include "pe_bliss2/detail/image_optional_header.h"
 #include "pe_bliss2/pe_error.h"
 

@@ -12,6 +12,7 @@
 #include "pe_bliss2/detail/image_file_header.h"
 #include "pe_bliss2/core/file_header.h"
 #include "pe_bliss2/core/optional_header.h"
+#include "pe_bliss2/core/optional_header_errc.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
@@ -101,7 +102,7 @@ TEST(FileHeaderTests, ValidateTest)
 	header.base_struct()->size_of_optional_header
 		= opt_header.get_size_of_structure() - 1;
 	EXPECT_EQ(header.validate_size_of_optional_header(opt_header),
-		file_header_errc::invalid_size_of_optional_header);
+		optional_header_errc::invalid_size_of_optional_header);
 
 	header.base_struct()->size_of_optional_header
 		= opt_header.get_size_of_structure();
@@ -110,7 +111,7 @@ TEST(FileHeaderTests, ValidateTest)
 
 	opt_header.set_raw_number_of_rva_and_sizes(3u);
 	EXPECT_EQ(header.validate_size_of_optional_header(opt_header),
-		file_header_errc::invalid_size_of_optional_header);
+		optional_header_errc::invalid_size_of_optional_header);
 
 	static constexpr auto data_dir_size = detail::packed_reflection
 		::get_type_size<detail::image_data_directory>();
