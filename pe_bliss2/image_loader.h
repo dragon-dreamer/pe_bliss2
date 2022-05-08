@@ -1,7 +1,7 @@
 #pragma once
 
 #include "buffers/input_buffer_interface.h"
-#include "pe_bliss2/dos/dos_header.h"
+#include "pe_bliss2/dos/dos_header_validator.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/optional_header.h"
 #include "utilities/static_class.h"

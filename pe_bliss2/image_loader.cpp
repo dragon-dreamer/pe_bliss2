@@ -6,6 +6,8 @@
 
 #include "buffers/input_buffer_section.h"
 #include "pe_bliss2/dos/dos_header.h"
+#include "pe_bliss2/dos/dos_header_errc.h"
+#include "pe_bliss2/dos/dos_header_validator.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/section/pe_section_error.h"
 #include "pe_bliss2/section/section_data.h"
@@ -25,7 +27,7 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 
 	auto& dos_hdr = instance.get_dos_header();
 	dos_hdr.deserialize(*buffer, options.allow_virtual_headers);
-	dos_hdr.validate(options.dos_header_validation).throw_on_error();
+	dos::validate(dos_hdr, options.dos_header_validation).throw_on_error();
 
 	instance.get_dos_stub().deserialize(buffer, {
 		.copy_memory = options.eager_dos_stub_data_copy,

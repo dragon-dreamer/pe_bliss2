@@ -393,6 +393,12 @@
     <ClInclude Include="overlay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dos\dos_header_validator.h">
+      <Filter>Header Files\dos</Filter>
+    </ClInclude>
+    <ClInclude Include="dos\dos_header_errc.h">
+      <Filter>Header Files\dos</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="image_signature.cpp">
@@ -552,6 +558,12 @@
       <Filter>Source Files\dos</Filter>
     </ClCompile>
     <ClCompile Include="dos\dos_stub.cpp">
+      <Filter>Source Files\dos</Filter>
+    </ClCompile>
+    <ClCompile Include="dos\dos_header_errc.cpp">
+      <Filter>Source Files\dos</Filter>
+    </ClCompile>
+    <ClCompile Include="dos\dos_header_validator.cpp">
       <Filter>Source Files\dos</Filter>
     </ClCompile>
   </ItemGroup>

@@ -46,6 +46,8 @@
     <ClInclude Include="detail\rich\rich_header_utils.h" />
     <ClInclude Include="detail\tls\image_tls_directory.h" />
     <ClInclude Include="dos\dos_header.h" />
+    <ClInclude Include="dos\dos_header_errc.h" />
+    <ClInclude Include="dos\dos_header_validator.h" />
     <ClInclude Include="dos\dos_stub.h" />
     <ClInclude Include="error_list.h" />
     <ClInclude Include="exceptions\arm64\arm64_exception_directory.h" />
@@ -111,6 +113,8 @@
     <ClCompile Include="data_directories.cpp" />
     <ClCompile Include="detail\rich\rich_header_utils.cpp" />
     <ClCompile Include="dos\dos_header.cpp" />
+    <ClCompile Include="dos\dos_header_errc.cpp" />
+    <ClCompile Include="dos\dos_header_validator.cpp" />
     <ClCompile Include="dos\dos_stub.cpp" />
     <ClCompile Include="error_list.cpp" />
     <ClCompile Include="exceptions\arm64\arm64_exception_directory.cpp" />

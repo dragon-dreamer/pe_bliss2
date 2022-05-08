@@ -5,6 +5,8 @@
 #include "buffers/input_memory_buffer.h"
 
 #include "pe_bliss2/dos/dos_header.h"
+#include "pe_bliss2/dos/dos_header_errc.h"
+#include "pe_bliss2/dos/dos_header_validator.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
@@ -15,12 +17,12 @@ using namespace pe_bliss::dos;
 TEST(DosHeaderTests, EmptyTest)
 {
 	dos_header header;
-	EXPECT_EQ(header.validate_magic(),
+	EXPECT_EQ(validate_magic(header),
 		dos_header_errc::invalid_dos_header_signature);
-	EXPECT_EQ(header.validate_e_lfanew(),
+	EXPECT_EQ(validate_e_lfanew(header),
 		dos_header_errc::invalid_e_lfanew);
-	EXPECT_THROW(header.validate({}).throw_on_error(), pe_error);
-	EXPECT_NO_THROW(header.validate({
+	EXPECT_THROW(validate(header, {}).throw_on_error(), pe_error);
+	EXPECT_NO_THROW(validate(header, {
 		.validate_e_lfanew = false,
 		.validate_magic = false
 	}).throw_on_error());
@@ -37,9 +39,9 @@ TEST(DosHeaderTests, ValidationTest1)
 		std::size(header_data));
 
 	header.deserialize(buf, false);
-	EXPECT_NO_THROW(header.validate_magic().throw_on_error());
-	EXPECT_NO_THROW(header.validate_e_lfanew().throw_on_error());
-	EXPECT_NO_THROW(header.validate({}).throw_on_error());
+	EXPECT_NO_THROW(validate_magic(header).throw_on_error());
+	EXPECT_NO_THROW(validate_e_lfanew(header).throw_on_error());
+	EXPECT_NO_THROW(validate(header, {}).throw_on_error());
 }
 
 TEST(DosHeaderTests, ValidationTest2)
@@ -53,11 +55,11 @@ TEST(DosHeaderTests, ValidationTest2)
 		std::size(header_data));
 
 	header.deserialize(buf, false);
-	EXPECT_EQ(header.validate_magic(),
+	EXPECT_EQ(validate_magic(header),
 		dos_header_errc::invalid_dos_header_signature);
-	EXPECT_EQ(header.validate_e_lfanew(),
+	EXPECT_EQ(validate_e_lfanew(header),
 		dos_header_errc::unaligned_e_lfanew);
-	EXPECT_THROW(header.validate({}).throw_on_error(), pe_error);
+	EXPECT_THROW(validate(header, {}).throw_on_error(), pe_error);
 }
 
 TEST(DosHeaderTests, DeserializeErrorTest)
