@@ -27,8 +27,6 @@ enum class file_header_errc
 
 std::error_code make_error_code(file_header_errc) noexcept;
 
-class optional_header;
-
 class [[nodiscard]] file_header
 	: public detail::packed_struct_base<detail::image_file_header>
 {
@@ -140,11 +138,6 @@ public:
 	{
 		return static_cast<bool>(get_characteristics() & characteristics::dll);
 	}
-
-public:
-	[[nodiscard]]
-	pe_error_wrapper validate_size_of_optional_header(
-		const optional_header& hdr) const noexcept;
 };
 
 } //namespace pe_bliss::core

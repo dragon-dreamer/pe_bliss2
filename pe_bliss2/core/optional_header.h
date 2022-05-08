@@ -6,7 +6,6 @@
 
 #include "pe_bliss2/detail/image_optional_header.h"
 #include "pe_bliss2/packed_struct.h"
-#include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 
 #include "utilities/static_class.h"
@@ -19,19 +18,6 @@ class output_buffer_interface;
 
 namespace pe_bliss::core
 {
-
-// validate() method does not validate image base, there is
-// a separate validate_image_base() method which should be used.
-struct [[nodiscard]] optional_header_validation_options
-{
-	//TODO: sometimes check_***, sometimes validate_***, make names similar
-	bool check_address_of_entry_point = true;
-	bool check_alignments = true;
-	bool check_subsystem_version = true;
-	bool check_size_of_heap = true;
-	bool check_size_of_stack = true;
-	bool check_size_of_headers = true;
-};
 
 class [[nodiscard]] optional_header
 {
@@ -171,26 +157,6 @@ public:
 		return std::visit([func = std::forward<Func>(func)](auto& obj) mutable {
 			return std::forward<Func>(func)(obj.get()); }, header_);
 	}
-
-	[[nodiscard]]
-	pe_error_wrapper validate(const optional_header_validation_options& options,
-		bool is_dll) const noexcept;
-	[[nodiscard]]
-	pe_error_wrapper validate_address_of_entry_point(bool is_dll) const noexcept;
-	[[nodiscard]]
-	pe_error_wrapper validate_image_base(bool has_relocations) const noexcept;
-	[[nodiscard]]
-	pe_error_wrapper validate_file_alignment() const noexcept;
-	[[nodiscard]]
-	pe_error_wrapper validate_section_alignment() const noexcept;
-	[[nodiscard]]
-	pe_error_wrapper validate_subsystem_version() const noexcept;
-	[[nodiscard]]
-	pe_error_wrapper validate_size_of_heap() const noexcept;
-	[[nodiscard]]
-	pe_error_wrapper validate_size_of_stack() const noexcept;
-	[[nodiscard]]
-	pe_error_wrapper validate_size_of_headers() const noexcept;
 
 	[[nodiscard]]
 	bool is_low_alignment() const noexcept;

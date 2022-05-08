@@ -2,6 +2,7 @@
 
 #include "buffers/input_buffer_interface.h"
 #include "pe_bliss2/core/optional_header.h"
+#include "pe_bliss2/core/optional_header_validator.h"
 #include "pe_bliss2/dos/dos_header_validator.h"
 #include "pe_bliss2/image.h"
 #include "utilities/static_class.h"
@@ -19,6 +20,7 @@ struct image_load_options
 	bool eager_section_data_copy = false;
 	bool eager_dos_stub_data_copy = false;
 	bool validate_image_base = true;
+	bool validate_size_of_optional_header = true;
 	bool load_overlay = true;
 	bool eager_overlay_data_copy = false;
 	bool load_full_headers_buffer = true;

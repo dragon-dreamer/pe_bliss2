@@ -9,6 +9,7 @@
 #include "pe_bliss2/dos/dos_header_errc.h"
 #include "pe_bliss2/dos/dos_header_validator.h"
 #include "pe_bliss2/core/image_signature_validator.h"
+#include "pe_bliss2/core/optional_header_validator.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/section/pe_section_error.h"
 #include "pe_bliss2/section/section_data.h"
@@ -48,15 +49,19 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 	auto& optional_hdr = instance.get_optional_header();
 	file_hdr.deserialize(*buffer, options.allow_virtual_headers);
 	optional_hdr.deserialize(*buffer, options.allow_virtual_headers);
-	file_hdr.validate_size_of_optional_header(optional_hdr).throw_on_error();
-	optional_hdr.validate(options.optional_header_validation,
+	if (options.validate_size_of_optional_header)
+	{
+		validate_size_of_optional_header(file_hdr.base_struct()->size_of_optional_header,
+			optional_hdr).throw_on_error();
+	}
+	validate(optional_hdr, options.optional_header_validation,
 		file_hdr.is_dll()).throw_on_error();
 
 	instance.get_data_directories().deserialize(*buffer,
 		optional_hdr.get_number_of_rva_and_sizes(), options.allow_virtual_headers);
 
 	if (options.validate_image_base)
-		optional_hdr.validate_image_base(instance.has_relocation()).throw_on_error();
+		validate_image_base(optional_hdr, instance.has_relocation()).throw_on_error();
 
 	buffer->set_rpos(file_hdr.get_section_table_buffer_pos());
 	auto& section_tbl = instance.get_section_table();

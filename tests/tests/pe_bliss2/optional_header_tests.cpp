@@ -12,7 +12,10 @@
 
 #include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/core/optional_header_errc.h"
+#include "pe_bliss2/core/optional_header_validator.h"
+#include "pe_bliss2/detail/image_data_directory.h"
 #include "pe_bliss2/detail/image_optional_header.h"
+#include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
@@ -54,8 +57,8 @@ TYPED_TEST(OptionalHeaderTests, EmptyTest)
 	EXPECT_FALSE(header.is_windows_gui());
 	EXPECT_EQ(header.get_dll_characteristics(), 0u);
 
-	EXPECT_THROW(header.validate({}, false).throw_on_error(), pe_error);
-	EXPECT_THROW(header.validate({}, true).throw_on_error(), pe_error);
+	EXPECT_THROW(validate(header, {}, false).throw_on_error(), pe_error);
+	EXPECT_THROW(validate(header, {}, true).throw_on_error(), pe_error);
 
 	EXPECT_FALSE(header.is_low_alignment());
 }
@@ -322,21 +325,21 @@ TYPED_TEST(OptionalHeaderTests, ValidateAddressOfEntryPointTest)
 	optional_header header;
 	header.initialize_with<typename TestFixture::type>();
 
-	EXPECT_EQ(header.validate_address_of_entry_point(false),
+	EXPECT_EQ(validate_address_of_entry_point(header, false),
 		optional_header_errc::invalid_address_of_entry_point);
-	EXPECT_NO_THROW(header.validate_address_of_entry_point(true)
+	EXPECT_NO_THROW(validate_address_of_entry_point(header, true)
 		.throw_on_error());
 
 	header.set_raw_address_of_entry_point(1u);
-	EXPECT_NO_THROW(header.validate_address_of_entry_point(false)
+	EXPECT_NO_THROW(validate_address_of_entry_point(header, false)
 		.throw_on_error());
-	EXPECT_NO_THROW(header.validate_address_of_entry_point(true)
+	EXPECT_NO_THROW(validate_address_of_entry_point(header, true)
 		.throw_on_error());
 
 	header.set_raw_size_of_headers(100u);
-	EXPECT_EQ(header.validate_address_of_entry_point(false),
+	EXPECT_EQ(validate_address_of_entry_point(header, false),
 		optional_header_errc::invalid_address_of_entry_point);
-	EXPECT_EQ(header.validate_address_of_entry_point(true),
+	EXPECT_EQ(validate_address_of_entry_point(header, true),
 		optional_header_errc::invalid_address_of_entry_point);
 }
 
@@ -345,22 +348,22 @@ TYPED_TEST(OptionalHeaderTests, ValidateImageBaseTest)
 	optional_header header;
 	header.initialize_with<typename TestFixture::type>();
 
-	EXPECT_NO_THROW(header.validate_image_base(true).throw_on_error());
-	EXPECT_NO_THROW(header.validate_image_base(false).throw_on_error());
+	EXPECT_NO_THROW(validate_image_base(header, true).throw_on_error());
+	EXPECT_NO_THROW(validate_image_base(header, false).throw_on_error());
 
 	header.set_raw_image_base(0x123u);
-	EXPECT_EQ(header.validate_image_base(true),
+	EXPECT_EQ(validate_image_base(header, true),
 		optional_header_errc::unaligned_image_base);
-	EXPECT_EQ(header.validate_image_base(false),
+	EXPECT_EQ(validate_image_base(header, false),
 		optional_header_errc::unaligned_image_base);
 
 	header.set_raw_image_base(0x40000u);
-	EXPECT_NO_THROW(header.validate_image_base(true).throw_on_error());
-	EXPECT_NO_THROW(header.validate_image_base(false).throw_on_error());
+	EXPECT_NO_THROW(validate_image_base(header, true).throw_on_error());
+	EXPECT_NO_THROW(validate_image_base(header, false).throw_on_error());
 
 	header.set_raw_image_base(0xf0000000u);
-	EXPECT_NO_THROW(header.validate_image_base(true).throw_on_error());
-	EXPECT_EQ(header.validate_image_base(false),
+	EXPECT_NO_THROW(validate_image_base(header, true).throw_on_error());
+	EXPECT_EQ(validate_image_base(header, false),
 		optional_header_errc::too_large_image_base);
 }
 
@@ -369,27 +372,27 @@ TYPED_TEST(OptionalHeaderTests, ValidateFileAlignmentTest)
 	optional_header header;
 	header.initialize_with<typename TestFixture::type>();
 
-	EXPECT_EQ(header.validate_file_alignment(),
+	EXPECT_EQ(validate_file_alignment(header),
 		optional_header_errc::incorrect_file_alignment);
 
 	header.set_raw_file_alignment(0x8000u);
 	header.set_raw_section_alignment(0x10000u);
-	EXPECT_NO_THROW(header.validate_file_alignment().throw_on_error());
+	EXPECT_NO_THROW(validate_file_alignment(header).throw_on_error());
 
 	header.set_raw_section_alignment(0x4000u);
-	EXPECT_EQ(header.validate_file_alignment(),
+	EXPECT_EQ(validate_file_alignment(header),
 		optional_header_errc::file_alignment_out_of_range);
 
 	header.set_raw_file_alignment(256u);
-	EXPECT_EQ(header.validate_file_alignment(),
+	EXPECT_EQ(validate_file_alignment(header),
 		optional_header_errc::file_alignment_out_of_range);
 
 	header.set_raw_file_alignment(1u);
 	header.set_raw_section_alignment(1u);
-	EXPECT_NO_THROW(header.validate_file_alignment().throw_on_error());
+	EXPECT_NO_THROW(validate_file_alignment(header).throw_on_error());
 
 	header.set_raw_file_alignment(5u);
-	EXPECT_EQ(header.validate_file_alignment(),
+	EXPECT_EQ(validate_file_alignment(header),
 		optional_header_errc::incorrect_file_alignment);
 }
 
@@ -398,27 +401,27 @@ TYPED_TEST(OptionalHeaderTests, ValidateSectionAlignmentTest)
 	optional_header header;
 	header.initialize_with<typename TestFixture::type>();
 
-	EXPECT_EQ(header.validate_section_alignment(),
+	EXPECT_EQ(validate_section_alignment(header),
 		optional_header_errc::incorrect_section_alignment);
 
 	header.set_raw_file_alignment(0x8000u);
 	header.set_raw_section_alignment(0x10000u);
-	EXPECT_NO_THROW(header.validate_section_alignment().throw_on_error());
+	EXPECT_NO_THROW(validate_section_alignment(header).throw_on_error());
 
 	header.set_raw_section_alignment(0x4000u);
-	EXPECT_EQ(header.validate_section_alignment(),
+	EXPECT_EQ(validate_section_alignment(header),
 		optional_header_errc::section_alignment_out_of_range);
 
 	header.set_raw_section_alignment(256u);
-	EXPECT_EQ(header.validate_section_alignment(),
+	EXPECT_EQ(validate_section_alignment(header),
 		optional_header_errc::section_alignment_out_of_range);
 
 	header.set_raw_file_alignment(1u);
 	header.set_raw_section_alignment(1u);
-	EXPECT_NO_THROW(header.validate_section_alignment().throw_on_error());
+	EXPECT_NO_THROW(validate_section_alignment(header).throw_on_error());
 
 	header.set_raw_section_alignment(5u);
-	EXPECT_EQ(header.validate_section_alignment(),
+	EXPECT_EQ(validate_section_alignment(header),
 		optional_header_errc::incorrect_section_alignment);
 }
 
@@ -427,18 +430,18 @@ TYPED_TEST(OptionalHeaderTests, ValidateSubsystemVersionTest)
 	optional_header header;
 	header.initialize_with<typename TestFixture::type>();
 
-	EXPECT_EQ(header.validate_subsystem_version(),
+	EXPECT_EQ(validate_subsystem_version(header),
 		optional_header_errc::too_low_subsystem_version);
 
 	header.set_raw_minor_subsystem_version(
 		optional_header::min_minor_subsystem_version);
 	header.set_raw_major_subsystem_version(
 		optional_header::min_major_subsystem_version);
-	EXPECT_NO_THROW(header.validate_subsystem_version().throw_on_error());
+	EXPECT_NO_THROW(validate_subsystem_version(header).throw_on_error());
 
 	header.set_raw_minor_subsystem_version(
 		optional_header::min_minor_subsystem_version - 1u);
-	EXPECT_EQ(header.validate_subsystem_version(),
+	EXPECT_EQ(validate_subsystem_version(header),
 		optional_header_errc::too_low_subsystem_version);
 }
 
@@ -447,14 +450,14 @@ TYPED_TEST(OptionalHeaderTests, ValidateSizeOfHeapTest)
 	optional_header header;
 	header.initialize_with<typename TestFixture::type>();
 
-	EXPECT_NO_THROW(header.validate_size_of_heap().throw_on_error());
+	EXPECT_NO_THROW(validate_size_of_heap(header).throw_on_error());
 
 	header.set_raw_size_of_heap_commit(10u);
-	EXPECT_EQ(header.validate_size_of_heap(),
+	EXPECT_EQ(validate_size_of_heap(header),
 		optional_header_errc::invalid_size_of_heap);
 
 	header.set_raw_size_of_heap_reserve(10u);
-	EXPECT_NO_THROW(header.validate_size_of_heap().throw_on_error());
+	EXPECT_NO_THROW(validate_size_of_heap(header).throw_on_error());
 }
 
 TYPED_TEST(OptionalHeaderTests, ValidateSizeOfStackTest)
@@ -462,14 +465,14 @@ TYPED_TEST(OptionalHeaderTests, ValidateSizeOfStackTest)
 	optional_header header;
 	header.initialize_with<typename TestFixture::type>();
 
-	EXPECT_NO_THROW(header.validate_size_of_stack().throw_on_error());
+	EXPECT_NO_THROW(validate_size_of_stack(header).throw_on_error());
 
 	header.set_raw_size_of_stack_commit(10u);
-	EXPECT_EQ(header.validate_size_of_stack(),
+	EXPECT_EQ(validate_size_of_stack(header),
 		optional_header_errc::invalid_size_of_stack);
 
 	header.set_raw_size_of_stack_reserve(10u);
-	EXPECT_NO_THROW(header.validate_size_of_stack().throw_on_error());
+	EXPECT_NO_THROW(validate_size_of_stack(header).throw_on_error());
 }
 
 TYPED_TEST(OptionalHeaderTests, ValidateSizeOfHeadersTest)
@@ -477,18 +480,18 @@ TYPED_TEST(OptionalHeaderTests, ValidateSizeOfHeadersTest)
 	optional_header header;
 	header.initialize_with<typename TestFixture::type>();
 
-	EXPECT_NO_THROW(header.validate_size_of_headers().throw_on_error());
+	EXPECT_NO_THROW(validate_size_of_headers(header).throw_on_error());
 
 	header.set_raw_size_of_headers(0x10000u);
-	EXPECT_EQ(header.validate_size_of_headers(),
+	EXPECT_EQ(validate_size_of_headers(header),
 		optional_header_errc::invalid_size_of_headers);
 
 	header.set_raw_section_alignment(0x20000u);
-	EXPECT_EQ(header.validate_size_of_headers(),
+	EXPECT_EQ(validate_size_of_headers(header),
 		optional_header_errc::invalid_size_of_headers);
 
 	header.set_raw_size_of_image(0x10000u);
-	EXPECT_NO_THROW(header.validate_size_of_headers().throw_on_error());
+	EXPECT_NO_THROW(validate_size_of_headers(header).throw_on_error());
 }
 
 TYPED_TEST(OptionalHeaderTests, ValidateTest)
@@ -509,84 +512,109 @@ TYPED_TEST(OptionalHeaderTests, ValidateTest)
 	header.set_raw_size_of_headers(0x1000u);
 	header.set_raw_size_of_image(0x1000u);
 
-	EXPECT_NO_THROW(header.validate({}, false).throw_on_error());
-	EXPECT_NO_THROW(header.validate({}, true).throw_on_error());
+	EXPECT_NO_THROW(validate(header, {}, false).throw_on_error());
+	EXPECT_NO_THROW(validate(header, {}, true).throw_on_error());
 
 	header.set_raw_address_of_entry_point(1u);
-	EXPECT_EQ(header.validate({}, false),
+	EXPECT_EQ(validate(header, {}, false),
 		optional_header_errc::invalid_address_of_entry_point);
-	EXPECT_EQ(header.validate({}, true),
+	EXPECT_EQ(validate(header, {}, true),
 		optional_header_errc::invalid_address_of_entry_point);
-	EXPECT_NO_THROW(header.validate({ .check_address_of_entry_point = false },
+	EXPECT_NO_THROW(validate(header, { .validate_address_of_entry_point = false },
 		false).throw_on_error());
-	EXPECT_NO_THROW(header.validate({ .check_address_of_entry_point = false },
+	EXPECT_NO_THROW(validate(header, { .validate_address_of_entry_point = false },
 		true).throw_on_error());
 	header.set_raw_address_of_entry_point(0x1000u);
 
 	header.set_raw_file_alignment(0x8001u);
-	EXPECT_EQ(header.validate({}, false),
+	EXPECT_EQ(validate(header, {}, false),
 		optional_header_errc::incorrect_file_alignment);
-	EXPECT_EQ(header.validate({}, true),
+	EXPECT_EQ(validate(header, {}, true),
 		optional_header_errc::incorrect_file_alignment);
-	EXPECT_NO_THROW(header.validate({ .check_alignments = false },
+	EXPECT_NO_THROW(validate(header, { .validate_alignments = false },
 		false).throw_on_error());
-	EXPECT_NO_THROW(header.validate({ .check_alignments = false },
+	EXPECT_NO_THROW(validate(header, { .validate_alignments = false },
 		true).throw_on_error());
 	header.set_raw_file_alignment(0x8000u);
 
 	header.set_raw_section_alignment(0x10001u);
-	EXPECT_EQ(header.validate({}, false),
+	EXPECT_EQ(validate(header, {}, false),
 		optional_header_errc::incorrect_section_alignment);
-	EXPECT_EQ(header.validate({}, true),
+	EXPECT_EQ(validate(header, {}, true),
 		optional_header_errc::incorrect_section_alignment);
-	EXPECT_NO_THROW(header.validate({ .check_alignments = false },
+	EXPECT_NO_THROW(validate(header, { .validate_alignments = false },
 		false).throw_on_error());
-	EXPECT_NO_THROW(header.validate({ .check_alignments = false },
+	EXPECT_NO_THROW(validate(header, { .validate_alignments = false },
 		true).throw_on_error());
 	header.set_raw_section_alignment(0x10000u);
 
 	header.set_raw_minor_subsystem_version(
 		optional_header::min_minor_subsystem_version - 1u);
-	EXPECT_EQ(header.validate({}, false),
+	EXPECT_EQ(validate(header, {}, false),
 		optional_header_errc::too_low_subsystem_version);
-	EXPECT_EQ(header.validate({}, true),
+	EXPECT_EQ(validate(header, {}, true),
 		optional_header_errc::too_low_subsystem_version);
-	EXPECT_NO_THROW(header.validate({ .check_subsystem_version = false },
+	EXPECT_NO_THROW(validate(header, { .validate_subsystem_version = false },
 		false).throw_on_error());
-	EXPECT_NO_THROW(header.validate({ .check_subsystem_version = false },
+	EXPECT_NO_THROW(validate(header, { .validate_subsystem_version = false },
 		true).throw_on_error());
 	header.set_raw_minor_subsystem_version(
 		optional_header::min_minor_subsystem_version);
 
 	header.set_raw_size_of_heap_commit(1u);
-	EXPECT_EQ(header.validate({}, false),
+	EXPECT_EQ(validate(header, {}, false),
 		optional_header_errc::invalid_size_of_heap);
-	EXPECT_EQ(header.validate({}, true),
+	EXPECT_EQ(validate(header, {}, true),
 		optional_header_errc::invalid_size_of_heap);
-	EXPECT_NO_THROW(header.validate({ .check_size_of_heap = false },
+	EXPECT_NO_THROW(validate(header, { .validate_size_of_heap = false },
 		false).throw_on_error());
-	EXPECT_NO_THROW(header.validate({ .check_size_of_heap = false },
+	EXPECT_NO_THROW(validate(header, { .validate_size_of_heap = false },
 		true).throw_on_error());
 	header.set_raw_size_of_heap_commit(0u);
 
 	header.set_raw_size_of_stack_commit(1u);
-	EXPECT_EQ(header.validate({}, false),
+	EXPECT_EQ(validate(header, {}, false),
 		optional_header_errc::invalid_size_of_stack);
-	EXPECT_EQ(header.validate({}, true),
+	EXPECT_EQ(validate(header, {}, true),
 		optional_header_errc::invalid_size_of_stack);
-	EXPECT_NO_THROW(header.validate({ .check_size_of_stack = false },
+	EXPECT_NO_THROW(validate(header, { .validate_size_of_stack = false },
 		false).throw_on_error());
-	EXPECT_NO_THROW(header.validate({ .check_size_of_stack = false },
+	EXPECT_NO_THROW(validate(header, { .validate_size_of_stack = false },
 		true).throw_on_error());
 	header.set_raw_size_of_stack_commit(0u);
 
 	header.set_raw_size_of_image(0u);
-	EXPECT_EQ(header.validate({}, false),
+	EXPECT_EQ(validate(header, {}, false),
 		optional_header_errc::invalid_size_of_headers);
-	EXPECT_EQ(header.validate({}, true),
+	EXPECT_EQ(validate(header, {}, true),
 		optional_header_errc::invalid_size_of_headers);
-	EXPECT_NO_THROW(header.validate({ .check_size_of_headers = false },
+	EXPECT_NO_THROW(validate(header, { .validate_size_of_headers = false },
 		false).throw_on_error());
-	EXPECT_NO_THROW(header.validate({ .check_size_of_headers = false },
+	EXPECT_NO_THROW(validate(header, { .validate_size_of_headers = false },
 		true).throw_on_error());
+}
+
+TEST(OptionalHeaderTests, ValidateSizeOfOptionalHeaderTest)
+{
+	optional_header header;
+
+	EXPECT_EQ(validate_size_of_optional_header(0u, header),
+		optional_header_errc::invalid_size_of_optional_header);
+
+	EXPECT_EQ(validate_size_of_optional_header(header.get_size_of_structure() - 1,
+		header), optional_header_errc::invalid_size_of_optional_header);
+
+	EXPECT_NO_THROW(validate_size_of_optional_header(
+		header.get_size_of_structure(), header).throw_on_error());
+
+	header.set_raw_number_of_rva_and_sizes(3u);
+	EXPECT_EQ(validate_size_of_optional_header(header.get_size_of_structure(), header),
+		optional_header_errc::invalid_size_of_optional_header);
+
+	static constexpr auto data_dir_size = detail::packed_reflection
+		::get_type_size<detail::image_data_directory>();
+	EXPECT_NO_THROW(validate_size_of_optional_header(
+		static_cast<std::uint16_t>(header.get_size_of_structure()
+			+ data_dir_size * 3u), header)
+		.throw_on_error());
 }

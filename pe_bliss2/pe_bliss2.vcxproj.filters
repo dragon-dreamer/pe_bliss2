@@ -414,6 +414,9 @@
     <ClInclude Include="core\optional_header_errc.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="core\optional_header_validator.h">
+      <Filter>Header Files\core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="image_loader.cpp">
@@ -588,6 +591,9 @@
       <Filter>Source Files\core</Filter>
     </ClCompile>
     <ClCompile Include="core\optional_header_errc.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\optional_header_validator.cpp">
       <Filter>Source Files\core</Filter>
     </ClCompile>
   </ItemGroup>

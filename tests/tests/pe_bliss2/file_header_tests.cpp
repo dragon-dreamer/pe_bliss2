@@ -8,11 +8,8 @@
 #include "buffers/output_memory_buffer.h"
 
 #include "pe_bliss2/detail/packed_reflection.h"
-#include "pe_bliss2/detail/image_data_directory.h"
 #include "pe_bliss2/detail/image_file_header.h"
 #include "pe_bliss2/core/file_header.h"
-#include "pe_bliss2/core/optional_header.h"
-#include "pe_bliss2/core/optional_header_errc.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
@@ -89,34 +86,4 @@ TEST(FileHeaderTests, DeserializeSerializeTest)
 	header.serialize(outbuf, false);
 	EXPECT_EQ(outdata.size(), buf.size());
 	EXPECT_TRUE(std::equal(outdata.cbegin(), outdata.cend(), data));
-}
-
-TEST(FileHeaderTests, ValidateTest)
-{
-	file_header header;
-	optional_header opt_header;
-
-	EXPECT_NO_THROW(header.validate_size_of_optional_header(opt_header)
-		.throw_on_error());
-
-	header.base_struct()->size_of_optional_header
-		= opt_header.get_size_of_structure() - 1;
-	EXPECT_EQ(header.validate_size_of_optional_header(opt_header),
-		optional_header_errc::invalid_size_of_optional_header);
-
-	header.base_struct()->size_of_optional_header
-		= opt_header.get_size_of_structure();
-	EXPECT_NO_THROW(header.validate_size_of_optional_header(opt_header)
-		.throw_on_error());
-
-	opt_header.set_raw_number_of_rva_and_sizes(3u);
-	EXPECT_EQ(header.validate_size_of_optional_header(opt_header),
-		optional_header_errc::invalid_size_of_optional_header);
-
-	static constexpr auto data_dir_size = detail::packed_reflection
-		::get_type_size<detail::image_data_directory>();
-	header.base_struct()->size_of_optional_header
-		+= data_dir_size * 3u;
-	EXPECT_NO_THROW(header.validate_size_of_optional_header(opt_header)
-		.throw_on_error());
 }
