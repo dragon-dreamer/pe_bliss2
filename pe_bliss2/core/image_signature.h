@@ -1,8 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <system_error>
-#include <type_traits>
 
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/detail/packed_struct_base.h"
@@ -15,14 +13,6 @@ class output_buffer_interface;
 
 namespace pe_bliss::core
 {
-
-enum class image_signature_errc
-{
-	invalid_pe_signature = 1,
-	unable_to_read_pe_signature
-};
-
-std::error_code make_error_code(image_signature_errc) noexcept;
 
 class [[nodiscard]] image_signature :
 	public detail::packed_struct_base<std::uint32_t>
@@ -52,15 +42,6 @@ public:
 	{
 		base_struct() = signature;
 	}
-
-	[[nodiscard]]
-	pe_error_wrapper validate() const noexcept;
 };
 
 } //namespace pe_bliss::core
-
-namespace std
-{
-template<>
-struct is_error_code_enum<pe_bliss::core::image_signature_errc> : true_type {};
-} //namespace std

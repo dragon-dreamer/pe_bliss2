@@ -8,6 +8,7 @@
 #include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/dos/dos_header_errc.h"
 #include "pe_bliss2/dos/dos_header_validator.h"
+#include "pe_bliss2/core/image_signature_validator.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/section/pe_section_error.h"
 #include "pe_bliss2/section/section_data.h"
@@ -41,7 +42,7 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 	buffer->set_rpos(pe_headers_start);
 
 	instance.get_image_signature().deserialize(*buffer, options.allow_virtual_headers);
-	instance.get_image_signature().validate().throw_on_error();
+	validate(instance.get_image_signature()).throw_on_error();
 
 	auto& file_hdr = instance.get_file_header();
 	auto& optional_hdr = instance.get_optional_header();

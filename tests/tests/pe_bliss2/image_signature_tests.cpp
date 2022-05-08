@@ -8,6 +8,8 @@
 #include "buffers/output_memory_buffer.h"
 
 #include "pe_bliss2/core/image_signature.h"
+#include "pe_bliss2/core/image_signature_errc.h"
+#include "pe_bliss2/core/image_signature_validator.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
@@ -51,7 +53,7 @@ TEST(ImageSignatureTests, DeserializeSerializeTest)
 TEST(ImageSignatureTests, ValidateTest)
 {
 	image_signature signature;
-	EXPECT_EQ(signature.validate(), image_signature_errc::invalid_pe_signature);
+	EXPECT_EQ(validate(signature), image_signature_errc::invalid_pe_signature);
 	signature.set_signature(image_signature::pe_signature);
-	EXPECT_NO_THROW(signature.validate().throw_on_error());
+	EXPECT_NO_THROW(validate(signature).throw_on_error());
 }
