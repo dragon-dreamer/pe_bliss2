@@ -26,6 +26,11 @@ public:
 		return !errors_.empty();
 	}
 
+	void clear_errors()
+	{
+		errors_.clear();
+	}
+
 private:
 	error_list_type errors_;
 };

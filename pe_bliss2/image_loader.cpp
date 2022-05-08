@@ -18,18 +18,25 @@
 namespace pe_bliss
 {
 
-image image_loader::load(const buffers::input_buffer_ptr& buffer,
-	const image_load_options& options)
+std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
+	const image_load_options& options, error_list& errors)
 {
 	assert(!options.load_section_data || options.validate_sections);
 	assert(buffer);
 
-	image instance;
+	errors.clear_errors();
+
+	std::optional<image> result;
+	image& instance = result.emplace();
 	instance.set_loaded_to_memory(options.image_loaded_to_memory);
 
 	auto& dos_hdr = instance.get_dos_header();
 	dos_hdr.deserialize(*buffer, options.allow_virtual_headers);
-	dos::validate(dos_hdr, options.dos_header_validation).throw_on_error();
+	if (!dos::validate(dos_hdr, options.dos_header_validation, errors))
+	{
+		result.reset();
+		return result;
+	}
 
 	instance.get_dos_stub().deserialize(buffer, {
 		.copy_memory = options.eager_dos_stub_data_copy,
@@ -78,13 +85,13 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 			.image_start_buffer_pos = dos_hdr.base_struct().get_state().buffer_pos()
 		};
 
-		pe_error_wrapper result;
+		pe_error_wrapper err;
 		std::size_t section_index = 0;
 		for (auto it = section_tbl.get_section_headers().cbegin(),
 			end = section_tbl.get_section_headers().cend(); it != end; ++it, ++section_index)
 		{
-			if ((result = section_tbl.validate_section_header(optional_hdr, it)))
-				throw section::pe_section_error(result, section_index, std::string(it->get_name()));
+			if ((err = section_tbl.validate_section_header(optional_hdr, it)))
+				throw section::pe_section_error(err, section_index, std::string(it->get_name()));
 		}
 
 		if (options.load_section_data)
@@ -133,7 +140,7 @@ image image_loader::load(const buffers::input_buffer_ptr& buffer,
 			options.eager_full_headers_buffer_copy);
 	}
 
-	return instance;
+	return result;
 }
 
 } //namespace pe_bliss

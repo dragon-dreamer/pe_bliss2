@@ -2,23 +2,25 @@
 
 #include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/dos/dos_header_errc.h"
+#include "pe_bliss2/error_list.h"
 
 #include "utilities/math.h"
 
 namespace pe_bliss::dos
 {
 
-pe_error_wrapper validate(const dos_header& header,
-	const dos_header_validation_options& options) noexcept
+bool validate(const dos_header& header,
+	const dos_header_validation_options& options,
+	error_list& errors) noexcept
 {
-	pe_error_wrapper result;
-	if (options.validate_magic && (result = validate_magic(header)))
-		return result;
+	pe_error_wrapper err;
+	if (options.validate_magic && (err = validate_magic(header)))
+		errors.add_error(err);
 
-	if (options.validate_e_lfanew && (result = validate_e_lfanew(header)))
-		return result;
+	if (options.validate_e_lfanew && (err = validate_e_lfanew(header)))
+		errors.add_error(err);
 
-	return result;
+	return !errors.has_errors();
 }
 
 pe_error_wrapper validate_magic(const dos_header& header) noexcept

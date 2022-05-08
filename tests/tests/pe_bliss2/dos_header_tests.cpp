@@ -7,6 +7,7 @@
 #include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/dos/dos_header_errc.h"
 #include "pe_bliss2/dos/dos_header_validator.h"
+#include "pe_bliss2/error_list.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
@@ -21,11 +22,18 @@ TEST(DosHeaderTests, EmptyTest)
 		dos_header_errc::invalid_dos_header_signature);
 	EXPECT_EQ(validate_e_lfanew(header),
 		dos_header_errc::invalid_e_lfanew);
-	EXPECT_THROW(validate(header, {}).throw_on_error(), pe_error);
-	EXPECT_NO_THROW(validate(header, {
+	error_list errs;
+	EXPECT_FALSE(validate(header, {}, errs));
+	expect_contains_errors(errs,
+		dos_header_errc::invalid_dos_header_signature,
+		dos_header_errc::invalid_e_lfanew);
+
+	errs.clear_errors();
+	EXPECT_TRUE(validate(header, {
 		.validate_e_lfanew = false,
 		.validate_magic = false
-	}).throw_on_error());
+	}, errs));
+	EXPECT_FALSE(errs.has_errors());
 }
 
 TEST(DosHeaderTests, ValidationTest1)
@@ -41,7 +49,8 @@ TEST(DosHeaderTests, ValidationTest1)
 	header.deserialize(buf, false);
 	EXPECT_NO_THROW(validate_magic(header).throw_on_error());
 	EXPECT_NO_THROW(validate_e_lfanew(header).throw_on_error());
-	EXPECT_NO_THROW(validate(header, {}).throw_on_error());
+	error_list errs;
+	EXPECT_TRUE(validate(header, {}, errs));
 }
 
 TEST(DosHeaderTests, ValidationTest2)
@@ -59,7 +68,11 @@ TEST(DosHeaderTests, ValidationTest2)
 		dos_header_errc::invalid_dos_header_signature);
 	EXPECT_EQ(validate_e_lfanew(header),
 		dos_header_errc::unaligned_e_lfanew);
-	EXPECT_THROW(validate(header, {}).throw_on_error(), pe_error);
+	error_list errs;
+	EXPECT_FALSE(validate(header, {}, errs));
+	expect_contains_errors(errs,
+		dos_header_errc::invalid_dos_header_signature,
+		dos_header_errc::unaligned_e_lfanew);
 }
 
 TEST(DosHeaderTests, DeserializeErrorTest)

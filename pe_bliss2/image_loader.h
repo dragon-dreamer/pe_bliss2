@@ -1,7 +1,8 @@
 #pragma once
 
+#include <optional>
+
 #include "buffers/input_buffer_interface.h"
-#include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/core/optional_header_validator.h"
 #include "pe_bliss2/dos/dos_header_validator.h"
 #include "pe_bliss2/image.h"
@@ -29,12 +30,14 @@ struct image_load_options
 	core::optional_header_validation_options optional_header_validation{};
 };
 
-class image_loader : public utilities::static_class
+class error_list;
+
+class image_loader final : public utilities::static_class
 {
 public:
 	[[nodiscard]]
-	static image load(const buffers::input_buffer_ptr& buffer,
-		const image_load_options& options);
+	static std::optional<image> load(const buffers::input_buffer_ptr& buffer,
+		const image_load_options& options, error_list& errors);
 };
 
 } //namespace pe_bliss
