@@ -4,6 +4,7 @@
 
 #include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/core/optional_header_errc.h"
+#include "pe_bliss2/error_list.h"
 #include "pe_bliss2/detail/image_data_directory.h"
 #include "pe_bliss2/detail/packed_reflection.h"
 
@@ -121,51 +122,51 @@ pe_error_wrapper validate_size_of_headers(const optional_header& header) noexcep
 	return {};
 }
 
-pe_error_wrapper validate(const optional_header& header,
+bool validate(const optional_header& header,
 	const optional_header_validation_options& options,
-	bool is_dll) noexcept
+	bool is_dll, error_list& errors) noexcept
 {
 	pe_error_wrapper result;
 	if (options.validate_address_of_entry_point
 		&& (result = validate_address_of_entry_point(header, is_dll)))
 	{
-		return result;
+		errors.add_error(result);
 	}
 
 	if (options.validate_alignments)
 	{
 		if ((result = validate_file_alignment(header)))
-			return result;
+			errors.add_error(result);
 
 		if ((result = validate_section_alignment(header)))
-			return result;
+			errors.add_error(result);
 	}
 
 	if (options.validate_subsystem_version
 		&& (result = validate_subsystem_version(header)))
 	{
-		return result;
+		errors.add_error(result);
 	}
 
 	if (options.validate_size_of_heap
 		&& (result = validate_size_of_heap(header)))
 	{
-		return result;
+		errors.add_error(result);
 	}
 
 	if (options.validate_size_of_stack
 		&& (result = validate_size_of_stack(header)))
 	{
-		return result;
+		errors.add_error(result);
 	}
 
 	if (options.validate_size_of_headers
 		&& (result = validate_size_of_headers(header)))
 	{
-		return result;
+		errors.add_error(result);
 	}
 
-	return {};
+	return !errors.has_errors();
 }
 
 pe_error_wrapper validate_size_of_optional_header(

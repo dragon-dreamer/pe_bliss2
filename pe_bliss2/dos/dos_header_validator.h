@@ -19,7 +19,6 @@ struct dos_header_validation_options
 	bool validate_magic = true;
 };
 
-[[nodiscard]]
 bool validate(const dos_header& header,
 	const dos_header_validation_options& options,
 	error_list& errors) noexcept;

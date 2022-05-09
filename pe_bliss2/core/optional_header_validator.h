@@ -4,6 +4,11 @@
 
 #include "pe_bliss2/pe_error.h"
 
+namespace pe_bliss
+{
+class error_list;
+} //namespace pe_bliss
+
 namespace pe_bliss::core
 {
 
@@ -23,10 +28,9 @@ struct [[nodiscard]] optional_header_validation_options
 // a separate validate_image_base() method which should be used.
 // validate() method does not validate size of optional header, there is
 // a separate validate_size_of_optional_header() method which should be used.
-[[nodiscard]]
-pe_error_wrapper validate(const optional_header& header,
+bool validate(const optional_header& header,
 	const optional_header_validation_options& options,
-	bool is_dll) noexcept;
+	bool is_dll, error_list& errors) noexcept;
 [[nodiscard]]
 pe_error_wrapper validate_address_of_entry_point(
 	const optional_header& header, bool is_dll) noexcept;
