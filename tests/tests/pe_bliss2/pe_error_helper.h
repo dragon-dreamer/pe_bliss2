@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <system_error>
 #include <type_traits>
 #include <utility>
@@ -17,17 +16,11 @@ constexpr void expect_contains_error(const pe_bliss::error_list&)
 {
 }
 
-template<typename ErrorCode>
-bool has_code(const pe_bliss::error_list& errs, ErrorCode code) {
-	return std::find(errs.get_errors().cbegin(), errs.get_errors().cend(), code)
-		!= errs.get_errors().cend();
-}
-
 template<typename ErrorCode, typename... ErrorCodes>
 void expect_contains_error(const pe_bliss::error_list& errs,
 	ErrorCode code, ErrorCodes... codes)
 {
-	EXPECT_TRUE(has_code(errs, code));
+	EXPECT_TRUE(errs.has_error(code));
 	expect_contains_error(errs, codes...);
 }
 

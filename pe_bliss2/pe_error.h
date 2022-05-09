@@ -1,9 +1,18 @@
 #pragma once
 
 #include <system_error>
+#include <type_traits>
 
 namespace pe_bliss
 {
+
+namespace detail
+{
+template<typename ErrorCode>
+concept is_comparable_with_error_code = requires(ErrorCode errc) {
+	{ errc == std::error_code{} } -> std::convertible_to<bool>;
+};
+} //namespace detail
 
 class [[nodiscard]] pe_error : public std::system_error
 {
@@ -35,8 +44,7 @@ public:
 		return ec_;
 	}
 
-	template<typename ErrorCode>
-		requires(std::is_error_code_enum_v<ErrorCode>)
+	template<detail::is_comparable_with_error_code ErrorCode>
 	[[nodiscard]]
 	bool operator==(ErrorCode ec) const noexcept
 	{
