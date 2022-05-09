@@ -54,13 +54,15 @@ int main(int argc, char* argv[]) try
 
 	pe_bliss::error_list errs;
 	auto image = load_image(filename, {}, errs);
-	if (!image)
+	if (errs.has_errors())
 	{
 		empty_color_provider color_provider;
 		formatter fmt(color_provider, std::cout, std::cerr);
 		fmt.print_errors(errs);
-		return -2;
 	}
+
+	if (!image)
+		return -2;
 
 	dump_pe(*image);
 }
