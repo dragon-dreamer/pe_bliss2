@@ -1,5 +1,8 @@
 #pragma once
 
+#include <compare>
+#include <string>
+#include <string_view>
 #include <system_error>
 #include <type_traits>
 #include <vector>
@@ -18,10 +21,21 @@ concept is_convertible_to_error_code = requires(ErrorCode ec) {
 class [[nodiscard]] error_list
 {
 public:
-	using error_list_type = std::vector<std::error_code>;
+	struct error_info
+	{
+		std::error_code code;
+		std::string context;
+
+		[[nodiscard]]
+		friend auto operator<=>(const error_info&, const error_info&) = default;
+	};
+
+public:
+	using error_list_type = std::vector<error_info>;
 
 public:
 	void add_error(std::error_code error);
+	void add_error(std::error_code error, std::string context);
 
 	[[nodiscard]]
 	constexpr const error_list_type& get_errors() const noexcept
@@ -42,12 +56,32 @@ public:
 
 	[[nodiscard]]
 	bool has_error(std::error_code error) const noexcept;
+	[[nodiscard]]
+	bool has_error(std::error_code error,
+		std::string_view context) const noexcept;
+	[[nodiscard]]
+	bool has_any_error(std::error_code error) const noexcept;
 
 	template<detail::is_convertible_to_error_code ErrorCode>
 	[[nodiscard]]
 	bool has_error(ErrorCode error) const noexcept
 	{
 		return has_error(std::make_error_code(error));
+	}
+
+	template<detail::is_convertible_to_error_code ErrorCode>
+	[[nodiscard]]
+	bool has_error(ErrorCode error,
+		std::string_view context) const noexcept
+	{
+		return has_error(std::make_error_code(error), context);
+	}
+
+	template<detail::is_convertible_to_error_code ErrorCode>
+	[[nodiscard]]
+	bool has_any_error(ErrorCode error) const noexcept
+	{
+		return has_any_error(std::make_error_code(error));
 	}
 
 private:

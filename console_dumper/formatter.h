@@ -337,7 +337,7 @@ public:
 
 			color_changer changer(stream_, color_provider_,
 				error_fg_color, error_bg_color);
-			error_stream_ << error.category().name() << ": " << error.message();
+			error_stream_ << error.code.category().name() << ": " << error.code.message();
 		}
 
 		error_stream_ << "\n\n";
