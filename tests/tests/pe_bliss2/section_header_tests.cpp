@@ -7,6 +7,7 @@
 
 #include "pe_bliss2/section/section_errc.h"
 #include "pe_bliss2/section/section_header.h"
+#include "pe_bliss2/section/section_header_validator.h"
 #include "pe_bliss2/section/section_table.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
@@ -26,34 +27,34 @@ TEST(SectionHeaderTests, EmptySectionHeaderTest)
 	EXPECT_EQ(header.get_pointer_to_raw_data(), 0u);
 	EXPECT_EQ(header.get_rva(), 0u);
 	EXPECT_TRUE(header.empty());
-	EXPECT_TRUE(header.check_raw_size(512u));
-	EXPECT_FALSE(header.check_virtual_size());
-	EXPECT_FALSE(header.check_raw_address());
+	EXPECT_FALSE(validate_raw_size(header, 512u));
+	EXPECT_TRUE(validate_virtual_size(header));
+	EXPECT_TRUE(validate_raw_address(header));
 
-	EXPECT_TRUE(header.check_raw_size_alignment(512, 512, false));
-	EXPECT_TRUE(header.check_raw_size_alignment(512, 512, true));
-	EXPECT_FALSE(header.check_raw_size_alignment(511, 512, false));
-	EXPECT_FALSE(header.check_raw_size_alignment(511, 512, true));
-	EXPECT_FALSE(header.check_raw_size_alignment(512, 511, false));
-	EXPECT_FALSE(header.check_raw_size_alignment(512, 511, true));
-	EXPECT_FALSE(header.check_raw_size_alignment(0, 0, false));
-	EXPECT_FALSE(header.check_raw_size_alignment(0, 0, true));
+	EXPECT_FALSE(validate_raw_size_alignment(header, 512, 512, false));
+	EXPECT_FALSE(validate_raw_size_alignment(header, 512, 512, true));
+	EXPECT_TRUE(validate_raw_size_alignment(header, 511, 512, false));
+	EXPECT_TRUE(validate_raw_size_alignment(header, 511, 512, true));
+	EXPECT_TRUE(validate_raw_size_alignment(header, 512, 511, false));
+	EXPECT_TRUE(validate_raw_size_alignment(header, 512, 511, true));
+	EXPECT_TRUE(validate_raw_size_alignment(header, 0, 0, false));
+	EXPECT_TRUE(validate_raw_size_alignment(header, 0, 0, true));
 
-	EXPECT_FALSE(header.check_raw_address_alignment(0));
-	EXPECT_TRUE(header.check_raw_address_alignment(512));
-	EXPECT_FALSE(header.check_raw_address_alignment(511));
+	EXPECT_TRUE(validate_raw_address_alignment(header, 0));
+	EXPECT_FALSE(validate_raw_address_alignment(header, 512));
+	EXPECT_TRUE(validate_raw_address_alignment(header, 511));
 
-	EXPECT_FALSE(header.check_virtual_address_alignment(0));
-	EXPECT_TRUE(header.check_virtual_address_alignment(512));
-	EXPECT_FALSE(header.check_virtual_address_alignment(511));
+	EXPECT_TRUE(validate_virtual_address_alignment(header, 0));
+	EXPECT_FALSE(validate_virtual_address_alignment(header, 512));
+	EXPECT_TRUE(validate_virtual_address_alignment(header, 511));
 
-	EXPECT_TRUE(header.check_low_alignment());
+	EXPECT_TRUE(header.is_low_alignment());
 
-	EXPECT_TRUE(header.check_raw_size_bounds(512));
-	EXPECT_TRUE(header.check_raw_size_bounds(0));
+	EXPECT_FALSE(validate_raw_size_bounds(header, 512));
+	EXPECT_FALSE(validate_raw_size_bounds(header, 0));
 
-	EXPECT_TRUE(header.check_virtual_size_bounds(512));
-	EXPECT_TRUE(header.check_virtual_size_bounds(0));
+	EXPECT_FALSE(validate_virtual_size_bounds(header, 512));
+	EXPECT_FALSE(validate_virtual_size_bounds(header, 0));
 
 	EXPECT_FALSE(header.is_writable());
 	EXPECT_FALSE(header.is_readable());
@@ -71,7 +72,7 @@ TEST(SectionHeaderTests, EmptySectionHeaderTest)
 		section_errc::invalid_section_virtual_size);
 
 	EXPECT_NO_THROW(header.set_virtual_size(100));
-	EXPECT_TRUE(header.check_virtual_size());
+	EXPECT_FALSE(validate_virtual_size(header));
 	EXPECT_EQ(header.get_virtual_size(1u), 100u);
 	EXPECT_EQ(header.get_virtual_size(0u), 100u);
 	EXPECT_EQ(header.get_virtual_size(64u), 128u);
@@ -218,21 +219,21 @@ TEST(SectionHeaderTests, CharacteristicsTest)
 TEST(SectionHeaderTests, VirtualSizeTest1)
 {
 	section_header header;
-	EXPECT_FALSE(header.check_virtual_size());
+	EXPECT_TRUE(validate_virtual_size(header));
 	expect_throw_pe_error([&] { header.set_virtual_size(0u); },
 		section_errc::invalid_section_virtual_size);
 	EXPECT_EQ(&header.set_virtual_size(123u), &header);
 	EXPECT_TRUE(header.empty());
 	EXPECT_EQ(header.get_virtual_size(0u), 123u);
 	EXPECT_EQ(header.get_virtual_size(2u), 124u);
-	EXPECT_TRUE(header.check_virtual_size());
+	EXPECT_FALSE(validate_virtual_size(header));
 
 	EXPECT_EQ(&header.set_virtual_size(0xf0000000u), &header);
-	EXPECT_FALSE(header.check_virtual_size());
+	EXPECT_TRUE(validate_virtual_size(header));
 
-	EXPECT_TRUE(header.check_virtual_size_bounds(512u));
+	EXPECT_FALSE(validate_virtual_size_bounds(header, 512u));
 	EXPECT_EQ(&header.set_rva(0xf0000000u), &header);
-	EXPECT_FALSE(header.check_virtual_size_bounds(512u));
+	EXPECT_TRUE(validate_virtual_size_bounds(header, 512u));
 }
 
 TEST(SectionHeaderTests, VirtualSizeTest2)
@@ -247,20 +248,20 @@ TEST(SectionHeaderTests, VirtualSizeTest2)
 TEST(SectionHeaderTests, RawSizeTest1)
 {
 	section_header header;
-	EXPECT_TRUE(header.check_raw_size(512u));
+	EXPECT_FALSE(validate_raw_size(header, 512u));
 	EXPECT_EQ(header.get_raw_size(0u), 0u);
 	EXPECT_TRUE(header.empty());
 	EXPECT_EQ(&header.set_raw_size(123u), &header);
 	EXPECT_FALSE(header.empty());
 	EXPECT_EQ(header.get_raw_size(0u), 123u);
 	EXPECT_EQ(header.get_raw_size(512u), 123u);
-	EXPECT_TRUE(header.check_raw_size(512u));
+	EXPECT_FALSE(validate_raw_size(header, 512u));
 	EXPECT_EQ(&header.set_raw_size(0xf0000000u), &header);
-	EXPECT_FALSE(header.check_raw_size(512u));
+	EXPECT_TRUE(validate_raw_size(header, 512u));
 
-	EXPECT_TRUE(header.check_raw_size_bounds(512u));
+	EXPECT_FALSE(validate_raw_size_bounds(header, 512u));
 	EXPECT_EQ(&header.set_pointer_to_raw_data(0xf0000000), &header);
-	EXPECT_FALSE(header.check_raw_size_bounds(512u));
+	EXPECT_TRUE(validate_raw_size_bounds(header, 512u));
 }
 
 TEST(SectionHeaderTests, RawSizeTest2)
@@ -274,33 +275,33 @@ TEST(SectionHeaderTests, RawSizeTest2)
 TEST(SectionHeaderTests, PointerToRawDataTest1)
 {
 	section_header header;
-	EXPECT_FALSE(header.check_raw_address());
+	EXPECT_TRUE(validate_raw_address(header));
 	EXPECT_EQ(&header.set_raw_size(1000u), &header);
 	EXPECT_EQ(&header.set_pointer_to_raw_data(128u), &header);
-	EXPECT_TRUE(header.check_raw_address());
+	EXPECT_FALSE(validate_raw_address(header));
 
-	EXPECT_FALSE(header.check_raw_address_alignment(0u));
-	EXPECT_TRUE(header.check_raw_address_alignment(1u));
-	EXPECT_TRUE(header.check_raw_address_alignment(64u));
-	EXPECT_TRUE(header.check_raw_address_alignment(1024u));
+	EXPECT_TRUE(validate_raw_address_alignment(header, 0u));
+	EXPECT_FALSE(validate_raw_address_alignment(header, 1u));
+	EXPECT_FALSE(validate_raw_address_alignment(header, 64u));
+	EXPECT_FALSE(validate_raw_address_alignment(header, 1024u));
 
-	EXPECT_FALSE(header.check_raw_size_alignment(512u, 512u, false));
-	EXPECT_TRUE(header.check_raw_size_alignment(512u, 512u, true));
+	EXPECT_TRUE(validate_raw_size_alignment(header, 512u, 512u, false));
+	EXPECT_FALSE(validate_raw_size_alignment(header, 512u, 512u, true));
 
 	EXPECT_EQ(&header.set_pointer_to_raw_data(
 		section_header::max_raw_address_rounded_to_0 + 1), &header);
-	EXPECT_FALSE(header.check_raw_address_alignment(0u));
-	EXPECT_TRUE(header.check_raw_address_alignment(1u));
-	EXPECT_TRUE(header.check_raw_address_alignment(64u));
-	EXPECT_FALSE(header.check_raw_address_alignment(1024u));
+	EXPECT_TRUE(validate_raw_address_alignment(header, 0u));
+	EXPECT_FALSE(validate_raw_address_alignment(header, 1u));
+	EXPECT_FALSE(validate_raw_address_alignment(header, 64u));
+	EXPECT_TRUE(validate_raw_address_alignment(header, 1024u));
 }
 
 TEST(SectionHeaderTests, PointerToRawDataTest2)
 {
 	section_header header;
 	EXPECT_EQ(&header.set_virtual_size(512u), &header);
-	EXPECT_TRUE(header.check_raw_address());
-	EXPECT_TRUE(header.check_raw_address_alignment(64u));
+	EXPECT_FALSE(validate_raw_address(header));
+	EXPECT_FALSE(validate_raw_address_alignment(header, 64u));
 }
 
 TEST(SectionHeaderTests, RvaTest)
@@ -308,10 +309,10 @@ TEST(SectionHeaderTests, RvaTest)
 	section_header header;
 	EXPECT_EQ(&header.set_rva(128u), &header);
 	EXPECT_EQ(header.get_rva(), 128u);
-	EXPECT_FALSE(header.check_virtual_address_alignment(123u));
-	EXPECT_FALSE(header.check_virtual_address_alignment(512u));
-	EXPECT_TRUE(header.check_virtual_address_alignment(1u));
-	EXPECT_TRUE(header.check_virtual_address_alignment(64u));
+	EXPECT_TRUE(validate_virtual_address_alignment(header, 123u));
+	EXPECT_TRUE(validate_virtual_address_alignment(header, 512u));
+	EXPECT_FALSE(validate_virtual_address_alignment(header, 1u));
+	EXPECT_FALSE(validate_virtual_address_alignment(header, 64u));
 }
 
 TEST(SectionHeaderTests, LowAlignmentTest)
@@ -319,9 +320,9 @@ TEST(SectionHeaderTests, LowAlignmentTest)
 	section_header header;
 	EXPECT_EQ(&header.set_rva(128u), &header);
 	EXPECT_EQ(&header.set_pointer_to_raw_data(1024u), &header);
-	EXPECT_FALSE(header.check_low_alignment());
+	EXPECT_FALSE(header.is_low_alignment());
 	EXPECT_EQ(&header.set_rva(1024u), &header);
-	EXPECT_TRUE(header.check_low_alignment());
+	EXPECT_TRUE(header.is_low_alignment());
 }
 
 TEST(SectionHeaderTests, RvaFromSectionOffsetTest)

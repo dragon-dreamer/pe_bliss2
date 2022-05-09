@@ -71,24 +71,7 @@ public:
 
 public:
 	[[nodiscard]]
-	bool check_raw_size(std::uint32_t section_alignment) const noexcept;
-	[[nodiscard]]
-	bool check_virtual_size() const noexcept;
-	[[nodiscard]]
-	bool check_raw_address() const noexcept;
-	[[nodiscard]]
-	bool check_raw_size_alignment(std::uint32_t section_alignment,
-		std::uint32_t file_alignment, bool last_section) const noexcept;
-	[[nodiscard]]
-	bool check_raw_address_alignment(std::uint32_t file_alignment) const noexcept;
-	[[nodiscard]]
-	bool check_virtual_address_alignment(std::uint32_t section_alignment) const noexcept;
-	[[nodiscard]]
-	bool check_low_alignment() const noexcept;
-	[[nodiscard]]
-	bool check_raw_size_bounds(std::uint32_t section_alignment) const noexcept;
-	[[nodiscard]]
-	bool check_virtual_size_bounds(std::uint32_t section_alignment) const noexcept;
+	bool is_low_alignment() const noexcept;
 
 public:
 	[[nodiscard]] bool is_writable() const noexcept;

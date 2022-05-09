@@ -10,6 +10,7 @@
 #include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/section/section_errc.h"
+#include "pe_bliss2/section/section_header_validator.h"
 #include "pe_bliss2/section/section_search.h"
 #include "utilities/math.h"
 
@@ -51,44 +52,47 @@ void section_table::serialize(buffers::output_buffer_interface& buf,
 }
 
 pe_error_wrapper section_table::validate_section_header(
-	const core::optional_header& oh, header_list::const_iterator header) const noexcept
+	const core::optional_header& oh,
+	header_list::const_iterator header_it) const noexcept
 {
 	auto section_alignment = oh.get_raw_section_alignment();
-	if (!header->check_raw_size(section_alignment))
-		return section_errc::invalid_section_raw_size;
+	const auto& header = *header_it;
+	if (auto err = validate_raw_size(header, section_alignment); err)
+		return err;
 
-	if (!header->check_virtual_size())
-		return section_errc::invalid_section_virtual_size;
+	if (auto err = validate_virtual_size(header); err)
+		return err;
 
-	if (!header->check_raw_address())
-		return section_errc::invalid_section_raw_address;
+	if (auto err = validate_raw_address(header); err)
+		return err;
 
 	auto file_alignment = oh.get_raw_file_alignment();
-	if (!header->check_raw_size_alignment(section_alignment, file_alignment,
-		header == std::prev(headers_.cend())))
+	if (auto err = validate_raw_size_alignment(header,
+		section_alignment, file_alignment,
+		header_it == std::prev(headers_.cend())); err)
 	{
-		return section_errc::invalid_section_raw_size_alignment;
+		return err;
 	}
 
-	if (!header->check_raw_address_alignment(file_alignment))
-		return section_errc::invalid_section_raw_address_alignment;
+	if (auto err = validate_raw_address_alignment(header, file_alignment); err)
+		return err;
 
-	if (!header->check_raw_size_bounds(section_alignment))
-		return section_errc::raw_section_size_overflow;
+	if (auto err = validate_raw_size_bounds(header, section_alignment); err)
+		return err;
 
-	if (!header->check_virtual_size_bounds(section_alignment))
-		return section_errc::virtual_section_size_overflow;
+	if (auto err = validate_virtual_size_bounds(header, section_alignment); err)
+		return err;
 
-	if (!header->check_virtual_address_alignment(section_alignment))
-		return section_errc::invalid_section_virtual_address_alignment;
+	if (auto err = validate_virtual_address_alignment(header, section_alignment); err)
+		return err;
 
-	if (header != headers_.cbegin())
+	if (header_it != headers_.cbegin())
 	{
-		auto prev = std::prev(header);
+		auto prev = std::prev(header_it);
 		auto next_virtual_address = prev->get_virtual_size(section_alignment);
 		if (!utilities::math::add_if_safe(next_virtual_address, prev->base_struct()->virtual_address))
 			return section_errc::invalid_section_virtual_size;
-		if (next_virtual_address != header->base_struct()->virtual_address)
+		if (next_virtual_address != header.base_struct()->virtual_address)
 		{
 			return section_errc::virtual_gap_between_sections;
 		}
@@ -99,11 +103,11 @@ pe_error_wrapper section_table::validate_section_header(
 		if (!utilities::math::align_up_if_safe(aligned_size_of_headers, section_alignment))
 			return section_errc::invalid_section_virtual_size;
 
-		if (header->base_struct()->virtual_address != aligned_size_of_headers)
+		if (header.base_struct()->virtual_address != aligned_size_of_headers)
 			return section_errc::virtual_gap_between_headers_and_first_section;
 	}
 
-	if (oh.is_low_alignment() && !header->check_low_alignment())
+	if (oh.is_low_alignment() && !header.is_low_alignment())
 		return section_errc::invalid_section_low_alignment;
 
 	return {};

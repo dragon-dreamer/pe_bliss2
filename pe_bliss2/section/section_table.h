@@ -38,7 +38,7 @@ public:
 
 	[[nodiscard]]
 	pe_error_wrapper validate_section_header(const core::optional_header& oh,
-		header_list::const_iterator header) const noexcept;
+		header_list::const_iterator header_it) const noexcept;
 	[[nodiscard]]
 	pe_error_wrapper validate_section_headers(
 		const core::optional_header& oh) const noexcept;

@@ -103,6 +103,7 @@
     <ClInclude Include="section\pe_section_error.h" />
     <ClInclude Include="section\section_data.h" />
     <ClInclude Include="section\section_header.h" />
+    <ClInclude Include="section\section_header_validator.h" />
     <ClInclude Include="section\section_search.h" />
     <ClInclude Include="section\section_table.h" />
     <ClInclude Include="section\section_errc.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="section\pe_section_error.cpp" />
     <ClCompile Include="section\section_data.cpp" />
     <ClCompile Include="section\section_header.cpp" />
+    <ClCompile Include="section\section_header_validator.cpp" />
     <ClCompile Include="section\section_search.cpp" />
     <ClCompile Include="section\section_table.cpp" />
     <ClCompile Include="section\section_errc.cpp" />

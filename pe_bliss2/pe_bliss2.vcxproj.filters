@@ -417,6 +417,9 @@
     <ClInclude Include="core\optional_header_validator.h">
       <Filter>Header Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="section\section_header_validator.h">
+      <Filter>Header Files\section</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="image_loader.cpp">
@@ -595,6 +598,9 @@
     </ClCompile>
     <ClCompile Include="core\optional_header_validator.cpp">
       <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="section\section_header_validator.cpp">
+      <Filter>Source Files\section</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

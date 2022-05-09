@@ -77,14 +77,6 @@ section_header& section_header::set_rva(std::uint32_t rva) noexcept
 	return *this;
 }
 
-bool section_header::check_raw_address() const noexcept
-{
-	if (base_struct()->size_of_raw_data == 0 && base_struct()->virtual_size == 0)
-		return false;
-	return base_struct()->size_of_raw_data == 0
-		|| base_struct()->pointer_to_raw_data != 0;
-}
-
 std::uint32_t section_header::get_raw_size(
 	std::uint32_t section_alignment) const noexcept
 {
@@ -93,18 +85,6 @@ std::uint32_t section_header::get_raw_size(
 	if (raw_size > virtual_size)
 		raw_size = virtual_size;
 	return raw_size;
-}
-
-bool section_header::check_raw_size(
-	std::uint32_t section_alignment) const noexcept
-{
-	return get_raw_size(section_alignment) < two_gb_size;
-}
-
-bool section_header::check_virtual_size() const noexcept
-{
-	auto size = base_struct()->virtual_size;
-	return size < two_gb_size && size;
 }
 
 std::uint32_t section_header::get_virtual_size(
@@ -122,49 +102,7 @@ std::uint32_t section_header::get_virtual_size(
 	return virtual_size;
 }
 
-bool section_header::check_raw_size_alignment(std::uint32_t section_alignment,
-	std::uint32_t file_alignment,
-	bool last_section) const noexcept
-{
-	if (!std::has_single_bit(section_alignment)
-		|| !std::has_single_bit(file_alignment))
-	{
-		return false;
-	}
-	return last_section || (get_raw_size(section_alignment) % file_alignment) == 0;
-}
-
-bool section_header::check_raw_size_bounds(
-	std::uint32_t section_alignment) const noexcept
-{
-	return utilities::math::is_sum_safe(get_raw_size(section_alignment),
-		get_pointer_to_raw_data());
-}
-
-bool section_header::check_virtual_size_bounds(
-	std::uint32_t section_alignment) const noexcept
-{
-	return utilities::math::is_sum_safe(
-		get_virtual_size(section_alignment), get_rva());
-}
-
-bool section_header::check_raw_address_alignment(
-	std::uint32_t file_alignment) const noexcept
-{
-	if (!std::has_single_bit(file_alignment))
-		return false;
-	return (get_pointer_to_raw_data() % file_alignment) == 0;
-}
-
-bool section_header::check_virtual_address_alignment(
-	std::uint32_t section_alignment) const noexcept
-{
-	if (!std::has_single_bit(section_alignment))
-		return false;
-	return (base_struct()->virtual_address % section_alignment) == 0;
-}
-
-bool section_header::check_low_alignment() const noexcept
+bool section_header::is_low_alignment() const noexcept
 {
 	return base_struct()->virtual_address == get_pointer_to_raw_data();
 }
