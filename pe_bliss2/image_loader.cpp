@@ -103,12 +103,11 @@ std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
 				.image_start_buffer_pos = dos_hdr.base_struct().get_state().buffer_pos()
 			};
 
-			pe_error_wrapper err;
 			std::size_t section_index = 0;
 			for (auto it = section_tbl.get_section_headers().cbegin(),
 				end = section_tbl.get_section_headers().cend(); it != end; ++it, ++section_index)
 			{
-				if ((err = section_tbl.validate_section_header(optional_hdr, it)))
+				if (auto err = section_tbl.validate_section_header(optional_hdr, it); err)
 					throw section::pe_section_error(err, section_index, std::string(it->get_name()));
 			}
 
@@ -123,7 +122,12 @@ std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
 			}
 
 			if (options.validate_size_of_image)
-				section_tbl.validate_size_of_image(optional_hdr).throw_on_error();
+			{
+				const auto* last_section = section_tbl.get_section_headers().empty()
+					? nullptr : &section_tbl.get_section_headers().back();
+				if (auto err = validate_size_of_image(last_section, optional_hdr); err)
+					errors.add_error(err);
+			}
 
 			if (options.load_overlay && !options.image_loaded_to_memory)
 			{

@@ -40,8 +40,6 @@ struct section_error_category : std::error_category
 			return "Invalid section alignment for low-aligned image";
 		case virtual_gap_between_headers_and_first_section:
 			return "Virtual gap between headers and first section";
-		case invalid_size_of_image:
-			return "Invalid size of image";
 		case unable_to_read_section_table:
 			return "Unable to read section table";
 		case invalid_section_offset:

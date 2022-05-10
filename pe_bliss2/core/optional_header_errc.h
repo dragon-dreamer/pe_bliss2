@@ -22,7 +22,8 @@ enum class optional_header_errc
 	invalid_size_of_headers,
 	no_base_of_data_field,
 	unable_to_read_optional_header,
-	invalid_size_of_optional_header
+	invalid_size_of_optional_header,
+	invalid_size_of_image
 };
 
 std::error_code make_error_code(optional_header_errc) noexcept;

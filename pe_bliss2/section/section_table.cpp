@@ -125,23 +125,6 @@ pe_error_wrapper section_table::validate_section_headers(
 	return result;
 }
 
-pe_error_wrapper section_table::validate_size_of_image(
-	const core::optional_header& oh) const noexcept
-{
-	if (headers_.empty())
-		return {};
-
-	auto real_size_of_image = headers_.back().base_struct()->virtual_address;
-	if (!utilities::math::add_if_safe(real_size_of_image,
-		headers_.back().get_virtual_size(oh.get_raw_section_alignment())))
-	{
-		return section_errc::invalid_size_of_image;
-	}
-	if (oh.get_raw_size_of_image() != real_size_of_image)
-		return section_errc::invalid_size_of_image;
-	return {};
-}
-
 section_table::header_list::const_iterator section_table::by_rva(rva_type rva,
 	std::uint32_t section_alignment, std::uint32_t data_size) const
 {

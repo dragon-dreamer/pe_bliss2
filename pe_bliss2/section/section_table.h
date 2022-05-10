@@ -42,9 +42,6 @@ public:
 	[[nodiscard]]
 	pe_error_wrapper validate_section_headers(
 		const core::optional_header& oh) const noexcept;
-	[[nodiscard]]
-	pe_error_wrapper validate_size_of_image(
-		const core::optional_header& oh) const noexcept;
 
 	[[nodiscard]]
 	header_list& get_section_headers() & noexcept

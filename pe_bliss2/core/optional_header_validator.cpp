@@ -4,9 +4,12 @@
 
 #include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/core/optional_header_errc.h"
-#include "pe_bliss2/error_list.h"
 #include "pe_bliss2/detail/image_data_directory.h"
 #include "pe_bliss2/detail/packed_reflection.h"
+#include "pe_bliss2/error_list.h"
+#include "pe_bliss2/section/section_header.h"
+
+#include "utilities/math.h"
 
 namespace pe_bliss::core
 {
@@ -180,6 +183,26 @@ pe_error_wrapper validate_size_of_optional_header(
 	{
 		return optional_header_errc::invalid_size_of_optional_header;
 	}
+
+	return {};
+}
+
+pe_error_wrapper validate_size_of_image(
+	const section::section_header* last_section,
+	const optional_header& oh) noexcept
+{
+	if (!last_section) [[unlikely]]
+		return {};
+
+	auto real_size_of_image = last_section->base_struct()->virtual_address;
+	if (!utilities::math::add_if_safe(real_size_of_image,
+		last_section->get_virtual_size(oh.get_raw_section_alignment())))
+	{
+		return optional_header_errc::invalid_size_of_image;
+	}
+
+	if (oh.get_raw_size_of_image() != real_size_of_image)
+		return optional_header_errc::invalid_size_of_image;
 
 	return {};
 }

@@ -17,6 +17,7 @@
 #include "pe_bliss2/detail/image_optional_header.h"
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/error_list.h"
+#include "pe_bliss2/section/section_header.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
@@ -653,4 +654,26 @@ TEST(OptionalHeaderTests, ValidateSizeOfOptionalHeaderTest)
 		static_cast<std::uint16_t>(header.get_size_of_structure()
 			+ data_dir_size * 3u), header)
 		.throw_on_error());
+}
+
+TEST(OptionalHeaderTests, ValidateSizeOfImageTest1)
+{
+	optional_header header;
+	EXPECT_NO_THROW(validate_size_of_image(nullptr, header).throw_on_error());
+}
+
+TEST(OptionalHeaderTests, ValidateSizeOfImageTest2)
+{
+	optional_header header;
+	header.set_raw_size_of_image(0x2000u);
+	header.set_raw_section_alignment(0x1000u);
+
+	section::section_header section_header;
+	section_header.set_virtual_size(0xa00u);
+	section_header.base_struct()->virtual_address = 0x1000u;
+	EXPECT_NO_THROW(validate_size_of_image(&section_header, header).throw_on_error());
+
+	header.set_raw_size_of_image(0x1a00u);
+	EXPECT_EQ(validate_size_of_image(&section_header, header),
+		optional_header_errc::invalid_size_of_image);
 }

@@ -48,6 +48,8 @@ struct optional_header_error_category : std::error_category
 			return "Unable to read optional header";
 		case invalid_size_of_optional_header:
 			return "Invalid size of optional header";
+		case invalid_size_of_image:
+			return "Invalid size of image";
 		default:
 			return {};
 		}
