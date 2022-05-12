@@ -1,10 +1,14 @@
 #pragma once
 
 #include <compare>
+#include <cstddef>
+#include <exception>
 #include <string>
 #include <string_view>
 #include <system_error>
 #include <type_traits>
+#include <utility>
+#include <variant>
 #include <vector>
 
 namespace pe_bliss
@@ -21,13 +25,25 @@ concept is_convertible_to_error_code = requires(ErrorCode ec) {
 class [[nodiscard]] error_list
 {
 public:
-	struct error_info
+	using context_type = std::variant<std::monostate,
+		std::size_t, std::string>;
+
+	struct error_context
 	{
 		std::error_code code;
-		std::string context;
+		context_type context;
 
 		[[nodiscard]]
-		friend auto operator<=>(const error_info&, const error_info&) = default;
+		friend auto operator<=>(const error_context&, const error_context&) = default;
+	};
+
+	struct error_info
+	{
+		error_context context;
+		std::exception_ptr error{};
+
+		[[nodiscard]]
+		friend bool operator==(const error_info&, const error_info&) = default;
 	};
 
 public:
@@ -36,6 +52,7 @@ public:
 public:
 	void add_error(std::error_code error);
 	void add_error(std::error_code error, std::string context);
+	void add_error(std::error_code error, std::size_t context);
 
 	[[nodiscard]]
 	constexpr const error_list_type& get_errors() const noexcept
@@ -60,6 +77,10 @@ public:
 	bool has_error(std::error_code error,
 		std::string_view context) const noexcept;
 	[[nodiscard]]
+	bool has_error(std::error_code error,
+		std::size_t context) const noexcept;
+
+	[[nodiscard]]
 	bool has_any_error(std::error_code error) const noexcept;
 
 	template<detail::is_convertible_to_error_code ErrorCode>
@@ -69,12 +90,14 @@ public:
 		return has_error(std::make_error_code(error));
 	}
 
-	template<detail::is_convertible_to_error_code ErrorCode>
+	template<detail::is_convertible_to_error_code ErrorCode,
+		typename Context>
 	[[nodiscard]]
 	bool has_error(ErrorCode error,
-		std::string_view context) const noexcept
+		Context&& context) const noexcept
 	{
-		return has_error(std::make_error_code(error), context);
+		return has_error(std::make_error_code(error),
+			std::forward<Context>(context));
 	}
 
 	template<detail::is_convertible_to_error_code ErrorCode>

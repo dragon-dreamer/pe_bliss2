@@ -1,5 +1,8 @@
 #include "gtest/gtest.h"
 
+#include <exception>
+#include <stdexcept>
+#include <string>
 #include <system_error>
 
 #include "pe_bliss2/error_list.h"
@@ -45,7 +48,37 @@ TEST(ErrorListTests, ErrorListTest2)
 	EXPECT_TRUE(errors.has_error(std::errc::timed_out, "test"));
 	EXPECT_TRUE(errors.has_error(std::errc::address_in_use, "test"));
 
+	EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::already_connected),
+		123u));
+	EXPECT_TRUE(errors.has_error(std::errc::already_connected, 123u));
+	EXPECT_FALSE(errors.has_error(std::errc::already_connected, "test"));
+	EXPECT_FALSE(errors.has_error(std::errc::already_connected, 456u));
+
 	EXPECT_TRUE(errors.has_any_error(std::errc::timed_out));
 	EXPECT_TRUE(errors.has_any_error(std::errc::address_in_use));
 	EXPECT_FALSE(errors.has_any_error(std::errc::address_family_not_supported));
+	EXPECT_TRUE(errors.has_any_error(std::errc::already_connected));
+}
+
+TEST(ErrorListTests, ErrorListTest3)
+{
+	pe_bliss::error_list errors;
+	try
+	{
+		throw std::runtime_error("test");
+	}
+	catch (...)
+	{
+		EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::timed_out)));
+	}
+
+	try
+	{
+		EXPECT_NE(errors.get_errors().at(0).error, std::exception_ptr());
+		std::rethrow_exception(errors.get_errors().at(0).error);
+	}
+	catch (const std::exception& e)
+	{
+		EXPECT_EQ(std::string(e.what()), "test");
+	}
 }
