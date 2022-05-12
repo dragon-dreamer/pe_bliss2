@@ -2,6 +2,8 @@
 
 #include <cassert>
 #include <cstdint>
+#include <exception>
+#include <iterator>
 #include <string>
 
 #include "buffers/input_buffer_section.h"
@@ -13,6 +15,7 @@
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/section/pe_section_error.h"
 #include "pe_bliss2/section/section_data.h"
+#include "pe_bliss2/section/section_table_validator.h"
 #include "utilities/math.h"
 
 namespace pe_bliss
@@ -93,9 +96,14 @@ std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
 		section_tbl.deserialize(*buffer, file_hdr.base_struct()->number_of_sections,
 			options.allow_virtual_headers);
 
+		const auto& section_headers = section_tbl.get_section_headers();
 		if (options.validate_sections)
 		{
-			auto& sections = instance.get_section_data_list();
+			section::validate_section_headers(optional_hdr, section_headers, errors);
+		}
+
+		if (options.load_section_data)
+		{
 			section::section_data_load_options load_opts{
 				.section_alignment = optional_hdr.get_raw_section_alignment(),
 				.copy_memory = options.eager_section_data_copy,
@@ -103,52 +111,49 @@ std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
 				.image_start_buffer_pos = dos_hdr.base_struct().get_state().buffer_pos()
 			};
 
-			std::size_t section_index = 0;
-			for (auto it = section_tbl.get_section_headers().cbegin(),
-				end = section_tbl.get_section_headers().cend(); it != end; ++it, ++section_index)
+			auto& sections = instance.get_section_data_list();
+			for (auto it = section_headers.cbegin(),
+				end = section_headers.cend(); it != end; ++it)
 			{
-				if (auto err = section_tbl.validate_section_header(optional_hdr, it); err)
-					throw section::pe_section_error(err, section_index, std::string(it->get_name()));
-			}
-
-			if (options.load_section_data)
-			{
-				for (auto it = section_tbl.get_section_headers().cbegin(),
-					end = section_tbl.get_section_headers().cend(); it != end; ++it)
+				try
 				{
-					//TODO: may throw - catch?
 					sections.emplace_back().deserialize(*it, buffer, load_opts);
 				}
-			}
-
-			if (options.validate_size_of_image)
-			{
-				const auto* last_section = section_tbl.get_section_headers().empty()
-					? nullptr : &section_tbl.get_section_headers().back();
-				if (auto err = validate_size_of_image(last_section, optional_hdr); err)
-					errors.add_error(err);
-			}
-
-			if (options.load_overlay && !options.image_loaded_to_memory)
-			{
-				std::uint32_t last_section_offset = 0;
-				for (auto it = section_tbl.get_section_headers().cbegin(),
-					end = section_tbl.get_section_headers().cend(); it != end; ++it)
+				catch (const pe_error& e)
 				{
-					last_section_offset = (std::max)(last_section_offset,
-						it->get_pointer_to_raw_data() + it->get_raw_size(
-							optional_hdr.get_raw_section_alignment()));
-				}
-
-				if (buffer->size() > last_section_offset)
-				{
-					buffer->set_rpos(last_section_offset);
-					std::size_t overlay_size = buffer->size() - last_section_offset;
-					instance.get_overlay().deserialize(
-						std::make_shared<buffers::input_buffer_section>(buffer, last_section_offset, overlay_size),
-						options.eager_overlay_data_copy);
+					errors.add_error(e.code(),
+						std::distance(section_headers.cbegin(), it));
 				}
 			}
+		}
+
+		if (options.load_overlay && !options.image_loaded_to_memory)
+		{
+			std::uint32_t last_section_offset = 0;
+			for (auto it = section_headers.cbegin(),
+				end = section_headers.cend(); it != end; ++it)
+			{
+				last_section_offset = (std::max)(last_section_offset,
+					it->get_pointer_to_raw_data() + it->get_raw_size(
+						optional_hdr.get_raw_section_alignment()));
+			}
+
+			if (buffer->size() > last_section_offset)
+			{
+				buffer->set_rpos(last_section_offset);
+				std::size_t overlay_size = buffer->size() - last_section_offset;
+				instance.get_overlay().deserialize(
+					std::make_shared<buffers::input_buffer_section>(buffer, last_section_offset, overlay_size),
+					options.eager_overlay_data_copy);
+			}
+		}
+
+		if (options.validate_size_of_image)
+		{
+			const auto* last_section = section_headers.empty()
+				? nullptr : &section_headers.back();
+			if (auto err = validate_size_of_image(last_section, optional_hdr); err)
+				errors.add_error(err);
 		}
 
 		//TODO: make dos, file, optional and other headers reference this data instead of copying its parts

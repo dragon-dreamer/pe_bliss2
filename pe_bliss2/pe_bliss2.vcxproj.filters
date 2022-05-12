@@ -420,6 +420,9 @@
     <ClInclude Include="section\section_header_validator.h">
       <Filter>Header Files\section</Filter>
     </ClInclude>
+    <ClInclude Include="section\section_table_validator.h">
+      <Filter>Header Files\section</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="image_loader.cpp">
@@ -600,6 +603,9 @@
       <Filter>Source Files\core</Filter>
     </ClCompile>
     <ClCompile Include="section\section_header_validator.cpp">
+      <Filter>Source Files\section</Filter>
+    </ClCompile>
+    <ClCompile Include="section\section_table_validator.cpp">
       <Filter>Source Files\section</Filter>
     </ClCompile>
   </ItemGroup>

@@ -7,12 +7,7 @@
 #include "buffers/input_buffer_interface.h"
 #include "buffers/output_buffer_interface.h"
 #include "pe_bliss2/core/data_directories.h"
-#include "pe_bliss2/core/optional_header.h"
-#include "pe_bliss2/pe_error.h"
-#include "pe_bliss2/section/section_errc.h"
-#include "pe_bliss2/section/section_header_validator.h"
 #include "pe_bliss2/section/section_search.h"
-#include "utilities/math.h"
 
 namespace pe_bliss::section
 {
@@ -49,80 +44,6 @@ void section_table::serialize(buffers::output_buffer_interface& buf,
 {
 	for (const auto& header : headers_)
 		header.serialize(buf, write_virtual_part);
-}
-
-pe_error_wrapper section_table::validate_section_header(
-	const core::optional_header& oh,
-	header_list::const_iterator header_it) const noexcept
-{
-	auto section_alignment = oh.get_raw_section_alignment();
-	const auto& header = *header_it;
-	if (auto err = validate_raw_size(header, section_alignment); err)
-		return err;
-
-	if (auto err = validate_virtual_size(header); err)
-		return err;
-
-	if (auto err = validate_raw_address(header); err)
-		return err;
-
-	auto file_alignment = oh.get_raw_file_alignment();
-	if (auto err = validate_raw_size_alignment(header,
-		section_alignment, file_alignment,
-		header_it == std::prev(headers_.cend())); err)
-	{
-		return err;
-	}
-
-	if (auto err = validate_raw_address_alignment(header, file_alignment); err)
-		return err;
-
-	if (auto err = validate_raw_size_bounds(header, section_alignment); err)
-		return err;
-
-	if (auto err = validate_virtual_size_bounds(header, section_alignment); err)
-		return err;
-
-	if (auto err = validate_virtual_address_alignment(header, section_alignment); err)
-		return err;
-
-	if (header_it != headers_.cbegin())
-	{
-		auto prev = std::prev(header_it);
-		auto next_virtual_address = prev->get_virtual_size(section_alignment);
-		if (!utilities::math::add_if_safe(next_virtual_address, prev->base_struct()->virtual_address))
-			return section_errc::invalid_section_virtual_size;
-		if (next_virtual_address != header.base_struct()->virtual_address)
-		{
-			return section_errc::virtual_gap_between_sections;
-		}
-	}
-	else
-	{
-		auto aligned_size_of_headers = oh.get_raw_size_of_headers();
-		if (!utilities::math::align_up_if_safe(aligned_size_of_headers, section_alignment))
-			return section_errc::invalid_section_virtual_size;
-
-		if (header.base_struct()->virtual_address != aligned_size_of_headers)
-			return section_errc::virtual_gap_between_headers_and_first_section;
-	}
-
-	if (oh.is_low_alignment() && !header.is_low_alignment())
-		return section_errc::invalid_section_low_alignment;
-
-	return {};
-}
-
-pe_error_wrapper section_table::validate_section_headers(
-	const core::optional_header& oh) const noexcept
-{
-	pe_error_wrapper result;
-	for (auto it = headers_.cbegin(), end = headers_.cend(); it != end; ++it)
-	{
-		if ((result = validate_section_header(oh, it)))
-			break;
-	}
-	return result;
 }
 
 section_table::header_list::const_iterator section_table::by_rva(rva_type rva,

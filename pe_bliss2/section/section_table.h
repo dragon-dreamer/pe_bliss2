@@ -1,9 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include <list>
+#include <vector>
 
-#include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "pe_bliss2/section/section_header.h"
 
@@ -13,18 +12,13 @@ class input_buffer_interface;
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss::core
-{
-class optional_header;
-} //namespace pe_bliss::core
-
 namespace pe_bliss::section
 {
 
 class [[nodiscard]] section_table
 {
 public:
-	using header_list = std::list<section_header>;
+	using header_list = std::vector<section_header>;
 
 public:
 	//When deserializing, buf should point to
@@ -35,13 +29,6 @@ public:
 	//the section table start
 	void serialize(buffers::output_buffer_interface& buf,
 		bool write_virtual_part = true) const;
-
-	[[nodiscard]]
-	pe_error_wrapper validate_section_header(const core::optional_header& oh,
-		header_list::const_iterator header_it) const noexcept;
-	[[nodiscard]]
-	pe_error_wrapper validate_section_headers(
-		const core::optional_header& oh) const noexcept;
 
 	[[nodiscard]]
 	header_list& get_section_headers() & noexcept
