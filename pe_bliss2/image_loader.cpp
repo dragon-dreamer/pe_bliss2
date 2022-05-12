@@ -13,7 +13,6 @@
 #include "pe_bliss2/core/image_signature_validator.h"
 #include "pe_bliss2/core/optional_header_validator.h"
 #include "pe_bliss2/pe_error.h"
-#include "pe_bliss2/section/pe_section_error.h"
 #include "pe_bliss2/section/section_data.h"
 #include "pe_bliss2/section/section_table_validator.h"
 #include "utilities/math.h"

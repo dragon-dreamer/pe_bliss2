@@ -4,7 +4,6 @@
 #include "gtest/gtest.h"
 
 #include "pe_bliss2/pe_error.h"
-#include "pe_bliss2/section/pe_section_error.h"
 
 TEST(PeErrorTests, PeErrorTest)
 {
@@ -32,12 +31,4 @@ TEST(PeErrorTests, PeErrorWrapperTest2)
 	EXPECT_THROW(wrapper.throw_on_error(), pe_bliss::pe_error);
 	EXPECT_EQ(static_cast<std::error_code>(wrapper), std::io_errc::stream);
 	EXPECT_TRUE(static_cast<bool>(wrapper));
-}
-
-TEST(PeErrorTests, PeSectionErrorTest)
-{
-	pe_bliss::section::pe_section_error err(std::io_errc::stream, 1u, "test");
-	EXPECT_EQ(err.code(), std::io_errc::stream);
-	EXPECT_EQ(err.get_section_index(), 1u);
-	EXPECT_EQ(err.get_section_name(), "test");
 }
