@@ -20,6 +20,8 @@ pe_error_wrapper validate_address_of_entry_point(
 	auto entry_point = header.get_raw_address_of_entry_point();
 	if (!entry_point && !is_dll)
 		return optional_header_errc::invalid_address_of_entry_point;
+	// Under Windows 8, AddressOfEntryPoint is not allowed to be smaller
+	// than SizeOfHeaders, except if it is 0.
 	if (entry_point && entry_point < header.get_raw_size_of_headers())
 		return optional_header_errc::invalid_address_of_entry_point;
 	return {};
