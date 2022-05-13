@@ -24,7 +24,7 @@ TEST(DataDirectoriesTests, EmptyTest)
 {
 	data_directories dirs;
 
-	EXPECT_EQ(dirs.size(), 0u);
+	ASSERT_EQ(dirs.size(), 0u);
 
 	EXPECT_FALSE(dirs.has_directory(data_directories::directory_type::exports));
 	EXPECT_FALSE(dirs.has_directory(data_directories::directory_type::com_descriptor));
@@ -75,7 +75,7 @@ TEST(DataDirectoriesTests, DeserializeSerializeTest)
 	dirs.get_directories().clear();
 
 	buffer.set_rpos(0);
-	EXPECT_NO_THROW(dirs.deserialize(buffer, dir_count, true));
+	ASSERT_NO_THROW(dirs.deserialize(buffer, dir_count, true));
 
 	EXPECT_EQ(dirs.size(), dir_count);
 
@@ -124,8 +124,8 @@ TEST(DataDirectoriesTests, DeserializeSerializeTest)
 	{
 		std::vector<std::byte> outdata;
 		buffers::output_memory_buffer outbuf(outdata);
-		EXPECT_NO_THROW(dirs.serialize(outbuf, false));
-		EXPECT_EQ(outdata.size(), std::size(data) - 1u);
+		ASSERT_NO_THROW(dirs.serialize(outbuf, false));
+		ASSERT_EQ(outdata.size(), std::size(data) - 1u);
 		EXPECT_TRUE(std::equal(std::cbegin(outdata), std::cend(outdata),
 			reinterpret_cast<const std::byte*>(data)));
 	}
@@ -133,8 +133,8 @@ TEST(DataDirectoriesTests, DeserializeSerializeTest)
 	{
 		std::vector<std::byte> outdata;
 		buffers::output_memory_buffer outbuf(outdata);
-		EXPECT_NO_THROW(dirs.serialize(outbuf, true));
-		EXPECT_EQ(outdata.size(), std::size(data) - 1u
+		ASSERT_NO_THROW(dirs.serialize(outbuf, true));
+		ASSERT_EQ(outdata.size(), std::size(data) - 1u
 			+ 3u /* remaining virtual bytes */);
 		EXPECT_TRUE(std::equal(std::cbegin(outdata), std::cend(outdata) - 3u,
 			reinterpret_cast<const std::byte*>(data)));
@@ -149,7 +149,7 @@ TEST(DataDirectoriesTests, StripTest1)
 {
 	data_directories dirs;
 	dirs.set_size(7u);
-	EXPECT_EQ(dirs.size(), 7u);
+	ASSERT_EQ(dirs.size(), 7u);
 	EXPECT_EQ(dirs.strip_data_directories(8u), 7u);
 	EXPECT_EQ(dirs.strip_data_directories(7u), 7u);
 	EXPECT_EQ(dirs.strip_data_directories(0u), 0u);
@@ -161,7 +161,7 @@ TEST(DataDirectoriesTests, StripTest2)
 	data_directories dirs;
 	dirs.set_size(7u);
 	dirs.get_directories()[3u]->virtual_address = 123u;
-	EXPECT_EQ(dirs.size(), 7u);
+	ASSERT_EQ(dirs.size(), 7u);
 	EXPECT_EQ(dirs.strip_data_directories(8u), 7u);
 	EXPECT_EQ(dirs.strip_data_directories(7u), 7u);
 	EXPECT_EQ(dirs.strip_data_directories(6u), 6u);

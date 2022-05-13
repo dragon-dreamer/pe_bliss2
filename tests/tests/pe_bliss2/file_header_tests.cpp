@@ -70,7 +70,7 @@ TEST(FileHeaderTests, DeserializeSerializeTest)
 	}, file_header_errc::unable_to_read_file_header);
 	buf.set_rpos(0u);
 
-	EXPECT_NO_THROW(header.deserialize(buf, true));
+	ASSERT_NO_THROW(header.deserialize(buf, true));
 	EXPECT_EQ(header.get_machine_type(), file_header::machine_type::i386);
 	EXPECT_EQ(header.base_struct()->number_of_sections, 0x250u);
 	EXPECT_EQ(header.base_struct()->time_date_stamp, 0x04030201u);
@@ -82,8 +82,7 @@ TEST(FileHeaderTests, DeserializeSerializeTest)
 
 	std::vector<std::byte> outdata;
 	buffers::output_memory_buffer outbuf(outdata);
-
-	header.serialize(outbuf, false);
-	EXPECT_EQ(outdata.size(), buf.size());
+	ASSERT_NO_THROW(header.serialize(outbuf, false));
+	ASSERT_EQ(outdata.size(), buf.size());
 	EXPECT_TRUE(std::equal(outdata.cbegin(), outdata.cend(), data));
 }

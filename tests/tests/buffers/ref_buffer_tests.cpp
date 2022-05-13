@@ -22,7 +22,7 @@ void check_buffer_empty(const buffers::ref_buffer& buf)
 
 	std::vector<std::byte> data;
 	buffers::output_memory_buffer out_buf(data);
-	EXPECT_EQ(buf.serialize(out_buf, 0u), 0u);
+	ASSERT_EQ(buf.serialize(out_buf, 0u), 0u);
 	EXPECT_TRUE(data.empty());
 }
 
@@ -32,8 +32,8 @@ void test_serialize(const std::vector<std::byte>& src,
 {
 	std::vector<std::byte> data;
 	buffers::output_memory_buffer out_buf(data);
-	EXPECT_EQ(buf.serialize(out_buf, pos, length), length);
-	EXPECT_EQ(data.size(), length);
+	ASSERT_EQ(buf.serialize(out_buf, pos, length), length);
+	ASSERT_EQ(data.size(), length);
 	EXPECT_TRUE(std::ranges::equal(src | std::views::drop(pos)
 		| std::views::take(length), data));
 }
@@ -57,7 +57,7 @@ void move_tests(
 
 	std::vector<std::byte> data;
 	buffers::output_memory_buffer out_buf(data);
-	EXPECT_NO_THROW(moved_buf2.serialize(out_buf));
+	ASSERT_NO_THROW(moved_buf2.serialize(out_buf));
 	EXPECT_EQ(data, input_buf->get_container());
 }
 
@@ -86,17 +86,17 @@ void copy_tests(
 
 	std::vector<std::byte> data;
 	buffers::output_memory_buffer out_buf(data);
-	EXPECT_NO_THROW(copied_buf.serialize(out_buf));
+	ASSERT_NO_THROW(copied_buf.serialize(out_buf));
 	EXPECT_EQ(data, input_buf->get_container());
 
 	data.clear();
 	out_buf.set_wpos(0);
-	EXPECT_NO_THROW(buf.serialize(out_buf));
+	ASSERT_NO_THROW(buf.serialize(out_buf));
 	EXPECT_EQ(data, input_buf->get_container());
 
 	data.clear();
 	out_buf.set_wpos(0);
-	EXPECT_NO_THROW(copied_buf2.serialize(out_buf));
+	ASSERT_NO_THROW(copied_buf2.serialize(out_buf));
 	EXPECT_EQ(data, input_buf->get_container());
 }
 
@@ -109,7 +109,7 @@ TEST(BufferTests, EmptyRefBufferTest)
 	buffers::ref_buffer buf;
 	check_buffer_empty(buf);
 
-	EXPECT_NO_THROW(buf.copy_referenced_buffer());
+	ASSERT_NO_THROW(buf.copy_referenced_buffer());
 	check_buffer_empty(buf);
 }
 
@@ -120,7 +120,7 @@ TEST(BufferTests, CopiedRefBufferTest)
 
 	for (std::size_t i = 0; i != 2; ++i) //loop to test ref_buffer reuse
 	{
-		EXPECT_NO_THROW(buf.deserialize(input_buf, true));
+		ASSERT_NO_THROW(buf.deserialize(input_buf, true));
 		EXPECT_EQ(input_buf.use_count(), 1u);
 
 		EXPECT_TRUE(!buf.empty());
@@ -146,7 +146,7 @@ TEST(BufferTests, ReferencedRefBufferTest)
 
 	for (std::size_t i = 0; i != 2; ++i) //loop to test ref_buffer reuse
 	{
-		EXPECT_NO_THROW(buf.deserialize(input_buf, false));
+		ASSERT_NO_THROW(buf.deserialize(input_buf, false));
 		EXPECT_EQ(input_buf.use_count(), 2u);
 
 		EXPECT_TRUE(!buf.empty());

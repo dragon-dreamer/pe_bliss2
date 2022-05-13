@@ -8,6 +8,7 @@
 #include "buffers/input_buffer_state.h"
 #include "buffers/input_memory_buffer.h"
 #include "buffers/output_memory_ref_buffer.h"
+
 #include "pe_bliss2/packed_byte_vector.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
@@ -81,7 +82,7 @@ TEST(PackedByteVectorTests, SerializeTest1)
 
 	std::vector<std::byte> serialized(size, std::byte{ 1 });
 	buffers::output_memory_ref_buffer buffer(serialized.data(), size);
-	EXPECT_EQ(vec.serialize(buffer, false), vec.physical_size());
+	ASSERT_EQ(vec.serialize(buffer, false), vec.physical_size());
 	EXPECT_TRUE(std::equal(vec.value().cbegin(), vec.value().cbegin()
 		+ vec.physical_size(), serialized.cbegin()));
 	EXPECT_EQ(serialized[vec.physical_size()], std::byte{ 1 });
@@ -91,7 +92,7 @@ TEST(PackedByteVectorTests, SerializeTest1)
 	buffer.set_wpos(0u);
 	vec.set_data_size(size);
 	EXPECT_EQ(vec.data_size(), size);
-	EXPECT_EQ(vec.serialize(buffer, true), vec.data_size());
+	ASSERT_EQ(vec.serialize(buffer, true), vec.data_size());
 	EXPECT_TRUE(std::equal(vec.value().cbegin(), vec.value().cbegin()
 		+ vec.physical_size(), serialized.cbegin()));
 	EXPECT_EQ(serialized[vec.physical_size()], std::byte{});
@@ -107,7 +108,7 @@ TEST(PackedByteVectorTests, SerializeTest2)
 	expect_throw_pe_error([&] {
 		vec.serialize(serialized.data(), vec.physical_size() - 1u, false); },
 		utilities::generic_errc::buffer_overrun);
-	EXPECT_EQ(vec.serialize(serialized.data(), vec.physical_size(), false),
+	ASSERT_EQ(vec.serialize(serialized.data(), vec.physical_size(), false),
 		vec.physical_size());
 	EXPECT_TRUE(std::equal(vec.value().cbegin(), vec.value().cbegin()
 		+ vec.physical_size(), serialized.cbegin()));
@@ -117,7 +118,7 @@ TEST(PackedByteVectorTests, SerializeTest2)
 	expect_throw_pe_error([&] {
 		vec.serialize(serialized.data(), vec.physical_size(), true); },
 		utilities::generic_errc::buffer_overrun);
-	EXPECT_EQ(vec.serialize(serialized.data(), vec.data_size(), true),
+	ASSERT_EQ(vec.serialize(serialized.data(), vec.data_size(), true),
 		vec.data_size());
 	EXPECT_TRUE(std::equal(vec.value().cbegin(), vec.value().cbegin()
 		+ vec.physical_size(), serialized.cbegin()));
@@ -157,14 +158,14 @@ TEST(PackedByteVectorTests, DeserializeTest)
 			utilities::generic_errc::buffer_overrun);
 
 		buffer.set_rpos(buffer_pos);
-		EXPECT_NO_THROW(vec.deserialize(buffer, size, false));
+		ASSERT_NO_THROW(vec.deserialize(buffer, size, false));
 
 		EXPECT_EQ(vec.get_state().absolute_offset(), absolute_offset + buffer_pos);
 		EXPECT_EQ(vec.get_state().relative_offset(), relative_offset + buffer_pos);
 		EXPECT_EQ(vec.get_state().buffer_pos(), buffer_pos);
 		EXPECT_FALSE(vec.is_virtual());
-		EXPECT_EQ(vec.physical_size(), size);
-		EXPECT_EQ(vec.data_size(), size);
+		ASSERT_EQ(vec.physical_size(), size);
+		ASSERT_EQ(vec.data_size(), size);
 		EXPECT_TRUE(std::equal(vec.value().cbegin(),
 			vec.value().cbegin() + vec.physical_size(),
 			test_vector.cbegin() + buffer_pos));
@@ -173,13 +174,13 @@ TEST(PackedByteVectorTests, DeserializeTest)
 	{
 		buffers::input_memory_buffer buffer(test_vector.data(), test_vector.size());
 		buffer.set_rpos(size);
-		EXPECT_NO_THROW(vec.deserialize(buffer, size, true));
+		ASSERT_NO_THROW(vec.deserialize(buffer, size, true));
 		EXPECT_EQ(vec.get_state().absolute_offset(), size);
 		EXPECT_EQ(vec.get_state().relative_offset(), size);
 		EXPECT_EQ(vec.get_state().buffer_pos(), size);
 		EXPECT_TRUE(vec.is_virtual());
-		EXPECT_EQ(vec.physical_size(), buffer_pos);
-		EXPECT_EQ(vec.data_size(), size);
+		ASSERT_EQ(vec.physical_size(), buffer_pos);
+		ASSERT_EQ(vec.data_size(), size);
 		EXPECT_TRUE(std::equal(vec.value().cbegin(),
 			vec.value().cbegin() + vec.physical_size(),
 			test_vector.cbegin() + size));

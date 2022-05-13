@@ -35,7 +35,7 @@ TEST(DosStubTests, DeserializeDosStubTest)
 		dos_stub_errc::unable_to_read_dos_stub);
 
 	buffer->set_rpos(1u);
-	EXPECT_NO_THROW(stub.deserialize(buffer, {
+	ASSERT_NO_THROW(stub.deserialize(buffer, {
 		.e_lfanew = static_cast<std::uint32_t>(data.size() - 2u) }));
 	EXPECT_EQ(stub.data()->absolute_offset(), 1u);
 	EXPECT_EQ(stub.data()->relative_offset(), 0u);

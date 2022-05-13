@@ -10,15 +10,15 @@
 TEST(ErrorListTests, ErrorListTest1)
 {
 	pe_bliss::error_list errors;
-	EXPECT_FALSE(errors.has_errors());
+	ASSERT_FALSE(errors.has_errors());
 	EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::timed_out)));
 	EXPECT_TRUE(errors.has_errors());
-	EXPECT_EQ(errors.get_errors(), pe_bliss::error_list::error_list_type{
+	ASSERT_EQ(errors.get_errors(), pe_bliss::error_list::error_list_type{
 		{ std::make_error_code(std::errc::timed_out) } });
 
 	EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::address_in_use)));
 	EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::timed_out)));
-	EXPECT_EQ(errors.get_errors(), (pe_bliss::error_list::error_list_type{
+	ASSERT_EQ(errors.get_errors(), (pe_bliss::error_list::error_list_type{
 		pe_bliss::error_list::error_info{ std::make_error_code(std::errc::timed_out) },
 		pe_bliss::error_list::error_info{ std::make_error_code(std::errc::address_in_use) } }));
 
@@ -33,11 +33,11 @@ TEST(ErrorListTests, ErrorListTest1)
 TEST(ErrorListTests, ErrorListTest2)
 {
 	pe_bliss::error_list errors;
-	EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::timed_out),
+	ASSERT_NO_THROW(errors.add_error(std::make_error_code(std::errc::timed_out),
 		"test"));
-	EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::timed_out),
+	ASSERT_NO_THROW(errors.add_error(std::make_error_code(std::errc::timed_out),
 		"test"));
-	EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::address_in_use),
+	ASSERT_NO_THROW(errors.add_error(std::make_error_code(std::errc::address_in_use),
 		"test"));
 	EXPECT_EQ(errors.get_errors(), (pe_bliss::error_list::error_list_type{
 		{ std::make_error_code(std::errc::timed_out), "test" },
@@ -48,7 +48,7 @@ TEST(ErrorListTests, ErrorListTest2)
 	EXPECT_TRUE(errors.has_error(std::errc::timed_out, "test"));
 	EXPECT_TRUE(errors.has_error(std::errc::address_in_use, "test"));
 
-	EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::already_connected),
+	ASSERT_NO_THROW(errors.add_error(std::make_error_code(std::errc::already_connected),
 		123u));
 	EXPECT_TRUE(errors.has_error(std::errc::already_connected, 123u));
 	EXPECT_FALSE(errors.has_error(std::errc::already_connected, "test"));

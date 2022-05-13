@@ -13,15 +13,15 @@
 
 namespace
 {
-constexpr std::array<std::byte, 8> data{
-	std::byte(1),
-	std::byte(2),
-	std::byte(3),
-	std::byte(4),
-	std::byte(5),
-	std::byte(6),
-	std::byte(7),
-	std::byte(8)
+constexpr std::array data{
+	std::byte{1},
+	std::byte{2},
+	std::byte{3},
+	std::byte{4},
+	std::byte{5},
+	std::byte{6},
+	std::byte{7},
+	std::byte{8}
 };
 } //namespace
 

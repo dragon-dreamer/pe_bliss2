@@ -308,7 +308,7 @@ TYPED_TEST(OptionalHeaderTests, SerializeDeserializeTest)
 	{
 		buf.set_rpos(0);
 		optional_header header;
-		EXPECT_NO_THROW(header.deserialize(buf, true));
+		ASSERT_NO_THROW(header.deserialize(buf, true));
 		EXPECT_EQ(header.get_magic(), TestFixture::is_32bit
 			? optional_header::magic::pe32 : optional_header::magic::pe64);
 		EXPECT_EQ(header.get_raw_major_linker_version(), 0x12u);
@@ -316,9 +316,8 @@ TYPED_TEST(OptionalHeaderTests, SerializeDeserializeTest)
 
 		std::vector<std::byte> outdata;
 		buffers::output_memory_buffer outbuf(outdata);
-
-		header.serialize(outbuf, false);
-		EXPECT_EQ(outdata.size(), buf.size());
+		ASSERT_NO_THROW(header.serialize(outbuf, false));
+		ASSERT_EQ(outdata.size(), buf.size());
 		EXPECT_TRUE(std::equal(outdata.cbegin(), outdata.cend(),
 			reinterpret_cast<const std::byte*>(header_data)));
 	}

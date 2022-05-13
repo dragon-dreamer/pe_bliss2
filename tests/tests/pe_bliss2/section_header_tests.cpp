@@ -346,3 +346,6 @@ TEST(SectionHeaderTests, DeserializeErrorTest)
 		[&header, &buf] { header.deserialize(buf, false); },
 		section_errc::unable_to_read_section_table);
 }
+
+// Serialize calls base_struct().serialize()
+// and thus does not require special tests

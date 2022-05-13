@@ -97,10 +97,10 @@ void test_add_if_sum_safe()
 	T target_max = max_val;
 
 	EXPECT_TRUE(math::add_if_safe(target_1, val_1));
-	EXPECT_EQ(target_1, 2u);
+	ASSERT_EQ(target_1, 2u);
 
 	EXPECT_TRUE(math::add_if_safe(target_1, val_0));
-	EXPECT_EQ(target_1, 2u);
+	ASSERT_EQ(target_1, 2u);
 
 	EXPECT_FALSE(math::add_if_safe(target_1, max_val));
 	EXPECT_EQ(target_1, 2u);
@@ -114,11 +114,11 @@ void test_align_up_if_safe()
 {
 	T target = 3u;
 	EXPECT_TRUE(math::align_up_if_safe(target, 1u));
-	EXPECT_EQ(target, 3u);
+	ASSERT_EQ(target, 3u);
 	EXPECT_TRUE(math::align_up_if_safe(target, 2u));
-	EXPECT_EQ(target, 4u);
+	ASSERT_EQ(target, 4u);
 	EXPECT_TRUE(math::align_up_if_safe(target, 4u));
-	EXPECT_EQ(target, 4u);
+	ASSERT_EQ(target, 4u);
 
 	target = (std::numeric_limits<T>::max)();
 	EXPECT_FALSE(math::align_up_if_safe(target, 2u));
@@ -189,22 +189,22 @@ TEST(MathTests, AddOffsetIfSafeTest)
 {
 	std::size_t pos = 0;
 	EXPECT_TRUE(math::add_offset_if_safe(pos, 10u));
-	EXPECT_EQ(pos, 10u);
+	ASSERT_EQ(pos, 10u);
 
 	EXPECT_TRUE(math::add_offset_if_safe(pos, -8));
-	EXPECT_EQ(pos, 2u);
+	ASSERT_EQ(pos, 2u);
 
 	EXPECT_FALSE(math::add_offset_if_safe(pos, -3));
-	EXPECT_EQ(pos, 2u);
+	ASSERT_EQ(pos, 2u);
 
 	EXPECT_TRUE(math::add_offset_if_safe(pos, -2));
-	EXPECT_EQ(pos, 0u);
+	ASSERT_EQ(pos, 0u);
 
 	constexpr auto max_val = (std::numeric_limits<std::size_t>::max)();
 	pos = max_val;
 	EXPECT_FALSE(math::add_offset_if_safe(pos, 1u));
-	EXPECT_EQ(pos, max_val);
+	ASSERT_EQ(pos, max_val);
 
 	EXPECT_TRUE(math::add_offset_if_safe(pos, 0u));
-	EXPECT_EQ(pos, max_val);
+	ASSERT_EQ(pos, max_val);
 }

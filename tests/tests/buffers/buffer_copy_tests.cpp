@@ -21,7 +21,7 @@ TEST_P(BufferTestsFixture, BufferCopyTest)
 	std::stringstream dst;
 	buffers::input_stream_buffer src_buf(src);
 	buffers::output_stream_buffer dst_buf(dst);
-	EXPECT_EQ(buffers::copy(src_buf, dst_buf, GetParam()), GetParam());
+	ASSERT_EQ(buffers::copy(src_buf, dst_buf, GetParam()), GetParam());
 	EXPECT_EQ(src->view(), dst.view());
 }
 
@@ -38,7 +38,7 @@ TEST(BufferTests, BufferOverCopyTest)
 	std::stringstream dst;
 	buffers::input_stream_buffer src_buf(src);
 	buffers::output_stream_buffer dst_buf(dst);
-	EXPECT_EQ(buffers::copy(src_buf, dst_buf, src->view().size() + 100u),
+	ASSERT_EQ(buffers::copy(src_buf, dst_buf, src->view().size() + 100u),
 		src->view().size());
 	EXPECT_EQ(src->view(), dst.view());
 }

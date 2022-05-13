@@ -92,21 +92,21 @@ TEST(PackedCStringTests, SerializeTest1)
 
 	std::vector<std::byte> serialized;
 	buffers::output_memory_buffer buffer(serialized);
-	EXPECT_EQ(str.serialize(buffer, false), test_string_length + 1u);
-	EXPECT_EQ(serialized.size(), test_string_length + 1u);
+	ASSERT_EQ(str.serialize(buffer, false), test_string_length + 1u);
+	ASSERT_EQ(serialized.size(), test_string_length + 1u);
 	EXPECT_EQ(std::memcmp(serialized.data(), test_string, serialized.size()), 0);
 
 	serialized.clear();
 	buffer.set_wpos(0u);
 	str.set_virtual_nullbyte(true);
-	EXPECT_EQ(str.serialize(buffer, false), test_string_length);
-	EXPECT_EQ(serialized.size(), test_string_length);
+	ASSERT_EQ(str.serialize(buffer, false), test_string_length);
+	ASSERT_EQ(serialized.size(), test_string_length);
 	EXPECT_EQ(std::memcmp(serialized.data(), test_string, serialized.size()), 0);
 
 	serialized.clear();
 	buffer.set_wpos(0u);
-	EXPECT_EQ(str.serialize(buffer, true), test_string_length + 1u);
-	EXPECT_EQ(serialized.size(), test_string_length + 1u);
+	ASSERT_EQ(str.serialize(buffer, true), test_string_length + 1u);
+	ASSERT_EQ(serialized.size(), test_string_length + 1u);
 	EXPECT_EQ(std::memcmp(serialized.data(), test_string, serialized.size()), 0);
 }
 
@@ -118,19 +118,19 @@ TEST(PackedCStringTests, SerializeTest2)
 	expect_throw_pe_error([&] {
 		str.serialize(serialized.data(), test_string_length, false); },
 		utilities::generic_errc::buffer_overrun);
-	EXPECT_EQ(str.serialize(serialized.data(), test_string_length + 1u, false),
+	ASSERT_EQ(str.serialize(serialized.data(), test_string_length + 1u, false),
 		test_string_length + 1u);
 	EXPECT_EQ(std::memcmp(serialized.data(), test_string,
 		test_string_length + 1u), 0);
 
 	serialized = {};
 	str.set_virtual_nullbyte(true);
-	EXPECT_EQ(str.serialize(serialized.data(), test_string_length, false),
+	ASSERT_EQ(str.serialize(serialized.data(), test_string_length, false),
 		test_string_length);
 	EXPECT_EQ(std::memcmp(serialized.data(), test_string, serialized.size()), 0);
 
 	serialized = {};
-	EXPECT_EQ(str.serialize(serialized.data(), test_string_length + 100u, true),
+	ASSERT_EQ(str.serialize(serialized.data(), test_string_length + 100u, true),
 		test_string_length + 1u);
 	EXPECT_EQ(std::memcmp(serialized.data(), test_string, serialized.size()), 0);
 }
@@ -151,7 +151,7 @@ TEST(PackedCStringTests, DeserializeTest)
 		buffer.set_rpos(buffer_pos);
 		buffer.set_absolute_offset(absolute_offset);
 		buffer.set_relative_offset(relative_offset);
-		EXPECT_NO_THROW(str.deserialize(buffer, false));
+		ASSERT_NO_THROW(str.deserialize(buffer, false));
 		EXPECT_EQ(str.get_state().absolute_offset(), absolute_offset + buffer_pos);
 		EXPECT_EQ(str.get_state().relative_offset(), relative_offset + buffer_pos);
 		EXPECT_EQ(str.get_state().buffer_pos(), buffer_pos);
@@ -175,7 +175,7 @@ TEST(PackedCStringTests, DeserializeTest)
 	{
 		buffers::input_memory_buffer buffer(reinterpret_cast<const std::byte*>(test_string),
 			test_string_length);
-		EXPECT_NO_THROW(str.deserialize(buffer, true));
+		ASSERT_NO_THROW(str.deserialize(buffer, true));
 		EXPECT_EQ(str.get_state().absolute_offset(), 0u);
 		EXPECT_EQ(str.get_state().relative_offset(), 0u);
 		EXPECT_EQ(str.get_state().buffer_pos(), 0u);

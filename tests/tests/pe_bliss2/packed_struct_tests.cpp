@@ -119,13 +119,13 @@ TYPED_TEST(PackedStructTestsWithEndianness, SerializeTest)
 	std::array<std::byte, total_size> result;
 	pe_bliss::detail::packed_serialization<TestFixture::endianness>::serialize(
 		wrapped.get(), result.data());
-	EXPECT_EQ(wrapped.serialize(), result);
+	ASSERT_EQ(wrapped.serialize(), result);
 
 	{
 		std::vector<std::byte> serialized;
 		buffers::output_memory_buffer buffer(serialized);
 		wrapped.serialize(buffer, false);
-		EXPECT_EQ(serialized.size(), total_size);
+		ASSERT_EQ(serialized.size(), total_size);
 		EXPECT_TRUE(std::equal(serialized.cbegin(), serialized.cend(), result.cbegin()));
 	}
 
@@ -135,14 +135,14 @@ TYPED_TEST(PackedStructTestsWithEndianness, SerializeTest)
 			wrapped.serialize(serialized.data(), total_size / 2, false); },
 			utilities::generic_errc::buffer_overrun);
 		EXPECT_EQ(serialized, decltype(serialized){});
-		EXPECT_EQ(wrapped.serialize(serialized.data(),
+		ASSERT_EQ(wrapped.serialize(serialized.data(),
 			total_size + 10u, false), total_size);
 		EXPECT_EQ(serialized, result);
 	}
 
 	{
 		std::array<std::byte, total_size / 2> serialized{};
-		EXPECT_EQ(wrapped.serialize_until(serialized.data(), total_size / 2, false),
+		ASSERT_EQ(wrapped.serialize_until(serialized.data(), total_size / 2, false),
 			total_size / 2);
 		EXPECT_TRUE(std::equal(serialized.cbegin(), serialized.cend(), result.cbegin()));
 	}
@@ -158,13 +158,13 @@ TYPED_TEST(PackedStructTestsWithEndianness, SerializeVirtualTest)
 	std::array<std::byte, total_size> result;
 	pe_bliss::detail::packed_serialization<TestFixture::endianness>::serialize(
 		wrapped.get(), result.data());
-	EXPECT_EQ(wrapped.serialize(), result);
+	ASSERT_EQ(wrapped.serialize(), result);
 
 	{
 		std::vector<std::byte> serialized;
 		buffers::output_memory_buffer buffer(serialized);
 		wrapped.serialize(buffer, true);
-		EXPECT_EQ(serialized.size(), total_size);
+		ASSERT_EQ(serialized.size(), total_size);
 		EXPECT_TRUE(std::equal(serialized.cbegin(), serialized.cend(), result.cbegin()));
 	}
 
@@ -172,7 +172,7 @@ TYPED_TEST(PackedStructTestsWithEndianness, SerializeVirtualTest)
 		std::vector<std::byte> serialized;
 		buffers::output_memory_buffer buffer(serialized);
 		wrapped.serialize(buffer, false);
-		EXPECT_EQ(serialized.size(), physical_size);
+		ASSERT_EQ(serialized.size(), physical_size);
 		EXPECT_TRUE(std::equal(serialized.cbegin(), serialized.cend(), result.cbegin()));
 	}
 
@@ -182,7 +182,7 @@ TYPED_TEST(PackedStructTestsWithEndianness, SerializeVirtualTest)
 			wrapped.serialize(serialized.data(), physical_size, true); },
 			utilities::generic_errc::buffer_overrun);
 		EXPECT_EQ(serialized, decltype(serialized){});
-		EXPECT_EQ(wrapped.serialize(serialized.data(),
+		ASSERT_EQ(wrapped.serialize(serialized.data(),
 			physical_size, false), physical_size);
 		EXPECT_TRUE(std::equal(serialized.cbegin(), serialized.cend(), result.cbegin()));
 	}
@@ -190,7 +190,7 @@ TYPED_TEST(PackedStructTestsWithEndianness, SerializeVirtualTest)
 	{
 		std::array<std::byte, physical_size + 5u> serialized{};
 		serialized[physical_size] = std::byte{ 0xff };
-		EXPECT_EQ(wrapped.serialize_until(serialized.data(), serialized.size(), false),
+		ASSERT_EQ(wrapped.serialize_until(serialized.data(), serialized.size(), false),
 			physical_size);
 		EXPECT_TRUE(std::equal(serialized.cbegin(),
 			serialized.cbegin() + physical_size, result.cbegin()));
@@ -214,8 +214,8 @@ TYPED_TEST(PackedStructTestsWithEndianness, DeserializeTest)
 	buffer.set_relative_offset(relative_offset);
 
 	pe_bliss::packed_struct<nested, TestFixture::endianness> wrapped;
-	EXPECT_NO_THROW(wrapped.deserialize(buffer, false));
-	EXPECT_EQ(wrapped.physical_size(), total_size);
+	ASSERT_NO_THROW(wrapped.deserialize(buffer, false));
+	ASSERT_EQ(wrapped.physical_size(), total_size);
 	EXPECT_FALSE(wrapped.is_virtual());
 	EXPECT_EQ(buffer.rpos(), rpos + total_size);
 	EXPECT_EQ(wrapped.get(), test_struct);
@@ -225,8 +225,8 @@ TYPED_TEST(PackedStructTestsWithEndianness, DeserializeTest)
 
 	buffer.set_rpos(rpos);
 	wrapped.get() = {};
-	EXPECT_NO_THROW(wrapped.deserialize_until(buffer, total_size / 2, false));
-	EXPECT_EQ(wrapped.physical_size(), total_size / 2);
+	ASSERT_NO_THROW(wrapped.deserialize_until(buffer, total_size / 2, false));
+	ASSERT_EQ(wrapped.physical_size(), total_size / 2);
 	EXPECT_EQ(buffer.rpos(), rpos + total_size / 2);
 	EXPECT_TRUE(wrapped.is_virtual());
 
@@ -267,7 +267,7 @@ TYPED_TEST(PackedStructTestsWithEndianness, DeserializeVirtualTest)
 		utilities::generic_errc::buffer_overrun);
 
 	truncated_buffer.set_rpos(0u);
-	EXPECT_NO_THROW(wrapped.deserialize(truncated_buffer, true));
+	ASSERT_NO_THROW(wrapped.deserialize(truncated_buffer, true));
 	EXPECT_EQ(wrapped.physical_size(), result.size());
 	EXPECT_EQ(wrapped.get(), original);
 	EXPECT_TRUE(wrapped.is_virtual());

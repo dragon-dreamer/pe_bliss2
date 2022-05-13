@@ -96,10 +96,10 @@ void test_serialization(const Value& value, std::string_view expected,
 	std::string_view expected_reversed)
 {
 	std::array<std::byte, packed_reflection::get_type_size<Value>()> buf{};
-	EXPECT_GE(buf.size(), expected.size());
-	EXPECT_EQ(expected.size(), expected_reversed.size());
+	ASSERT_GE(buf.size(), expected.size());
+	ASSERT_EQ(expected.size(), expected_reversed.size());
 
-	EXPECT_EQ(Serializer<serializer_to_same>::serialize(
+	ASSERT_EQ(Serializer<serializer_to_same>::serialize(
 		value, buf.data()), buf.data() + expected.size());
 	EXPECT_TRUE(std::equal(buf.cbegin(), buf.cbegin() + expected.size(),
 		boost::endian::order::native == boost::endian::order::little
@@ -107,7 +107,7 @@ void test_serialization(const Value& value, std::string_view expected,
 		: reinterpret_cast<const std::byte*>(expected.data())));
 
 	buf = {};
-	EXPECT_EQ(Serializer<serializer_to_opposite>::serialize(
+	ASSERT_EQ(Serializer<serializer_to_opposite>::serialize(
 		value, buf.data()), buf.data() + expected.size());
 	EXPECT_TRUE(std::equal(buf.cbegin(), buf.cbegin() + expected.size(),
 		boost::endian::order::native == boost::endian::order::little
@@ -121,14 +121,14 @@ void test_deserialization(std::string_view serialized,
 	std::string_view serialized_reversed, const Value& target_value)
 {
 	auto size = serialized.size();
-	EXPECT_EQ(size, serialized_reversed.size());
+	ASSERT_EQ(size, serialized_reversed.size());
 
 	Value value {};
 	auto deserialize_buf
 		= boost::endian::order::native == boost::endian::order::little
 		? reinterpret_cast<const std::byte*>(serialized_reversed.data())
 		: reinterpret_cast<const std::byte*>(serialized.data());
-	EXPECT_EQ(Deserializer<serializer_to_same>::deserialize(
+	ASSERT_EQ(Deserializer<serializer_to_same>::deserialize(
 		value, deserialize_buf), deserialize_buf + size);
 	EXPECT_EQ(value, target_value);
 
@@ -137,7 +137,7 @@ void test_deserialization(std::string_view serialized,
 		= boost::endian::order::native == boost::endian::order::little
 		? reinterpret_cast<const std::byte*>(serialized.data())
 		: reinterpret_cast<const std::byte*>(serialized_reversed.data());
-	EXPECT_EQ(Deserializer<serializer_to_opposite>::deserialize(
+	ASSERT_EQ(Deserializer<serializer_to_opposite>::deserialize(
 		value, deserialize_buf), deserialize_buf + size);
 	EXPECT_EQ(value, target_value);
 }

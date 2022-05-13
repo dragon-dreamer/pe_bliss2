@@ -40,11 +40,11 @@ private:
 TEST(BufferTests, OutputStreamBufferTest)
 {
 	static constexpr std::array data{
-		std::byte(1),
-		std::byte(2),
-		std::byte(3),
-		std::byte(4),
-		std::byte(5)
+		std::byte{1},
+		std::byte{2},
+		std::byte{3},
+		std::byte{4},
+		std::byte{5}
 	};
 
 	std::stringstream ss;

@@ -33,33 +33,33 @@ void test_input_buffer(Buffer& buffer, const SourceData& data,
 	}
 	
 	std::array<std::byte, 2u> copy{};
-	EXPECT_EQ(buffer.read(copy.size(), copy.data()), copy.size());
+	ASSERT_EQ(buffer.read(copy.size(), copy.data()), copy.size());
 	EXPECT_EQ(buffer.rpos(), 2u);
 	EXPECT_EQ(copy[0], data[0]);
 	EXPECT_EQ(copy[1], data[1]);
 
 	std::array<std::byte, 3u> copy2{};
-	EXPECT_EQ(buffer.read(10u, copy2.data()), copy2.size());
+	ASSERT_EQ(buffer.read(10u, copy2.data()), copy2.size());
 	EXPECT_EQ(buffer.rpos(), test_buffer_size);
 	EXPECT_EQ(copy2[0], data[2]);
 	EXPECT_EQ(copy2[1], data[3]);
 	EXPECT_EQ(copy2[2], data[4]);
 
-	EXPECT_EQ(buffer.read(10u, copy.data()), 0u);
+	ASSERT_EQ(buffer.read(10u, copy.data()), 0u);
 	EXPECT_EQ(copy[0], data[0]);
 	EXPECT_EQ(copy[1], data[1]);
 
-	EXPECT_NO_THROW(buffer.set_rpos(test_buffer_size));
+	ASSERT_NO_THROW(buffer.set_rpos(test_buffer_size));
 	EXPECT_EQ(buffer.rpos(), test_buffer_size);
-	EXPECT_NO_THROW(buffer.set_rpos(1u));
+	ASSERT_NO_THROW(buffer.set_rpos(1u));
 	EXPECT_EQ(buffer.rpos(), 1u);
 	EXPECT_THROW(buffer.set_rpos(test_buffer_size + 1u), Exception);
 	EXPECT_EQ(buffer.rpos(), 1u);
 
 	EXPECT_THROW(buffer.advance_rpos(-2), Exception);
 	EXPECT_THROW(buffer.advance_rpos(test_buffer_size), Exception);
-	EXPECT_NO_THROW(buffer.advance_rpos(-1));
+	ASSERT_NO_THROW(buffer.advance_rpos(-1));
 	EXPECT_EQ(buffer.rpos(), 0u);
-	EXPECT_NO_THROW(buffer.advance_rpos(3u));
+	ASSERT_NO_THROW(buffer.advance_rpos(3u));
 	EXPECT_EQ(buffer.rpos(), 3u);
 }

@@ -39,14 +39,13 @@ TEST(ImageSignatureTests, DeserializeSerializeTest)
 		signature.deserialize(buf, false);
 	}, image_signature_errc::unable_to_read_pe_signature);
 	buf.set_rpos(0u);
-	EXPECT_NO_THROW(signature.deserialize(buf, true));
+	ASSERT_NO_THROW(signature.deserialize(buf, true));
 	EXPECT_EQ(signature.get_signature(), image_signature::pe_signature);
 
 	std::vector<std::byte> outdata;
 	buffers::output_memory_buffer outbuf(outdata);
-
-	signature.serialize(outbuf, false);
-	EXPECT_EQ(outdata.size(), buf.size());
+	ASSERT_NO_THROW(signature.serialize(outbuf, false));
+	ASSERT_EQ(outdata.size(), buf.size());
 	EXPECT_TRUE(std::equal(outdata.cbegin(), outdata.cend(), data));
 }
 

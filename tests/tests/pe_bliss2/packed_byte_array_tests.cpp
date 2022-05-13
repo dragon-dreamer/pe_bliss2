@@ -87,13 +87,13 @@ TEST(PackedByteArrayTests, SerializeTest1)
 
 	std::array<std::byte, size> serialized{};
 	buffers::output_memory_ref_buffer buffer(serialized.data(), size);
-	EXPECT_EQ(arr.serialize(buffer, false), arr.physical_size());
+	ASSERT_EQ(arr.serialize(buffer, false), arr.physical_size());
 	EXPECT_EQ(arr.value(), serialized);
 	
 	serialized = {};
 	buffer.set_wpos(0u);
 	arr.set_physical_size(size - 4u);
-	EXPECT_EQ(arr.serialize(buffer, false), arr.physical_size());
+	ASSERT_EQ(arr.serialize(buffer, false), arr.physical_size());
 	EXPECT_EQ(std::memcmp(serialized.data(), arr.value().data(),
 		arr.physical_size()), 0);
 	EXPECT_EQ(serialized[7], std::byte{});
@@ -114,13 +114,13 @@ TEST(PackedByteArrayTests, SerializeTest2)
 	expect_throw_pe_error([&] {
 		arr.serialize(serialized.data(), arr.physical_size() - 1u, false); },
 		utilities::generic_errc::buffer_overrun);
-	EXPECT_EQ(arr.serialize(serialized.data(), arr.physical_size(), false),
+	ASSERT_EQ(arr.serialize(serialized.data(), arr.physical_size(), false),
 		arr.physical_size());
 	EXPECT_EQ(arr.value(), serialized);
 
 	serialized = {};
 	arr.set_physical_size(size - 4u);
-	EXPECT_EQ(arr.serialize(serialized.data(), arr.physical_size(), false),
+	ASSERT_EQ(arr.serialize(serialized.data(), arr.physical_size(), false),
 		arr.physical_size());
 	EXPECT_EQ(std::memcmp(serialized.data(), arr.value().data(),
 		arr.physical_size()), 0);
@@ -129,7 +129,7 @@ TEST(PackedByteArrayTests, SerializeTest2)
 	expect_throw_pe_error([&] {
 		arr.serialize(serialized.data(), arr.physical_size(), true); },
 		utilities::generic_errc::buffer_overrun);
-	EXPECT_EQ(arr.serialize(serialized.data(), arr.data_size(), true),
+	ASSERT_EQ(arr.serialize(serialized.data(), arr.data_size(), true),
 		arr.data_size());
 	EXPECT_EQ(arr.value(), serialized);
 }
@@ -166,7 +166,7 @@ TEST(PackedByteArrayTests, DeserializeTest)
 			utilities::generic_errc::buffer_overrun);
 
 		buffer.set_rpos(buffer_pos);
-		EXPECT_NO_THROW(arr.deserialize(buffer, size, false));
+		ASSERT_NO_THROW(arr.deserialize(buffer, size, false));
 
 		EXPECT_EQ(arr.get_state().absolute_offset(), absolute_offset + buffer_pos);
 		EXPECT_EQ(arr.get_state().relative_offset(), relative_offset + buffer_pos);
@@ -182,7 +182,7 @@ TEST(PackedByteArrayTests, DeserializeTest)
 	{
 		buffers::input_memory_buffer buffer(test_array.data(), test_array.size());
 		buffer.set_rpos(size);
-		EXPECT_NO_THROW(arr.deserialize(buffer, size, true));
+		ASSERT_NO_THROW(arr.deserialize(buffer, size, true));
 		EXPECT_EQ(arr.get_state().absolute_offset(), size);
 		EXPECT_EQ(arr.get_state().relative_offset(), size);
 		EXPECT_EQ(arr.get_state().buffer_pos(), size);

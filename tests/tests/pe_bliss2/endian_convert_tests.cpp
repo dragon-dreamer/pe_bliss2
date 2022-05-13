@@ -28,8 +28,8 @@ TEST(EndianConvertTests, SameEndianTests)
 
 TEST(PackedSerializationTests, LittleToBigTests)
 {
-	static constexpr std::uint32_t initial_value = 0x12345678;
-	static constexpr std::uint32_t reversed_value = 0x78563412;
+	static constexpr std::uint32_t initial_value = 0x12345678u;
+	static constexpr std::uint32_t reversed_value = 0x78563412u;
 	std::uint32_t value = initial_value;
 
 	convert_endianness<boost::endian::order::little,

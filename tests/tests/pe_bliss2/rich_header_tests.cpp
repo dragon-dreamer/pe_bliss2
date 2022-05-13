@@ -189,10 +189,9 @@ TEST(RichHeaderTests, DecodeCompidsTest)
 	EXPECT_TRUE(compids.empty());
 
 	buffer.set_rpos(15u); //Check alignment
-	EXPECT_NO_THROW(rich_header_utils::decode_compids(buffer,
+	ASSERT_NO_THROW(rich_header_utils::decode_compids(buffer,
 		buffer.size() - 4u, dos_stub_checksum, compids));
-	EXPECT_EQ(compids.size(), 2u);
-
+	ASSERT_EQ(compids.size(), 2u);
 	EXPECT_EQ(compids.at(0), compid1);
 	EXPECT_EQ(compids.at(1), compid2);
 }
@@ -202,7 +201,7 @@ TEST(RichHeaderTests, DeserializeTest1)
 	buffers::input_memory_buffer buffer(dos_stub.data(), dos_stub.size());
 	buffer.set_absolute_offset(100u);
 	auto header = load(buffer);
-	EXPECT_TRUE(header.has_value());
+	ASSERT_TRUE(header.has_value());
 	EXPECT_EQ(header->get_dos_stub_offset(), 16u);
 	EXPECT_EQ(header->get_absolute_offset(), buffer.absolute_offset() + 16u);
 	EXPECT_EQ(header->get_checksum(), dos_stub_checksum);
@@ -233,7 +232,7 @@ TEST(RichHeaderTests, CalculateSize1)
 {
 	buffers::input_memory_buffer buffer(dos_stub.data(), dos_stub.size());
 	auto header = load(buffer);
-	EXPECT_TRUE(header.has_value());
+	ASSERT_TRUE(header.has_value());
 	EXPECT_EQ(get_built_size(*header), 40u);
 }
 
@@ -317,7 +316,7 @@ TEST(RichHeaderTests, CalculateChecksum1)
 
 	auto dos_stub_buffer = buffers::reduce(buffer, dos_header_size);
 	auto header = load(*dos_stub_buffer);
-	EXPECT_TRUE(header.has_value());
+	ASSERT_TRUE(header.has_value());
 
 	std::uint32_t checksum = 0x40 + 16;
 	checksum += get_checksum(compid1) + get_checksum(compid2);
@@ -372,8 +371,8 @@ TEST(RichHeaderTests, SerializeTest1)
 
 	std::vector<std::byte> serialized;
 	buffers::output_memory_buffer outbuf(serialized);
-	EXPECT_NO_THROW(build(header, outbuf));
-	EXPECT_EQ(serialized.size(),
+	ASSERT_NO_THROW(build(header, outbuf));
+	ASSERT_EQ(serialized.size(),
 		dos_header_with_stub.size() - dos_header_size);
 	EXPECT_TRUE(std::equal(serialized.cbegin(), serialized.cend(),
 		dos_header_with_stub.cbegin() + dos_header_size));

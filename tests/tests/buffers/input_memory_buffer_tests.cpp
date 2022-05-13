@@ -8,14 +8,14 @@
 
 TEST(BufferTests, InputMemoryBufferTest)
 {
-	static constexpr std::byte data[]{
-		std::byte(1),
-		std::byte(2),
-		std::byte(3),
-		std::byte(4),
-		std::byte(5)
+	static constexpr std::array data{
+		std::byte{1},
+		std::byte{2},
+		std::byte{3},
+		std::byte{4},
+		std::byte{5}
 	};
 
-	buffers::input_memory_buffer buffer(data, std::size(data));
+	buffers::input_memory_buffer buffer(data.data(), data.size());
 	test_input_buffer(buffer, data);
 }
