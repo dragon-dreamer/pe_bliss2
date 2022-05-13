@@ -24,7 +24,6 @@ std::error_code make_error_code(image_builder_errc) noexcept;
 
 struct image_builder_options
 {
-	bool keep_structure_offsets = true;
 	bool write_structure_virtual_parts = true;
 	bool fill_full_headers_data_gaps = true;
 	std::optional<std::size_t> rich_header_dos_stub_offset;

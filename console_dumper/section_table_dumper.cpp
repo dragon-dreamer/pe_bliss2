@@ -64,8 +64,6 @@ void dump_section_table(formatter& fmt, const pe_bliss::section::section_table& 
 
 	fmt.get_stream() << "===== ";
 	fmt.print_structure_name("Section table");
-	fmt.get_stream() << ' ';
-	fmt.print_absolute_offset(table.buffer_pos());
 	fmt.get_stream() << " =====\n\n";
 
 	for (const auto& header : table.get_section_headers())

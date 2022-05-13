@@ -37,27 +37,12 @@ public:
 	}
 
 	[[nodiscard]]
-	header_list get_section_headers() && noexcept
-	{
-		auto result = std::move(headers_);
-		headers_.clear();
-		return result;
-	}
+	header_list get_section_headers() && noexcept;
 
 	[[nodiscard]]
 	const header_list& get_section_headers() const & noexcept
 	{
 		return headers_;
-	}
-
-	[[nodiscard]] std::size_t buffer_pos() const noexcept
-	{
-		return buffer_pos_;
-	}
-
-	void set_buffer_pos(std::size_t buffer_pos) noexcept
-	{
-		buffer_pos_ = buffer_pos;
 	}
 
 public:
@@ -83,7 +68,6 @@ public:
 
 private:
 	header_list headers_;
-	std::size_t buffer_pos_ = 0;
 };
 
 } //namespace pe_bliss::section
