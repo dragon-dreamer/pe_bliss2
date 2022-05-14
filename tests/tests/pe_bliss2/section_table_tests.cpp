@@ -309,3 +309,74 @@ TEST(SectionTableTests, SectionHeaderValidationTest5)
 	EXPECT_TRUE(errors.has_error(section_errc::invalid_section_raw_size_alignment, 0u));
 	EXPECT_FALSE(errors.has_error(section_errc::invalid_section_raw_size_alignment, 1u));
 }
+
+TEST(SectionTableTests, SectionSearchByRvaTest)
+{
+	section_table table;
+	table.get_section_headers().emplace_back()
+		.set_rva(0x100u).set_virtual_size(0x100u);
+	table.get_section_headers().emplace_back()
+		.set_rva(0x200u).set_virtual_size(0x100u);
+
+	EXPECT_EQ(table.by_rva(0x5u, 0x100u, 0),
+		table.get_section_headers().cend());
+	EXPECT_EQ(std::as_const(table).by_rva(0x5u, 0x100u, 0),
+		table.get_section_headers().cend());
+
+	EXPECT_EQ(table.by_rva(0x105u, 0x100, 10),
+		table.get_section_headers().cbegin());
+	EXPECT_EQ(std::as_const(table).by_rva(0x105u, 0x100, 10),
+		table.get_section_headers().cbegin());
+
+	EXPECT_EQ(table.by_rva(0x205u, 0x100, 10),
+		table.get_section_headers().cbegin() + 1);
+	EXPECT_EQ(std::as_const(table).by_rva(0x205u, 0x100, 10),
+		table.get_section_headers().cbegin() + 1);
+}
+
+TEST(SectionTableTests, SectionSearchByRawOffsetTest)
+{
+	section_table table;
+	table.get_section_headers().emplace_back()
+		.set_pointer_to_raw_data(0x1000u).set_raw_size(0x100u);
+	table.get_section_headers().emplace_back()
+		.set_pointer_to_raw_data(0x2000u).set_raw_size(0x100u);
+
+	EXPECT_EQ(table.by_raw_offset(0x5u, 0x100u, 0),
+		table.get_section_headers().cend());
+	EXPECT_EQ(std::as_const(table).by_raw_offset(0x5u, 0x100u, 0),
+		table.get_section_headers().cend());
+
+	EXPECT_EQ(table.by_raw_offset(0x1000u, 0x100, 10),
+		table.get_section_headers().cbegin());
+	EXPECT_EQ(std::as_const(table).by_raw_offset(0x1000u, 0x100, 10),
+		table.get_section_headers().cbegin());
+
+	EXPECT_EQ(table.by_raw_offset(0x2000u, 0x100, 10),
+		table.get_section_headers().cbegin() + 1);
+	EXPECT_EQ(std::as_const(table).by_raw_offset(0x2000u, 0x100, 10),
+		table.get_section_headers().cbegin() + 1);
+}
+
+TEST(SectionTableTests, SectionSearchByReferenceTest)
+{
+	section_table table;
+	table.get_section_headers().emplace_back();
+	table.get_section_headers().emplace_back();
+
+	EXPECT_EQ(table.by_reference(table.get_section_headers().back()),
+		table.get_section_headers().cbegin() + 1);
+	EXPECT_EQ(std::as_const(table).by_reference(table.get_section_headers().back()),
+		table.get_section_headers().cbegin() + 1);
+
+	EXPECT_EQ(table.by_reference(table.get_section_headers().front()),
+		table.get_section_headers().cbegin());
+	EXPECT_EQ(std::as_const(table).by_reference(table.get_section_headers().front()),
+		table.get_section_headers().cbegin());
+
+	section_header header;
+	EXPECT_EQ(table.by_reference(header),
+		table.get_section_headers().cend());
+	EXPECT_EQ(std::as_const(table).by_reference(header),
+		table.get_section_headers().cend());
+}
