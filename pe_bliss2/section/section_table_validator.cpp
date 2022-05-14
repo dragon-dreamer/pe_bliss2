@@ -3,6 +3,7 @@
 #include <iterator>
 
 #include "pe_bliss2/core/optional_header.h"
+#include "pe_bliss2/core/optional_header_errc.h"
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/section/section_errc.h"
 #include "pe_bliss2/section/section_header.h"
@@ -67,33 +68,20 @@ void validate_section_header(const core::optional_header& oh,
 	{
 		auto prev = std::prev(header_it);
 		auto next_virtual_address = prev->get_virtual_size(section_alignment);
-		if (!utilities::math::add_if_safe(next_virtual_address,
-			prev->base_struct()->virtual_address))
+		if (!utilities::math::add_if_safe(next_virtual_address, prev->get_rva()))
 		{
 			errors.add_error(section_errc::invalid_section_virtual_size,
-				section_index);
+				section_index - 1);
 		}
-		else if (next_virtual_address != header.base_struct()->virtual_address)
+		else if (next_virtual_address != header.get_rva())
 		{
 			errors.add_error(section_errc::virtual_gap_between_sections,
 				section_index);
 		}
 	}
-	else
+	else if (oh.get_raw_size_of_headers() > header.get_rva())
 	{
-		auto aligned_size_of_headers = oh.get_raw_size_of_headers();
-		if (!utilities::math::align_up_if_safe(aligned_size_of_headers,
-			section_alignment))
-		{
-			errors.add_error(section_errc::invalid_section_virtual_size,
-				section_index);
-		}
-
-		if (header.base_struct()->virtual_address != aligned_size_of_headers)
-		{
-			errors.add_error(section_errc::virtual_gap_between_headers_and_first_section,
-				section_index);
-		}
+		errors.add_error(core::optional_header_errc::invalid_size_of_headers);
 	}
 }
 

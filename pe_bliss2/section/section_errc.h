@@ -18,7 +18,6 @@ enum class section_errc
 	invalid_section_virtual_address_alignment,
 	virtual_gap_between_sections,
 	invalid_section_low_alignment,
-	virtual_gap_between_headers_and_first_section,
 	unable_to_read_section_table,
 	invalid_section_offset,
 	unable_to_read_section_data

@@ -35,11 +35,9 @@ struct section_error_category : std::error_category
 		case invalid_section_virtual_address_alignment:
 			return "Invalid section virtual address alignment";
 		case virtual_gap_between_sections:
-			return "Virtual gap between sections";
+			return "Virtual gap between sections, or section virtual space overlaps";
 		case invalid_section_low_alignment:
 			return "Invalid section alignment for low-aligned image";
-		case virtual_gap_between_headers_and_first_section:
-			return "Virtual gap between headers and first section";
 		case unable_to_read_section_table:
 			return "Unable to read section table";
 		case invalid_section_offset:
