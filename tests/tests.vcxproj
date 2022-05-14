@@ -195,6 +195,7 @@
     <ClCompile Include="tests\pe_bliss2\section_data_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\section_header_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\section_search_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\section_table_tests.cpp" />
     <ClCompile Include="tests\utilities\math_tests.cpp" />
     <ClCompile Include="tests\utilities\safe_uint_tests.cpp" />
     <ClCompile Include="tests\utilities\scoped_guard_tests.cpp" />

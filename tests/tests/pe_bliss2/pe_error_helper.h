@@ -20,7 +20,7 @@ template<typename ErrorCode, typename... ErrorCodes>
 void expect_contains_error(const pe_bliss::error_list& errs,
 	ErrorCode code, ErrorCodes... codes)
 {
-	EXPECT_TRUE(errs.has_error(code));
+	EXPECT_TRUE(errs.has_any_error(code));
 	expect_contains_error(errs, codes...);
 }
 
