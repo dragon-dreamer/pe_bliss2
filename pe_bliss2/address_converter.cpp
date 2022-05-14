@@ -1,12 +1,14 @@
 #include "pe_bliss2/address_converter.h"
 
 #include <cstdint>
+#include <exception>
 #include <limits>
 #include <system_error>
 
 #include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/image.h"
 #include "pe_bliss2/pe_error.h"
+
 #include "utilities/math.h"
 #include "utilities/safe_uint.h"
 
@@ -46,7 +48,8 @@ void rva_to_va_impl(rva_type rva, std::uint64_t image_base, Va& va)
 	}
 	catch (const std::runtime_error&)
 	{
-		throw pe_error(address_converter_errc::address_conversion_overflow);
+		std::throw_with_nested(pe_error(
+			address_converter_errc::address_conversion_overflow));
 	}
 }
 

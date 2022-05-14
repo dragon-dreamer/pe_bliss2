@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <system_error>
 #include <type_traits>
-#include <utility>
 
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/pe_types.h"
@@ -25,7 +24,7 @@ namespace core
 class optional_header;
 } //namespace core
 
-class address_converter
+class [[nodiscard]] address_converter
 {
 public:
 	explicit address_converter(const image& instance) noexcept;
