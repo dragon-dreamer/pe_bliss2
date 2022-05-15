@@ -46,6 +46,12 @@ public:
 	[[nodiscard]] rva_type va_to_rva(std::uint32_t va) const;
 	[[nodiscard]] rva_type va_to_rva(std::uint64_t va) const;
 
+	[[nodiscard]]
+	std::uint64_t get_image_base() const noexcept
+	{
+		return image_base_;
+	}
+
 private:
 	std::uint64_t image_base_;
 };

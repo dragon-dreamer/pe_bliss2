@@ -173,6 +173,7 @@
     <ClCompile Include="tests\buffers\output_memory_ref_buffer_tests.cpp" />
     <ClCompile Include="tests\buffers\output_stream_buffer_tests.cpp" />
     <ClCompile Include="tests\buffers\ref_buffer_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\address_converter_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\bit_stream_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\compid_database_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\data_directories_tests.cpp" />
