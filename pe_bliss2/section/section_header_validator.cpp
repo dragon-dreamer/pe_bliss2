@@ -29,14 +29,15 @@ pe_error_wrapper validate_virtual_size(
 pe_error_wrapper validate_raw_address(
 	const section_header& header) noexcept
 {
-	if (header.base_struct()->size_of_raw_data == 0
-		&& header.base_struct()->virtual_size == 0)
+	const auto& base_struct = header.base_struct().get();
+	if (base_struct.size_of_raw_data == 0
+		&& base_struct.virtual_size == 0)
 	{
 		return section_errc::invalid_section_raw_address;
 	}
 
-	if (header.base_struct()->size_of_raw_data != 0
-		&& header.base_struct()->pointer_to_raw_data == 0)
+	if (base_struct.size_of_raw_data != 0
+		&& base_struct.pointer_to_raw_data == 0)
 	{
 		return section_errc::invalid_section_raw_address;
 	}
