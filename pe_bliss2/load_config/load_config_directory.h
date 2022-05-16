@@ -1023,13 +1023,15 @@ public:
 	}
 
 	[[nodiscard]]
-	bit_stream<const data_type::vector_type> to_bit_stream() const noexcept
+	bit_stream<const data_type::vector_type> to_bit_stream() const
+		noexcept(noexcept(bit_stream(data_.value())))
 	{
 		return bit_stream(data_.value());
 	}
 
 	[[nodiscard]]
-	bit_stream<data_type::vector_type> to_bit_stream() noexcept
+	bit_stream<data_type::vector_type> to_bit_stream()
+		noexcept(noexcept(bit_stream(data_.value())))
 	{
 		return bit_stream(data_.value());
 	}
