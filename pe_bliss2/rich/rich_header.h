@@ -47,9 +47,7 @@ public:
 
 	[[nodiscard]] compid_list get_compids() && noexcept
 	{
-		auto result = std::move(compids_);
-		compids_.clear();
-		return std::move(result);
+		return std::move(compids_);
 	}
 
 	[[nodiscard]] checksum_type get_checksum() const noexcept

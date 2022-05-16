@@ -39,7 +39,7 @@ public:
 		return value_;
 	}
 
-	[[nodiscard]] constexpr vector_type&& value() && noexcept
+	[[nodiscard]] constexpr vector_type value() && noexcept
 	{
 		return std::move(value_);
 	}

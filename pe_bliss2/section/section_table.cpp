@@ -95,9 +95,7 @@ section_table::header_list::iterator section_table::by_reference(
 
 section_table::header_list section_table::get_section_headers() && noexcept
 {
-	auto result = std::move(headers_);
-	headers_.clear();
-	return result;
+	return std::move(headers_);
 }
 
 } //namespace pe_bliss::section

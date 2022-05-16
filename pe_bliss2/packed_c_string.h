@@ -81,7 +81,7 @@ public:
 		return value_;
 	}
 
-	[[nodiscard]] std::string&& value() && noexcept
+	[[nodiscard]] std::string value() && noexcept
 	{
 		return std::move(value_);
 	}

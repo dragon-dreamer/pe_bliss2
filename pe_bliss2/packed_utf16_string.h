@@ -39,7 +39,7 @@ public:
 		return value_;
 	}
 
-	[[nodiscard]] constexpr string_type&& value() && noexcept
+	[[nodiscard]] constexpr string_type value() && noexcept
 	{
 		return std::move(value_);
 	}
