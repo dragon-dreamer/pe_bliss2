@@ -12,8 +12,9 @@
 
 void dump_rich_data(formatter& fmt, const pe_bliss::image& image) try
 {
-	std::error_code ec;
 	auto result = pe_bliss::rich::load(*image.get_dos_stub().data());
+	if (!result)
+		return;
 
 	fmt.print_structure_name("Rich header");
 	const auto& header = *result;
