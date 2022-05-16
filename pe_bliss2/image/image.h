@@ -1,11 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <list>
 #include <span>
 #include <system_error>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 #include "buffers/input_buffer_interface.h"
 #include "buffers/ref_buffer.h"
@@ -38,6 +38,9 @@ concept packed_string_type = std::is_same_v<T, packed_utf16_string>
 	|| std::is_same_v<T, packed_c_string>;
 } //namespace detail
 
+namespace image
+{
+
 enum class image_errc
 {
 	too_many_sections = 1,
@@ -47,111 +50,51 @@ enum class image_errc
 
 std::error_code make_error_code(image_errc) noexcept;
 
-class image
+class [[nodiscard]] image
 {
 public:
-	using section_data_list = std::list<section::section_data>;
+	using section_data_list = std::vector<section::section_data>;
 
 public:
-	[[nodiscard]] dos::dos_header& get_dos_header() noexcept
-	{
-		return dos_header_;
-	}
+	[[nodiscard]] inline dos::dos_header& get_dos_header() & noexcept;
+	[[nodiscard]] inline const dos::dos_header& get_dos_header() const& noexcept;
+	[[nodiscard]] inline dos::dos_header get_dos_header() && noexcept;
 
-	[[nodiscard]] const dos::dos_header& get_dos_header() const noexcept
-	{
-		return dos_header_;
-	}
+	[[nodiscard]] inline dos::dos_stub& get_dos_stub() & noexcept;
+	[[nodiscard]] inline const dos::dos_stub& get_dos_stub() const& noexcept;
+	[[nodiscard]] inline dos::dos_stub get_dos_stub() && noexcept;
 
-	[[nodiscard]] dos::dos_stub& get_dos_stub() noexcept
-	{
-		return dos_stub_;
-	}
+	[[nodiscard]] inline core::image_signature& get_image_signature() & noexcept;
+	[[nodiscard]] inline const core::image_signature& get_image_signature() const& noexcept;
+	[[nodiscard]] inline core::image_signature get_image_signature() && noexcept;
 
-	[[nodiscard]] const dos::dos_stub& get_dos_stub() const noexcept
-	{
-		return dos_stub_;
-	}
+	[[nodiscard]] inline core::file_header& get_file_header() & noexcept;
+	[[nodiscard]] inline const core::file_header& get_file_header() const& noexcept;
+	[[nodiscard]] inline core::file_header get_file_header() && noexcept;
 
-	[[nodiscard]] core::image_signature& get_image_signature() noexcept
-	{
-		return image_signature_;
-	}
+	[[nodiscard]] inline core::optional_header& get_optional_header() & noexcept;
+	[[nodiscard]] inline const core::optional_header& get_optional_header() const& noexcept;
+	[[nodiscard]] inline core::optional_header get_optional_header() && noexcept;
 
-	[[nodiscard]] const core::image_signature& get_image_signature() const noexcept
-	{
-		return image_signature_;
-	}
+	[[nodiscard]] inline core::data_directories& get_data_directories() & noexcept;
+	[[nodiscard]] inline const core::data_directories& get_data_directories() const& noexcept;
+	[[nodiscard]] inline core::data_directories get_data_directories() && noexcept;
 
-	[[nodiscard]] core::file_header& get_file_header() noexcept
-	{
-		return file_header_;
-	}
+	[[nodiscard]] inline section::section_table& get_section_table() & noexcept;
+	[[nodiscard]] inline const section::section_table& get_section_table() const& noexcept;
+	[[nodiscard]] inline section::section_table get_section_table() && noexcept;
 
-	[[nodiscard]] const core::file_header& get_file_header() const noexcept
-	{
-		return file_header_;
-	}
+	[[nodiscard]] inline section_data_list& get_section_data_list() & noexcept;
+	[[nodiscard]] inline const section_data_list& get_section_data_list() const& noexcept;
+	[[nodiscard]] inline section_data_list get_section_data_list() && noexcept;
 
-	[[nodiscard]] core::optional_header& get_optional_header() noexcept
-	{
-		return optional_header_;
-	}
+	[[nodiscard]] inline core::overlay& get_overlay() & noexcept;
+	[[nodiscard]] inline const core::overlay& get_overlay() const& noexcept;
+	[[nodiscard]] inline core::overlay get_overlay() && noexcept;
 
-	[[nodiscard]] const core::optional_header& get_optional_header() const noexcept
-	{
-		return optional_header_;
-	}
-
-	[[nodiscard]] core::data_directories& get_data_directories() noexcept
-	{
-		return data_directories_;
-	}
-
-	[[nodiscard]] const core::data_directories& get_data_directories() const noexcept
-	{
-		return data_directories_;
-	}
-
-	[[nodiscard]] section::section_table& get_section_table() noexcept
-	{
-		return section_table_;
-	}
-
-	[[nodiscard]] const section::section_table& get_section_table() const noexcept
-	{
-		return section_table_;
-	}
-	
-	[[nodiscard]] section_data_list& get_section_data_list() noexcept
-	{
-		return section_list_;
-	}
-
-	[[nodiscard]] const section_data_list& get_section_data_list() const noexcept
-	{
-		return section_list_;
-	}
-
-	[[nodiscard]] const core::overlay& get_overlay() const noexcept
-	{
-		return overlay_;
-	}
-
-	[[nodiscard]] core::overlay& get_overlay() noexcept
-	{
-		return overlay_;
-	}
-
-	[[nodiscard]] const buffers::ref_buffer& get_full_headers_buffer() const noexcept
-	{
-		return full_headers_buffer_;
-	}
-
-	[[nodiscard]] buffers::ref_buffer& get_full_headers_buffer() noexcept
-	{
-		return full_headers_buffer_;
-	}
+	[[nodiscard]] inline buffers::ref_buffer& get_full_headers_buffer() & noexcept;
+	[[nodiscard]] inline const buffers::ref_buffer& get_full_headers_buffer() const& noexcept;
+	[[nodiscard]] inline buffers::ref_buffer get_full_headers_buffer() && noexcept;
 
 public:
 	[[nodiscard]] bool is_64bit() const noexcept;
@@ -175,9 +118,11 @@ public:
 
 public:
 	[[nodiscard]]
-	section_ref section_from_reference(section::section_header& section_hdr) noexcept;
+	section_ref section_from_reference(
+		section::section_header& section_hdr) noexcept;
 	[[nodiscard]]
-	section_const_ref section_from_reference(const section::section_header& section_hdr) const noexcept;
+	section_const_ref section_from_reference(
+		const section::section_header& section_hdr) const noexcept;
 
 public:
 	[[nodiscard]]
@@ -201,9 +146,11 @@ public:
 		std::uint32_t data_size = 0) const;
 
 	[[nodiscard]]
-	section_ref section_from_directory(core::data_directories::directory_type directory);
+	section_ref section_from_directory(
+		core::data_directories::directory_type directory);
 	[[nodiscard]]
-	section_const_ref section_from_directory(core::data_directories::directory_type directory) const;
+	section_const_ref section_from_directory(
+		core::data_directories::directory_type directory) const;
 
 	[[nodiscard]]
 	section_ref section_from_file_offset(std::uint32_t offset,
@@ -561,10 +508,13 @@ private:
 	buffers::ref_buffer full_headers_buffer_;
 };
 
+} //namespace image
 } //namespace pe_bliss
 
 namespace std
 {
 template<>
-struct is_error_code_enum<pe_bliss::image_errc> : true_type {};
+struct is_error_code_enum<pe_bliss::image::image_errc> : true_type {};
 } //namespace std
+
+#include "pe_bliss2/detail/image/image-inl.h"

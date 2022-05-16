@@ -6,10 +6,10 @@
 
 #include "pe_bliss2/load_config/load_config_directory.h"
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::load_config
 {
@@ -81,7 +81,7 @@ struct loader_options
 	bool load_xfg_type_based_hashes = true;
 };
 
-std::optional<load_config_directory_details> load(const image& instance,
+std::optional<load_config_directory_details> load(const image::image& instance,
 	const loader_options& options);
 
 } //namespace pe_bliss::load_config

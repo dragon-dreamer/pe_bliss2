@@ -7,10 +7,10 @@
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/relocations/base_relocation.h"
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::relocations
 {
@@ -36,7 +36,7 @@ struct relocation_directory
 	error_list errors;
 };
 
-std::optional<relocation_directory> load(const image& instance,
+std::optional<relocation_directory> load(const image::image& instance,
 	const loader_options& options);
 
 } //namespace pe_bliss::relocations

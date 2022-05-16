@@ -12,10 +12,10 @@ namespace buffers
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::tls
 {
@@ -42,13 +42,13 @@ struct build_result
 	std::uint32_t directory_size{};
 };
 
-void build_in_place(image& instance, const tls_directory_details& table,
+void build_in_place(image::image& instance, const tls_directory_details& table,
 	const builder_options& options);
-void build_in_place(image& instance, const tls_directory& table,
+void build_in_place(image::image& instance, const tls_directory& table,
 	const builder_options& options);
-build_result build_new(image& instance, tls_directory_details& table,
+build_result build_new(image::image& instance, tls_directory_details& table,
 	const builder_options& options);
-build_result build_new(image& instance, tls_directory& table,
+build_result build_new(image::image& instance, tls_directory& table,
 	const builder_options& options);
 build_result build_new(buffers::output_buffer_interface& buf, tls_directory_details& table,
 	const builder_options& options, std::uint64_t image_base);

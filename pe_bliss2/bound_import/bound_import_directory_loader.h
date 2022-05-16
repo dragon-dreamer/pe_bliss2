@@ -6,10 +6,10 @@
 
 #include "pe_bliss2/bound_import/bound_library.h"
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::bound_import
 {
@@ -28,7 +28,7 @@ struct loader_options
 	bool allow_virtual_data = false;
 };
 
-std::optional<bound_library_details_list> load(const image& instance,
+std::optional<bound_library_details_list> load(const image::image& instance,
 	const loader_options& options);
 
 } //namespace pe_bliss::bound_import

@@ -14,7 +14,7 @@
 #include "pe_bliss2/detail/load_config/image_load_config_directory.h"
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/packed_struct.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "utilities/math.h"
 #include "utilities/safe_uint.h"
 
@@ -133,7 +133,7 @@ using namespace pe_bliss;
 using namespace pe_bliss::load_config;
 
 template<typename Directory>
-void load_lock_prefix_table(const image& instance,
+void load_lock_prefix_table(const image::image& instance,
 	const loader_options& options, Directory& directory) try
 {
 	if (!options.load_lock_prefix_table)
@@ -158,7 +158,7 @@ catch (const std::system_error&)
 	directory.add_error(load_config_directory_loader_errc::invalid_lock_prefix_table);
 }
 
-void load_safeseh_handler_table(const image& instance,
+void load_safeseh_handler_table(const image::image& instance,
 	const loader_options& options, load_config_directory_details::underlying_type32& directory) try
 {
 	if (!options.load_safeseh_handler_table)
@@ -198,19 +198,20 @@ catch (const std::system_error&)
 }
 
 constexpr void load_safeseh_handler_table(
-	const image&, const loader_options&, load_config_directory_details::underlying_type64&) noexcept
+	const image::image&, const loader_options&,
+	load_config_directory_details::underlying_type64&) noexcept
 {
 	//No SafeSEH on PE+
 }
 
-bool has_cf_guard(const image& instance) noexcept
+bool has_cf_guard(const image::image& instance) noexcept
 {
 	return static_cast<bool>(instance.get_optional_header().get_dll_characteristics()
 		& core::optional_header::dll_characteristics::guard_cf);
 }
 
 template<typename GuardFunction, typename Directory, typename Va, typename Table>
-void read_cf_guard_rva_table(const image& instance, const loader_options& options,
+void read_cf_guard_rva_table(const image::image& instance, const loader_options& options,
 	Directory& directory, Va table_va, Va function_count, Table& optional_table)
 {
 	if (!table_va)
@@ -262,7 +263,7 @@ void read_cf_guard_rva_table(const image& instance, const loader_options& option
 }
 
 template<typename Directory>
-void load_cf_guard(const image& instance,
+void load_cf_guard(const image::image& instance,
 	const loader_options& options, Directory& directory) try
 {
 	if (!options.load_cf_guard_function_table)
@@ -318,7 +319,7 @@ catch (const std::system_error&)
 }
 
 template<typename Directory>
-void load_cf_guard_export_suppression_table(const image& instance,
+void load_cf_guard_export_suppression_table(const image::image& instance,
 	const loader_options& options, Directory& directory) try
 {
 	if (!options.load_cf_guard_export_suppression_table)
@@ -344,7 +345,7 @@ catch (const std::system_error&)
 }
 
 template<typename Directory>
-void load_cf_guard_longjump_table(const image& instance,
+void load_cf_guard_longjump_table(const image::image& instance,
 	const loader_options& options, Directory& directory) try
 {
 	if (!options.load_cf_guard_longjump_table)
@@ -370,7 +371,7 @@ catch (const std::system_error&)
 }
 
 template<typename Metadata>
-void load_chpe_range_entries(const image& instance,
+void load_chpe_range_entries(const image::image& instance,
 	const loader_options& options, Metadata& metadata) try
 {
 	auto& metadata_descriptor = metadata.get_metadata();
@@ -401,7 +402,7 @@ catch (const std::system_error&)
 }
 
 template<typename Va>
-void load_chpe_metadata(const image& instance,
+void load_chpe_metadata(const image::image& instance,
 	const loader_options& options, utilities::safe_uint<Va> metadata_va,
 	chpe_arm64x_metadata_details& metadata)
 {
@@ -413,7 +414,7 @@ void load_chpe_metadata(const image& instance,
 }
 
 template<typename Va>
-void load_chpe_metadata(const image& instance,
+void load_chpe_metadata(const image::image& instance,
 	const loader_options& options, utilities::safe_uint<Va> metadata_va,
 	chpe_x86_metadata_details& metadata)
 {
@@ -446,7 +447,7 @@ void load_chpe_metadata(const image& instance,
 }
 
 template<typename Directory>
-void load_chpe_metadata(const image& instance,
+void load_chpe_metadata(const image::image& instance,
 	const loader_options& options, Directory& directory) try
 {
 	if (!options.load_chpe_metadata)
@@ -479,13 +480,14 @@ catch (const std::system_error&)
 }
 
 constexpr void load_dynamic_relocation_table(
-	const image&, const loader_options&, load_config_directory_details::underlying_type32&) noexcept
+	const image::image&, const loader_options&,
+	load_config_directory_details::underlying_type32&) noexcept
 {
 	//No SafeSEH on PE
 }
 
 template<typename DynamicRelocationList>
-bool load_dynamic_relocation_struct(const image& instance, const loader_options& options,
+bool load_dynamic_relocation_struct(const image::image& instance, const loader_options& options,
 	rva_type last_rva, rva_type& current_rva, DynamicRelocationList& list)
 {
 	if (last_rva == current_rva)
@@ -515,7 +517,7 @@ using arm64x_dynamic_relocation_list_type
 	= dynamic_relocation_table_v1_details<std::uint64_t>::arm64x_dynamic_relocation_list_type;
 
 template<typename DynamicRelocationList>
-bool load_base_relocation(const image& instance, const loader_options& options,
+bool load_base_relocation(const image::image& instance, const loader_options& options,
 	rva_type current_rva, rva_type last_base_reloc_rva, DynamicRelocationList& list)
 {
 	if (last_base_reloc_rva == current_rva)
@@ -558,7 +560,7 @@ void check_fixup_end_block_rva(rva_type current_rva, rva_type block_end_rva, Fix
 }
 
 template<typename DynamicRelocationList>
-void load_relocations_no_extra_data(const image& instance, const loader_options& options,
+void load_relocations_no_extra_data(const image::image& instance, const loader_options& options,
 	rva_type current_rva, rva_type last_base_reloc_rva, DynamicRelocationList& list)
 {
 	while (load_base_relocation(instance, options, current_rva, last_base_reloc_rva, list))
@@ -600,7 +602,7 @@ void load_relocations_no_extra_data(const image& instance, const loader_options&
 	}
 }
 
-void load_arm64x_relocations(const image& instance, const loader_options& options,
+void load_arm64x_relocations(const image::image& instance, const loader_options& options,
 	rva_type current_rva, rva_type last_base_reloc_rva,
 	arm64x_dynamic_relocation_list_type& list)
 {
@@ -680,7 +682,7 @@ void load_arm64x_relocations(const image& instance, const loader_options& option
 	}
 }
 
-void load_dynamic_relocation_list(const image& instance, const loader_options& options,
+void load_dynamic_relocation_list(const image::image& instance, const loader_options& options,
 	rva_type current_rva, dynamic_relocation_table_details<std::uint64_t>& table,
 	dynamic_relocation_table_details<std::uint64_t>::relocation_v1_list_type& list)
 {
@@ -735,7 +737,7 @@ void load_dynamic_relocation_list(const image& instance, const loader_options& o
 }
 
 template<typename Header>
-bool load_relocations_header_base(const image& instance, const loader_options& options,
+bool load_relocations_header_base(const image::image& instance, const loader_options& options,
 	rva_type& current_rva, rva_type last_header_rva, Header& header)
 {
 	if (last_header_rva - current_rva < header.get_header().packed_size)
@@ -753,7 +755,7 @@ bool load_relocations_header_base(const image& instance, const loader_options& o
 	return true;
 }
 
-bool load_relocations_header(const image& instance, const loader_options& options,
+bool load_relocations_header(const image::image& instance, const loader_options& options,
 	rva_type current_rva, rva_type last_header_rva, prologue_dynamic_relocation_header& header)
 {
 	if (!load_relocations_header_base(instance, options, current_rva, last_header_rva, header))
@@ -776,7 +778,7 @@ bool load_relocations_header(const image& instance, const loader_options& option
 	return true;
 }
 
-bool load_relocations_header(const image& instance, const loader_options& options,
+bool load_relocations_header(const image::image& instance, const loader_options& options,
 	rva_type current_rva, rva_type last_header_rva, epilogue_dynamic_relocation_header_details& header)
 {
 	if (!load_relocations_header_base(instance, options, current_rva, last_header_rva, header))
@@ -862,7 +864,7 @@ bool load_relocations_header(const image& instance, const loader_options& option
 	return true;
 }
 
-void load_dynamic_relocation_list(const image& instance, const loader_options& options,
+void load_dynamic_relocation_list(const image::image& instance, const loader_options& options,
 	rva_type current_rva, dynamic_relocation_table_details<std::uint64_t>& table,
 	dynamic_relocation_table_details<std::uint64_t>::relocation_v2_list_type& list)
 {
@@ -936,7 +938,7 @@ void load_dynamic_relocation_list(const image& instance, const loader_options& o
 	}
 }
 
-void load_dynamic_relocation_table(const image& instance, const loader_options& options,
+void load_dynamic_relocation_table(const image::image& instance, const loader_options& options,
 	load_config_directory_details::underlying_type64& directory) try
 {
 	if (!options.load_dynamic_relocation_table)
@@ -997,7 +999,7 @@ catch (const std::system_error&)
 }
 
 template<typename Directory>
-void load_enclave_config(const image& instance, const loader_options& options,
+void load_enclave_config(const image::image& instance, const loader_options& options,
 	Directory& directory) try
 {
 	if (!options.load_enclave_config)
@@ -1078,7 +1080,7 @@ catch (const std::system_error&)
 }
 
 template<typename Directory>
-void load_volatile_metadata(const image& instance, const loader_options& options,
+void load_volatile_metadata(const image::image& instance, const loader_options& options,
 	Directory& directory) try
 {
 	if (!options.load_volatile_metadata)
@@ -1146,7 +1148,7 @@ catch (const std::system_error&)
 }
 
 template<typename Directory>
-void load_ehcont_targets(const image& instance, const loader_options& options,
+void load_ehcont_targets(const image::image& instance, const loader_options& options,
 	Directory& directory) try
 {
 	if (!options.load_ehcont_targets)
@@ -1179,7 +1181,7 @@ catch (const std::system_error&)
 }
 
 template<typename Directory>
-void load_impl(const image& instance,
+void load_impl(const image::image& instance,
 	const loader_options& options, Directory& directory)
 {
 	const auto& load_config_dir_info = instance.get_data_directories().get_directory(
@@ -1246,7 +1248,7 @@ std::error_code make_error_code(load_config_directory_loader_errc e) noexcept
 	return { static_cast<int>(e), load_config_directory_loader_error_category_instance };
 }
 
-std::optional<load_config_directory_details> load(const image& instance,
+std::optional<load_config_directory_details> load(const image::image& instance,
 	const loader_options& options)
 {
 	std::optional<load_config_directory_details> result;

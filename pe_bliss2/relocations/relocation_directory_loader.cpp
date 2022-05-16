@@ -5,7 +5,7 @@
 
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/generic_error.h"
@@ -44,7 +44,7 @@ using namespace pe_bliss::relocations;
 
 using safe_rva_type = utilities::safe_uint<rva_type>;
 
-bool load_element(const image& instance, const loader_options& options,
+bool load_element(const image::image& instance, const loader_options& options,
 	base_relocation_details::entry_list_type& relocations, std::uint32_t& elem_count,
 	safe_rva_type& current_rva, rva_type last_rva)
 {
@@ -98,7 +98,7 @@ std::error_code make_error_code(relocation_directory_loader_errc e) noexcept
 	return { static_cast<int>(e), relocation_directory_loader_error_category_instance };
 }
 
-std::optional<relocation_directory> load(const image& instance, const loader_options& options)
+std::optional<relocation_directory> load(const image::image& instance, const loader_options& options)
 {
 	std::optional<relocation_directory> result;
 	if (!instance.get_data_directories().has_reloc())

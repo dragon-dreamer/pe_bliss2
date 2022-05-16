@@ -10,7 +10,7 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "utilities/generic_error.h"
 #include "utilities/safe_uint.h"
 
@@ -51,7 +51,7 @@ std::uint32_t get_built_size_impl(const Directory& relocs, const builder_options
 	return result.value();
 }
 
-void update_data_directory(image& instance, const builder_options& options, std::uint32_t size)
+void update_data_directory(image::image& instance, const builder_options& options, std::uint32_t size)
 {
 	if (options.update_data_directory)
 	{
@@ -63,7 +63,7 @@ void update_data_directory(image& instance, const builder_options& options, std:
 }
 
 template<typename Directory>
-void build_in_place_impl(image& instance, const Directory& relocs,
+void build_in_place_impl(image::image& instance, const Directory& relocs,
 	const builder_options& options)
 {
 	assert(options.directory_rva);
@@ -131,7 +131,7 @@ std::uint32_t build_new_impl(buffers::output_buffer_interface& buf, Directory& r
 }
 
 template<typename Directory>
-std::uint32_t build_new_impl(image& instance, Directory& directory,
+std::uint32_t build_new_impl(image::image& instance, Directory& directory,
 	const builder_options& options)
 {
 	assert(options.directory_rva);
@@ -146,25 +146,25 @@ std::uint32_t build_new_impl(image& instance, Directory& directory,
 namespace pe_bliss::relocations
 {
 
-void build_in_place(image& instance, const base_relocation_details_list& directory,
+void build_in_place(image::image& instance, const base_relocation_details_list& directory,
 	const builder_options& options)
 {
 	build_in_place_impl(instance, directory, options);
 }
 
-void build_in_place(image& instance, const base_relocation_list& directory,
+void build_in_place(image::image& instance, const base_relocation_list& directory,
 	const builder_options& options)
 {
 	build_in_place_impl(instance, directory, options);
 }
 
-std::uint32_t build_new(image& instance, base_relocation_details_list& directory,
+std::uint32_t build_new(image::image& instance, base_relocation_details_list& directory,
 	const builder_options& options)
 {
 	return build_new_impl(instance, directory, options);
 }
 
-std::uint32_t build_new(image& instance, base_relocation_list& directory,
+std::uint32_t build_new(image::image& instance, base_relocation_list& directory,
 	const builder_options& options)
 {
 	return build_new_impl(instance, directory, options);

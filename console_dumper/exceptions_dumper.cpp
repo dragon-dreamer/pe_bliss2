@@ -7,7 +7,7 @@
 
 #include "formatter.h"
 
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/exceptions/exception_directory_loader.h"
 
 namespace
@@ -873,7 +873,7 @@ void dump_directory(formatter& fmt, const Directory& directory)
 
 } //namespace
 
-void dump_exceptions(formatter& fmt, const pe_bliss::image& image) try
+void dump_exceptions(formatter& fmt, const pe_bliss::image::image& image) try
 {
 	auto exceptions = pe_bliss::exceptions::load(image, {});
 	if (exceptions.get_directories().empty())

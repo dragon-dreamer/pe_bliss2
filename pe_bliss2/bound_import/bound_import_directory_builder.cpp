@@ -9,7 +9,7 @@
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/packed_struct.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/generic_error.h"
@@ -51,7 +51,7 @@ std::size_t get_descriptor_count(const Directory& directory) noexcept
 	return count;
 }
 
-void update_data_directory(image& instance, const builder_options& options, std::uint32_t size)
+void update_data_directory(image::image& instance, const builder_options& options, std::uint32_t size)
 {
 	if (options.update_data_directory)
 	{
@@ -63,7 +63,7 @@ void update_data_directory(image& instance, const builder_options& options, std:
 }
 
 template<typename Entry>
-void build_descriptor_in_place(image& instance,
+void build_descriptor_in_place(image::image& instance,
 	const Entry& entry, rva_type& last_descriptor_rva,
 	rva_type& last_rva, const builder_options& options)
 {
@@ -76,7 +76,7 @@ void build_descriptor_in_place(image& instance,
 }
 
 template<typename Directory>
-void build_in_place_impl(image& instance, const Directory& directory,
+void build_in_place_impl(image::image& instance, const Directory& directory,
 	const builder_options& options)
 {
 	assert(options.directory_rva);
@@ -136,7 +136,7 @@ std::uint32_t build_new_impl(buffers::output_buffer_interface& buf, Directory& d
 }
 
 template<typename Directory>
-std::uint32_t build_new_impl(image& instance, Directory& directory,
+std::uint32_t build_new_impl(image::image& instance, Directory& directory,
 	const builder_options& options)
 {
 	assert(options.directory_rva);
@@ -151,25 +151,25 @@ std::uint32_t build_new_impl(image& instance, Directory& directory,
 namespace pe_bliss::bound_import
 {
 
-void build_in_place(image& instance, const bound_library_list& directory,
+void build_in_place(image::image& instance, const bound_library_list& directory,
 	const builder_options& options)
 {
 	build_in_place_impl(instance, directory, options);
 }
 
-void build_in_place(image& instance, const bound_library_details_list& directory,
+void build_in_place(image::image& instance, const bound_library_details_list& directory,
 	const builder_options& options)
 {
 	build_in_place_impl(instance, directory, options);
 }
 
-std::uint32_t build_new(image& instance, bound_library_list& directory,
+std::uint32_t build_new(image::image& instance, bound_library_list& directory,
 	const builder_options& options)
 {
 	return build_new_impl(instance, directory, options);
 }
 
-std::uint32_t build_new(image& instance, bound_library_details_list& directory,
+std::uint32_t build_new(image::image& instance, bound_library_details_list& directory,
 	const builder_options& options)
 {
 	return build_new_impl(instance, directory, options);

@@ -11,7 +11,7 @@
 #include "formatter.h"
 
 #include "buffers/input_memory_buffer.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/load_config/load_config_directory.h"
 #include "pe_bliss2/load_config/load_config_directory_loader.h"
 
@@ -1109,7 +1109,7 @@ void dump_load_config_impl(formatter& fmt, const LoadConfig& directory)
 
 } //namespace
 
-void dump_load_config(formatter& fmt, const pe_bliss::image& image) try
+void dump_load_config(formatter& fmt, const pe_bliss::image::image& image) try
 {
 	auto load_config = pe_bliss::load_config::load(image, {});
 	if (!load_config)

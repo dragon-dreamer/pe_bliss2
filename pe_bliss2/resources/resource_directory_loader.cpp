@@ -8,7 +8,7 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/resources/image_resource_directory.h"
 #include "pe_bliss2/packed_utf16_string.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/math.h"
@@ -73,7 +73,7 @@ using namespace pe_bliss::resources;
 using safe_rva_type = utilities::safe_uint<rva_type>;
 using visited_directories_map = std::unordered_set<rva_type>;
 
-void load_resource_data_entry(const image& instance, const loader_options& options,
+void load_resource_data_entry(const image::image& instance, const loader_options& options,
 	safe_rva_type current_rva, rva_type& max_rva, resource_data_entry_details& entry)
 {
 	auto& entry_descriptor = entry.get_descriptor();
@@ -120,11 +120,11 @@ void load_resource_data_entry(const image& instance, const loader_options& optio
 	}
 }
 
-void load_resource_directory(const image& instance, const loader_options& options,
+void load_resource_directory(const image::image& instance, const loader_options& options,
 	safe_rva_type resource_dir_rva, safe_rva_type current_rva, rva_type& max_rva,
 	resource_directory_details& directory, visited_directories_map& visited_directories);
 
-bool load_resource_directory_entry(const image& instance, const loader_options& options,
+bool load_resource_directory_entry(const image::image& instance, const loader_options& options,
 	safe_rva_type resource_dir_rva, safe_rva_type current_rva, rva_type& max_rva,
 	resource_directory_entry_details& entry, visited_directories_map& visited_directories)
 {
@@ -226,7 +226,7 @@ bool load_resource_directory_entry(const image& instance, const loader_options& 
 	return true;
 }
 
-void load_resource_directory(const image& instance, const loader_options& options,
+void load_resource_directory(const image::image& instance, const loader_options& options,
 	safe_rva_type resource_dir_rva, safe_rva_type current_rva, rva_type& max_rva,
 	resource_directory_details& directory, visited_directories_map& visited_directories)
 {
@@ -302,7 +302,7 @@ std::error_code make_error_code(resource_directory_loader_errc e) noexcept
 	return { static_cast<int>(e), resource_directory_loader_error_category_instance };
 }
 
-std::optional<resource_directory_details> load(const image& instance,
+std::optional<resource_directory_details> load(const image::image& instance,
 	const loader_options& options)
 {
 	std::optional<resource_directory_details> result;

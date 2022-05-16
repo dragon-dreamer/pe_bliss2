@@ -1,4 +1,4 @@
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 
 #include <algorithm>
 #include <cstddef>
@@ -30,13 +30,14 @@ struct image_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
-		switch (static_cast<pe_bliss::image_errc>(ev))
+		using enum pe_bliss::image::image_errc;
+		switch (static_cast<pe_bliss::image::image_errc>(ev))
 		{
-		case pe_bliss::image_errc::too_many_sections:
+		case too_many_sections:
 			return "Too many sections";
-		case pe_bliss::image_errc::too_many_rva_and_sizes:
+		case too_many_rva_and_sizes:
 			return "Too many data directories";
-		case pe_bliss::image_errc::section_data_does_not_exist:
+		case section_data_does_not_exist:
 			return "Requested section data does not exist";
 		default:
 			return {};
@@ -92,7 +93,7 @@ Result section_from_reference_impl(Reference& section_hdr,
 
 } //namespace
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 
 std::error_code make_error_code(image_errc e) noexcept
@@ -816,4 +817,4 @@ void pe_base::realign_section(uint32_t index)
 }
 */
 
-} //namespace pe_bliss
+} //namespace pe_bliss::image

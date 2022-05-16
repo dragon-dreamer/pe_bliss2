@@ -4,7 +4,7 @@
 
 #include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/core/optional_header.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_types.h"
 
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
@@ -54,7 +54,7 @@ TEST(AddressConverterTests, ImageBaseTest)
 	oh.set_raw_image_base(image_base);
 	EXPECT_EQ(address_converter(oh).get_image_base(), image_base);
 
-	image img;
+	image::image img;
 	img.get_optional_header().set_raw_image_base(image_base);
 	EXPECT_EQ(address_converter(img).get_image_base(), image_base);
 }

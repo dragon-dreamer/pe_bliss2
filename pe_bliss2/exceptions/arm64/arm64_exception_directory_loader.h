@@ -2,10 +2,10 @@
 
 #include "pe_bliss2/exceptions/exception_directory.h"
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::exceptions::arm64
 {
@@ -17,7 +17,7 @@ struct loader_options
 	bool load_hybrid_pe_directory = true;
 };
 
-void load(const image& instance, const loader_options& options,
+void load(const image::image& instance, const loader_options& options,
 	pe_bliss::exceptions::exception_directory_details& directory);
 
 } //namespace pe_bliss::exceptions::arm64

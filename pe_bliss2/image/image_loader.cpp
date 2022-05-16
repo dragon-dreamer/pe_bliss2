@@ -1,4 +1,4 @@
-#include "pe_bliss2/image_loader.h"
+#include "pe_bliss2/image/image_loader.h"
 
 #include <cassert>
 #include <cstdint>
@@ -17,7 +17,7 @@
 #include "pe_bliss2/section/section_table_validator.h"
 #include "utilities/math.h"
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 
 std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
@@ -175,4 +175,4 @@ std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
 	return result;
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::image

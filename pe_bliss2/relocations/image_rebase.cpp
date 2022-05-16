@@ -3,7 +3,7 @@
 #include <cstdint>
 
 #include "pe_bliss2/packed_struct.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
 #include "utilities/math.h"
@@ -15,7 +15,7 @@ using namespace pe_bliss;
 using namespace pe_bliss::relocations;
 
 template<typename T, typename Reloc>
-void process_relocation(image& instance, rva_type rva, std::uint64_t base_diff, const Reloc& entry)
+void process_relocation(image::image& instance, rva_type rva, std::uint64_t base_diff, const Reloc& entry)
 {
 	if (!utilities::math::add_if_safe<rva_type>(rva, entry.get_address()))
 		throw pe_error(utilities::generic_errc::integer_overflow);
@@ -27,7 +27,7 @@ void process_relocation(image& instance, rva_type rva, std::uint64_t base_diff, 
 }
 
 template<typename RelocsList>
-void rebase_impl(image& instance, const RelocsList& relocs,
+void rebase_impl(image::image& instance, const RelocsList& relocs,
 	std::uint64_t new_base)
 {
 	const auto base_diff = new_base - instance.get_optional_header().get_raw_image_base();
@@ -64,12 +64,12 @@ void rebase_impl(image& instance, const RelocsList& relocs,
 namespace pe_bliss::relocations
 {
 
-void rebase(image& instance, const base_relocation_details_list& relocs, std::uint64_t new_base)
+void rebase(image::image& instance, const base_relocation_details_list& relocs, std::uint64_t new_base)
 {
 	rebase_impl(instance, relocs, new_base);
 }
 
-void rebase(image& instance, const base_relocation_list& relocs, std::uint64_t new_base)
+void rebase(image::image& instance, const base_relocation_list& relocs, std::uint64_t new_base)
 {
 	rebase_impl(instance, relocs, new_base);
 }

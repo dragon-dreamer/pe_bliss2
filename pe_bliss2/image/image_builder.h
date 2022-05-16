@@ -4,7 +4,7 @@
 #include <system_error>
 #include <type_traits>
 
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "utilities/static_class.h"
 
 namespace buffers
@@ -12,7 +12,7 @@ namespace buffers
 class output_buffer_interface;
 } //namespace detail
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 
 enum class image_builder_errc
@@ -36,10 +36,10 @@ public:
 		buffers::output_buffer_interface& buffer);
 };
 
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace std
 {
 template<>
-struct is_error_code_enum<pe_bliss::image_builder_errc> : true_type {};
+struct is_error_code_enum<pe_bliss::image::image_builder_errc> : true_type {};
 } //namespace std

@@ -1,4 +1,4 @@
-#include "pe_bliss2/image_builder.h"
+#include "pe_bliss2/image/image_builder.h"
 
 #include <cstdint>
 #include <cstddef>
@@ -18,9 +18,10 @@ struct image_builder_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
-		switch (static_cast<pe_bliss::image_builder_errc>(ev))
+		using enum pe_bliss::image::image_builder_errc;
+		switch (static_cast<pe_bliss::image::image_builder_errc>(ev))
 		{
-		case pe_bliss::image_builder_errc::inconsistent_section_headers_and_data:
+		case inconsistent_section_headers_and_data:
 			return "Inconsistent image section header and section data count";
 		default:
 			return {};
@@ -32,7 +33,7 @@ const image_builder_error_category image_builder_error_category_instance;
 
 } //namespace
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 
 std::error_code make_error_code(image_builder_errc e) noexcept
@@ -97,4 +98,4 @@ void image_builder::build(const image& instance, const image_builder_options& op
 	}
 }
 
-} //namespace pe_bliss
+} //namespace pe_bliss::image

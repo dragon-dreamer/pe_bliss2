@@ -8,7 +8,7 @@
 
 #include "formatter.h"
 
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/bound_import/bound_import_directory_loader.h"
 #include "pe_bliss2/bound_import/bound_library.h"
 
@@ -29,7 +29,7 @@ void dump_descriptor(const char* name, const Library& library, formatter& fmt)
 
 } //namespace
 
-void dump_bound_imports(formatter& fmt, const pe_bliss::image& image) try
+void dump_bound_imports(formatter& fmt, const pe_bliss::image::image& image) try
 {
 	auto bound_imports = pe_bliss::bound_import::load(image, {});
 	if (!bound_imports)

@@ -17,7 +17,10 @@ enum class address_converter_errc
 
 std::error_code make_error_code(address_converter_errc) noexcept;
 
+namespace image
+{
 class image;
+} //namespace image
 
 namespace core
 {
@@ -27,7 +30,7 @@ class optional_header;
 class [[nodiscard]] address_converter
 {
 public:
-	explicit address_converter(const image& instance) noexcept;
+	explicit address_converter(const image::image& instance) noexcept;
 	explicit address_converter(const core::optional_header& header) noexcept;
 	explicit address_converter(std::uint64_t image_base) noexcept;
 

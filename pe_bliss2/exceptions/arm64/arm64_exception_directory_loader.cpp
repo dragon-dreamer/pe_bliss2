@@ -9,7 +9,7 @@
 #include "pe_bliss2/exceptions/arm64/arm64_exception_directory.h"
 #include "pe_bliss2/exceptions/arm_common/arm_common_exception_directory_loader.h"
 #include "pe_bliss2/load_config/load_config_directory_loader.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 
 namespace
 {
@@ -20,7 +20,7 @@ using namespace pe_bliss::exceptions::arm64;
 struct exception_directory_control
 {
 	static pe_bliss::exceptions::arm_common::exception_directory_info get_exception_directory(
-		const image& instance, const loader_options& options)
+		const image::image& instance, const loader_options& options)
 	{
 		if (!instance.is_64bit())
 			return {};
@@ -177,7 +177,7 @@ struct uwop_control
 namespace pe_bliss::exceptions::arm64
 {
 
-void load(const image& instance, const loader_options& options,
+void load(const image::image& instance, const loader_options& options,
 	pe_bliss::exceptions::exception_directory_details& directory)
 {
 	arm_common::load<exception_directory_control, uwop_control,

@@ -6,7 +6,7 @@
 
 #include "formatter.h"
 
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/relocations/relocation_entry.h"
 #include "pe_bliss2/relocations/relocation_directory_loader.h"
 #include "pe_bliss2/relocations/relocation_entry.h"
@@ -34,7 +34,7 @@ const char* relocation_type_to_string(pe_bliss::relocations::relocation_type typ
 }
 } //namespace
 
-void dump_relocations(formatter& fmt, const pe_bliss::image& image) try
+void dump_relocations(formatter& fmt, const pe_bliss::image::image& image) try
 {
 	auto relocations = pe_bliss::relocations::load(image, {});
 	if (!relocations)

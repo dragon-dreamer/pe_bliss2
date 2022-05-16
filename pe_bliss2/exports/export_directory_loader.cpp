@@ -9,7 +9,7 @@
 
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/exports/image_export_directory.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/safe_uint.h"
@@ -41,7 +41,7 @@ const export_directory_loader_error_category export_directory_loader_error_categ
 using namespace pe_bliss;
 using namespace pe_bliss::exports;
 
-void read_library_name(const image& instance,
+void read_library_name(const image::image& instance,
 	const loader_options& options, export_directory_details& directory)
 {
 	try
@@ -56,7 +56,7 @@ void read_library_name(const image& instance,
 	}
 }
 
-void read_forwarded_name(const image& instance, const loader_options& options,
+void read_forwarded_name(const image::image& instance, const loader_options& options,
 	const core::data_directories::base_struct_type& export_dir_info,
 	rva_type exported_addr, exported_address_details& exported_symbol)
 {
@@ -92,7 +92,7 @@ using ordinal_to_exported_address_map = std::vector<
 	export_directory_details::export_list_type::iterator>;
 
 ordinal_to_exported_address_map load_addresses(
-	const image& instance, const loader_options& options,
+	const image::image& instance, const loader_options& options,
 	const core::data_directories::base_struct_type& export_dir_info,
 	export_directory_details& directory)
 {
@@ -120,7 +120,7 @@ ordinal_to_exported_address_map load_addresses(
 	return ordinal_to_exported_address;
 }
 
-auto load_names(const image& instance, const loader_options& options, export_directory_details& directory,
+auto load_names(const image::image& instance, const loader_options& options, export_directory_details& directory,
 	const ordinal_to_exported_address_map& ordinal_to_exported_address)
 {
 	auto& descriptor = directory.get_descriptor();
@@ -189,7 +189,7 @@ std::error_code make_error_code(export_directory_loader_errc e) noexcept
 	return { static_cast<int>(e), export_directory_loader_error_category_instance };
 }
 
-std::optional<export_directory_details> load(const image& instance,
+std::optional<export_directory_details> load(const image::image& instance,
 	const loader_options& options)
 {
 	std::optional<export_directory_details> result;

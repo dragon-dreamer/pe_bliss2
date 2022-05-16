@@ -6,10 +6,10 @@
 
 #include "pe_bliss2/resources/resource_directory.h"
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::resources
 {
@@ -35,7 +35,7 @@ struct loader_options
 
 std::error_code make_error_code(resource_directory_loader_errc) noexcept;
 
-std::optional<resource_directory_details> load(const image& instance,
+std::optional<resource_directory_details> load(const image::image& instance,
 	const loader_options& options);
 
 } //namespace pe_bliss::resources

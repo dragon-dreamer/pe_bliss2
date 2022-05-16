@@ -11,10 +11,10 @@ namespace buffers
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::imports
 {
@@ -43,13 +43,13 @@ struct built_size
 	std::uint32_t iat_size;
 };
 
-void build_in_place(image& instance, const import_directory_details& directory,
+void build_in_place(image::image& instance, const import_directory_details& directory,
 	const builder_options& options);
-void build_in_place(image& instance, const import_directory& directory,
+void build_in_place(image::image& instance, const import_directory& directory,
 	const builder_options& options);
-build_result build_new(image& instance, import_directory_details& directory,
+build_result build_new(image::image& instance, import_directory_details& directory,
 	const builder_options& options);
-build_result build_new(image& instance, import_directory& directory,
+build_result build_new(image::image& instance, import_directory& directory,
 	const builder_options& options);
 build_result build_new(buffers::output_buffer_interface& directory_buf,
 	buffers::output_buffer_interface* iat_buf, import_directory_details& directory,

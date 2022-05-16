@@ -7,7 +7,7 @@
 
 #include "formatter.h"
 
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/tls/tls_directory_loader.h"
 #include "pe_bliss2/tls/tls_directory.h"
 
@@ -43,7 +43,7 @@ void dump_tls_impl(formatter& fmt, const Directory& directory)
 
 } //namespace
 
-void dump_tls(formatter& fmt, const pe_bliss::image& image) try
+void dump_tls(formatter& fmt, const pe_bliss::image::image& image) try
 {
 	auto tls = pe_bliss::tls::load(image, {});
 	if (!tls)

@@ -8,7 +8,7 @@
 
 #include "formatter.h"
 
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/imports/imported_address.h"
 #include "pe_bliss2/imports/import_directory.h"
 #include "pe_bliss2/imports/import_directory_loader.h"
@@ -119,7 +119,7 @@ catch (const std::exception& e)
 
 } //namespace
 
-void dump_imports(formatter& fmt, const pe_bliss::image& image) try
+void dump_imports(formatter& fmt, const pe_bliss::image::image& image) try
 {
 	auto imports = pe_bliss::imports::load(image, {});
 	if (!imports)

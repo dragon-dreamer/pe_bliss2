@@ -8,10 +8,10 @@
 #include "pe_bliss2/exceptions/arm64/arm64_exception_directory_loader.h"
 #include "pe_bliss2/exceptions/arm/arm_exception_directory_loader.h"
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::exceptions
 {
@@ -32,7 +32,7 @@ struct loader_options
 	arm::loader_options arm_loader_options;
 };
 
-exception_directory_details load(const image& instance, const loader_options& options);
+exception_directory_details load(const image::image& instance, const loader_options& options);
 
 } //namespace pe_bliss::exceptions
 

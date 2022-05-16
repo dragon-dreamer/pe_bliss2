@@ -3,7 +3,7 @@
 #include <string>
 #include <system_error>
 
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/exceptions/arm/arm_exception_directory_loader.h"
 #include "pe_bliss2/exceptions/arm64/arm64_exception_directory_loader.h"
 #include "pe_bliss2/exceptions/x64/x64_exception_directory_loader.h"
@@ -47,7 +47,7 @@ std::error_code make_error_code(exception_directory_loader_errc e) noexcept
 	return { static_cast<int>(e), exception_directory_loader_error_category_instance };
 }
 
-exception_directory_details load(const image& instance, const loader_options& options)
+exception_directory_details load(const image::image& instance, const loader_options& options)
 {
 	exception_directory_details result;
 

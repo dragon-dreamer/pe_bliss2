@@ -4,13 +4,13 @@
 
 #include "formatter.h"
 
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/rich/compid_database.h"
 #include "pe_bliss2/rich/rich_header.h"
 #include "pe_bliss2/rich/rich_header_loader.h"
 
-void dump_rich_data(formatter& fmt, const pe_bliss::image& image) try
+void dump_rich_data(formatter& fmt, const pe_bliss::image::image& image) try
 {
 	auto result = pe_bliss::rich::load(*image.get_dos_stub().data());
 	if (!result)

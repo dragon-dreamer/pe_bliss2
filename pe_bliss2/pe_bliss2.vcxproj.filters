@@ -145,6 +145,15 @@
     <Filter Include="Source Files\core">
       <UniqueIdentifier>{64deaa2c-1e16-4da7-bf06-ababa6fe07e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\image">
+      <UniqueIdentifier>{1a32737f-8ff6-40ec-aa1e-67215b0d07dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\image">
+      <UniqueIdentifier>{ac02b4d9-784d-4388-9c5c-85a207146df6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\image">
+      <UniqueIdentifier>{8d7ceb44-66f2-491c-b723-bea3507dcb49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detail\packed_serialization.h">
@@ -173,15 +182,6 @@
     </ClInclude>
     <ClInclude Include="detail\image_section_header.h">
       <Filter>Header Files\detail</Filter>
-    </ClInclude>
-    <ClInclude Include="image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="image_loader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="image_builder.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="address_converter.h">
       <Filter>Header Files</Filter>
@@ -420,17 +420,20 @@
     <ClInclude Include="section\section_table_validator.h">
       <Filter>Header Files\section</Filter>
     </ClInclude>
+    <ClInclude Include="image\image.h">
+      <Filter>Header Files\image</Filter>
+    </ClInclude>
+    <ClInclude Include="image\image_builder.h">
+      <Filter>Header Files\image</Filter>
+    </ClInclude>
+    <ClInclude Include="image\image_loader.h">
+      <Filter>Header Files\image</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\image\image-inl.h">
+      <Filter>Header Files\detail\image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="image_loader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="image_builder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="address_converter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -601,6 +604,15 @@
     </ClCompile>
     <ClCompile Include="section\section_table_validator.cpp">
       <Filter>Source Files\section</Filter>
+    </ClCompile>
+    <ClCompile Include="image\image.cpp">
+      <Filter>Source Files\image</Filter>
+    </ClCompile>
+    <ClCompile Include="image\image_builder.cpp">
+      <Filter>Source Files\image</Filter>
+    </ClCompile>
+    <ClCompile Include="image\image_loader.cpp">
+      <Filter>Source Files\image</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

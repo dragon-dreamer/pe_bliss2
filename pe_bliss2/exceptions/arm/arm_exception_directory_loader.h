@@ -5,10 +5,10 @@
 
 #include "pe_bliss2/exceptions/exception_directory.h"
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::exceptions::arm
 {
@@ -26,7 +26,7 @@ struct loader_options
 	bool allow_virtual_data = false;
 };
 
-void load(const image& instance, const loader_options& options,
+void load(const image::image& instance, const loader_options& options,
 	pe_bliss::exceptions::exception_directory_details& directory);
 
 } //namespace pe_bliss::exceptions::arm

@@ -10,7 +10,7 @@
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/packed_struct.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/safe_uint.h"
 
@@ -20,7 +20,7 @@ namespace
 using namespace pe_bliss;
 using namespace pe_bliss::exports;
 
-void update_data_directory(image& instance,
+void update_data_directory(image::image& instance,
 	const builder_options& options, std::uint32_t size)
 {
 	if (options.update_data_directory)
@@ -166,7 +166,7 @@ std::size_t build_new_impl(buffers::output_buffer_interface& buf, Directory& dir
 }
 
 template<typename Directory>
-std::uint32_t build_new_impl(image& instance, Directory& directory,
+std::uint32_t build_new_impl(image::image& instance, Directory& directory,
 	const builder_options& options)
 {
 	assert(options.directory_rva);
@@ -205,7 +205,7 @@ std::uint32_t get_built_size_impl(const Directory& directory)
 }
 
 template<typename Directory>
-rva_type build_functions_in_place(image& instance, const Directory& directory, rva_type last_rva,
+rva_type build_functions_in_place(image::image& instance, const Directory& directory, rva_type last_rva,
 	bool write_virtual_part)
 {
 	const auto& export_list = directory.get_export_list();
@@ -224,7 +224,7 @@ rva_type build_functions_in_place(image& instance, const Directory& directory, r
 }
 
 template<typename Directory>
-rva_type build_names_in_place(image& instance, const Directory& directory, rva_type last_rva,
+rva_type build_names_in_place(image::image& instance, const Directory& directory, rva_type last_rva,
 	bool write_virtual_part)
 {
 	for (const auto& symbol : directory.get_export_list())
@@ -247,7 +247,7 @@ rva_type build_names_in_place(image& instance, const Directory& directory, rva_t
 }
 
 template<typename Directory>
-void build_in_place_impl(image& instance, const Directory& directory,
+void build_in_place_impl(image::image& instance, const Directory& directory,
 	const builder_options& options)
 {
 	const auto& descriptor = directory.get_descriptor();
@@ -267,25 +267,25 @@ void build_in_place_impl(image& instance, const Directory& directory,
 namespace pe_bliss::exports
 {
 
-void build_in_place(image& instance, const export_directory_details& directory,
+void build_in_place(image::image& instance, const export_directory_details& directory,
 	const builder_options& options)
 {
 	build_in_place_impl(instance, directory, options);
 }
 
-void build_in_place(image& instance, const export_directory& directory,
+void build_in_place(image::image& instance, const export_directory& directory,
 	const builder_options& options)
 {
 	build_in_place_impl(instance, directory, options);
 }
 
-std::uint32_t build_new(image& instance, export_directory& directory,
+std::uint32_t build_new(image::image& instance, export_directory& directory,
 	const builder_options& options)
 {
 	return build_new_impl(instance, directory, options);
 }
 
-std::uint32_t build_new(image& instance, export_directory_details& directory,
+std::uint32_t build_new(image::image& instance, export_directory_details& directory,
 	const builder_options& options)
 {
 	return build_new_impl(instance, directory, options);

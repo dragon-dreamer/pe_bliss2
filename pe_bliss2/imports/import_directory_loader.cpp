@@ -7,7 +7,7 @@
 
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/detail/imports/image_import_descriptor.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/safe_uint.h"
@@ -57,7 +57,7 @@ using namespace pe_bliss;
 using namespace pe_bliss::imports;
 
 template<typename ImportList, typename Directory>
-rva_type load_library(const image& instance, const loader_options& options,
+rva_type load_library(const image::image& instance, const loader_options& options,
 	rva_type current_descriptor_rva, ImportList& import_list, Directory& directory)
 {
 	auto& library = import_list.emplace_back();
@@ -114,7 +114,7 @@ std::uint32_t to_ordinal(std::uint32_t thunk) noexcept
 }
 
 template<typename Import, typename Va>
-void add_imported_va(const image& instance,
+void add_imported_va(const image::image& instance,
 	Import& new_import, imported_library_details<Va>& library)
 {
 	if ((library.has_lookup_table() && library.is_bound()) || instance.is_loaded_to_memory())
@@ -126,7 +126,7 @@ void add_imported_va(const image& instance,
 }
 
 template<typename Va>
-bool load_import(const image& instance, const loader_options& options,
+bool load_import(const image::image& instance, const loader_options& options,
 	utilities::safe_uint<rva_type>& lookup_rva,
 	utilities::safe_uint<rva_type>& address_rva,
 	imported_library_details<Va>& library)
@@ -231,7 +231,7 @@ bool load_import(const image& instance, const loader_options& options,
 }
 
 template<typename Va, typename Directory>
-void load_impl(const image& instance, const loader_options& options,
+void load_impl(const image::image& instance, const loader_options& options,
 	rva_type current_descriptor_rva, std::list<imported_library_details<Va>>& import_list,
 	Directory& directory)
 {
@@ -276,7 +276,7 @@ std::error_code make_error_code(import_table_loader_errc e) noexcept
 	return { static_cast<int>(e), import_table_loader_error_category_instance };
 }
 
-std::optional<import_directory_details> load(const image& instance,
+std::optional<import_directory_details> load(const image::image& instance,
 	const loader_options& options)
 {
 	std::optional<import_directory_details> result;

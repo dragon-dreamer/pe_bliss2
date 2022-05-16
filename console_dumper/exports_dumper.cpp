@@ -7,12 +7,12 @@
 
 #include "formatter.h"
 
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/exports/export_directory.h"
 #include "pe_bliss2/exports/export_directory_builder.h"
 #include "pe_bliss2/exports/export_directory_loader.h"
 
-void dump_exports(formatter& fmt, const pe_bliss::image& image) try
+void dump_exports(formatter& fmt, const pe_bliss::image::image& image) try
 {
 	auto exports = pe_bliss::exports::load(image, {});
 	if (!exports)

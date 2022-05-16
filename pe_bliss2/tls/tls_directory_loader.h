@@ -6,10 +6,10 @@
 
 #include "pe_bliss2/tls/tls_directory.h"
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::tls
 {
@@ -28,7 +28,7 @@ struct loader_options
 	bool copy_raw_data = false;
 };
 
-std::optional<tls_directory_details> load(const image& instance,
+std::optional<tls_directory_details> load(const image::image& instance,
 	const loader_options& options);
 
 } //namespace pe_bliss::tls

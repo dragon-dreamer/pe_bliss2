@@ -13,7 +13,7 @@
 #include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/concepts.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/generic_error.h"
@@ -48,7 +48,7 @@ const tls_directory_builder_error_category tls_directory_builder_error_category_
 using namespace pe_bliss;
 using namespace pe_bliss::tls;
 
-void update_data_directory(image& instance, const builder_options& options, std::uint32_t size)
+void update_data_directory(image::image& instance, const builder_options& options, std::uint32_t size)
 {
 	if (options.update_data_directory)
 	{
@@ -60,7 +60,7 @@ void update_data_directory(image& instance, const builder_options& options, std:
 }
 
 template<typename Directory>
-void build_in_place_impl(image& instance, const Directory& directory,
+void build_in_place_impl(image::image& instance, const Directory& directory,
 	const builder_options& options)
 {
 	const auto& descriptor = directory.get_descriptor();
@@ -88,7 +88,7 @@ void build_in_place_impl(image& instance, const Directory& directory,
 }
 
 template<typename... Directories>
-void build_in_place_impl(image& instance, const std::variant<Directories...>& directories,
+void build_in_place_impl(image::image& instance, const std::variant<Directories...>& directories,
 	const builder_options& options)
 {
 	std::visit([&options, &instance] (const auto& descriptor) {
@@ -225,7 +225,7 @@ build_result build_new_impl(buffers::output_buffer_interface& buf,
 }
 
 template<typename... Directories>
-build_result build_new_impl(image& instance, std::variant<Directories...>& directories,
+build_result build_new_impl(image::image& instance, std::variant<Directories...>& directories,
 	const builder_options& options, std::uint64_t image_base)
 {
 	auto buf = buffers::output_memory_ref_buffer(instance.section_data_from_rva(
@@ -245,26 +245,26 @@ std::error_code make_error_code(tls_directory_builder_errc e) noexcept
 	return { static_cast<int>(e), tls_directory_builder_error_category_instance };
 }
 
-void build_in_place(image& instance, const tls_directory_details& directory,
+void build_in_place(image::image& instance, const tls_directory_details& directory,
 	const builder_options& options)
 {
 	build_in_place_impl(instance, directory, options);
 }
 
-void build_in_place(image& instance, const tls_directory& directory,
+void build_in_place(image::image& instance, const tls_directory& directory,
 	const builder_options& options)
 {
 	build_in_place_impl(instance, directory, options);
 }
 
-build_result build_new(image& instance, tls_directory_details& directory,
+build_result build_new(image::image& instance, tls_directory_details& directory,
 	const builder_options& options)
 {
 	return build_new_impl(instance, directory, options,
 		instance.get_optional_header().get_raw_image_base());
 }
 
-build_result build_new(image& instance, tls_directory& directory,
+build_result build_new(image::image& instance, tls_directory& directory,
 	const builder_options& options)
 {
 	return build_new_impl(instance, directory, options,

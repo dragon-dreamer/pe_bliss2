@@ -6,7 +6,7 @@
 #include <system_error>
 
 #include "pe_bliss2/core/optional_header.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_error.h"
 
 #include "utilities/math.h"
@@ -72,7 +72,7 @@ std::error_code make_error_code(address_converter_errc e) noexcept
 	return { static_cast<int>(e), address_converter_error_category_instance };
 }
 
-address_converter::address_converter(const image& instance) noexcept
+address_converter::address_converter(const image::image& instance) noexcept
 	: address_converter(instance.get_optional_header())
 {
 }

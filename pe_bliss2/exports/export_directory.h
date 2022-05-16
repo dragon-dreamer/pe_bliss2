@@ -11,11 +11,6 @@
 #include "pe_bliss2/exports/exported_address.h"
 #include "pe_bliss2/pe_types.h"
 
-namespace pe_bliss
-{
-class image;
-} //namespace pe_bliss
-
 namespace pe_bliss::exports
 {
 

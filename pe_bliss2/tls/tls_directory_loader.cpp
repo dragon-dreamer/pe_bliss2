@@ -6,7 +6,7 @@
 
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/packed_struct.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_types.h"
 
 namespace
@@ -38,7 +38,7 @@ using namespace pe_bliss;
 using namespace pe_bliss::tls;
 
 template<typename Directory>
-Directory load_impl(const image& instance, const loader_options& options)
+Directory load_impl(const image::image& instance, const loader_options& options)
 {
 	const auto& tls_dir_info = instance.get_data_directories().get_directory(
 		core::data_directories::directory_type::tls);
@@ -94,7 +94,7 @@ std::error_code make_error_code(tls_directory_loader_errc e) noexcept
 	return { static_cast<int>(e), tls_directory_loader_error_category_instance };
 }
 
-std::optional<tls_directory_details> load(const image& instance,
+std::optional<tls_directory_details> load(const image::image& instance,
 	const loader_options& options)
 {
 	if (!instance.get_data_directories().has_tls())

@@ -19,10 +19,10 @@
 #include "tls_dumper.h"
 
 #include "pe_bliss2/error_list.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 
 //TODO: configuration flags, output options
-void dump_pe(const pe_bliss::image& image)
+void dump_pe(const pe_bliss::image::image& image)
 {
 	//escape_sequence_color_provider color_provider;
 	empty_color_provider color_provider;

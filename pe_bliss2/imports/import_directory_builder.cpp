@@ -14,7 +14,7 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/packed_struct.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "utilities/safe_uint.h"
 
 namespace
@@ -124,7 +124,7 @@ built_size get_built_size_impl(const import_directory_base<ImportedLibrary>& dir
 	}, directory.get_list());
 }
 
-void update_data_directory(image& instance, const builder_options& options,
+void update_data_directory(image::image& instance, const builder_options& options,
 	const build_result& result)
 {
 	if (options.update_import_data_directory)
@@ -152,7 +152,7 @@ void update_data_directory(image& instance, const builder_options& options,
 
 template<template <detail::executable_pointer> typename ImportedLibrary,
 	detail::executable_pointer Va>
-void build_in_place_impl(image& instance, const std::list<ImportedLibrary<Va>>& libraries,
+void build_in_place_impl(image::image& instance, const std::list<ImportedLibrary<Va>>& libraries,
 	const builder_options& options)
 {
 	auto last_descriptor_rva = options.directory_rva;
@@ -227,7 +227,7 @@ void build_in_place_impl(image& instance, const std::list<ImportedLibrary<Va>>& 
 }
 
 template<typename Directory>
-void build_in_place_impl(image& instance, const Directory& directory,
+void build_in_place_impl(image::image& instance, const Directory& directory,
 	const builder_options& options)
 {
 	assert(options.directory_rva);
@@ -445,7 +445,7 @@ build_result build_new_impl(buffers::output_buffer_interface& buf,
 }
 
 template<typename Directory>
-build_result build_new_impl(image& instance, Directory& directory,
+build_result build_new_impl(image::image& instance, Directory& directory,
 	const builder_options& options)
 {
 	assert(options.directory_rva);
@@ -464,25 +464,25 @@ build_result build_new_impl(image& instance, Directory& directory,
 namespace pe_bliss::imports
 {
 
-void build_in_place(image& instance, const import_directory_details& directory,
+void build_in_place(image::image& instance, const import_directory_details& directory,
 	const builder_options& options)
 {
 	build_in_place_impl(instance, directory, options);
 }
 
-void build_in_place(image& instance, const import_directory& directory,
+void build_in_place(image::image& instance, const import_directory& directory,
 	const builder_options& options)
 {
 	build_in_place_impl(instance, directory, options);
 }
 
-build_result build_new(image& instance, import_directory_details& directory,
+build_result build_new(image::image& instance, import_directory_details& directory,
 	const builder_options& options)
 {
 	return build_new_impl(instance, directory, options);
 }
 
-build_result build_new(image& instance, import_directory& directory,
+build_result build_new(image::image& instance, import_directory& directory,
 	const builder_options& options)
 {
 	return build_new_impl(instance, directory, options);

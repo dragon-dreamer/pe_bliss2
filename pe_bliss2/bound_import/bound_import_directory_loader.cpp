@@ -3,7 +3,7 @@
 #include <system_error>
 
 #include "pe_bliss2/core/data_directories.h"
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/math.h"
 
@@ -39,7 +39,7 @@ using namespace pe_bliss::bound_import;
 
 template<typename ListElem>
 rva_type read_bound_import_entry(rva_type current_rva, rva_type start_rva,
-	const image& instance, const loader_options& options, ListElem& elem)
+	const image::image& instance, const loader_options& options, ListElem& elem)
 {
 	auto& descriptor = elem.get_descriptor();
 	instance.struct_from_rva(current_rva, descriptor, options.include_headers, options.allow_virtual_data);
@@ -84,7 +84,7 @@ std::error_code make_error_code(bound_import_directory_loader_errc e) noexcept
 	return { static_cast<int>(e), bound_import_directory_loader_error_category_instance };
 }
 
-std::optional<bound_library_details_list> load(const image& instance,
+std::optional<bound_library_details_list> load(const image::image& instance,
 	const loader_options& options)
 {
 	std::optional<bound_library_details_list> result;

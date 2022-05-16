@@ -10,10 +10,10 @@ namespace buffers
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::exports
 {
@@ -25,13 +25,13 @@ struct builder_options
 	bool update_data_directory = true;
 };
 
-void build_in_place(image& instance, const export_directory_details& directory,
+void build_in_place(image::image& instance, const export_directory_details& directory,
 	const builder_options& options);
-void build_in_place(image& instance, const export_directory& directory,
+void build_in_place(image::image& instance, const export_directory& directory,
 	const builder_options& options);
-std::uint32_t build_new(image& instance, export_directory& directory,
+std::uint32_t build_new(image::image& instance, export_directory& directory,
 	const builder_options& options);
-std::uint32_t build_new(image& instance, export_directory_details& directory,
+std::uint32_t build_new(image::image& instance, export_directory_details& directory,
 	const builder_options& options);
 std::uint32_t build_new(buffers::output_buffer_interface& buf, export_directory& directory,
 	const builder_options& options);

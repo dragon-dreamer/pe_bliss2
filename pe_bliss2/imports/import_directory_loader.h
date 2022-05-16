@@ -7,10 +7,10 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/imports/import_directory.h"
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::imports
 {
@@ -39,7 +39,7 @@ struct loader_options
 		= core::data_directories::directory_type::imports;
 };
 
-std::optional<import_directory_details> load(const image& instance,
+std::optional<import_directory_details> load(const image::image& instance,
 	const loader_options& options);
 
 } //namespace pe_bliss::imports

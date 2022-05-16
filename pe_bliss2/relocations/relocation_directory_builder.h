@@ -10,10 +10,10 @@ namespace buffers
 class output_buffer_interface;
 } //namespace buffers
 
-namespace pe_bliss
+namespace pe_bliss::image
 {
 class image;
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 namespace pe_bliss::relocations
 {
@@ -26,13 +26,13 @@ struct builder_options
 	bool align_base_relocation_structures = true;
 };
 
-void build_in_place(image& instance, const base_relocation_details_list& directory,
+void build_in_place(image::image& instance, const base_relocation_details_list& directory,
 	const builder_options& options);
-void build_in_place(image& instance, const base_relocation_list& directory,
+void build_in_place(image::image& instance, const base_relocation_list& directory,
 	const builder_options& options);
-std::uint32_t build_new(image& instance, base_relocation_details_list& directory,
+std::uint32_t build_new(image::image& instance, base_relocation_details_list& directory,
 	const builder_options& options);
-std::uint32_t build_new(image& instance, base_relocation_list& directory,
+std::uint32_t build_new(image::image& instance, base_relocation_list& directory,
 	const builder_options& options);
 std::uint32_t build_new(buffers::output_buffer_interface& buf, base_relocation_details_list& directory,
 	const builder_options& options);

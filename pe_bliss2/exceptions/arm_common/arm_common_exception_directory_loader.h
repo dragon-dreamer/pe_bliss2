@@ -6,7 +6,7 @@
 #include <type_traits>
 #include <variant>
 
-#include "pe_bliss2/image.h"
+#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/exceptions/exception_directory.h"
 #include "pe_bliss2/pe_error.h"
@@ -47,7 +47,7 @@ struct exception_directory_info
 
 template<typename UwopControl, typename LoaderOptions,
 	typename RuntimeFunction, typename ExtendedUnwindRecord>
-void load_extended_unwind_record(const image& instance, const LoaderOptions& options,
+void load_extended_unwind_record(const image::image& instance, const LoaderOptions& options,
 	utilities::safe_uint<rva_type> current_rva, RuntimeFunction& func,
 	ExtendedUnwindRecord& unwind_info) try
 {
@@ -136,7 +136,7 @@ catch (const std::system_error& e)
 
 template<typename UwopControl, typename PackedUnwindData, typename ExtendedUnwindRecord,
 	typename LoaderOptions, typename RuntimeFunction>
-void load_runtime_function(const image& instance, const LoaderOptions& options,
+void load_runtime_function(const image::image& instance, const LoaderOptions& options,
 	rva_type current_rva, RuntimeFunction& func)
 {
 	instance.struct_from_rva(current_rva, func.get_descriptor(),
@@ -156,7 +156,7 @@ void load_runtime_function(const image& instance, const LoaderOptions& options,
 
 template<typename ExceptionDirectoryControl, typename UwopControl, typename PackedUnwindData,
 	typename ExtendedUnwindRecord, typename ExceptionDirectory, typename LoaderOptions>
-void load(const image& instance, const LoaderOptions& options,
+void load(const image::image& instance, const LoaderOptions& options,
 	pe_bliss::exceptions::exception_directory_details& directory)
 {
 	auto [current_rva, size] = ExceptionDirectoryControl::get_exception_directory(instance, options);
