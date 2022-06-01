@@ -5,7 +5,6 @@
 #include <system_error>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 #include "buffers/input_buffer_interface.h"
 #include "buffers/ref_buffer.h"
@@ -53,9 +52,6 @@ std::error_code make_error_code(image_errc) noexcept;
 class [[nodiscard]] image
 {
 public:
-	using section_data_list = std::vector<section::section_data>;
-
-public:
 	[[nodiscard]] inline dos::dos_header& get_dos_header() & noexcept;
 	[[nodiscard]] inline const dos::dos_header& get_dos_header() const& noexcept;
 	[[nodiscard]] inline dos::dos_header get_dos_header() && noexcept;
@@ -84,9 +80,9 @@ public:
 	[[nodiscard]] inline const section::section_table& get_section_table() const& noexcept;
 	[[nodiscard]] inline section::section_table get_section_table() && noexcept;
 
-	[[nodiscard]] inline section_data_list& get_section_data_list() & noexcept;
-	[[nodiscard]] inline const section_data_list& get_section_data_list() const& noexcept;
-	[[nodiscard]] inline section_data_list get_section_data_list() && noexcept;
+	[[nodiscard]] inline section::section_data_list& get_section_data_list() & noexcept;
+	[[nodiscard]] inline const section::section_data_list& get_section_data_list() const& noexcept;
+	[[nodiscard]] inline section::section_data_list get_section_data_list() && noexcept;
 
 	[[nodiscard]] inline core::overlay& get_overlay() & noexcept;
 	[[nodiscard]] inline const core::overlay& get_overlay() const& noexcept;
@@ -109,55 +105,6 @@ public:
 	{
 		loaded_to_memory_ = loaded_to_memory;
 	}
-
-public:
-	using section_ref = std::pair<
-		section::section_table::header_list::iterator, section_data_list::iterator>;
-	using section_const_ref = std::pair<
-		section::section_table::header_list::const_iterator, section_data_list::const_iterator>;
-
-public:
-	[[nodiscard]]
-	section_ref section_from_reference(
-		section::section_header& section_hdr) noexcept;
-	[[nodiscard]]
-	section_const_ref section_from_reference(
-		const section::section_header& section_hdr) const noexcept;
-
-public:
-	[[nodiscard]]
-	section_ref section_from_rva(rva_type rva,
-		std::uint32_t data_size = 0);
-	[[nodiscard]]
-	section_const_ref section_from_rva(rva_type rva,
-		std::uint32_t data_size = 0) const;
-
-	[[nodiscard]]
-	section_ref section_from_va(std::uint32_t va,
-		std::uint32_t data_size = 0);
-	[[nodiscard]]
-	section_const_ref section_from_va(std::uint32_t va,
-		std::uint32_t data_size = 0) const;
-	[[nodiscard]]
-	section_ref section_from_va(std::uint64_t va,
-		std::uint32_t data_size = 0);
-	[[nodiscard]]
-	section_const_ref section_from_va(std::uint64_t va,
-		std::uint32_t data_size = 0) const;
-
-	[[nodiscard]]
-	section_ref section_from_directory(
-		core::data_directories::directory_type directory);
-	[[nodiscard]]
-	section_const_ref section_from_directory(
-		core::data_directories::directory_type directory) const;
-
-	[[nodiscard]]
-	section_ref section_from_file_offset(std::uint32_t offset,
-		std::uint32_t data_size = 0);
-	[[nodiscard]]
-	section_const_ref section_from_file_offset(std::uint32_t offset,
-		std::uint32_t data_size = 0) const;
 
 public:
 	[[nodiscard]]
@@ -503,7 +450,7 @@ private:
 	core::optional_header optional_header_;
 	core::data_directories data_directories_;
 	section::section_table section_table_;
-	section_data_list section_list_;
+	section::section_data_list section_list_;
 	core::overlay overlay_;
 	buffers::ref_buffer full_headers_buffer_;
 };

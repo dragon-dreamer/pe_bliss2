@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <vector>
 
 #include "buffers/input_buffer_interface.h"
 #include "buffers/ref_buffer.h"
@@ -35,5 +36,7 @@ public:
 		const buffers::input_buffer_ptr& buffer,
 		const section_data_load_options& options);
 };
+
+using section_data_list = std::vector<section_data>;
 
 } //namespace pe_bliss::section

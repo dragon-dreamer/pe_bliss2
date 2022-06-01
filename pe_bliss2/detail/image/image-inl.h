@@ -108,17 +108,17 @@ section::section_table image::get_section_table() && noexcept
 	return std::move(section_table_);
 }
 
-image::section_data_list& image::get_section_data_list() & noexcept
+section::section_data_list& image::get_section_data_list() & noexcept
 {
 	return section_list_;
 }
 
-const image::section_data_list& image::get_section_data_list() const& noexcept
+const section::section_data_list& image::get_section_data_list() const& noexcept
 {
 	return section_list_;
 }
 
-image::section_data_list image::get_section_data_list() && noexcept
+section::section_data_list image::get_section_data_list() && noexcept
 {
 	return std::move(section_list_);
 }

@@ -12,6 +12,7 @@
 #include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/image_file_header.h"
+#include "pe_bliss2/image/image_section_search.h"
 #include "pe_bliss2/packed_c_string.h"
 #include "pe_bliss2/packed_utf16_string.h"
 #include "pe_bliss2/pe_error.h"
@@ -46,50 +47,6 @@ struct image_error_category : std::error_category
 };
 
 const image_error_category image_error_category_instance;
-
-template<typename Result, typename SectionHeaderIt,
-	typename SectionTable, typename SectionDataList>
-Result get_section_iterators(SectionHeaderIt header_it, SectionTable& section_tbl,
-	SectionDataList& section_data_list) noexcept
-{
-	if (header_it == std::end(section_tbl.get_section_headers()))
-		return { header_it, std::end(section_data_list) };
-
-	auto header_index = std::distance(
-		std::begin(section_tbl.get_section_headers()), header_it);
-	return {
-		header_it,
-		std::next(std::begin(section_data_list), header_index)
-	};
-}
-
-template<typename Result, typename SectionTable, typename SectionDataList>
-Result section_from_rva_impl(pe_bliss::rva_type rva, std::uint32_t data_size,
-	SectionTable& section_tbl, SectionDataList& section_data_list,
-	std::uint32_t section_alignment)
-{
-	return get_section_iterators<Result>(
-		section_tbl.by_rva(rva, section_alignment, data_size),
-		section_tbl, section_data_list);
-}
-
-template<typename Result, typename SectionTable, typename SectionDataList>
-Result section_from_raw_offset_impl(std::uint32_t raw_offset, std::uint32_t data_size,
-	SectionTable& section_tbl, SectionDataList& section_data_list,
-	std::uint32_t section_alignment)
-{
-	return get_section_iterators<Result>(
-		section_tbl.by_raw_offset(raw_offset, section_alignment, data_size),
-		section_tbl, section_data_list);
-}
-
-template<typename Result, typename Reference, typename SectionTable, typename SectionDataList>
-Result section_from_reference_impl(Reference& section_hdr,
-	SectionTable& section_tbl, SectionDataList& section_data_list) noexcept
-{
-	return get_section_iterators<Result>(section_tbl.by_reference(section_hdr),
-		section_tbl, section_data_list);
-}
 
 } //namespace
 
@@ -132,88 +89,6 @@ void image::set_number_of_data_directories(std::uint32_t number)
 	optional_header_.set_raw_number_of_rva_and_sizes(number);
 }
 
-image::section_ref image::section_from_rva(rva_type rva,
-	std::uint32_t data_size)
-{
-	return section_from_rva_impl<image::section_ref>(rva, data_size,
-		section_table_, section_list_, optional_header_.get_raw_section_alignment());
-}
-
-image::section_const_ref image::section_from_rva(rva_type rva,
-	std::uint32_t data_size) const
-{
-	return section_from_rva_impl<image::section_const_ref>(rva, data_size,
-		section_table_, section_list_, optional_header_.get_raw_section_alignment());
-}
-
-image::section_ref image::section_from_va(std::uint32_t va,
-	std::uint32_t data_size)
-{
-	return section_from_rva_impl<image::section_ref>(
-		address_converter(*this).va_to_rva(va), data_size,
-		section_table_, section_list_, optional_header_.get_raw_section_alignment());
-}
-
-image::section_const_ref image::section_from_va(std::uint32_t va,
-	std::uint32_t data_size) const
-{
-	return section_from_rva_impl<image::section_const_ref>(
-		address_converter(*this).va_to_rva(va), data_size,
-		section_table_, section_list_, optional_header_.get_raw_section_alignment());
-}
-
-image::section_ref image::section_from_va(std::uint64_t va,
-	std::uint32_t data_size)
-{
-	return section_from_rva_impl<image::section_ref>(
-		address_converter(*this).va_to_rva(va), data_size,
-		section_table_, section_list_, optional_header_.get_raw_section_alignment());
-}
-
-image::section_const_ref image::section_from_va(std::uint64_t va,
-	std::uint32_t data_size) const
-{
-	return section_from_rva_impl<image::section_const_ref>(
-		address_converter(*this).va_to_rva(va), data_size,
-		section_table_, section_list_, optional_header_.get_raw_section_alignment());
-}
-
-image::section_ref image::section_from_directory(
-	core::data_directories::directory_type directory)
-{
-	if (!data_directories_.has_directory(directory))
-		return { std::end(section_table_.get_section_headers()), std::end(section_list_) };
-
-	return section_from_rva_impl<image::section_ref>(
-		data_directories_.get_directory(directory)->virtual_address, 0,
-		section_table_, section_list_, optional_header_.get_raw_section_alignment());
-}
-
-image::section_const_ref image::section_from_directory(
-	core::data_directories::directory_type directory) const
-{
-	if (!data_directories_.has_directory(directory))
-		return { std::cend(section_table_.get_section_headers()), std::cend(section_list_) };
-
-	return section_from_rva_impl<image::section_const_ref>(
-		data_directories_.get_directory(directory)->virtual_address, 0,
-		section_table_, section_list_, optional_header_.get_raw_section_alignment());
-}
-
-image::section_ref image::section_from_file_offset(std::uint32_t offset,
-	std::uint32_t data_size)
-{
-	return section_from_raw_offset_impl<image::section_ref>(offset, data_size,
-		section_table_, section_list_, optional_header_.get_raw_section_alignment());
-}
-
-image::section_const_ref image::section_from_file_offset(std::uint32_t offset,
-	std::uint32_t data_size) const
-{
-	return section_from_raw_offset_impl<image::section_const_ref>(offset, data_size,
-		section_table_, section_list_, optional_header_.get_raw_section_alignment());
-}
-
 void image::update_image_size()
 {
 	if (section_table_.get_section_headers().empty())
@@ -252,7 +127,7 @@ std::uint32_t image::file_offset_to_rva(std::uint32_t offset) const
 	if (offset < optional_header_.get_raw_size_of_headers())
 		return offset;
 
-	auto it = section_from_file_offset(offset, 1u).first;
+	auto it = section_from_file_offset(*this, offset, 1u).first;
 	std::uint32_t result = offset - it->get_pointer_to_raw_data();
 	if (!utilities::math::add_if_safe(result, it->get_rva()))
 		throw pe_error(utilities::generic_errc::integer_overflow);
@@ -265,7 +140,7 @@ std::uint32_t image::rva_to_file_offset(rva_type rva) const
 	if (rva < optional_header_.get_raw_size_of_headers())
 		return rva;
 
-	auto it = section_from_rva(rva, 1u).first;
+	auto it = section_from_rva(*this, rva, 1u).first;
 	std::uint32_t result = rva - it->get_rva();
 	if (!utilities::math::add_if_safe(result, it->get_pointer_to_raw_data()))
 		throw pe_error(utilities::generic_errc::integer_overflow);
@@ -282,7 +157,7 @@ buffers::input_buffer_ptr image::section_data_from_rva(rva_type rva,
 	if (include_headers && (rva + data_size <= full_headers_buffer_.size()))
 		return buffers::reduce(full_headers_buffer_.data(), rva, data_size);
 
-	auto [header_it, data_it] = section_from_rva(rva, data_size);
+	auto [header_it, data_it] = section_from_rva(*this, rva, data_size);
 	if (data_it == std::cend(section_list_))
 		throw pe_error(image_errc::section_data_does_not_exist);
 
@@ -311,7 +186,7 @@ std::span<std::byte> image::section_data_from_rva(rva_type rva,
 	if (include_headers && (rva + data_size <= full_headers_buffer_.size()))
 		return { full_headers_buffer_.copied_data().data() + rva, data_size };
 
-	auto [header_it, data_it] = section_from_rva(rva, data_size);
+	auto [header_it, data_it] = section_from_rva(*this, rva, data_size);
 	if (data_it == std::end(section_list_))
 		throw pe_error(image_errc::section_data_does_not_exist);
 
@@ -365,7 +240,7 @@ std::uint32_t image::section_data_length_from_rva(rva_type rva,
 	if (include_headers && rva <= full_headers_buffer_.size())
 		return static_cast<std::uint32_t>(full_headers_buffer_.size()) - rva;
 
-	auto [header_it, data_it] = section_from_rva(rva, 1u);
+	auto [header_it, data_it] = section_from_rva(*this, rva, 1u);
 	if (data_it == std::end(section_list_))
 		throw pe_error(image_errc::section_data_does_not_exist);
 
@@ -394,20 +269,6 @@ std::uint32_t image::section_data_length_from_va(std::uint64_t va,
 {
 	return section_data_length_from_rva(address_converter(*this).va_to_rva(va),
 		include_headers, allow_virtual_data);
-}
-
-image::section_ref image::section_from_reference(
-	section::section_header& section_hdr) noexcept
-{
-	return section_from_reference_impl<section_ref>(section_hdr,
-		get_section_table(), get_section_data_list());
-}
-
-image::section_const_ref image::section_from_reference(
-	const section::section_header& section_hdr) const noexcept
-{
-	return section_from_reference_impl<section_const_ref>(section_hdr,
-		get_section_table(), get_section_data_list());
 }
 
 template<detail::packed_string_type PackedString>
@@ -505,7 +366,7 @@ buffers::input_buffer_ptr image::section_data_from_rva(rva_type rva,
 	if (include_headers && rva < full_headers_buffer_.size())
 		return buffers::reduce(full_headers_buffer_.data(), rva, full_headers_buffer_.size() - rva);
 
-	auto [header_it, data_it] = section_from_rva(rva, 1u);
+	auto [header_it, data_it] = section_from_rva(*this, rva, 1u);
 	if (data_it == std::cend(section_list_))
 		throw pe_error(image_errc::section_data_does_not_exist);
 
@@ -522,7 +383,7 @@ std::span<std::byte> image::section_data_from_rva(rva_type rva,
 			full_headers_buffer_.size() - rva };
 	}
 
-	auto [header_it, data_it] = section_from_rva(rva, 1u);
+	auto [header_it, data_it] = section_from_rva(*this, rva, 1u);
 	if (data_it == std::end(section_list_))
 		throw pe_error(image_errc::section_data_does_not_exist);
 
