@@ -435,6 +435,9 @@
     <ClInclude Include="image\image_section_search.h">
       <Filter>Header Files\image</Filter>
     </ClInclude>
+    <ClInclude Include="image\rva_file_offset_converter.h">
+      <Filter>Header Files\image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -618,6 +621,9 @@
       <Filter>Source Files\image</Filter>
     </ClCompile>
     <ClCompile Include="image\image_section_search.cpp">
+      <Filter>Source Files\image</Filter>
+    </ClCompile>
+    <ClCompile Include="image\rva_file_offset_converter.cpp">
       <Filter>Source Files\image</Filter>
     </ClCompile>
   </ItemGroup>

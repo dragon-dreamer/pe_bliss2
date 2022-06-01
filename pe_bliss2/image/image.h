@@ -15,6 +15,7 @@
 #include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/core/overlay.h"
 #include "pe_bliss2/detail/concepts.h"
+#include "pe_bliss2/image/rva_file_offset_converter.h"
 #include "pe_bliss2/packed_byte_array.h"
 #include "pe_bliss2/packed_byte_vector.h"
 #include "pe_bliss2/packed_struct.h"
@@ -105,12 +106,6 @@ public:
 	{
 		loaded_to_memory_ = loaded_to_memory;
 	}
-
-public:
-	[[nodiscard]]
-	std::uint32_t file_offset_to_rva(std::uint32_t offset) const;
-	[[nodiscard]]
-	std::uint32_t rva_to_file_offset(rva_type rva) const;
 
 public:
 	[[nodiscard]]
@@ -346,7 +341,7 @@ public:
 	rva_type struct_to_file_offset(const packed_struct<T>& value,
 		bool include_headers = false, bool write_virtual_part = false)
 	{
-		return struct_to_rva(absolute_offset_to_rva(value),
+		return struct_to_rva(absolute_offset_to_rva(*this, value),
 			value, include_headers, write_virtual_part);
 	}
 
@@ -396,7 +391,7 @@ public:
 	rva_type byte_array_to_file_offset(const ArrayOrVector& arr,
 		bool include_headers = false, bool write_virtual_part = false)
 	{
-		return byte_array_to_rva(absolute_offset_to_rva(arr), arr,
+		return byte_array_to_rva(absolute_offset_to_rva(*this, arr), arr,
 			include_headers, write_virtual_part);
 	}
 
@@ -422,17 +417,6 @@ public:
 	[[nodiscard]]
 	std::uint32_t section_data_length_from_va(std::uint64_t va,
 		bool include_headers = false, bool allow_virtual_data = false) const;
-
-public:
-	template<typename PackedStruct>
-	rva_type absolute_offset_to_rva(const PackedStruct& obj) const
-	{
-		utilities::safe_uint<std::uint32_t> offset;
-		offset += obj.get_state().absolute_offset();
-		return file_offset_to_rva(offset.value());
-	}
-
-	rva_type absolute_offset_to_rva(const buffers::input_buffer_interface& buf) const;
 
 public:
 	void update_number_of_sections();

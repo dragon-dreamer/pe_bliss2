@@ -13,6 +13,7 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/image_file_header.h"
 #include "pe_bliss2/image/image_section_search.h"
+#include "pe_bliss2/image/rva_file_offset_converter.h"
 #include "pe_bliss2/packed_c_string.h"
 #include "pe_bliss2/packed_utf16_string.h"
 #include "pe_bliss2/pe_error.h"
@@ -120,32 +121,6 @@ void image::copy_referenced_section_memory()
 {
 	for (auto& section : section_list_)
 		section.copy_referenced_buffer();
-}
-
-std::uint32_t image::file_offset_to_rva(std::uint32_t offset) const
-{
-	if (offset < optional_header_.get_raw_size_of_headers())
-		return offset;
-
-	auto it = section_from_file_offset(*this, offset, 1u).first;
-	std::uint32_t result = offset - it->get_pointer_to_raw_data();
-	if (!utilities::math::add_if_safe(result, it->get_rva()))
-		throw pe_error(utilities::generic_errc::integer_overflow);
-
-	return result;
-}
-
-std::uint32_t image::rva_to_file_offset(rva_type rva) const
-{
-	if (rva < optional_header_.get_raw_size_of_headers())
-		return rva;
-
-	auto it = section_from_rva(*this, rva, 1u).first;
-	std::uint32_t result = rva - it->get_rva();
-	if (!utilities::math::add_if_safe(result, it->get_pointer_to_raw_data()))
-		throw pe_error(utilities::generic_errc::integer_overflow);
-
-	return result;
 }
 
 buffers::input_buffer_ptr image::section_data_from_rva(rva_type rva,
@@ -419,7 +394,7 @@ template<detail::packed_string_type PackedString>
 rva_type image::string_to_file_offset(const PackedString& str,
 	bool include_headers, bool write_virtual_part)
 {
-	return string_to_rva(absolute_offset_to_rva(str), str, include_headers, write_virtual_part);
+	return string_to_rva(absolute_offset_to_rva(*this, str), str, include_headers, write_virtual_part);
 }
 
 template<detail::packed_string_type PackedString>
@@ -523,7 +498,7 @@ std::uint64_t image::buffer_to_va(std::uint64_t va, const buffers::ref_buffer& b
 rva_type image::buffer_to_file_offset(const buffers::ref_buffer& buf,
 	bool include_headers)
 {
-	return buffer_to_rva(absolute_offset_to_rva(*buf.data()), buf, include_headers);
+	return buffer_to_rva(absolute_offset_to_rva(*this, *buf.data()), buf, include_headers);
 }
 
 packed_byte_vector image::byte_vector_from_rva(rva_type rva,
@@ -539,13 +514,6 @@ void image::byte_vector_from_rva(rva_type rva, packed_byte_vector& arr,
 {
 	auto buf = section_data_from_rva(rva, size, include_headers, allow_virtual_data);
 	arr.deserialize(*buf, size, allow_virtual_data);
-}
-
-rva_type image::absolute_offset_to_rva(const buffers::input_buffer_interface& buf) const
-{
-	utilities::safe_uint<std::uint32_t> offset;
-	offset += buf.absolute_offset();
-	return file_offset_to_rva(offset.value());
 }
 
 /*
