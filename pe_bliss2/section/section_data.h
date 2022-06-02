@@ -35,6 +35,18 @@ public:
 	void deserialize(const section_header& header,
 		const buffers::input_buffer_ptr& buffer,
 		const section_data_load_options& options);
+
+	[[nodiscard]]
+	buffers::ref_buffer& get_buffer() noexcept
+	{
+		return static_cast<buffers::ref_buffer&>(*this);
+	}
+
+	[[nodiscard]]
+	const buffers::ref_buffer& get_buffer() const noexcept
+	{
+		return static_cast<const buffers::ref_buffer&>(*this);
+	}
 };
 
 using section_data_list = std::vector<section_data>;

@@ -9,6 +9,7 @@
 #include "pe_bliss2/detail/resources/image_resource_directory.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_length_from_va.h"
+#include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/packed_utf16_string.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
@@ -109,7 +110,7 @@ void load_resource_data_entry(const image::image& instance, const loader_options
 		raw_length = (std::min)(raw_length, data_size);
 		if (raw_length)
 		{
-			auto buf = instance.section_data_from_rva(data_rva, raw_length,
+			auto buf = section_data_from_rva(instance, data_rva, raw_length,
 				options.include_headers, false);
 			entry.get_raw_data().deserialize(buf, options.copy_raw_data);
 		}

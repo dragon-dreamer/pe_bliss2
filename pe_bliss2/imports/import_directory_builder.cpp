@@ -13,8 +13,9 @@
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/concepts.h"
-#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/section_data_from_va.h"
+#include "pe_bliss2/packed_struct.h"
 #include "utilities/safe_uint.h"
 
 namespace
@@ -449,10 +450,11 @@ build_result build_new_impl(image::image& instance, Directory& directory,
 	const builder_options& options)
 {
 	assert(options.directory_rva);
-	auto buf = buffers::output_memory_ref_buffer(instance.section_data_from_rva(options.directory_rva, true));
+	auto buf = buffers::output_memory_ref_buffer(
+		section_data_from_rva(instance, options.directory_rva, true));
 	std::optional<buffers::output_memory_ref_buffer> iat_buf;
 	if (options.iat_rva)
-		iat_buf.emplace(instance.section_data_from_rva(*options.iat_rva, true));
+		iat_buf.emplace(section_data_from_rva(instance , *options.iat_rva, true));
 
 	auto result = build_new_impl(buf, iat_buf ? &*iat_buf : nullptr, directory, options);
 	update_data_directory(instance, options, result);

@@ -14,6 +14,7 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/generic_error.h"
@@ -228,7 +229,7 @@ template<typename... Directories>
 build_result build_new_impl(image::image& instance, std::variant<Directories...>& directories,
 	const builder_options& options, std::uint64_t image_base)
 {
-	auto buf = buffers::output_memory_ref_buffer(instance.section_data_from_rva(
+	auto buf = buffers::output_memory_ref_buffer(section_data_from_rva(instance,
 		options.directory_rva, true));
 	auto result = build_new_impl(buf, directories, options, image_base);
 	update_data_directory(instance, options, result.directory_size);

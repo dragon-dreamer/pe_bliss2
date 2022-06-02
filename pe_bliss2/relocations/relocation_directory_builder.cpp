@@ -11,6 +11,7 @@
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/section_data_from_va.h"
 #include "utilities/generic_error.h"
 #include "utilities/safe_uint.h"
 
@@ -135,7 +136,7 @@ std::uint32_t build_new_impl(image::image& instance, Directory& directory,
 	const builder_options& options)
 {
 	assert(options.directory_rva);
-	auto buf = buffers::output_memory_ref_buffer(instance.section_data_from_rva(options.directory_rva, true));
+	auto buf = buffers::output_memory_ref_buffer(section_data_from_rva(instance, options.directory_rva, true));
 	auto result = build_new_impl(buf, directory, options);
 	update_data_directory(instance, options, result);
 	return result;

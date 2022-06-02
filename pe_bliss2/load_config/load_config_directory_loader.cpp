@@ -13,8 +13,9 @@
 #include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/detail/load_config/image_load_config_directory.h"
 #include "pe_bliss2/detail/packed_reflection.h"
-#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/section_data_from_va.h"
+#include "pe_bliss2/packed_struct.h"
 #include "utilities/math.h"
 #include "utilities/safe_uint.h"
 
@@ -438,7 +439,7 @@ void load_chpe_metadata(const image::image& instance,
 		break;
 	}
 
-	auto buf = instance.section_data_from_va(metadata_va.value(), metadata_size,
+	auto buf = section_data_from_va(instance, metadata_va.value(), metadata_size,
 		options.include_headers, options.allow_virtual_data);
 	auto& metadata_descriptor = metadata.get_metadata();
 	metadata_descriptor.deserialize_until(*buf, metadata_size, options.allow_virtual_data);
@@ -1193,7 +1194,7 @@ void load_impl(const image::image& instance,
 	auto size = directory.get_descriptor_size();
 
 	rva_type struct_rva = load_config_dir_info->virtual_address + sizeof(size);
-	auto struct_buf = instance.section_data_from_rva(struct_rva,
+	auto struct_buf = section_data_from_rva(instance, struct_rva,
 		size, options.include_headers, options.allow_virtual_data);
 	directory.get_descriptor().deserialize_until(*struct_buf, size, options.allow_virtual_data);
 

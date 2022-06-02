@@ -2,7 +2,6 @@
 
 #include <cstdint>
 #include <span>
-#include <system_error>
 #include <type_traits>
 #include <utility>
 
@@ -16,6 +15,7 @@
 #include "pe_bliss2/core/overlay.h"
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/image/rva_file_offset_converter.h"
+#include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/packed_byte_array.h"
 #include "pe_bliss2/packed_byte_vector.h"
 #include "pe_bliss2/packed_struct.h"
@@ -40,15 +40,6 @@ concept packed_string_type = std::is_same_v<T, packed_utf16_string>
 
 namespace image
 {
-
-enum class image_errc
-{
-	too_many_sections = 1,
-	too_many_rva_and_sizes,
-	section_data_does_not_exist
-};
-
-std::error_code make_error_code(image_errc) noexcept;
 
 class [[nodiscard]] image
 {
@@ -108,52 +99,6 @@ public:
 	}
 
 public:
-	[[nodiscard]]
-	buffers::input_buffer_ptr section_data_from_rva(rva_type rva,
-		std::uint32_t data_size, bool include_headers = false,
-		bool allow_virtual_data = false) const;
-	[[nodiscard]]
-	std::span<std::byte> section_data_from_rva(rva_type rva,
-		std::uint32_t data_size, bool include_headers = false,
-		bool allow_virtual_data = false);
-	[[nodiscard]]
-	buffers::input_buffer_ptr section_data_from_va(std::uint32_t va,
-		std::uint32_t data_size, bool include_headers = false,
-		bool allow_virtual_data = false) const;
-	[[nodiscard]]
-	std::span<std::byte> section_data_from_va(std::uint32_t va,
-		std::uint32_t data_size, bool include_headers = false,
-		bool allow_virtual_data = false);
-	[[nodiscard]]
-	buffers::input_buffer_ptr section_data_from_va(std::uint64_t va,
-		std::uint32_t data_size, bool include_headers = false,
-		bool allow_virtual_data = false) const;
-	[[nodiscard]]
-	std::span<std::byte> section_data_from_va(std::uint64_t va,
-		std::uint32_t data_size, bool include_headers = false,
-		bool allow_virtual_data = false);
-
-public:
-	[[nodiscard]]
-	buffers::input_buffer_ptr section_data_from_rva(rva_type rva,
-		bool include_headers = false) const;
-	[[nodiscard]]
-	std::span<std::byte> section_data_from_rva(rva_type rva,
-		bool include_headers = false);
-	[[nodiscard]]
-	buffers::input_buffer_ptr section_data_from_va(std::uint32_t va,
-		bool include_headers = false) const;
-	[[nodiscard]]
-	std::span<std::byte> section_data_from_va(std::uint32_t va,
-		bool include_headers = false);
-	[[nodiscard]]
-	buffers::input_buffer_ptr section_data_from_va(std::uint64_t va,
-		bool include_headers = false) const;
-	[[nodiscard]]
-	std::span<std::byte> section_data_from_va(std::uint64_t va,
-		bool include_headers = false);
-
-public:
 	template<detail::packed_string_type PackedString = packed_c_string>
 	[[nodiscard]]
 	PackedString string_from_rva(rva_type rva,
@@ -192,7 +137,7 @@ public:
 	void byte_array_from_rva(rva_type rva, packed_byte_array<MaxSize>& arr,
 		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
 	{
-		auto buf = section_data_from_rva(rva, size, include_headers, allow_virtual_data);
+		auto buf = section_data_from_rva(*this, rva, size, include_headers, allow_virtual_data);
 		arr.deserialize(*buf, size, allow_virtual_data);
 	}
 
@@ -241,7 +186,7 @@ public:
 		bool allow_virtual_data = false) const
 	{
 		packed_struct<T> value{};
-		auto buf = section_data_from_rva(rva,
+		auto buf = section_data_from_rva(*this, rva,
 			value.packed_size, include_headers, allow_virtual_data);
 		value.deserialize(*buf, allow_virtual_data);
 		return value;
@@ -253,7 +198,7 @@ public:
 		bool allow_virtual_data = false) const
 	{
 		packed_struct<T> value{};
-		auto buf = section_data_from_va(va,
+		auto buf = section_data_from_va(*this, va,
 			value.packed_size, include_headers, allow_virtual_data);
 		value.deserialize(*buf, allow_virtual_data);
 		return value;
@@ -263,7 +208,7 @@ public:
 	packed_struct<T>& struct_from_rva(uint32_t rva, packed_struct<T>& value,
 		bool include_headers = false, bool allow_virtual_data = false) const
 	{
-		auto buf = section_data_from_rva(rva,
+		auto buf = section_data_from_rva(*this, rva,
 			value.packed_size, include_headers, allow_virtual_data);
 		value.deserialize(*buf, allow_virtual_data);
 		return value;
@@ -273,7 +218,7 @@ public:
 	packed_struct<T>& struct_from_va(Va va, packed_struct<T>& value,
 		bool include_headers = false, bool allow_virtual_data = false) const
 	{
-		auto buf = section_data_from_va(va,
+		auto buf = section_data_from_va(*this, va,
 			value.packed_size, include_headers, allow_virtual_data);
 		value.deserialize(*buf, allow_virtual_data);
 		return value;
@@ -288,7 +233,7 @@ public:
 		if (!value.physical_size() && !write_virtual_part)
 			return rva;
 
-		auto buf = section_data_from_rva(rva,
+		auto buf = section_data_from_rva(*this, rva,
 			static_cast<std::uint32_t>(
 				write_virtual_part ? value.packed_size : value.physical_size()),
 			include_headers, cut_if_does_not_fit);
@@ -308,7 +253,7 @@ public:
 		if (!value.physical_size() && !write_virtual_part)
 			return va;
 
-		auto buf = section_data_from_va(va,
+		auto buf = section_data_from_va(*this, va,
 			static_cast<std::uint32_t>(
 				write_virtual_part ? value.packed_size : value.physical_size()),
 			include_headers, cut_if_does_not_fit);
@@ -369,7 +314,7 @@ public:
 		if (!arr.data_size() || (!arr.physical_size() && !write_virtual_part))
 			return rva;
 
-		auto buf = section_data_from_rva(rva, include_headers);
+		auto buf = section_data_from_rva(*this, rva, include_headers);
 		return rva + static_cast<rva_type>(
 			arr.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
 	}
@@ -430,11 +375,5 @@ private:
 
 } //namespace image
 } //namespace pe_bliss
-
-namespace std
-{
-template<>
-struct is_error_code_enum<pe_bliss::image::image_errc> : true_type {};
-} //namespace std
 
 #include "pe_bliss2/detail/image/image-inl.h"

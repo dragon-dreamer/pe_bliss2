@@ -8,8 +8,9 @@
 #include "buffers/output_buffer_interface.h"
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/core/data_directories.h"
-#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/section_data_from_va.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/generic_error.h"
@@ -140,7 +141,7 @@ std::uint32_t build_new_impl(image::image& instance, Directory& directory,
 	const builder_options& options)
 {
 	assert(options.directory_rva);
-	auto buf = buffers::output_memory_ref_buffer(instance.section_data_from_rva(options.directory_rva, true));
+	auto buf = buffers::output_memory_ref_buffer(section_data_from_rva(instance, options.directory_rva, true));
 	auto size = static_cast<std::uint32_t>(build_new_impl(buf, directory));
 	update_data_directory(instance, options, size);
 	return size;

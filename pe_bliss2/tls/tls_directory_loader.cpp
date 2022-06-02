@@ -6,6 +6,7 @@
 
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/image/section_data_length_from_va.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_types.h"
@@ -76,7 +77,7 @@ Directory load_impl(const image::image& instance, const loader_options& options)
 			static_cast<std::uint32_t>(descriptor->end_address_of_raw_data - descriptor->start_address_of_raw_data));
 		if (raw_length)
 		{
-			auto buf = instance.section_data_from_va(descriptor->start_address_of_raw_data, raw_length,
+			auto buf = section_data_from_va(instance, descriptor->start_address_of_raw_data, raw_length,
 				options.include_headers, false);
 			directory.get_raw_data().deserialize(buf, options.copy_raw_data);
 		}

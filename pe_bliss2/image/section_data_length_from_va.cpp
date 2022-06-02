@@ -4,6 +4,7 @@
 
 #include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/image_errc.h"
 #include "pe_bliss2/image/image_section_search.h"
 
 namespace pe_bliss::image

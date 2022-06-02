@@ -5,59 +5,24 @@
 #include <cstdint>
 #include <iterator>
 #include <limits>
-#include <system_error>
 
 #include "buffers/input_buffer_section.h"
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/image_file_header.h"
+#include "pe_bliss2/image/image_errc.h"
 #include "pe_bliss2/image/image_section_search.h"
 #include "pe_bliss2/image/rva_file_offset_converter.h"
+#include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/packed_c_string.h"
 #include "pe_bliss2/packed_utf16_string.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
 #include "utilities/math.h"
 
-namespace
-{
-
-struct image_error_category : std::error_category
-{
-	const char* name() const noexcept override
-	{
-		return "image";
-	}
-
-	std::string message(int ev) const override
-	{
-		using enum pe_bliss::image::image_errc;
-		switch (static_cast<pe_bliss::image::image_errc>(ev))
-		{
-		case too_many_sections:
-			return "Too many sections";
-		case too_many_rva_and_sizes:
-			return "Too many data directories";
-		case section_data_does_not_exist:
-			return "Requested section data does not exist";
-		default:
-			return {};
-		}
-	}
-};
-
-const image_error_category image_error_category_instance;
-
-} //namespace
-
 namespace pe_bliss::image
 {
-
-std::error_code make_error_code(image_errc e) noexcept
-{
-	return { static_cast<int>(e), image_error_category_instance };
-}
 
 bool image::has_relocation() const noexcept
 {
@@ -123,92 +88,6 @@ void image::copy_referenced_section_memory()
 		section.copy_referenced_buffer();
 }
 
-buffers::input_buffer_ptr image::section_data_from_rva(rva_type rva,
-	std::uint32_t data_size, bool include_headers, bool allow_virtual_data) const
-{
-	if (!utilities::math::is_sum_safe(rva, data_size))
-		throw pe_error(utilities::generic_errc::integer_overflow);
-
-	if (include_headers && (rva + data_size <= full_headers_buffer_.size()))
-		return buffers::reduce(full_headers_buffer_.data(), rva, data_size);
-
-	auto [header_it, data_it] = section_from_rva(*this, rva, data_size);
-	if (data_it == std::cend(section_list_))
-		throw pe_error(image_errc::section_data_does_not_exist);
-
-	std::uint32_t data_offset = rva - header_it->get_rva();
-	if (data_offset + data_size <= data_it->size())
-		return buffers::reduce(data_it->data(), data_offset, data_size);
-
-	if (allow_virtual_data)
-	{
-		data_size = data_offset < data_it->size()
-			? static_cast<std::uint32_t>(data_it->size()) - data_offset
-			: 0u;
-		return buffers::reduce(data_it->data(), (std::min)(data_it->size(),
-			static_cast<std::size_t>(data_offset)), data_size);
-	}
-
-	throw pe_error(image_errc::section_data_does_not_exist);
-}
-
-std::span<std::byte> image::section_data_from_rva(rva_type rva,
-	std::uint32_t data_size, bool include_headers, bool allow_virtual_data)
-{
-	if (!utilities::math::is_sum_safe(rva, data_size))
-		throw pe_error(utilities::generic_errc::integer_overflow);
-
-	if (include_headers && (rva + data_size <= full_headers_buffer_.size()))
-		return { full_headers_buffer_.copied_data().data() + rva, data_size };
-
-	auto [header_it, data_it] = section_from_rva(*this, rva, data_size);
-	if (data_it == std::end(section_list_))
-		throw pe_error(image_errc::section_data_does_not_exist);
-
-	std::uint32_t data_offset = rva - header_it->get_rva();
-	if (data_offset + data_size <= data_it->size())
-		return { data_it->copied_data().data() + data_offset, data_size };
-
-	if (allow_virtual_data)
-	{
-		data_size = data_offset < data_it->size()
-			? static_cast<std::uint32_t>(data_it->size()) - data_offset
-			: 0u;
-		return { data_it->copied_data().data()
-			+ (std::min)(data_it->size(), static_cast<std::size_t>(data_offset)), data_size };
-	}
-
-	throw pe_error(image_errc::section_data_does_not_exist);
-}
-
-buffers::input_buffer_ptr image::section_data_from_va(std::uint32_t va,
-	std::uint32_t data_size, bool include_headers, bool allow_virtual_data) const
-{
-	return section_data_from_rva(address_converter(*this).va_to_rva(va),
-		data_size, include_headers, allow_virtual_data);
-}
-
-std::span<std::byte> image::section_data_from_va(std::uint32_t va,
-	std::uint32_t data_size, bool include_headers, bool allow_virtual_data)
-{
-	return section_data_from_rva(address_converter(*this).va_to_rva(va),
-		data_size, include_headers, allow_virtual_data);
-}
-
-buffers::input_buffer_ptr image::section_data_from_va(std::uint64_t va,
-	std::uint32_t data_size, bool include_headers, bool allow_virtual_data) const
-{
-	return section_data_from_rva(address_converter(*this).va_to_rva(va),
-		data_size, include_headers, allow_virtual_data);
-}
-
-std::span<std::byte> image::section_data_from_va(std::uint64_t va,
-	std::uint32_t data_size, bool include_headers, bool allow_virtual_data)
-{
-	return section_data_from_rva(address_converter(*this).va_to_rva(va),
-		data_size, include_headers, allow_virtual_data);
-}
-
 template<detail::packed_string_type PackedString>
 PackedString image::string_from_rva(rva_type rva,
 	bool include_headers, bool allow_virtual_data) const
@@ -222,7 +101,7 @@ template<detail::packed_string_type PackedString>
 void image::string_from_rva(rva_type rva, PackedString& str,
 	bool include_headers, bool allow_virtual_data) const
 {
-	auto buf = section_data_from_rva(rva, include_headers);
+	auto buf = section_data_from_rva(*this, rva, include_headers);
 	str.deserialize(*buf, allow_virtual_data);
 }
 
@@ -298,61 +177,6 @@ template void image::string_from_va<
 	packed_utf16_string>(std::uint64_t va, packed_utf16_string& str,
 		bool include_headers, bool allow_virtual_data) const;
 
-buffers::input_buffer_ptr image::section_data_from_rva(rva_type rva,
-	bool include_headers) const
-{
-	if (include_headers && rva < full_headers_buffer_.size())
-		return buffers::reduce(full_headers_buffer_.data(), rva, full_headers_buffer_.size() - rva);
-
-	auto [header_it, data_it] = section_from_rva(*this, rva, 1u);
-	if (data_it == std::cend(section_list_))
-		throw pe_error(image_errc::section_data_does_not_exist);
-
-	std::uint32_t data_offset = rva - header_it->get_rva();
-	return buffers::reduce(data_it->data(), data_offset, data_it->size() - data_offset);
-}
-
-std::span<std::byte> image::section_data_from_rva(rva_type rva,
-	bool include_headers)
-{
-	if (include_headers && rva < full_headers_buffer_.size())
-	{
-		return { full_headers_buffer_.copied_data().data() + rva,
-			full_headers_buffer_.size() - rva };
-	}
-
-	auto [header_it, data_it] = section_from_rva(*this, rva, 1u);
-	if (data_it == std::end(section_list_))
-		throw pe_error(image_errc::section_data_does_not_exist);
-
-	std::uint32_t data_offset = rva - header_it->get_rva();
-	return { data_it->copied_data().data() + data_offset, data_it->size() - data_offset };
-}
-
-buffers::input_buffer_ptr image::section_data_from_va(std::uint32_t va,
-	bool include_headers) const
-{
-	return section_data_from_rva(address_converter(*this).va_to_rva(va), include_headers);
-}
-
-std::span<std::byte> image::section_data_from_va(std::uint32_t va,
-	bool include_headers)
-{
-	return section_data_from_rva(address_converter(*this).va_to_rva(va), include_headers);
-}
-
-buffers::input_buffer_ptr image::section_data_from_va(std::uint64_t va,
-	bool include_headers) const
-{
-	return section_data_from_rva(address_converter(*this).va_to_rva(va), include_headers);
-}
-
-std::span<std::byte> image::section_data_from_va(std::uint64_t va,
-	bool include_headers)
-{
-	return section_data_from_rva(address_converter(*this).va_to_rva(va), include_headers);
-}
-
 template<detail::packed_string_type PackedString>
 rva_type image::string_to_file_offset(const PackedString& str,
 	bool include_headers, bool write_virtual_part)
@@ -367,7 +191,7 @@ rva_type image::string_to_rva(rva_type rva, const PackedString& str,
 	if (str.value().empty() && str.is_virtual() && !write_virtual_part)
 		return rva;
 
-	auto buf = section_data_from_rva(rva, include_headers);
+	auto buf = section_data_from_rva(*this, rva, include_headers);
 	return rva + static_cast<rva_type>(
 		str.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
 }
@@ -379,7 +203,7 @@ std::uint32_t image::string_to_va(std::uint32_t va, const PackedString& str,
 	if (str.value().empty() && str.is_virtual() && !write_virtual_part)
 		return va;
 
-	auto buf = section_data_from_va(va, include_headers);
+	auto buf = section_data_from_va(*this, va, include_headers);
 	return va + static_cast<std::uint32_t>(
 		str.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
 }
@@ -391,7 +215,7 @@ std::uint64_t image::string_to_va(std::uint64_t va, const PackedString& str,
 	if (str.value().empty() && str.is_virtual() && !write_virtual_part)
 		return va;
 
-	auto buf = section_data_from_va(va, include_headers);
+	auto buf = section_data_from_va(*this, va, include_headers);
 	return va + static_cast<std::uint64_t>(
 		str.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
 }
@@ -428,7 +252,7 @@ rva_type image::buffer_to_rva(rva_type rva, const buffers::ref_buffer& buf,
 	if (buf.empty())
 		return rva;
 
-	auto data = section_data_from_rva(rva, include_headers);
+	auto data = section_data_from_rva(*this, rva, include_headers);
 	auto data_buffer = buffers::output_memory_ref_buffer(data);
 	buf.serialize(data_buffer);
 	return rva + static_cast<rva_type>(buf.size());
@@ -440,7 +264,7 @@ std::uint32_t image::buffer_to_va(std::uint32_t va, const buffers::ref_buffer& b
 	if (buf.empty())
 		return va;
 
-	auto data = section_data_from_va(va, include_headers);
+	auto data = section_data_from_va(*this, va, include_headers);
 	auto data_buffer = buffers::output_memory_ref_buffer(data);
 	buf.serialize(data_buffer);
 	return va + static_cast<std::uint32_t>(buf.size());
@@ -452,7 +276,7 @@ std::uint64_t image::buffer_to_va(std::uint64_t va, const buffers::ref_buffer& b
 	if (buf.empty())
 		return va;
 
-	auto data = section_data_from_va(va, include_headers);
+	auto data = section_data_from_va(*this, va, include_headers);
 	auto data_buffer = buffers::output_memory_ref_buffer(data);
 	buf.serialize(data_buffer);
 	return va + static_cast<std::uint64_t>(buf.size());
@@ -475,7 +299,7 @@ packed_byte_vector image::byte_vector_from_rva(rva_type rva,
 void image::byte_vector_from_rva(rva_type rva, packed_byte_vector& arr,
 	std::uint32_t size, bool include_headers, bool allow_virtual_data) const
 {
-	auto buf = section_data_from_rva(rva, size, include_headers, allow_virtual_data);
+	auto buf = section_data_from_rva(*this, rva, size, include_headers, allow_virtual_data);
 	arr.deserialize(*buf, size, allow_virtual_data);
 }
 

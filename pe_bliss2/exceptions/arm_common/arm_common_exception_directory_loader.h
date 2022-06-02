@@ -7,6 +7,7 @@
 #include <variant>
 
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/exceptions/exception_directory.h"
 #include "pe_bliss2/pe_error.h"
@@ -113,7 +114,7 @@ void load_extended_unwind_record(const image::image& instance, const LoaderOptio
 				if (current_rva + (code.length - 1u) > last_rva)
 					throw pe_error(exception_directory_loader_errc::invalid_unwind_info);
 
-				auto bytes_read = instance.section_data_from_rva(current_rva.value(),
+				auto bytes_read = section_data_from_rva(instance, current_rva.value(),
 					code.length - 1u, options.include_headers, options.allow_virtual_data)
 					->read(code.length - 1u, &descriptor.value()[1]);
 				descriptor.set_physical_size(descriptor.physical_size() + bytes_read);

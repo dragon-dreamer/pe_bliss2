@@ -75,9 +75,11 @@
     <ClInclude Include="exports\export_directory_loader.h" />
     <ClInclude Include="image\image.h" />
     <ClInclude Include="image\image_builder.h" />
+    <ClInclude Include="image\image_errc.h" />
     <ClInclude Include="image\image_loader.h" />
     <ClInclude Include="image\image_section_search.h" />
     <ClInclude Include="image\rva_file_offset_converter.h" />
+    <ClInclude Include="image\section_data_from_va.h" />
     <ClInclude Include="image\section_data_length_from_va.h" />
     <ClInclude Include="imports\imported_address.h" />
     <ClInclude Include="imports\import_directory.h" />
@@ -157,9 +159,11 @@
     <ClCompile Include="exports\export_directory_loader.cpp" />
     <ClCompile Include="image\image.cpp" />
     <ClCompile Include="image\image_builder.cpp" />
+    <ClCompile Include="image\image_errc.cpp" />
     <ClCompile Include="image\image_loader.cpp" />
     <ClCompile Include="image\image_section_search.cpp" />
     <ClCompile Include="image\rva_file_offset_converter.cpp" />
+    <ClCompile Include="image\section_data_from_va.cpp" />
     <ClCompile Include="image\section_data_length_from_va.cpp" />
     <ClCompile Include="imports\import_directory_builder.cpp">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
