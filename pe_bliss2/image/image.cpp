@@ -209,43 +209,6 @@ std::span<std::byte> image::section_data_from_va(std::uint64_t va,
 		data_size, include_headers, allow_virtual_data);
 }
 
-std::uint32_t image::section_data_length_from_rva(rva_type rva,
-	bool include_headers, bool allow_virtual_data) const
-{
-	if (include_headers && rva <= full_headers_buffer_.size())
-		return static_cast<std::uint32_t>(full_headers_buffer_.size()) - rva;
-
-	auto [header_it, data_it] = section_from_rva(*this, rva, 1u);
-	if (data_it == std::end(section_list_))
-		throw pe_error(image_errc::section_data_does_not_exist);
-
-	std::uint32_t data_offset = rva - header_it->get_rva();
-	if (allow_virtual_data)
-	{
-		return header_it->get_virtual_size(optional_header_.get_raw_section_alignment())
-			- data_offset;
-	}
-
-	if (data_offset >= data_it->size())
-		return 0u;
-
-	return static_cast<std::uint32_t>(data_it->size()) - data_offset;
-}
-
-std::uint32_t image::section_data_length_from_va(std::uint32_t va,
-	bool include_headers, bool allow_virtual_data) const
-{
-	return section_data_length_from_rva(address_converter(*this).va_to_rva(va),
-		include_headers, allow_virtual_data);
-}
-
-std::uint32_t image::section_data_length_from_va(std::uint64_t va,
-	bool include_headers, bool allow_virtual_data) const
-{
-	return section_data_length_from_rva(address_converter(*this).va_to_rva(va),
-		include_headers, allow_virtual_data);
-}
-
 template<detail::packed_string_type PackedString>
 PackedString image::string_from_rva(rva_type rva,
 	bool include_headers, bool allow_virtual_data) const

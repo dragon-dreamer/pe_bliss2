@@ -5,8 +5,9 @@
 #include <system_error>
 
 #include "pe_bliss2/core/data_directories.h"
-#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/section_data_length_from_va.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_types.h"
 
 namespace
@@ -69,7 +70,7 @@ Directory load_impl(const image::image& instance, const loader_options& options)
 			return directory;
 		}
 
-		auto raw_length = instance.section_data_length_from_va(
+		auto raw_length = section_data_length_from_va(instance,
 			descriptor->start_address_of_raw_data, options.include_headers, false);
 		raw_length = (std::min)(raw_length,
 			static_cast<std::uint32_t>(descriptor->end_address_of_raw_data - descriptor->start_address_of_raw_data));

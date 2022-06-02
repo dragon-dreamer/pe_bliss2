@@ -408,17 +408,6 @@ public:
 		bool include_headers = false);
 
 public:
-	[[nodiscard]]
-	std::uint32_t section_data_length_from_rva(rva_type rva,
-		bool include_headers = false, bool allow_virtual_data = false) const;
-	[[nodiscard]]
-	std::uint32_t section_data_length_from_va(std::uint32_t va,
-		bool include_headers = false, bool allow_virtual_data = false) const;
-	[[nodiscard]]
-	std::uint32_t section_data_length_from_va(std::uint64_t va,
-		bool include_headers = false, bool allow_virtual_data = false) const;
-
-public:
 	void update_number_of_sections();
 	void update_image_size();
 	void set_number_of_data_directories(std::uint32_t number);
