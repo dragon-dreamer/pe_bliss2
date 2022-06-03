@@ -10,6 +10,7 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
+#include "pe_bliss2/image/string_to_va.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
@@ -72,7 +73,7 @@ void build_descriptor_in_place(image::image& instance,
 		instance.struct_to_file_offset(entry.get_descriptor(),
 		true, options.write_virtual_part));
 	last_rva = (std::max)(last_rva,
-		instance.string_to_file_offset(entry.get_library_name(), true, options.write_virtual_part));
+		string_to_file_offset(instance, entry.get_library_name(), true, options.write_virtual_part));
 	last_rva = (std::max)(last_rva, last_descriptor_rva);
 }
 

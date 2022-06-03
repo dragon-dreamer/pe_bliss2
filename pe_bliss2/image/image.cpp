@@ -15,8 +15,6 @@
 #include "pe_bliss2/image/image_section_search.h"
 #include "pe_bliss2/image/rva_file_offset_converter.h"
 #include "pe_bliss2/image/section_data_from_va.h"
-#include "pe_bliss2/packed_c_string.h"
-#include "pe_bliss2/packed_utf16_string.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
 #include "utilities/math.h"
@@ -87,75 +85,6 @@ void image::copy_referenced_section_memory()
 	for (auto& section : section_list_)
 		section.copy_referenced_buffer();
 }
-
-template<packed_string_type PackedString>
-rva_type image::string_to_file_offset(const PackedString& str,
-	bool include_headers, bool write_virtual_part)
-{
-	return string_to_rva(absolute_offset_to_rva(*this, str), str, include_headers, write_virtual_part);
-}
-
-template<packed_string_type PackedString>
-rva_type image::string_to_rva(rva_type rva, const PackedString& str,
-	bool include_headers, bool write_virtual_part)
-{
-	if (str.value().empty() && str.is_virtual() && !write_virtual_part)
-		return rva;
-
-	auto buf = section_data_from_rva(*this, rva, include_headers);
-	return rva + static_cast<rva_type>(
-		str.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
-}
-
-template<packed_string_type PackedString>
-std::uint32_t image::string_to_va(std::uint32_t va, const PackedString& str,
-	bool include_headers, bool write_virtual_part)
-{
-	if (str.value().empty() && str.is_virtual() && !write_virtual_part)
-		return va;
-
-	auto buf = section_data_from_va(*this, va, include_headers);
-	return va + static_cast<std::uint32_t>(
-		str.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
-}
-
-template<packed_string_type PackedString>
-std::uint64_t image::string_to_va(std::uint64_t va, const PackedString& str,
-	bool include_headers, bool write_virtual_part)
-{
-	if (str.value().empty() && str.is_virtual() && !write_virtual_part)
-		return va;
-
-	auto buf = section_data_from_va(*this, va, include_headers);
-	return va + static_cast<std::uint64_t>(
-		str.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
-}
-
-template rva_type image::string_to_rva<packed_c_string>(
-	rva_type rva, const packed_c_string& str,
-	bool include_headers, bool write_virtual_part);
-template std::uint32_t image::string_to_va<packed_c_string>(
-	std::uint32_t va, const packed_c_string& str,
-	bool include_headers, bool write_virtual_part);
-template std::uint64_t image::string_to_va<packed_c_string>(
-	std::uint64_t va, const packed_c_string& str,
-	bool include_headers, bool write_virtual_part);
-template rva_type image::string_to_file_offset<packed_c_string>(
-	const packed_c_string& str,
-	bool include_headers, bool write_virtual_part);
-
-template rva_type image::string_to_rva<packed_utf16_string>(
-	rva_type rva, const packed_utf16_string& str,
-	bool include_headers, bool write_virtual_part);
-template std::uint32_t image::string_to_va<packed_utf16_string>(
-	std::uint32_t va, const packed_utf16_string& str,
-	bool include_headers, bool write_virtual_part);
-template std::uint64_t image::string_to_va<packed_utf16_string>(
-	std::uint64_t va, const packed_utf16_string& str,
-	bool include_headers, bool write_virtual_part);
-template rva_type image::string_to_file_offset<packed_utf16_string>(
-	const packed_utf16_string& str,
-	bool include_headers, bool write_virtual_part);
 
 rva_type image::buffer_to_rva(rva_type rva, const buffers::ref_buffer& buf,
 	bool include_headers)

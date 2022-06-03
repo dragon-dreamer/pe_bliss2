@@ -82,6 +82,7 @@
     <ClInclude Include="image\section_data_from_va.h" />
     <ClInclude Include="image\section_data_length_from_va.h" />
     <ClInclude Include="image\string_from_va.h" />
+    <ClInclude Include="image\string_to_va.h" />
     <ClInclude Include="imports\imported_address.h" />
     <ClInclude Include="imports\import_directory.h" />
     <ClInclude Include="imports\import_directory_builder.h" />
@@ -168,6 +169,7 @@
     <ClCompile Include="image\section_data_from_va.cpp" />
     <ClCompile Include="image\section_data_length_from_va.cpp" />
     <ClCompile Include="image\string_from_va.cpp" />
+    <ClCompile Include="image\string_to_va.cpp" />
     <ClCompile Include="imports\import_directory_builder.cpp">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </DeploymentContent>

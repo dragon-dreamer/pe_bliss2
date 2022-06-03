@@ -15,6 +15,7 @@
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
+#include "pe_bliss2/image/string_to_va.h"
 #include "pe_bliss2/packed_struct.h"
 #include "utilities/safe_uint.h"
 
@@ -172,7 +173,7 @@ void build_in_place_impl(image::image& instance, const std::list<ImportedLibrary
 	rva_type first_ilt_rva = (std::numeric_limits<rva_type>::max)(), last_ilt_rva{};
 	for (const auto& library : libraries)
 	{
-		instance.string_to_file_offset(library.get_library_name(), true, options.write_virtual_part);
+		string_to_file_offset(instance, library.get_library_name(), true, options.write_virtual_part);
 
 		rva_type first_symbol_iat_rva = (std::numeric_limits<rva_type>::max)(), last_symbol_iat_rva{};
 		rva_type first_symbol_ilt_rva = (std::numeric_limits<rva_type>::max)(), last_symbol_ilt_rva{};
@@ -198,7 +199,7 @@ void build_in_place_impl(image::image& instance, const std::list<ImportedLibrary
 			if (const auto* ptr = std::get_if<typename symbol_type::hint_name_type>(&info))
 			{
 				instance.struct_to_file_offset(ptr->get_hint(), true, options.write_virtual_part);
-				instance.string_to_file_offset(ptr->get_name(), true, options.write_virtual_part);
+				string_to_file_offset(instance, ptr->get_name(), true, options.write_virtual_part);
 			}
 		}
 

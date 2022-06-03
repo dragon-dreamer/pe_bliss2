@@ -19,7 +19,6 @@
 #include "pe_bliss2/packed_byte_array.h"
 #include "pe_bliss2/packed_byte_vector.h"
 #include "pe_bliss2/packed_struct.h"
-#include "pe_bliss2/packed_string_type.h"
 #include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/dos/dos_stub.h"
 #include "pe_bliss2/pe_types.h"
@@ -27,10 +26,7 @@
 #include "pe_bliss2/section/section_data.h"
 #include "utilities/safe_uint.h"
 
-namespace pe_bliss
-{
-
-namespace image
+namespace pe_bliss::image
 {
 
 class [[nodiscard]] image
@@ -258,22 +254,6 @@ public:
 	}
 
 public:
-	template<packed_string_type PackedString = packed_c_string>
-	rva_type string_to_rva(rva_type rva, const PackedString& str,
-		bool include_headers = false, bool write_virtual_part = false);
-	template<packed_string_type PackedString = packed_c_string>
-	std::uint32_t string_to_va(std::uint32_t va, const PackedString& str,
-		bool include_headers = false, bool write_virtual_part = false);
-	template<packed_string_type PackedString = packed_c_string>
-	std::uint64_t string_to_va(std::uint64_t va, const PackedString& str,
-		bool include_headers = false, bool write_virtual_part = false);
-
-public:
-	template<packed_string_type PackedString = packed_c_string>
-	rva_type string_to_file_offset(const PackedString& str,
-		bool include_headers = false, bool write_virtual_part = false);
-
-public:
 	template<typename ArrayOrVector>
 	rva_type byte_array_to_rva(rva_type rva, const ArrayOrVector& arr,
 		bool include_headers = false, bool write_virtual_part = false)
@@ -340,7 +320,6 @@ private:
 	buffers::ref_buffer full_headers_buffer_;
 };
 
-} //namespace image
-} //namespace pe_bliss
+} //namespace pe_bliss::image
 
 #include "pe_bliss2/detail/image/image-inl.h"

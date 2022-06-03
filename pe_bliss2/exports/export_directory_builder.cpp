@@ -11,6 +11,7 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
+#include "pe_bliss2/image/string_to_va.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/safe_uint.h"
@@ -217,7 +218,7 @@ rva_type build_functions_in_place(image::image& instance, const Directory& direc
 		if (symbol.get_forwarded_name())
 		{
 			last_rva = (std::max)(last_rva,
-				instance.string_to_file_offset(*symbol.get_forwarded_name(), true,
+				string_to_file_offset(instance, *symbol.get_forwarded_name(), true,
 					write_virtual_part));
 		}
 	}
@@ -239,7 +240,7 @@ rva_type build_names_in_place(image::image& instance, const Directory& directory
 			if (name.get_name())
 			{
 				last_rva = (std::max)(last_rva,
-					instance.string_to_file_offset(*name.get_name(), true, write_virtual_part));
+					string_to_file_offset(instance, *name.get_name(), true, write_virtual_part));
 			}
 		}
 	}
@@ -254,7 +255,7 @@ void build_in_place_impl(image::image& instance, const Directory& directory,
 	const auto& descriptor = directory.get_descriptor();
 	auto last_rva = instance.struct_to_file_offset(descriptor, true, options.write_virtual_part);
 	last_rva = (std::max)(last_rva,
-		instance.string_to_file_offset(directory.get_library_name(), true,
+		string_to_file_offset(instance, directory.get_library_name(), true,
 			options.write_virtual_part));
 
 	last_rva = build_functions_in_place(instance, directory, last_rva, options.write_virtual_part);
