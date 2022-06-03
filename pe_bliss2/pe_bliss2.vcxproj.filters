@@ -447,6 +447,12 @@
     <ClInclude Include="image\image_errc.h">
       <Filter>Header Files\image</Filter>
     </ClInclude>
+    <ClInclude Include="image\string_from_va.h">
+      <Filter>Header Files\image</Filter>
+    </ClInclude>
+    <ClInclude Include="packed_string_type.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -642,6 +648,9 @@
       <Filter>Source Files\image</Filter>
     </ClCompile>
     <ClCompile Include="image\image_errc.cpp">
+      <Filter>Source Files\image</Filter>
+    </ClCompile>
+    <ClCompile Include="image\string_from_va.cpp">
       <Filter>Source Files\image</Filter>
     </ClCompile>
   </ItemGroup>

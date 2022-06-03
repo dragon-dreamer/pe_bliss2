@@ -10,6 +10,7 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/exports/image_export_directory.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/string_from_va.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/safe_uint.h"
@@ -46,7 +47,7 @@ void read_library_name(const image::image& instance,
 {
 	try
 	{
-		instance.string_from_rva(directory.get_descriptor()->name,
+		string_from_rva(instance, directory.get_descriptor()->name,
 			directory.get_library_name(),
 			options.include_headers, options.allow_virtual_data);
 	}
@@ -66,7 +67,7 @@ void read_forwarded_name(const image::image& instance, const loader_options& opt
 	{
 		try
 		{
-			instance.string_from_rva(exported_addr, exported_symbol.get_forwarded_name().emplace(),
+			string_from_rva(instance, exported_addr, exported_symbol.get_forwarded_name().emplace(),
 				options.include_headers, options.allow_virtual_data);
 		}
 		catch (const pe_error&)
@@ -152,7 +153,7 @@ auto load_names(const image::image& instance, const loader_options& options, exp
 			bool name_read = false;
 			try
 			{
-				instance.string_from_rva(name_rva.get(), name,
+				string_from_rva(instance, name_rva.get(), name,
 					options.include_headers, options.allow_virtual_data);
 				if (name.value().empty())
 					addr->add_error(export_directory_loader_errc::empty_name);

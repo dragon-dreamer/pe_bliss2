@@ -81,6 +81,7 @@
     <ClInclude Include="image\rva_file_offset_converter.h" />
     <ClInclude Include="image\section_data_from_va.h" />
     <ClInclude Include="image\section_data_length_from_va.h" />
+    <ClInclude Include="image\string_from_va.h" />
     <ClInclude Include="imports\imported_address.h" />
     <ClInclude Include="imports\import_directory.h" />
     <ClInclude Include="imports\import_directory_builder.h" />
@@ -90,6 +91,7 @@
     <ClInclude Include="packed_byte_array.h" />
     <ClInclude Include="packed_byte_vector.h" />
     <ClInclude Include="packed_c_string.h" />
+    <ClInclude Include="packed_string_type.h" />
     <ClInclude Include="packed_struct.h" />
     <ClInclude Include="packed_utf16_string.h" />
     <ClInclude Include="pe_error.h" />
@@ -165,6 +167,7 @@
     <ClCompile Include="image\rva_file_offset_converter.cpp" />
     <ClCompile Include="image\section_data_from_va.cpp" />
     <ClCompile Include="image\section_data_length_from_va.cpp" />
+    <ClCompile Include="image\string_from_va.cpp" />
     <ClCompile Include="imports\import_directory_builder.cpp">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </DeploymentContent>

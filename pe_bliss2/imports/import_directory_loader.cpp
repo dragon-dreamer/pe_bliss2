@@ -8,6 +8,7 @@
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/detail/imports/image_import_descriptor.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/string_from_va.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/safe_uint.h"
@@ -82,7 +83,7 @@ rva_type load_library(const image::image& instance, const loader_options& option
 
 	try
 	{
-		instance.string_from_rva(descriptor->name, library.get_library_name(),
+		string_from_rva(instance, descriptor->name, library.get_library_name(),
 			options.include_headers, options.allow_virtual_data);
 	}
 	catch (const pe_error&)
@@ -219,7 +220,7 @@ bool load_import(const image::image& instance, const loader_options& options,
 	try
 	{
 		hint_name_rva += imported_function_hint_and_name<Va>::hint_type::packed_size;
-		instance.string_from_rva(hint_name_rva.value(),
+		string_from_rva(instance, hint_name_rva.value(),
 			info.get_name(), options.include_headers, options.allow_virtual_data);
 	}
 	catch (const std::system_error&)

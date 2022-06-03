@@ -10,6 +10,7 @@
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_length_from_va.h"
 #include "pe_bliss2/image/section_data_from_va.h"
+#include "pe_bliss2/image/string_from_va.h"
 #include "pe_bliss2/packed_utf16_string.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
@@ -155,7 +156,7 @@ bool load_resource_directory_entry(const image::image& instance, const loader_op
 			name_rva = resource_dir_rva
 				+ (entry_descriptor->name_or_id
 					& ~detail::resources::name_is_string_flag);
-			instance.string_from_rva(name_rva.value(), name,
+			string_from_rva(instance, name_rva.value(), name,
 				options.include_headers, options.allow_virtual_data);
 		}
 		catch (const pe_error&)

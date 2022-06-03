@@ -15,6 +15,7 @@
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
+#include "pe_bliss2/image/string_from_va.h"
 #include "pe_bliss2/packed_struct.h"
 #include "utilities/math.h"
 #include "utilities/safe_uint.h"
@@ -1066,7 +1067,7 @@ void load_enclave_config(const image::image& instance, const loader_options& opt
 
 		try
 		{
-			instance.string_from_rva(import_descriptor->import_name, import.get_name(),
+			string_from_rva(instance, import_descriptor->import_name, import.get_name(),
 				options.include_headers, options.allow_virtual_data);
 		}
 		catch (const std::system_error&)

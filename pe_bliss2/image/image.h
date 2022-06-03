@@ -19,6 +19,7 @@
 #include "pe_bliss2/packed_byte_array.h"
 #include "pe_bliss2/packed_byte_vector.h"
 #include "pe_bliss2/packed_struct.h"
+#include "pe_bliss2/packed_string_type.h"
 #include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/dos/dos_stub.h"
 #include "pe_bliss2/pe_types.h"
@@ -28,15 +29,6 @@
 
 namespace pe_bliss
 {
-
-class packed_c_string;
-class packed_utf16_string;
-namespace detail
-{
-template<typename T>
-concept packed_string_type = std::is_same_v<T, packed_utf16_string>
-	|| std::is_same_v<T, packed_c_string>;
-} //namespace detail
 
 namespace image
 {
@@ -97,31 +89,6 @@ public:
 	{
 		loaded_to_memory_ = loaded_to_memory;
 	}
-
-public:
-	template<detail::packed_string_type PackedString = packed_c_string>
-	[[nodiscard]]
-	PackedString string_from_rva(rva_type rva,
-		bool include_headers = false, bool allow_virtual_data = false) const;
-	template<detail::packed_string_type PackedString = packed_c_string>
-	void string_from_rva(rva_type rva, PackedString& str,
-		bool include_headers = false, bool allow_virtual_data = false) const;
-
-	template<detail::packed_string_type PackedString = packed_c_string>
-	[[nodiscard]]
-	PackedString string_from_va(std::uint32_t va,
-		bool include_headers = false, bool allow_virtual_data = false) const;
-	template<detail::packed_string_type PackedString = packed_c_string>
-	void string_from_va(std::uint32_t va, PackedString& str,
-		bool include_headers = false, bool allow_virtual_data = false) const;
-
-	template<detail::packed_string_type PackedString = packed_c_string>
-	[[nodiscard]]
-	PackedString string_from_va(std::uint64_t va,
-		bool include_headers = false, bool allow_virtual_data = false) const;
-	template<detail::packed_string_type PackedString = packed_c_string>
-	void string_from_va(std::uint64_t va, PackedString& str,
-		bool include_headers = false, bool allow_virtual_data = false) const;
 
 public:
 	template<std::size_t MaxSize>
@@ -291,18 +258,18 @@ public:
 	}
 
 public:
-	template<detail::packed_string_type PackedString = packed_c_string>
+	template<packed_string_type PackedString = packed_c_string>
 	rva_type string_to_rva(rva_type rva, const PackedString& str,
 		bool include_headers = false, bool write_virtual_part = false);
-	template<detail::packed_string_type PackedString = packed_c_string>
+	template<packed_string_type PackedString = packed_c_string>
 	std::uint32_t string_to_va(std::uint32_t va, const PackedString& str,
 		bool include_headers = false, bool write_virtual_part = false);
-	template<detail::packed_string_type PackedString = packed_c_string>
+	template<packed_string_type PackedString = packed_c_string>
 	std::uint64_t string_to_va(std::uint64_t va, const PackedString& str,
 		bool include_headers = false, bool write_virtual_part = false);
 
 public:
-	template<detail::packed_string_type PackedString = packed_c_string>
+	template<packed_string_type PackedString = packed_c_string>
 	rva_type string_to_file_offset(const PackedString& str,
 		bool include_headers = false, bool write_virtual_part = false);
 

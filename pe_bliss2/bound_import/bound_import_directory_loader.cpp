@@ -4,6 +4,7 @@
 
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/string_from_va.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/math.h"
 
@@ -56,7 +57,7 @@ rva_type read_bound_import_entry(rva_type current_rva, rva_type start_rva,
 	{
 		try
 		{
-			instance.string_from_rva(name_rva, elem.get_library_name(),
+			string_from_rva(instance, name_rva, elem.get_library_name(),
 				options.include_headers, options.allow_virtual_data);
 		}
 		catch (const pe_error&)
