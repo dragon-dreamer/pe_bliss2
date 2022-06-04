@@ -1,20 +1,11 @@
 #include "pe_bliss2/image/image.h"
 
-#include <algorithm>
-#include <cstddef>
 #include <cstdint>
-#include <iterator>
 #include <limits>
 
-#include "buffers/input_buffer_section.h"
-#include "buffers/output_memory_ref_buffer.h"
-#include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/image_file_header.h"
 #include "pe_bliss2/image/image_errc.h"
-#include "pe_bliss2/image/image_section_search.h"
-#include "pe_bliss2/image/rva_file_offset_converter.h"
-#include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
 #include "utilities/math.h"

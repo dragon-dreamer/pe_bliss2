@@ -1,29 +1,17 @@
 #pragma once
 
 #include <cstdint>
-#include <span>
-#include <type_traits>
-#include <utility>
 
-#include "buffers/input_buffer_interface.h"
 #include "buffers/ref_buffer.h"
-#include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/core/file_header.h"
 #include "pe_bliss2/core/image_signature.h"
 #include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/core/overlay.h"
-#include "pe_bliss2/detail/concepts.h"
-#include "pe_bliss2/image/rva_file_offset_converter.h"
-#include "pe_bliss2/image/section_data_from_va.h"
-#include "pe_bliss2/packed_byte_vector.h"
-#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/dos/dos_stub.h"
-#include "pe_bliss2/pe_types.h"
 #include "pe_bliss2/section/section_table.h"
 #include "pe_bliss2/section/section_data.h"
-#include "utilities/safe_uint.h"
 
 namespace pe_bliss::image
 {

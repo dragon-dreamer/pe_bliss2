@@ -1,6 +1,6 @@
 #include "pe_bliss2/image/string_from_va.h"
 
-#include "pe_bliss2/image/image.h"
+#include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/packed_c_string.h"
 #include "pe_bliss2/packed_utf16_string.h"

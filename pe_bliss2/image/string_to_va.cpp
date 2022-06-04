@@ -1,6 +1,5 @@
 #include "pe_bliss2/image/string_to_va.h"
 
-#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/rva_file_offset_converter.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/packed_c_string.h"

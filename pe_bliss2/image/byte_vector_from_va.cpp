@@ -1,6 +1,5 @@
 #include "pe_bliss2/image/byte_vector_from_va.h"
 
-#include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 
 namespace pe_bliss::image
