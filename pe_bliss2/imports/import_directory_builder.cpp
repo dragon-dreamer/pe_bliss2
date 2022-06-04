@@ -16,6 +16,7 @@
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/image/string_to_va.h"
+#include "pe_bliss2/image/struct_to_va.h"
 #include "pe_bliss2/packed_struct.h"
 #include "utilities/safe_uint.h"
 
@@ -160,13 +161,13 @@ void build_in_place_impl(image::image& instance, const std::list<ImportedLibrary
 	auto last_descriptor_rva = options.directory_rva;
 	for (const auto& library : libraries)
 	{
-		auto rva = instance.struct_to_file_offset(library.get_descriptor(),
+		auto rva = struct_to_file_offset(instance, library.get_descriptor(),
 			true, options.write_virtual_part);
 		last_descriptor_rva = (std::max)(last_descriptor_rva, rva);
 	}
 
 	//Terminating descriptor
-	last_descriptor_rva = instance.struct_to_rva(last_descriptor_rva,
+	last_descriptor_rva = struct_to_rva(instance, last_descriptor_rva,
 		typename ImportedLibrary<Va>::packed_descriptor_type{}, true, true);
 
 	rva_type first_iat_rva = (std::numeric_limits<rva_type>::max)(), last_iat_rva{};
@@ -180,7 +181,7 @@ void build_in_place_impl(image::image& instance, const std::list<ImportedLibrary
 		for (const auto& symbol : library.get_imports())
 		{
 			{
-				auto rva = instance.struct_to_file_offset(symbol.get_address(),
+				auto rva = struct_to_file_offset(instance, symbol.get_address(),
 					true, options.write_virtual_part);
 				first_symbol_iat_rva = (std::min)(first_symbol_iat_rva, rva);
 				last_symbol_iat_rva = (std::max)(last_symbol_iat_rva, rva);
@@ -188,7 +189,7 @@ void build_in_place_impl(image::image& instance, const std::list<ImportedLibrary
 
 			if (symbol.get_lookup())
 			{
-				auto rva = instance.struct_to_file_offset(*symbol.get_lookup(),
+				auto rva = struct_to_file_offset(instance, *symbol.get_lookup(),
 					true, options.write_virtual_part);
 				first_symbol_ilt_rva = (std::min)(first_symbol_ilt_rva, rva);
 				last_symbol_ilt_rva = (std::max)(last_symbol_ilt_rva, rva);
@@ -198,16 +199,16 @@ void build_in_place_impl(image::image& instance, const std::list<ImportedLibrary
 			using symbol_type = std::remove_cvref_t<decltype(symbol)>;
 			if (const auto* ptr = std::get_if<typename symbol_type::hint_name_type>(&info))
 			{
-				instance.struct_to_file_offset(ptr->get_hint(), true, options.write_virtual_part);
+				struct_to_file_offset(instance, ptr->get_hint(), true, options.write_virtual_part);
 				string_to_file_offset(instance, ptr->get_name(), true, options.write_virtual_part);
 			}
 		}
 
 		//Terminating thunk
 		if (first_symbol_ilt_rva != (std::numeric_limits<rva_type>::max)())
-			instance.struct_to_rva(last_symbol_ilt_rva, Va{}, true, true);
+			struct_to_rva(instance, last_symbol_ilt_rva, Va{}, true, true);
 		else if (first_symbol_iat_rva != (std::numeric_limits<rva_type>::max)())
-			instance.struct_to_rva(last_symbol_iat_rva, Va{}, true, true);
+			struct_to_rva(instance, last_symbol_iat_rva, Va{}, true, true);
 
 		first_iat_rva = (std::min)(first_iat_rva, first_symbol_iat_rva);
 		first_ilt_rva = (std::min)(first_ilt_rva, first_symbol_ilt_rva);

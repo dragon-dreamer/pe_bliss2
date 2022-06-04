@@ -15,6 +15,7 @@
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
+#include "pe_bliss2/image/struct_to_va.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/generic_error.h"
@@ -65,20 +66,20 @@ void build_in_place_impl(image::image& instance, const Directory& directory,
 	const builder_options& options)
 {
 	const auto& descriptor = directory.get_descriptor();
-	instance.struct_to_file_offset(descriptor, true, options.write_virtual_part);
+	struct_to_file_offset(instance, descriptor, true, options.write_virtual_part);
 
 	const auto& callbacks = directory.get_callbacks();
 	rva_type last_callback_rva{};
 	for (const auto& callback : callbacks)
 	{
 		last_callback_rva = (std::max)(last_callback_rva,
-			instance.struct_to_file_offset(callback, true, options.write_virtual_part));
+			struct_to_file_offset(instance, callback, true, options.write_virtual_part));
 	}
 
 	if (descriptor->address_of_callbacks)
 	{
 		//Terminator
-		instance.struct_to_rva(last_callback_rva, typename Directory::va_type{}, true, true);
+		struct_to_rva(instance, last_callback_rva, typename Directory::va_type{}, true, true);
 	}
 
 	const auto& raw_data = directory.get_raw_data();

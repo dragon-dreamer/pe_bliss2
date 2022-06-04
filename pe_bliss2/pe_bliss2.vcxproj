@@ -87,6 +87,7 @@
     <ClInclude Include="image\string_from_va.h" />
     <ClInclude Include="image\string_to_va.h" />
     <ClInclude Include="image\struct_from_va.h" />
+    <ClInclude Include="image\struct_to_va.h" />
     <ClInclude Include="imports\imported_address.h" />
     <ClInclude Include="imports\import_directory.h" />
     <ClInclude Include="imports\import_directory_builder.h" />

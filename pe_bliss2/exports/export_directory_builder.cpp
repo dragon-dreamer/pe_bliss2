@@ -12,6 +12,7 @@
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/image/string_to_va.h"
+#include "pe_bliss2/image/struct_to_va.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/safe_uint.h"
@@ -214,7 +215,7 @@ rva_type build_functions_in_place(image::image& instance, const Directory& direc
 	for (const auto& symbol : export_list)
 	{
 		last_rva = (std::max)(last_rva,
-			instance.struct_to_file_offset(symbol.get_rva(), true));
+			struct_to_file_offset(instance, symbol.get_rva(), true));
 		if (symbol.get_forwarded_name())
 		{
 			last_rva = (std::max)(last_rva,
@@ -234,9 +235,9 @@ rva_type build_names_in_place(image::image& instance, const Directory& directory
 		for (const auto& name : symbol.get_names())
 		{
 			last_rva = (std::max)(last_rva,
-				instance.struct_to_file_offset(name.get_name_rva(), true, write_virtual_part));
+				struct_to_file_offset(instance, name.get_name_rva(), true, write_virtual_part));
 			last_rva = (std::max)(last_rva,
-				instance.struct_to_file_offset(name.get_name_ordinal(), true, write_virtual_part));
+				struct_to_file_offset(instance, name.get_name_ordinal(), true, write_virtual_part));
 			if (name.get_name())
 			{
 				last_rva = (std::max)(last_rva,
@@ -253,7 +254,7 @@ void build_in_place_impl(image::image& instance, const Directory& directory,
 	const builder_options& options)
 {
 	const auto& descriptor = directory.get_descriptor();
-	auto last_rva = instance.struct_to_file_offset(descriptor, true, options.write_virtual_part);
+	auto last_rva = struct_to_file_offset(instance, descriptor, true, options.write_virtual_part);
 	last_rva = (std::max)(last_rva,
 		string_to_file_offset(instance, directory.get_library_name(), true,
 			options.write_virtual_part));

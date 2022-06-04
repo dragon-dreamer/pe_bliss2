@@ -12,6 +12,7 @@
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
+#include "pe_bliss2/image/struct_to_va.h"
 #include "utilities/generic_error.h"
 #include "utilities/safe_uint.h"
 
@@ -72,16 +73,16 @@ void build_in_place_impl(image::image& instance, const Directory& relocs,
 	auto last_rva = options.directory_rva;
 	for (const auto& basereloc : relocs)
 	{
-		last_rva = (std::max)(last_rva, instance.struct_to_file_offset(
+		last_rva = (std::max)(last_rva, struct_to_file_offset(instance,
 			basereloc.get_descriptor(), true, options.write_virtual_part));
 
 		for (const auto& entry : basereloc.get_relocations())
 		{
-			last_rva = (std::max)(last_rva, instance.struct_to_file_offset(
+			last_rva = (std::max)(last_rva, struct_to_file_offset(instance,
 				entry.get_descriptor(), true, options.write_virtual_part));
 			if (entry.get_param().has_value())
 			{
-				last_rva = (std::max)(last_rva, instance.struct_to_file_offset(
+				last_rva = (std::max)(last_rva, struct_to_file_offset(instance,
 					*entry.get_param(), true));
 			}
 		}
