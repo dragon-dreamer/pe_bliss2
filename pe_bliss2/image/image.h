@@ -86,18 +86,6 @@ public:
 	}
 
 public:
-	rva_type buffer_to_rva(rva_type rva, const buffers::ref_buffer& buf,
-		bool include_headers = false);
-	std::uint32_t buffer_to_va(std::uint32_t va, const buffers::ref_buffer& buf,
-		bool include_headers = false);
-	std::uint64_t buffer_to_va(std::uint64_t va, const buffers::ref_buffer& buf,
-		bool include_headers = false);
-
-public:
-	rva_type buffer_to_file_offset(const buffers::ref_buffer& buf,
-		bool include_headers = false);
-
-public:
 	void update_number_of_sections();
 	void update_image_size();
 	void set_number_of_data_directories(std::uint32_t number);

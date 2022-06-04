@@ -86,48 +86,6 @@ void image::copy_referenced_section_memory()
 		section.copy_referenced_buffer();
 }
 
-rva_type image::buffer_to_rva(rva_type rva, const buffers::ref_buffer& buf,
-	bool include_headers)
-{
-	if (buf.empty())
-		return rva;
-
-	auto data = section_data_from_rva(*this, rva, include_headers);
-	auto data_buffer = buffers::output_memory_ref_buffer(data);
-	buf.serialize(data_buffer);
-	return rva + static_cast<rva_type>(buf.size());
-}
-
-std::uint32_t image::buffer_to_va(std::uint32_t va, const buffers::ref_buffer& buf,
-	bool include_headers)
-{
-	if (buf.empty())
-		return va;
-
-	auto data = section_data_from_va(*this, va, include_headers);
-	auto data_buffer = buffers::output_memory_ref_buffer(data);
-	buf.serialize(data_buffer);
-	return va + static_cast<std::uint32_t>(buf.size());
-}
-
-std::uint64_t image::buffer_to_va(std::uint64_t va, const buffers::ref_buffer& buf,
-	bool include_headers)
-{
-	if (buf.empty())
-		return va;
-
-	auto data = section_data_from_va(*this, va, include_headers);
-	auto data_buffer = buffers::output_memory_ref_buffer(data);
-	buf.serialize(data_buffer);
-	return va + static_cast<std::uint64_t>(buf.size());
-}
-
-rva_type image::buffer_to_file_offset(const buffers::ref_buffer& buf,
-	bool include_headers)
-{
-	return buffer_to_rva(absolute_offset_to_rva(*this, *buf.data()), buf, include_headers);
-}
-
 /*
 //TODO
 //Prepares section before attaching it

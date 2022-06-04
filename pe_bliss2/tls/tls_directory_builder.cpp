@@ -14,6 +14,7 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/buffer_to_va.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/image/struct_to_va.h"
 #include "pe_bliss2/pe_error.h"
@@ -84,7 +85,7 @@ void build_in_place_impl(image::image& instance, const Directory& directory,
 
 	const auto& raw_data = directory.get_raw_data();
 	if (descriptor->start_address_of_raw_data && !raw_data.empty())
-		instance.buffer_to_file_offset(raw_data, true);
+		buffer_to_file_offset(instance, raw_data, true);
 
 	update_data_directory(instance, options, descriptor.packed_size);
 }
