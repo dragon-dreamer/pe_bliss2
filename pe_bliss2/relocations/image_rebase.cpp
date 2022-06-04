@@ -2,8 +2,9 @@
 
 #include <cstdint>
 
-#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/struct_from_va.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
 #include "utilities/math.h"
@@ -21,7 +22,7 @@ void process_relocation(image::image& instance, rva_type rva, std::uint64_t base
 		throw pe_error(utilities::generic_errc::integer_overflow);
 
 	packed_struct<T> value;
-	instance.struct_from_rva(rva, value, true, false);
+	struct_from_rva(instance, rva, value, true, false);
 	value.get() = static_cast<T>(entry.apply_to(value.get(), base_diff));
 	instance.struct_to_rva(rva, value, true, true);
 }

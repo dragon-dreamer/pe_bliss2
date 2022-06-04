@@ -8,6 +8,7 @@
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/image/section_data_length_from_va.h"
+#include "pe_bliss2/image/struct_from_va.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_types.h"
 
@@ -47,14 +48,14 @@ Directory load_impl(const image::image& instance, const loader_options& options)
 
 	Directory directory;
 	auto& descriptor = directory.get_descriptor();
-	instance.struct_from_rva(tls_dir_info->virtual_address, descriptor,
+	struct_from_rva(instance, tls_dir_info->virtual_address, descriptor,
 		options.include_headers, options.allow_virtual_data);
 
 	if (descriptor->address_of_callbacks)
 	{
 		using va_type = typename Directory::va_type;
 		packed_struct<va_type> callback_va{};
-		while ((callback_va = instance.struct_from_va<va_type>(descriptor->address_of_callbacks,
+		while ((callback_va = struct_from_va<va_type>(instance, descriptor->address_of_callbacks,
 			options.include_headers, options.allow_virtual_data)).get())
 		{
 			directory.get_callbacks().emplace_back(callback_va);

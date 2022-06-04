@@ -11,6 +11,7 @@
 #include "pe_bliss2/detail/exports/image_export_directory.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/string_from_va.h"
+#include "pe_bliss2/image/struct_from_va.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/safe_uint.h"
@@ -79,7 +80,7 @@ void read_forwarded_name(const image::image& instance, const loader_options& opt
 	{
 		try
 		{
-			(void)instance.struct_from_rva<std::byte>(exported_addr,
+			(void)struct_from_rva<std::byte>(instance, exported_addr,
 				options.include_headers, options.allow_virtual_data);
 		}
 		catch (const pe_error&)
@@ -106,7 +107,7 @@ ordinal_to_exported_address_map load_addresses(
 		number_of_functions, std::end(export_list));
 	for (std::uint32_t i = 0; i != number_of_functions; ++i)
 	{
-		auto exported_addr = instance.struct_from_rva<rva_type>(address_of_functions.value(),
+		auto exported_addr = struct_from_rva<rva_type>(instance, address_of_functions.value(),
 			options.include_headers, options.allow_virtual_data);
 		address_of_functions += sizeof(rva_type);
 		if (!exported_addr.get())
@@ -136,7 +137,7 @@ auto load_names(const image::image& instance, const loader_options& options, exp
 	{
 		for (std::uint32_t i = 0; i != number_of_names; ++i)
 		{
-			auto name_ordinal = instance.struct_from_rva<ordinal_type>(address_of_name_ordinals.value(),
+			auto name_ordinal = struct_from_rva<ordinal_type>(instance, address_of_name_ordinals.value(),
 				options.include_headers, options.allow_virtual_data);
 			if (name_ordinal.get() >= ordinal_to_exported_address.size()
 				|| ordinal_to_exported_address[name_ordinal.get()] == exported_item_end)
@@ -146,7 +147,7 @@ auto load_names(const image::image& instance, const loader_options& options, exp
 			}
 
 			auto addr = ordinal_to_exported_address[name_ordinal.get()];
-			auto name_rva = instance.struct_from_rva<rva_type>(address_of_names.value(),
+			auto name_rva = struct_from_rva<rva_type>(instance, address_of_names.value(),
 				options.include_headers, options.allow_virtual_data);
 
 			packed_c_string name;
@@ -204,7 +205,7 @@ std::optional<export_directory_details> load(const image::image& instance,
 	auto& directory = *result;
 	auto& descriptor = directory.get_descriptor();
 
-	instance.struct_from_rva(export_dir_info->virtual_address,
+	struct_from_rva(instance, export_dir_info->virtual_address,
 		descriptor, options.include_headers, options.allow_virtual_data);
 	read_library_name(instance, options, directory);
 

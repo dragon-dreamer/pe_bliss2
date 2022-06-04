@@ -18,6 +18,7 @@
 #include "pe_bliss2/image/byte_vector_from_va.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/image/string_from_va.h"
+#include "pe_bliss2/image/struct_from_va.h"
 #include "pe_bliss2/packed_struct.h"
 #include "utilities/math.h"
 #include "utilities/safe_uint.h"
@@ -150,7 +151,7 @@ void load_lock_prefix_table(const image::image& instance,
 	auto& table = directory.get_lock_prefix_table().emplace().get_prefix_va_list();
 	using va_type = typename Directory::lock_prefix_table_type::value_type::pointer_type;
 	packed_struct<va_type> lock_prefix_va;
-	while (instance.struct_from_va(lock_prefix_table_va.value(), lock_prefix_va,
+	while (struct_from_va(instance, lock_prefix_table_va.value(), lock_prefix_va,
 		options.include_headers, options.allow_virtual_data).get())
 	{
 		table.emplace_back(lock_prefix_va);
@@ -189,7 +190,7 @@ void load_safeseh_handler_table(const image::image& instance,
 
 	while (count)
 	{
-		instance.struct_from_va(safeseh_handler_table_va, handler_rva,
+		struct_from_va(instance, safeseh_handler_table_va, handler_rva,
 			options.include_headers, options.allow_virtual_data);
 		table.emplace_back(handler_rva);
 		safeseh_handler_table_va += static_cast<std::uint32_t>(handler_rva.packed_size);
@@ -243,7 +244,7 @@ void read_cf_guard_rva_table(const image::image& instance, const loader_options&
 	while (function_count)
 	{
 		GuardFunction func;
-		instance.struct_from_va(table_va, func.get_rva(),
+		struct_from_va(instance, table_va, func.get_rva(),
 			options.include_headers, options.allow_virtual_data);
 		table_va += static_cast<Va>(func.get_rva().packed_size);
 		if (stride)
@@ -307,7 +308,7 @@ void load_cf_guard(const image::image& instance,
 
 		try
 		{
-			instance.struct_from_rva(func_rva - guard_function_details::type_based_hash_type::packed_size,
+			struct_from_rva(instance, func_rva - guard_function_details::type_based_hash_type::packed_size,
 				entry.get_type_based_hash().emplace(),
 				options.include_headers, options.allow_virtual_data);
 		}
@@ -395,7 +396,7 @@ void load_chpe_range_entries(const image::image& instance,
 	while (entry_count)
 	{
 		entry_rva += static_cast<rva_type>(
-			instance.struct_from_rva(entry_rva, entry_list.emplace_back().get_entry(),
+			struct_from_rva(instance, entry_rva, entry_list.emplace_back().get_entry(),
 				options.include_headers, options.allow_virtual_data).packed_size);
 		--entry_count;
 	}
@@ -410,9 +411,9 @@ void load_chpe_metadata(const image::image& instance,
 	const loader_options& options, utilities::safe_uint<Va> metadata_va,
 	chpe_arm64x_metadata_details& metadata)
 {
-	metadata_va += instance.struct_from_va(metadata_va.value(), metadata.get_version(),
+	metadata_va += struct_from_va(instance, metadata_va.value(), metadata.get_version(),
 		options.include_headers, options.allow_virtual_data).packed_size;
-	instance.struct_from_va(metadata_va.value(), metadata.get_metadata(),
+	struct_from_va(instance, metadata_va.value(), metadata.get_metadata(),
 		options.include_headers, options.allow_virtual_data);
 	load_chpe_range_entries(instance, options, metadata);
 }
@@ -422,7 +423,7 @@ void load_chpe_metadata(const image::image& instance,
 	const loader_options& options, utilities::safe_uint<Va> metadata_va,
 	chpe_x86_metadata_details& metadata)
 {
-	metadata_va += instance.struct_from_va(metadata_va.value(), metadata.get_version(),
+	metadata_va += struct_from_va(instance, metadata_va.value(), metadata.get_version(),
 		options.include_headers, options.allow_virtual_data).packed_size;
 
 	std::uint32_t metadata_size = 0;
@@ -506,7 +507,7 @@ bool load_dynamic_relocation_struct(const image::image& instance, const loader_o
 	}
 
 	current_rva += static_cast<rva_type>(
-		instance.struct_from_rva(current_rva, relocation_list.get_dynamic_relocation(),
+		struct_from_rva(instance, current_rva, relocation_list.get_dynamic_relocation(),
 			options.include_headers, options.allow_virtual_data).packed_size);
 	return true;
 }
@@ -535,7 +536,7 @@ bool load_base_relocation(const image::image& instance, const loader_options& op
 		return false;
 	}
 
-	instance.struct_from_rva(current_rva, fixups.get_base_relocation(),
+	struct_from_rva(instance, current_rva, fixups.get_base_relocation(),
 		options.include_headers, options.allow_virtual_data);
 
 	if (fixups.get_base_relocation()->size_of_block > last_base_reloc_rva - current_rva)
@@ -580,7 +581,7 @@ void load_relocations_no_extra_data(const image::image& instance, const loader_o
 			>= DynamicRelocationList::value_type::symbol_type::relocation_type::packed_size)
 		{
 			current_rva += static_cast<rva_type>(
-				instance.struct_from_rva(current_rva, fixup_list.emplace_back().get_relocation(),
+				struct_from_rva(instance, current_rva, fixup_list.emplace_back().get_relocation(),
 					options.include_headers, options.allow_virtual_data).packed_size);
 
 			if (!first_element)
@@ -623,7 +624,7 @@ void load_arm64x_relocations(const image::image& instance, const loader_options&
 		{
 			arm64x_dynamic_relocation_base relocation_base;
 			current_rva += static_cast<rva_type>(
-				instance.struct_from_rva(current_rva, relocation_base.get_relocation(),
+				struct_from_rva(instance, current_rva, relocation_base.get_relocation(),
 					options.include_headers, options.allow_virtual_data).packed_size);
 
 			if (!first_element && !relocation_base.get_relocation()->metadata)
@@ -669,7 +670,7 @@ void load_arm64x_relocations(const image::image& instance, const loader_options&
 					else
 					{
 						current_rva += static_cast<rva_type>(
-							instance.struct_from_rva(current_rva, element.get_value(),
+							struct_from_rva(instance, current_rva, element.get_value(),
 								options.include_headers, options.allow_virtual_data).packed_size);
 					}
 					fixups.get_fixups().emplace_back() = element;
@@ -749,7 +750,7 @@ bool load_relocations_header_base(const image::image& instance, const loader_opt
 
 	try
 	{
-		current_rva += static_cast<rva_type>(instance.struct_from_rva(current_rva, header.get_header(),
+		current_rva += static_cast<rva_type>(struct_from_rva(instance, current_rva, header.get_header(),
 			options.include_headers, options.allow_virtual_data).packed_size);
 	}
 	catch (const std::system_error&)
@@ -832,7 +833,7 @@ bool load_relocations_header(const image::image& instance, const loader_options&
 		auto& branch_descriptor = branch_descriptors.emplace_back();
 		try
 		{
-			instance.struct_from_rva(current_rva, branch_descriptor.get_descriptor(),
+			struct_from_rva(instance, current_rva, branch_descriptor.get_descriptor(),
 				options.include_headers, options.allow_virtual_data);
 			current_rva += static_cast<rva_type>(branch_descriptor.get_descriptor().packed_size);
 
@@ -975,7 +976,7 @@ void load_dynamic_relocation_table(const image::image& instance, const loader_op
 	utilities::safe_uint<rva_type> current_rva = section->get_rva() + table_offset;
 	auto& table = directory.get_dynamic_relocation_table().emplace();
 	using table_type = std::remove_cvref_t<decltype(table)>;
-	current_rva += instance.struct_from_rva(current_rva.value(), table.get_table(),
+	current_rva += struct_from_rva(instance, current_rva.value(), table.get_table(),
 		options.include_headers, options.allow_virtual_data).packed_size;
 	
 	auto version = table.get_table()->version;
@@ -1017,7 +1018,7 @@ void load_enclave_config(const image::image& instance, const loader_options& opt
 	auto& config = directory.get_enclave_config().emplace();
 	auto& config_descriptor = config.get_descriptor();
 
-	enclave_config_va += instance.struct_from_va(enclave_config_va.value(), config_descriptor,
+	enclave_config_va += struct_from_va(instance, enclave_config_va.value(), config_descriptor,
 		options.include_headers, options.allow_virtual_data).packed_size;
 
 	if (config_descriptor->size > config_descriptor.packed_size)
@@ -1047,7 +1048,7 @@ void load_enclave_config(const image::image& instance, const loader_options& opt
 		auto& import = imports.emplace_back();
 		auto& import_descriptor = import.get_descriptor();
 
-		current_rva += instance.struct_from_rva(current_rva.value(), import_descriptor,
+		current_rva += struct_from_rva(instance, current_rva.value(), import_descriptor,
 			options.include_headers, options.allow_virtual_data).packed_size;
 
 		if (extra_import_size)
@@ -1097,7 +1098,7 @@ void load_volatile_metadata(const image::image& instance, const loader_options& 
 	auto& config = directory.get_volatile_metadata().emplace();
 	auto& config_descriptor = config.get_descriptor();
 
-	instance.struct_from_va(volatile_metadata_va, config_descriptor,
+	struct_from_va(instance, volatile_metadata_va, config_descriptor,
 		options.include_headers, options.allow_virtual_data).packed_size;
 
 	if (config_descriptor->volatile_access_table && config_descriptor->volatile_access_table_size)
@@ -1111,7 +1112,7 @@ void load_volatile_metadata(const image::image& instance, const loader_options& 
 			for (std::uint32_t i = 0u, count = config_descriptor->volatile_access_table_size / 4u;
 				i != count; ++i)
 			{
-				table_rva += instance.struct_from_va(table_rva.value(),
+				table_rva += struct_from_va(instance, table_rva.value(),
 					config.get_access_rva_table().emplace_back(),
 					options.include_headers, options.allow_virtual_data).packed_size;
 			}
@@ -1135,7 +1136,7 @@ void load_volatile_metadata(const image::image& instance, const loader_options& 
 			for (std::uint32_t i = 0u, count = config_descriptor->volatile_info_range_table_size
 				/ range_entry_type::packed_size; i != count; ++i)
 			{
-				table_rva += instance.struct_from_va(table_rva.value(),
+				table_rva += struct_from_va(instance, table_rva.value(),
 					config.get_range_table().emplace_back(),
 					options.include_headers, options.allow_virtual_data).packed_size;
 			}
@@ -1169,7 +1170,7 @@ void load_ehcont_targets(const image::image& instance, const loader_options& opt
 	bool is_sorted = true;
 	while (count--)
 	{
-		ehcont_targets_va += instance.struct_from_va(ehcont_targets_va.value(),
+		ehcont_targets_va += struct_from_va(instance, ehcont_targets_va.value(),
 			targets.emplace_back(), options.include_headers, options.allow_virtual_data).packed_size
 			+ 1u /* unknown single-byte data */;
 		if (prev > targets.back().get())
@@ -1191,7 +1192,7 @@ void load_impl(const image::image& instance,
 	const auto& load_config_dir_info = instance.get_data_directories().get_directory(
 		core::data_directories::directory_type::config);
 
-	instance.struct_from_rva<std::uint32_t>(load_config_dir_info->virtual_address,
+	struct_from_rva(instance, load_config_dir_info->virtual_address,
 		directory.get_size(), options.include_headers, options.allow_virtual_data);
 
 	auto size = directory.get_descriptor_size();

@@ -87,51 +87,6 @@ public:
 
 public:
 	template<detail::standard_layout T>
-	[[nodiscard]]
-	packed_struct<T> struct_from_rva(uint32_t rva, bool include_headers = false,
-		bool allow_virtual_data = false) const
-	{
-		packed_struct<T> value{};
-		auto buf = section_data_from_rva(*this, rva,
-			value.packed_size, include_headers, allow_virtual_data);
-		value.deserialize(*buf, allow_virtual_data);
-		return value;
-	}
-
-	template<detail::standard_layout T, detail::executable_pointer Va>
-	[[nodiscard]]
-	packed_struct<T> struct_from_va(Va va, bool include_headers = false,
-		bool allow_virtual_data = false) const
-	{
-		packed_struct<T> value{};
-		auto buf = section_data_from_va(*this, va,
-			value.packed_size, include_headers, allow_virtual_data);
-		value.deserialize(*buf, allow_virtual_data);
-		return value;
-	}
-
-	template<detail::standard_layout T>
-	packed_struct<T>& struct_from_rva(uint32_t rva, packed_struct<T>& value,
-		bool include_headers = false, bool allow_virtual_data = false) const
-	{
-		auto buf = section_data_from_rva(*this, rva,
-			value.packed_size, include_headers, allow_virtual_data);
-		value.deserialize(*buf, allow_virtual_data);
-		return value;
-	}
-
-	template<detail::executable_pointer Va, detail::standard_layout T>
-	packed_struct<T>& struct_from_va(Va va, packed_struct<T>& value,
-		bool include_headers = false, bool allow_virtual_data = false) const
-	{
-		auto buf = section_data_from_va(*this, va,
-			value.packed_size, include_headers, allow_virtual_data);
-		value.deserialize(*buf, allow_virtual_data);
-		return value;
-	}
-
-public:
-	template<detail::standard_layout T>
 	rva_type struct_to_rva(uint32_t rva, const packed_struct<T>& value,
 		bool include_headers = false, bool write_virtual_part = false,
 		bool cut_if_does_not_fit = false)

@@ -6,6 +6,7 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/struct_from_va.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/generic_error.h"
@@ -54,7 +55,7 @@ bool load_element(const image::image& instance, const loader_options& options,
 	if (current_rva + elem_descriptor.packed_size > last_rva)
 		return false;
 
-	instance.struct_from_rva(current_rva.value(), elem_descriptor,
+	struct_from_rva(instance, current_rva.value(), elem_descriptor,
 		options.include_headers, options.allow_virtual_data);
 	current_rva += elem_descriptor.packed_size;
 	--elem_count;
@@ -64,7 +65,7 @@ bool load_element(const image::image& instance, const loader_options& options,
 		bool has_space = current_rva + sizeof(detail::relocations::type_or_offset_entry) <= last_rva;
 		if (elem_count && has_space)
 		{
-			instance.struct_from_rva(current_rva.value(), elem.get_param().emplace(),
+			struct_from_rva(instance, current_rva.value(), elem.get_param().emplace(),
 				options.include_headers, options.allow_virtual_data);
 			current_rva += sizeof(detail::relocations::type_or_offset_entry);
 			--elem_count;
@@ -119,7 +120,7 @@ std::optional<relocation_directory> load(const image::image& instance, const loa
 	{
 		auto& basereloc = list.emplace_back();
 		auto& descriptor = basereloc.get_descriptor();
-		instance.struct_from_rva(current_rva.value(), descriptor,
+		struct_from_rva(instance, current_rva.value(), descriptor,
 			options.include_headers, options.allow_virtual_data);
 
 		auto aligned_rva = current_rva;

@@ -5,6 +5,7 @@
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/string_from_va.h"
+#include "pe_bliss2/image/struct_from_va.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/math.h"
 
@@ -43,7 +44,7 @@ rva_type read_bound_import_entry(rva_type current_rva, rva_type start_rva,
 	const image::image& instance, const loader_options& options, ListElem& elem)
 {
 	auto& descriptor = elem.get_descriptor();
-	instance.struct_from_rva(current_rva, descriptor, options.include_headers, options.allow_virtual_data);
+	struct_from_rva(instance, current_rva, descriptor, options.include_headers, options.allow_virtual_data);
 	current_rva += descriptor.packed_size;
 	if (!descriptor->offset_module_name)
 		return current_rva;

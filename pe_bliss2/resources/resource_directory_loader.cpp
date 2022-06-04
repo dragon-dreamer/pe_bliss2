@@ -11,6 +11,7 @@
 #include "pe_bliss2/image/section_data_length_from_va.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/image/string_from_va.h"
+#include "pe_bliss2/image/struct_from_va.h"
 #include "pe_bliss2/packed_utf16_string.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
@@ -83,7 +84,7 @@ void load_resource_data_entry(const image::image& instance, const loader_options
 
 	try
 	{
-		instance.struct_from_rva(
+		struct_from_rva(instance,
 			current_rva.value(), entry_descriptor, options.include_headers,
 			options.allow_virtual_data);
 	}
@@ -135,7 +136,7 @@ bool load_resource_directory_entry(const image::image& instance, const loader_op
 
 	try
 	{
-		instance.struct_from_rva(
+		struct_from_rva(instance,
 			current_rva.value(), entry_descriptor, options.include_headers,
 			options.allow_virtual_data);
 	}
@@ -240,7 +241,7 @@ void load_resource_directory(const image::image& instance, const loader_options&
 	auto& descriptor = directory.get_descriptor();
 	try
 	{
-		current_rva += static_cast<rva_type>(instance.struct_from_rva(
+		current_rva += static_cast<rva_type>(struct_from_rva(instance,
 			current_rva.value(), descriptor, options.include_headers,
 			options.allow_virtual_data).packed_size);
 	}

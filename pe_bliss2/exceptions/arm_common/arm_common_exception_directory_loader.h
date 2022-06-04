@@ -8,6 +8,7 @@
 
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
+#include "pe_bliss2/image/struct_from_va.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/exceptions/exception_directory.h"
 #include "pe_bliss2/pe_error.h"
@@ -55,13 +56,13 @@ void load_extended_unwind_record(const image::image& instance, const LoaderOptio
 	if (!utilities::math::is_aligned<rva_type>(current_rva.value()))
 		func.add_error(exception_directory_loader_errc::unaligned_unwind_info);
 
-	current_rva += instance.struct_from_rva(current_rva.value(),
+	current_rva += struct_from_rva(instance, current_rva.value(),
 		unwind_info.get_main_header(), options.include_headers,
 		options.allow_virtual_data).packed_size;
 
 	if (unwind_info.has_extended_main_header())
 	{
-		current_rva += instance.struct_from_rva(current_rva.value(),
+		current_rva += struct_from_rva(instance, current_rva.value(),
 			unwind_info.get_main_extended_header(), options.include_headers,
 			options.allow_virtual_data).packed_size;
 	}
@@ -73,7 +74,7 @@ void load_extended_unwind_record(const image::image& instance, const LoaderOptio
 		bool ordered = true;
 		for (std::uint32_t i = 0, count = unwind_info.get_epilog_count(); i != count; ++i)
 		{
-			current_rva += instance.struct_from_rva(current_rva.value(),
+			current_rva += struct_from_rva(instance, current_rva.value(),
 				epilogs.emplace_back().get_descriptor(), options.include_headers,
 				options.allow_virtual_data).packed_size;
 
@@ -94,7 +95,7 @@ void load_extended_unwind_record(const image::image& instance, const LoaderOptio
 	while (current_rva < last_rva)
 	{
 		packed_struct<std::byte> first_byte;
-		current_rva += instance.struct_from_rva(current_rva.value(),
+		current_rva += struct_from_rva(instance, current_rva.value(),
 			first_byte, options.include_headers, options.allow_virtual_data).packed_size;
 
 		if (!std::to_integer<std::uint8_t>(first_byte.get()))
@@ -125,7 +126,7 @@ void load_extended_unwind_record(const image::image& instance, const LoaderOptio
 
 	if (unwind_info.has_exception_data())
 	{
-		instance.struct_from_rva(current_rva.value(),
+		struct_from_rva(instance, current_rva.value(),
 			unwind_info.get_exception_handler_rva(), options.include_headers,
 			options.allow_virtual_data);
 	}
@@ -140,7 +141,7 @@ template<typename UwopControl, typename PackedUnwindData, typename ExtendedUnwin
 void load_runtime_function(const image::image& instance, const LoaderOptions& options,
 	rva_type current_rva, RuntimeFunction& func)
 {
-	instance.struct_from_rva(current_rva, func.get_descriptor(),
+	struct_from_rva(instance, current_rva, func.get_descriptor(),
 		options.include_headers, options.allow_virtual_data);
 
 	if (func.has_extended_unwind_record())

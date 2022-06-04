@@ -9,6 +9,7 @@
 #include "pe_bliss2/detail/imports/image_import_descriptor.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/string_from_va.h"
+#include "pe_bliss2/image/struct_from_va.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/safe_uint.h"
@@ -66,7 +67,7 @@ rva_type load_library(const image::image& instance, const loader_options& option
 
 	try
 	{
-		instance.struct_from_rva(current_descriptor_rva, descriptor,
+		struct_from_rva(instance, current_descriptor_rva, descriptor,
 			options.include_headers, options.allow_virtual_data);
 	}
 	catch (const pe_error&)
@@ -139,11 +140,11 @@ bool load_import(const image::image& instance, const loader_options& options,
 	{
 		if (lookup_rva)
 		{
-			instance.struct_from_rva(lookup_rva.value(), new_import.get_lookup().emplace(),
+			struct_from_rva(instance, lookup_rva.value(), new_import.get_lookup().emplace(),
 				options.include_headers, options.allow_virtual_data);
 		}
 
-		instance.struct_from_rva(address_rva.value(), new_import.get_address(),
+		struct_from_rva(instance, address_rva.value(), new_import.get_address(),
 			options.include_headers, options.allow_virtual_data);
 	}
 	catch (const pe_error&)
@@ -208,7 +209,7 @@ bool load_import(const image::image& instance, const loader_options& options,
 
 	try
 	{
-		instance.struct_from_rva(hint_name_rva.value(),
+		struct_from_rva(instance, hint_name_rva.value(),
 			info.get_hint(), options.include_headers, options.allow_virtual_data);
 	}
 	catch (const pe_error&)
