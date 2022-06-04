@@ -128,21 +128,6 @@ rva_type image::buffer_to_file_offset(const buffers::ref_buffer& buf,
 	return buffer_to_rva(absolute_offset_to_rva(*this, *buf.data()), buf, include_headers);
 }
 
-packed_byte_vector image::byte_vector_from_rva(rva_type rva,
-	std::uint32_t size, bool include_headers, bool allow_virtual_data) const
-{
-	packed_byte_vector result;
-	byte_vector_from_rva(rva, result, size, include_headers, allow_virtual_data);
-	return result;
-}
-
-void image::byte_vector_from_rva(rva_type rva, packed_byte_vector& arr,
-	std::uint32_t size, bool include_headers, bool allow_virtual_data) const
-{
-	auto buf = section_data_from_rva(*this, rva, size, include_headers, allow_virtual_data);
-	arr.deserialize(*buf, size, allow_virtual_data);
-}
-
 /*
 //TODO
 //Prepares section before attaching it

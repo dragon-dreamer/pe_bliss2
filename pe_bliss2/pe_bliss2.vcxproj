@@ -75,6 +75,7 @@
     <ClInclude Include="exports\export_directory_loader.h" />
     <ClInclude Include="image\bytes_to_va.h" />
     <ClInclude Include="image\byte_array_from_va.h" />
+    <ClInclude Include="image\byte_vector_from_va.h" />
     <ClInclude Include="image\image.h" />
     <ClInclude Include="image\image_builder.h" />
     <ClInclude Include="image\image_errc.h" />
@@ -162,6 +163,7 @@
       </ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="exports\export_directory_loader.cpp" />
+    <ClCompile Include="image\byte_vector_from_va.cpp" />
     <ClCompile Include="image\image.cpp" />
     <ClCompile Include="image\image_builder.cpp" />
     <ClCompile Include="image\image_errc.cpp" />

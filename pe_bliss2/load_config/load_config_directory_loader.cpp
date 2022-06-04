@@ -15,6 +15,7 @@
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/byte_array_from_va.h"
+#include "pe_bliss2/image/byte_vector_from_va.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/image/string_from_va.h"
 #include "pe_bliss2/packed_struct.h"
@@ -770,7 +771,7 @@ bool load_relocations_header(const image::image& instance, const loader_options&
 
 	try
 	{
-		instance.byte_vector_from_rva(current_rva, header.get_data(),
+		byte_vector_from_rva(instance, current_rva, header.get_data(),
 			prologue_size, options.include_headers, options.allow_virtual_data);
 	}
 	catch (const std::system_error&)
@@ -837,7 +838,7 @@ bool load_relocations_header(const image::image& instance, const loader_options&
 
 			if (branch_descriptor_data_size)
 			{
-				instance.byte_vector_from_rva(branch_descriptor_data_rva, branch_descriptor.get_value(),
+				byte_vector_from_rva(instance, branch_descriptor_data_rva, branch_descriptor.get_value(),
 					branch_descriptor_data_size, options.include_headers, options.allow_virtual_data);
 				branch_descriptor_data_rva += branch_descriptor_data_size;
 			}
@@ -854,7 +855,7 @@ bool load_relocations_header(const image::image& instance, const loader_options&
 	bit_map.set_bit_width(bit_width);
 	try
 	{
-		instance.byte_vector_from_rva(branch_descriptor_data_rva, bit_map.get_data(),
+		byte_vector_from_rva(instance, branch_descriptor_data_rva, bit_map.get_data(),
 			static_cast<std::uint32_t>(bytes_for_bit_map), options.include_headers, options.allow_virtual_data);
 	}
 	catch (const std::system_error&)
@@ -1023,7 +1024,7 @@ void load_enclave_config(const image::image& instance, const loader_options& opt
 	{
 		try
 		{
-			instance.byte_vector_from_va(enclave_config_va.value(), config.get_extra_data(),
+			byte_vector_from_va(instance, enclave_config_va.value(), config.get_extra_data(),
 				config_descriptor->size - config_descriptor.packed_size,
 				options.include_headers, options.allow_virtual_data);
 		}
@@ -1053,7 +1054,7 @@ void load_enclave_config(const image::image& instance, const loader_options& opt
 		{
 			try
 			{
-				instance.byte_vector_from_rva(current_rva.value(), config.get_extra_data(),
+				byte_vector_from_rva(instance, current_rva.value(), config.get_extra_data(),
 					extra_import_size, options.include_headers, options.allow_virtual_data);
 			}
 			catch (const std::system_error&)

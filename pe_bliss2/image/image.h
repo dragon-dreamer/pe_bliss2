@@ -86,28 +86,6 @@ public:
 	}
 
 public:
-	packed_byte_vector byte_vector_from_rva(rva_type rva,
-		std::uint32_t size, bool include_headers, bool allow_virtual_data) const;
-	void byte_vector_from_rva(rva_type rva, packed_byte_vector& arr,
-		std::uint32_t size, bool include_headers, bool allow_virtual_data) const;
-
-	template<detail::executable_pointer Va>
-	packed_byte_vector byte_vector_from_va(Va va,
-		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
-	{
-		return byte_vector_from_rva(address_converter(*this).va_to_rva(va),
-			size, include_headers, allow_virtual_data);
-	}
-
-	template<detail::executable_pointer Va>
-	void byte_vector_from_va(Va va, packed_byte_vector& arr,
-		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
-	{
-		byte_vector_from_rva(address_converter(*this).va_to_rva(va), arr, size,
-			include_headers, allow_virtual_data);
-	}
-
-public:
 	template<detail::standard_layout T>
 	[[nodiscard]]
 	packed_struct<T> struct_from_rva(uint32_t rva, bool include_headers = false,
