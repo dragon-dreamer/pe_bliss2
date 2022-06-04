@@ -73,6 +73,7 @@
     <ClInclude Include="exports\export_directory.h" />
     <ClInclude Include="exports\export_directory_builder.h" />
     <ClInclude Include="exports\export_directory_loader.h" />
+    <ClInclude Include="image\byte_array_from_va.h" />
     <ClInclude Include="image\image.h" />
     <ClInclude Include="image\image_builder.h" />
     <ClInclude Include="image\image_errc.h" />

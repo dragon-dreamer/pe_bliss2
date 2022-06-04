@@ -87,40 +87,6 @@ public:
 	}
 
 public:
-	template<std::size_t MaxSize>
-	packed_byte_array<MaxSize> byte_array_from_rva(rva_type rva,
-		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
-	{
-		packed_byte_array<MaxSize> result;
-		byte_array_from_rva(rva, result, size, include_headers, allow_virtual_data);
-		return result;
-	}
-
-	template<std::size_t MaxSize>
-	void byte_array_from_rva(rva_type rva, packed_byte_array<MaxSize>& arr,
-		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
-	{
-		auto buf = section_data_from_rva(*this, rva, size, include_headers, allow_virtual_data);
-		arr.deserialize(*buf, size, allow_virtual_data);
-	}
-
-	template<detail::executable_pointer Va, std::size_t MaxSize>
-	packed_byte_array<MaxSize> byte_array_from_va(Va va,
-		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
-	{
-		return byte_array_from_rva(address_converter(*this).va_to_rva(va),
-			size, include_headers, allow_virtual_data);
-	}
-
-	template<detail::executable_pointer Va, std::size_t MaxSize>
-	void byte_array_from_va(Va va, packed_byte_array<MaxSize>& arr,
-		std::uint32_t size, bool include_headers, bool allow_virtual_data) const
-	{
-		byte_array_from_rva(address_converter(*this).va_to_rva(va), arr, size,
-			include_headers, allow_virtual_data);
-	}
-
-public:
 	packed_byte_vector byte_vector_from_rva(rva_type rva,
 		std::uint32_t size, bool include_headers, bool allow_virtual_data) const;
 	void byte_vector_from_rva(rva_type rva, packed_byte_vector& arr,

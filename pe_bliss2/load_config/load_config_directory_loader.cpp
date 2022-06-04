@@ -14,6 +14,7 @@
 #include "pe_bliss2/detail/load_config/image_load_config_directory.h"
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/image/image.h"
+#include "pe_bliss2/image/byte_array_from_va.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/image/string_from_va.h"
 #include "pe_bliss2/packed_struct.h"
@@ -246,7 +247,7 @@ void read_cf_guard_rva_table(const image::image& instance, const loader_options&
 		table_va += static_cast<Va>(func.get_rva().packed_size);
 		if (stride)
 		{
-			instance.byte_array_from_va(table_va, func.get_additional_data(), stride,
+			byte_array_from_va(instance, table_va, func.get_additional_data(), stride,
 				options.include_headers, options.allow_virtual_data);
 			table_va += static_cast<Va>(func.get_additional_data().data_size());
 		}
@@ -648,7 +649,7 @@ void load_arm64x_relocations(const image::image& instance, const loader_options&
 					}
 					else
 					{
-						instance.byte_array_from_rva(current_rva, element.get_data(), element.get_size(),
+						byte_array_from_rva(instance, current_rva, element.get_data(), element.get_size(),
 							options.include_headers, options.allow_virtual_data);
 						current_rva += static_cast<rva_type>(element.get_data().data_size());
 					}

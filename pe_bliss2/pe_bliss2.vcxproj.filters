@@ -456,6 +456,9 @@
     <ClInclude Include="image\string_to_va.h">
       <Filter>Header Files\image</Filter>
     </ClInclude>
+    <ClInclude Include="image\byte_array_from_va.h">
+      <Filter>Header Files\image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
