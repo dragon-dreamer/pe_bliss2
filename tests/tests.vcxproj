@@ -182,7 +182,9 @@
     <ClCompile Include="tests\pe_bliss2\endian_convert_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\error_list_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\file_header_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\image_helper.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_signature_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\image_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\optional_header_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\packed_byte_array_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\packed_byte_vector_tests.cpp" />
@@ -217,6 +219,7 @@
     <ClInclude Include="tests\buffers\buffer_helpers.h" />
     <ClInclude Include="tests\buffers\input_buffer_helpers.h" />
     <ClInclude Include="tests\buffers\output_buffer_helpers.h" />
+    <ClInclude Include="tests\pe_bliss2\image_helper.h" />
     <ClInclude Include="tests\pe_bliss2\input_buffer_mock.h" />
     <ClInclude Include="tests\pe_bliss2\output_buffer_mock.h" />
     <ClInclude Include="tests\pe_bliss2\pe_error_helper.h" />
