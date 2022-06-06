@@ -25,6 +25,7 @@ void optional_header::deserialize(buffers::input_buffer_interface& buf,
 		std::throw_with_nested(pe_error(
 			optional_header_errc::unable_to_read_optional_header));
 	}
+
 	if (magic_value.get() == static_cast<uint16_t>(magic::pe32))
 		initialize_with<optional_header_32_type>();
 	else if (magic_value.get() == static_cast<uint16_t>(magic::pe64))

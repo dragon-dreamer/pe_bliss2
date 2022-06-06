@@ -61,7 +61,7 @@ public:
 
 public:
 	[[nodiscard]] bool is_64bit() const noexcept;
-	[[nodiscard]] bool has_relocation() const noexcept;
+	[[nodiscard]] bool has_relocations() const noexcept;
 	[[nodiscard]] bool is_loaded_to_memory() const noexcept
 	{
 		return loaded_to_memory_;
@@ -79,6 +79,7 @@ public:
 	void set_number_of_data_directories(std::uint32_t number);
 	std::uint32_t strip_data_directories(std::uint32_t min_count);
 	void copy_referenced_section_memory();
+	void update_full_headers_buffer(bool keep_headers_gap_data = true);
 
 private:
 	bool loaded_to_memory_ = false;

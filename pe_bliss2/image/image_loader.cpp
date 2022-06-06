@@ -84,7 +84,7 @@ std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
 		if (options.validate_image_base)
 		{
 			if (auto err = validate_image_base(optional_hdr,
-				instance.has_relocation()); err)
+				instance.has_relocations()); err)
 			{
 				errors.add_error(err);
 			}

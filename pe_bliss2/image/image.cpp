@@ -2,21 +2,26 @@
 
 #include <cstdint>
 #include <limits>
+#include <utility>
+
+#include "buffers/output_memory_buffer.h"
 
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/detail/image_file_header.h"
 #include "pe_bliss2/image/image_errc.h"
 #include "pe_bliss2/pe_error.h"
+
 #include "utilities/generic_error.h"
 #include "utilities/math.h"
 
 namespace pe_bliss::image
 {
 
-bool image::has_relocation() const noexcept
+bool image::has_relocations() const noexcept
 {
 	return data_directories_.has_reloc()
-		&& !(file_header_.get_characteristics() & core::file_header::characteristics::relocs_stripped);
+		&& !(file_header_.get_characteristics()
+			& core::file_header::characteristics::relocs_stripped);
 }
 
 bool image::is_64bit() const noexcept
@@ -75,6 +80,33 @@ void image::copy_referenced_section_memory()
 {
 	for (auto& section : section_list_)
 		section.copy_referenced_buffer();
+}
+
+void image::update_full_headers_buffer(bool keep_headers_gap_data)
+{
+	if (!keep_headers_gap_data)
+		full_headers_buffer_ = {};
+
+	buffers::output_memory_buffer::buffer_type data(std::move(
+		full_headers_buffer_.copied_data()));
+
+	buffers::output_memory_buffer buffer(data);
+	dos_header_.serialize(buffer);
+	dos_stub_.serialize(buffer);
+	buffer.set_wpos(dos_header_.base_struct()->e_lfanew);
+	image_signature_.serialize(buffer);
+	file_header_.serialize(buffer);
+	auto optional_header_buffer_pos = buffer.wpos();
+	optional_header_.serialize(buffer);
+	data_directories_.serialize(buffer);
+
+	buffer.set_wpos(optional_header_buffer_pos
+		+ file_header_.base_struct()->size_of_optional_header);
+	section_table_.serialize(buffer);
+
+	data.resize(optional_header_.get_raw_size_of_headers());
+
+	full_headers_buffer_.copied_data() = std::move(data);
 }
 
 /*
