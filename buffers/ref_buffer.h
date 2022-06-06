@@ -55,6 +55,8 @@ public:
 	[[nodiscard]] bool empty() const noexcept;
 	[[nodiscard]] std::size_t size() const noexcept;
 
+	[[nodiscard]] bool is_copied() const noexcept;
+
 private:
 	struct buffer_ref
 	{

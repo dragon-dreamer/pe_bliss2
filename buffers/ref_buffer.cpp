@@ -139,15 +139,20 @@ void ref_buffer::read_buffer(input_buffer_interface& buf)
 	auto& container = copied_buf->get_container();
 	container.resize(size);
 
-	if (!size)
-		return;
-
-	buf.set_rpos(0u);
-	auto read_bytes = buf.read(container.size(), container.data());
-	if (read_bytes != container.size())
-		throw std::system_error(ref_buffer_errc::unable_to_read_data);
+	if (size)
+	{
+		buf.set_rpos(0u);
+		auto read_bytes = buf.read(container.size(), container.data());
+		if (read_bytes != container.size())
+			throw std::system_error(ref_buffer_errc::unable_to_read_data);
+	}
 
 	buffer_ = copied_buffer(std::move(copied_buf));
+}
+
+bool ref_buffer::is_copied() const noexcept
+{
+	return buffer_.index() == 0u;
 }
 
 void ref_buffer::copy_referenced_buffer()
