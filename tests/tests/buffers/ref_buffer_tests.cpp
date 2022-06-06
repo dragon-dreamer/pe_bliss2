@@ -186,7 +186,18 @@ TEST_P(RefBufferTestsFixture, CopyRefBufferTest)
 	auto input_buf = create_input_container_buffer(100u);
 	buffers::ref_buffer buf;
 	EXPECT_NO_THROW(buf.deserialize(input_buf, GetParam()));
+	EXPECT_EQ(buf.is_copied(), GetParam());
 	copy_tests(input_buf, buf, GetParam());
+}
+
+TEST_P(RefBufferTestsFixture, CopyRefBufferEmptyTest)
+{
+	auto input_buf = create_input_container_buffer(0u);
+	buffers::ref_buffer buf;
+	EXPECT_NO_THROW(buf.deserialize(input_buf, GetParam()));
+	EXPECT_EQ(buf.is_copied(), GetParam());
+	EXPECT_NO_THROW((void)buf.copied_data());
+	EXPECT_EQ(buf.is_copied(), true);
 }
 
 INSTANTIATE_TEST_SUITE_P(
