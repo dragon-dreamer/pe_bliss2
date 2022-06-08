@@ -28,41 +28,41 @@ section_const_ref section_from_reference(const image& instance,
 
 [[nodiscard]]
 section_ref section_from_rva(image& instance, rva_type rva,
-	std::uint32_t data_size = 0);
+	std::uint32_t data_size = 0) noexcept;
 [[nodiscard]]
 section_const_ref section_from_rva(
 	const image& instance, rva_type rva,
-	std::uint32_t data_size = 0);
+	std::uint32_t data_size = 0) noexcept;
 
 [[nodiscard]]
 section_ref section_from_va(image& instance, std::uint32_t va,
-	std::uint32_t data_size = 0);
+	std::uint32_t data_size = 0) noexcept;
 [[nodiscard]]
 section_const_ref section_from_va(
 	const image& instance, std::uint32_t va,
-	std::uint32_t data_size = 0);
+	std::uint32_t data_size = 0) noexcept;
 [[nodiscard]]
 section_ref section_from_va(image& instance, std::uint64_t va,
-	std::uint32_t data_size = 0);
+	std::uint32_t data_size = 0) noexcept;
 [[nodiscard]]
 section_const_ref section_from_va(
 	const image& instance, std::uint64_t va,
-	std::uint32_t data_size = 0);
+	std::uint32_t data_size = 0) noexcept;
 
 [[nodiscard]]
 section_ref section_from_directory(image& instance,
-	core::data_directories::directory_type directory);
+	core::data_directories::directory_type directory) noexcept;
 [[nodiscard]]
 section_const_ref section_from_directory(const image& instance,
-	core::data_directories::directory_type directory);
+	core::data_directories::directory_type directory) noexcept;
 
 [[nodiscard]]
 section_ref section_from_file_offset(
 	image& instance, std::uint32_t offset,
-	std::uint32_t data_size = 0);
+	std::uint32_t data_size = 0) noexcept;
 [[nodiscard]]
 section_const_ref section_from_file_offset(
 	const image& instance, std::uint32_t offset,
-	std::uint32_t data_size = 0);
+	std::uint32_t data_size = 0) noexcept;
 
 } //namespace pe_bliss::image
