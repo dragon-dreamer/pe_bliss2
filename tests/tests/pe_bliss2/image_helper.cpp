@@ -59,8 +59,8 @@ pe_bliss::image::image create_test_image(const test_image_options& options)
 
 	auto section_headers_it = instance.get_section_table().get_section_headers().begin();
 	auto section_data_it = instance.get_section_data_list().begin();
-	std::uint32_t current_rva = 0x1000u;
-	std::uint32_t current_raw_pos = 0x1000u;
+	std::uint32_t current_rva = options.start_section_rva;
+	std::uint32_t current_raw_pos = options.start_section_raw_offset;
 	for (auto [vsize, rsize] : options.sections)
 	{
 		section_headers_it->set_raw_size(rsize);

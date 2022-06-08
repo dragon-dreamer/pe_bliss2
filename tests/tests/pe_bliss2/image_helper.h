@@ -22,6 +22,8 @@ struct test_image_options
 	std::uint32_t file_alignment = 0x200u;
 	std::uint32_t section_alignment = 0x1000u;
 	std::uint32_t e_lfanew = 0xf8u;
+	std::uint32_t start_section_rva = 0x1000u;
+	std::uint32_t start_section_raw_offset = 0x1000u;
 	std::vector<test_section_info> sections{
 		{ 0x1000u, 0x1000u },
 		{ 0x2000u, 0x1000u },
