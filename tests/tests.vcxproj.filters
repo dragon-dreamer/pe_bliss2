@@ -153,6 +153,12 @@
     <ClCompile Include="tests\pe_bliss2\image_helper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\rva_file_offset_converter_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\image_section_search_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">
