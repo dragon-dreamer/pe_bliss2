@@ -2,6 +2,7 @@
 
 #include <cstdint>
 
+#include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/pe_types.h"
 
 #include "utilities/safe_uint.h"
@@ -21,7 +22,7 @@ std::uint32_t file_offset_to_rva(const image& instance, std::uint32_t offset);
 [[nodiscard]]
 std::uint32_t rva_to_file_offset(const image& instance, rva_type rva);
 
-template<typename PackedStruct>
+template<detail::has_state_with_absolute_offset PackedStruct>
 [[nodiscard]]
 rva_type absolute_offset_to_rva(const image& instance,
 	const PackedStruct& obj)
