@@ -13,8 +13,11 @@ namespace pe_bliss::image
 std::uint32_t section_data_length_from_rva(const image& instance,
 	rva_type rva, bool include_headers, bool allow_virtual_data)
 {
-	if (include_headers && rva <= instance.get_full_headers_buffer().size())
+	if (rva <= instance.get_full_headers_buffer().size())
 	{
+		if (!include_headers)
+			throw pe_error(image_errc::section_data_does_not_exist);
+
 		return static_cast<std::uint32_t>(
 			instance.get_full_headers_buffer().size()) - rva;
 	}
