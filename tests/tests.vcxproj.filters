@@ -162,6 +162,9 @@
     <ClCompile Include="tests\pe_bliss2\section_data_length_from_rva_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2</Filter>
     </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\section_data_from_rva_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">
