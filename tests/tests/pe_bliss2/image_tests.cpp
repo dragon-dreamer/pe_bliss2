@@ -160,7 +160,8 @@ TEST(ImageTests, CopyReferencedSectionMemoryTest)
 
 namespace
 {
-class ImageTestsFixture : public ::testing::TestWithParam<std::pair<bool, bool>> {
+class ImageTestsFixture : public ::testing::TestWithParam<std::pair<bool, bool>>
+{
 };
 } //namespace
 

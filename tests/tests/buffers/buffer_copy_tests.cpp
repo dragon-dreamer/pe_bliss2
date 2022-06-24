@@ -11,7 +11,8 @@
 
 namespace
 {
-class BufferTestsFixture : public ::testing::TestWithParam<std::size_t> {
+class BufferTestsFixture : public ::testing::TestWithParam<std::size_t>
+{
 };
 } //namespace
 

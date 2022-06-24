@@ -100,7 +100,8 @@ void copy_tests(
 	EXPECT_EQ(data, input_buf->get_container());
 }
 
-class RefBufferTestsFixture : public ::testing::TestWithParam<bool> {
+class RefBufferTestsFixture : public ::testing::TestWithParam<bool>
+{
 };
 } //namespace
 
