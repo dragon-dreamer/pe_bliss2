@@ -443,8 +443,7 @@ void load_chpe_metadata(const image::image& instance,
 		break;
 	}
 
-	auto buf = section_data_from_va(instance, metadata_va.value(), metadata_size,
-		options.include_headers, options.allow_virtual_data);
+	auto buf = section_data_from_va(instance, metadata_va.value(), options.include_headers);
 	auto& metadata_descriptor = metadata.get_metadata();
 	metadata_descriptor.deserialize_until(*buf, metadata_size, options.allow_virtual_data);
 
@@ -1198,8 +1197,7 @@ void load_impl(const image::image& instance,
 	auto size = directory.get_descriptor_size();
 
 	rva_type struct_rva = load_config_dir_info->virtual_address + sizeof(size);
-	auto struct_buf = section_data_from_rva(instance, struct_rva,
-		size, options.include_headers, options.allow_virtual_data);
+	auto struct_buf = section_data_from_rva(instance, struct_rva, options.include_headers);
 	directory.get_descriptor().deserialize_until(*struct_buf, size, options.allow_virtual_data);
 
 	using enum load_config::version;

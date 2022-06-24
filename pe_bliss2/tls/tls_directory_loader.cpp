@@ -73,13 +73,13 @@ Directory load_impl(const image::image& instance, const loader_options& options)
 		}
 
 		auto raw_length = section_data_length_from_va(instance,
-			descriptor->start_address_of_raw_data, options.include_headers, false);
+			descriptor->start_address_of_raw_data, options.include_headers);
 		raw_length = (std::min)(raw_length,
 			static_cast<std::uint32_t>(descriptor->end_address_of_raw_data - descriptor->start_address_of_raw_data));
 		if (raw_length)
 		{
 			auto buf = section_data_from_va(instance, descriptor->start_address_of_raw_data, raw_length,
-				options.include_headers, false);
+				options.include_headers);
 			directory.get_raw_data().deserialize(buf, options.copy_raw_data);
 		}
 	}

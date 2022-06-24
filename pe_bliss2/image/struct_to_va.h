@@ -24,11 +24,7 @@ rva_type struct_to_rva(image& instance,
 	if (!value.physical_size() && !write_virtual_part)
 		return rva;
 
-	auto buf = section_data_from_rva(instance, rva,
-		static_cast<std::uint32_t>(
-			write_virtual_part ? value.packed_size : value.physical_size()),
-		include_headers, cut_if_does_not_fit);
-
+	auto buf = section_data_from_rva(instance, rva, include_headers);
 	auto size = cut_if_does_not_fit
 		? value.serialize_until(buf.data(), buf.size_bytes(), write_virtual_part)
 		: value.serialize(buf.data(), buf.size_bytes(), write_virtual_part);
@@ -44,11 +40,7 @@ Va struct_to_va(image& instance, Va va, const packed_struct<T>& value,
 	if (!value.physical_size() && !write_virtual_part)
 		return va;
 
-	auto buf = section_data_from_va(instance, va,
-		static_cast<std::uint32_t>(
-			write_virtual_part ? value.packed_size : value.physical_size()),
-		include_headers, cut_if_does_not_fit);
-
+	auto buf = section_data_from_va(instance, va, include_headers);
 	auto size = cut_if_does_not_fit
 		? value.serialize_until(buf.data(), buf.size_bytes(), write_virtual_part)
 		: value.serialize(buf.data(), buf.size_bytes(), write_virtual_part);

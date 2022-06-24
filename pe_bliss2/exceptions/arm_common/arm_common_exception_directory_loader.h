@@ -105,7 +105,7 @@ void load_extended_unwind_record(const image::image& instance, const LoaderOptio
 		}
 
 		UwopControl::create_uwop_code(unwind_codes, UwopControl::decode_unwind_code(first_byte.get()));
-		std::visit([&first_byte, &current_rva, &instance, &options, &last_rva] (auto& code) {
+		std::visit([&first_byte, &current_rva, &instance, &options, &last_rva, &func] (auto& code) {
 			auto& descriptor = code.get_descriptor();
 			descriptor.copy_metadata_from(first_byte);
 			descriptor[0] = first_byte.get();
@@ -116,8 +116,10 @@ void load_extended_unwind_record(const image::image& instance, const LoaderOptio
 					throw pe_error(exception_directory_loader_errc::invalid_unwind_info);
 
 				auto bytes_read = section_data_from_rva(instance, current_rva.value(),
-					code.length - 1u, options.include_headers, options.allow_virtual_data)
-					->read(code.length - 1u, &descriptor.value()[1]);
+					options.include_headers)->read(code.length - 1u, &descriptor.value()[1]);
+				//TODO: add error to uwop code and not the func
+				if (bytes_read != code.length - 1u && !options.allow_virtual_data)
+					func.add_error(exception_directory_loader_errc::invalid_runtime_function_entry);
 				descriptor.set_physical_size(descriptor.physical_size() + bytes_read);
 				current_rva += code.length - 1u;
 			}

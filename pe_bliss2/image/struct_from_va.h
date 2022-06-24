@@ -16,8 +16,7 @@ packed_struct<T> struct_from_rva(const image& instance, rva_type rva,
 	bool include_headers = false, bool allow_virtual_data = false)
 {
 	packed_struct<T> value{};
-	auto buf = section_data_from_rva(instance, rva,
-		value.packed_size, include_headers, allow_virtual_data);
+	auto buf = section_data_from_rva(instance, rva, include_headers);
 	value.deserialize(*buf, allow_virtual_data);
 	return value;
 }
@@ -28,8 +27,7 @@ packed_struct<T> struct_from_va(const image& instance, Va va,
 	bool include_headers = false, bool allow_virtual_data = false)
 {
 	packed_struct<T> value{};
-	auto buf = section_data_from_va(instance, va,
-		value.packed_size, include_headers, allow_virtual_data);
+	auto buf = section_data_from_va(instance, va, include_headers);
 	value.deserialize(*buf, allow_virtual_data);
 	return value;
 }
@@ -39,8 +37,7 @@ packed_struct<T>& struct_from_rva(const image& instance,
 	rva_type rva, packed_struct<T>& value,
 	bool include_headers = false, bool allow_virtual_data = false)
 {
-	auto buf = section_data_from_rva(instance, rva,
-		value.packed_size, include_headers, allow_virtual_data);
+	auto buf = section_data_from_rva(instance, rva, include_headers);
 	value.deserialize(*buf, allow_virtual_data);
 	return value;
 }
@@ -50,8 +47,7 @@ packed_struct<T>& struct_from_va(const image& instance,
 	Va va, packed_struct<T>& value,
 	bool include_headers = false, bool allow_virtual_data = false)
 {
-	auto buf = section_data_from_va(instance, va,
-		value.packed_size, include_headers, allow_virtual_data);
+	auto buf = section_data_from_va(instance, va, include_headers);
 	value.deserialize(*buf, allow_virtual_data);
 	return value;
 }

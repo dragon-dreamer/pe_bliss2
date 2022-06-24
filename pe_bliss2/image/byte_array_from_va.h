@@ -30,8 +30,7 @@ void byte_array_from_rva(const image& instance, rva_type rva,
 	packed_byte_array<MaxSize>& arr, std::uint32_t size,
 	bool include_headers, bool allow_virtual_data)
 {
-	auto buf = section_data_from_rva(instance, rva,
-		size, include_headers, allow_virtual_data);
+	auto buf = section_data_from_rva(instance, rva, include_headers);
 	arr.deserialize(*buf, size, allow_virtual_data);
 }
 
