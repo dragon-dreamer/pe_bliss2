@@ -20,37 +20,37 @@ packed_byte_array<MaxSize> byte_array_from_rva(
 	std::uint32_t size, bool include_headers, bool allow_virtual_data)
 {
 	packed_byte_array<MaxSize> result;
-	byte_array_from_rva(rva, result, size,
+	byte_array_from_rva(instance, rva, size, result,
 		include_headers, allow_virtual_data);
 	return result;
 }
 
 template<std::size_t MaxSize>
 void byte_array_from_rva(const image& instance, rva_type rva,
-	packed_byte_array<MaxSize>& arr, std::uint32_t size,
+	std::uint32_t size, packed_byte_array<MaxSize>& arr,
 	bool include_headers, bool allow_virtual_data)
 {
 	auto buf = section_data_from_rva(instance, rva, include_headers);
 	arr.deserialize(*buf, size, allow_virtual_data);
 }
 
-template<detail::executable_pointer Va, std::size_t MaxSize>
+template<std::size_t MaxSize, detail::executable_pointer Va>
 [[nodiscard]]
 packed_byte_array<MaxSize> byte_array_from_va(const image& instance, Va va,
 	std::uint32_t size, bool include_headers, bool allow_virtual_data)
 {
-	return byte_array_from_rva(instance,
+	return byte_array_from_rva<MaxSize>(instance,
 		address_converter(instance).va_to_rva(va),
 		size, include_headers, allow_virtual_data);
 }
 
 template<detail::executable_pointer Va, std::size_t MaxSize>
 void byte_array_from_va(const image& instance, Va va,
-	packed_byte_array<MaxSize>& arr, std::uint32_t size,
+	std::uint32_t size, packed_byte_array<MaxSize>& arr,
 	bool include_headers, bool allow_virtual_data)
 {
 	byte_array_from_rva(instance,
-		address_converter(instance).va_to_rva(va), arr, size,
+		address_converter(instance).va_to_rva(va), size, arr,
 		include_headers, allow_virtual_data);
 }
 

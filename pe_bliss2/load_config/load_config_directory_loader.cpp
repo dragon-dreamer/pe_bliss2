@@ -249,7 +249,7 @@ void read_cf_guard_rva_table(const image::image& instance, const loader_options&
 		table_va += static_cast<Va>(func.get_rva().packed_size);
 		if (stride)
 		{
-			byte_array_from_va(instance, table_va, func.get_additional_data(), stride,
+			byte_array_from_va(instance, table_va, stride, func.get_additional_data(),
 				options.include_headers, options.allow_virtual_data);
 			table_va += static_cast<Va>(func.get_additional_data().data_size());
 		}
@@ -650,7 +650,7 @@ void load_arm64x_relocations(const image::image& instance, const loader_options&
 					}
 					else
 					{
-						byte_array_from_rva(instance, current_rva, element.get_data(), element.get_size(),
+						byte_array_from_rva(instance, current_rva, element.get_size(), element.get_data(),
 							options.include_headers, options.allow_virtual_data);
 						current_rva += static_cast<rva_type>(element.get_data().data_size());
 					}
