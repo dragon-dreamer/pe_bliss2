@@ -65,22 +65,25 @@ public:
 		}
 	}
 
-	decltype(auto) string_from_address(pe_bliss::rva_type rva, String& str,
+	void string_from_address(pe_bliss::rva_type rva, String& str,
 		bool include_headers, bool allow_virtual_data)
 	{
 		switch (GetParam())
 		{
 		case function_type::va32:
-			return string_from_va(instance, static_cast<std::uint32_t>(rva
+			string_from_va(instance, static_cast<std::uint32_t>(rva
 				+ instance.get_optional_header().get_raw_image_base()),
 				str, include_headers, allow_virtual_data);
+			break;
 		case function_type::va64:
-			return string_from_va(instance, static_cast<std::uint64_t>(rva
+			string_from_va(instance, static_cast<std::uint64_t>(rva
 				+ instance.get_optional_header().get_raw_image_base()),
 				str, include_headers, allow_virtual_data);
+			break;
 		default: //rva
-			return string_from_rva(instance, rva,
+			string_from_rva(instance, rva,
 				str, include_headers, allow_virtual_data);
+			break;
 		}
 	}
 
@@ -255,8 +258,6 @@ void test_with_fixture_header(Fixture& fixture)
 			fixture.expected_physical_size(fixture.header_string));
 		EXPECT_FALSE(str.is_virtual());
 	}
-
-	//TODO: test string_from_va address overflow exception
 }
 
 template<typename Fixture>
@@ -294,7 +295,6 @@ void test_with_fixture_cut_string(Fixture& fixture)
 
 } //namespace
 
-//TODO
 TEST_P(CStringFromVaFixture, PackedStringSectionTest)
 {
 	test_with_fixture_section(*this);
