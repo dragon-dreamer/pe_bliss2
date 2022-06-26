@@ -9,13 +9,13 @@ packed_byte_vector byte_vector_from_rva(const image& instance, rva_type rva,
 	std::uint32_t size, bool include_headers, bool allow_virtual_data)
 {
 	packed_byte_vector result;
-	byte_vector_from_rva(instance, rva, result,
-		size, include_headers, allow_virtual_data);
+	byte_vector_from_rva(instance, rva,
+		size, result, include_headers, allow_virtual_data);
 	return result;
 }
 
 void byte_vector_from_rva(const image& instance, rva_type rva,
-	packed_byte_vector& arr, std::uint32_t size,
+	std::uint32_t size, packed_byte_vector& arr,
 	bool include_headers, bool allow_virtual_data)
 {
 	auto buf = section_data_from_rva(instance, rva,

@@ -16,8 +16,8 @@ class image;
 packed_byte_vector byte_vector_from_rva(const image& instance, rva_type rva,
 	std::uint32_t size, bool include_headers, bool allow_virtual_data);
 void byte_vector_from_rva(const image& instance,
-	rva_type rva, packed_byte_vector& arr,
-	std::uint32_t size, bool include_headers, bool allow_virtual_data);
+	rva_type rva, std::uint32_t size, packed_byte_vector& arr,
+	bool include_headers, bool allow_virtual_data);
 
 template<detail::executable_pointer Va>
 [[nodiscard]]
@@ -31,11 +31,11 @@ packed_byte_vector byte_vector_from_va(const image& instance, Va va,
 
 template<detail::executable_pointer Va>
 void byte_vector_from_va(const image& instance, Va va,
-	packed_byte_vector& arr, std::uint32_t size,
+	std::uint32_t size, packed_byte_vector& arr,
 	bool include_headers, bool allow_virtual_data)
 {
 	byte_vector_from_rva(instance,
-		address_converter(instance).va_to_rva(va), arr, size,
+		address_converter(instance).va_to_rva(va), size, arr,
 		include_headers, allow_virtual_data);
 }
 
