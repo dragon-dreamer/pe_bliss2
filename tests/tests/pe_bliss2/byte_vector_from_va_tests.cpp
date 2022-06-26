@@ -126,24 +126,18 @@ TEST_P(ByteVectorFromVaFixture, PackedByteVectorCutErrorTest)
 {
 	expect_throw_pe_error([this] {
 		(void)byte_vector_from_address(
-			section_arr_offset, section_arr.size() + 1u, false, false);
-	}, pe_bliss::image::image_errc::section_data_does_not_exist);
+			section_arr_rva, section_arr.size() + 1u, false, false);
+	}, utilities::generic_errc::buffer_overrun);
 
 	expect_throw_pe_error([this] {
 		pe_bliss::packed_byte_vector arr;
 		(void)byte_vector_from_address(
-			section_arr_offset, section_arr.size() + 1u, arr, false, false);
-	}, pe_bliss::image::image_errc::section_data_does_not_exist);
+			section_arr_rva, section_arr.size() + 1u, arr, false, false);
+	}, utilities::generic_errc::buffer_overrun);
 }
 
 TEST_P(ByteVectorFromVaFixture, PackedByteVectorSectionVirtualDataTest)
 {
-	expect_throw_pe_error([this] {
-		pe_bliss::packed_byte_vector arr;
-		(void)byte_vector_from_address(
-			section_arr_offset, section_arr.size() + 1u, arr, false, false);
-	}, pe_bliss::image::image_errc::section_data_does_not_exist);
-
 	auto arr1 = byte_vector_from_address(
 		section_arr_rva, section_arr.size() + 1u, false, true);
 	pe_bliss::packed_byte_vector arr2;

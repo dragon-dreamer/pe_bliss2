@@ -144,23 +144,18 @@ TEST_P(ByteArrayFromVaFixture, PackedByteArrayCutErrorTest)
 {
 	expect_throw_pe_error([this] {
 		(void)byte_array_from_address<10u>(
-			section_arr_offset, section_arr.size() + 1u, false, false);
-	}, pe_bliss::image::image_errc::section_data_does_not_exist);
+			section_arr_rva, section_arr.size() + 1u, false, false);
+	}, utilities::generic_errc::buffer_overrun);
 
 	expect_throw_pe_error([this] {
 		pe_bliss::packed_byte_array<10u> arr;
 		(void)byte_array_from_address(
-			section_arr_offset, section_arr.size() + 1u, arr, false, false);
-	}, pe_bliss::image::image_errc::section_data_does_not_exist);
+			section_arr_rva, section_arr.size() + 1u, arr, false, false);
+	}, utilities::generic_errc::buffer_overrun);
 }
 
 TEST_P(ByteArrayFromVaFixture, PackedByteArraySectionVirtualDataTest)
 {
-	expect_throw_pe_error([this] {
-		pe_bliss::packed_byte_array<10u> arr;
-		(void)byte_array_from_address(
-			section_arr_offset, section_arr.size() + 1u, arr, false, false);
-	}, pe_bliss::image::image_errc::section_data_does_not_exist);
 	auto arr1 = byte_array_from_address<10u>(
 		section_arr_rva, section_arr.size() + 1u, false, true);
 	pe_bliss::packed_byte_array<10u> arr2;
