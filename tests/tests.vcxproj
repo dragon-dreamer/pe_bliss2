@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -108,7 +108,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ControlFlowGuard>
       </ControlFlowGuard>
@@ -147,7 +147,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -205,6 +205,7 @@
     <ClCompile Include="tests\pe_bliss2\section_search_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\section_table_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\string_from_va_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\struct_from_va_tests.cpp" />
     <ClCompile Include="tests\utilities\math_tests.cpp" />
     <ClCompile Include="tests\utilities\safe_uint_tests.cpp" />
     <ClCompile Include="tests\utilities\scoped_guard_tests.cpp" />
