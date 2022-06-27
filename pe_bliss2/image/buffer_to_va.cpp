@@ -1,7 +1,9 @@
 #include "pe_bliss2/image/buffer_to_va.h"
 
 #include "buffers/output_memory_ref_buffer.h"
+#include "buffers/ref_buffer.h"
 
+#include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/image/rva_file_offset_converter.h"
 
@@ -23,25 +25,17 @@ rva_type buffer_to_rva(image& instance,
 std::uint32_t buffer_to_va(image& instance,
 	std::uint32_t va, const buffers::ref_buffer& buf, bool include_headers)
 {
-	if (buf.empty())
-		return va;
-
-	auto data = section_data_from_va(instance, va, include_headers);
-	auto data_buffer = buffers::output_memory_ref_buffer(data);
-	buf.serialize(data_buffer);
-	return va + static_cast<std::uint32_t>(buf.size());
+	address_converter conv(instance);
+	return conv.rva_to_va<std::uint32_t>(
+		buffer_to_rva(instance, conv.va_to_rva(va), buf, include_headers));
 }
 
 std::uint64_t buffer_to_va(image& instance,
 	std::uint64_t va, const buffers::ref_buffer& buf, bool include_headers)
 {
-	if (buf.empty())
-		return va;
-
-	auto data = section_data_from_va(instance, va, include_headers);
-	buffers::output_memory_ref_buffer data_buffer(data);
-	buf.serialize(data_buffer);
-	return va + static_cast<std::uint64_t>(buf.size());
+	address_converter conv(instance);
+	return conv.rva_to_va<std::uint64_t>(
+		buffer_to_rva(instance, conv.va_to_rva(va), buf, include_headers));
 }
 
 rva_type buffer_to_file_offset(image& instance,

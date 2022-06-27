@@ -2,9 +2,12 @@
 
 #include <cstdint>
 
-#include "buffers/ref_buffer.h"
-
 #include "pe_bliss2/pe_types.h"
+
+namespace buffers
+{
+class ref_buffer;
+} //namespace buffers
 
 namespace pe_bliss::image
 {
