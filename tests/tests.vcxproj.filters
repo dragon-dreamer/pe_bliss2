@@ -177,6 +177,9 @@
     <ClCompile Include="tests\pe_bliss2\struct_from_va_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2</Filter>
     </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\buffer_to_va_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">
@@ -204,6 +207,9 @@
       <Filter>Source Files\tests\pe_bliss2</Filter>
     </ClInclude>
     <ClInclude Include="tests\pe_bliss2\byte_container_fixture_base.h">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\pe_bliss2\bytes_to_va_fixture_base.h">
       <Filter>Source Files\tests\pe_bliss2</Filter>
     </ClInclude>
   </ItemGroup>

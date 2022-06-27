@@ -175,6 +175,7 @@
     <ClCompile Include="tests\buffers\ref_buffer_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\address_converter_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\bit_stream_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\buffer_to_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\byte_array_from_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\byte_vector_from_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\compid_database_tests.cpp" />
@@ -226,6 +227,7 @@
     <ClInclude Include="tests\buffers\buffer_helpers.h" />
     <ClInclude Include="tests\buffers\input_buffer_helpers.h" />
     <ClInclude Include="tests\buffers\output_buffer_helpers.h" />
+    <ClInclude Include="tests\pe_bliss2\bytes_to_va_fixture_base.h" />
     <ClInclude Include="tests\pe_bliss2\byte_container_fixture_base.h" />
     <ClInclude Include="tests\pe_bliss2\image_helper.h" />
     <ClInclude Include="tests\pe_bliss2\input_buffer_mock.h" />
