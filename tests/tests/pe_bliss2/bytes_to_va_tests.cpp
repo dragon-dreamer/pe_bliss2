@@ -8,14 +8,15 @@
 #include <system_error>
 
 #include "pe_bliss2/address_converter.h"
+#include "pe_bliss2/image/bytes_to_va.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/image_errc.h"
-#include "pe_bliss2/image/bytes_to_va.h"
 #include "pe_bliss2/packed_byte_array.h"
 #include "pe_bliss2/packed_byte_vector.h"
 #include "pe_bliss2/pe_types.h"
 
 #include "tests/tests/pe_bliss2/bytes_to_va_fixture_base.h"
+#include "tests/tests/pe_bliss2/image_helper.h"
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
 namespace
