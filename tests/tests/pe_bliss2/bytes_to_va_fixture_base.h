@@ -16,17 +16,17 @@ enum class function_type
 	va64
 };
 
-class BytesToVaFixture : public ::testing::TestWithParam<function_type>
+class BytesToVaFixtureBase : public ::testing::TestWithParam<function_type>
 {
 public:
 	static constexpr std::array header_arr{ std::byte{1}, std::byte{2}, std::byte{3} };
 	static constexpr std::array section_arr{ std::byte{4}, std::byte{5}, std::byte{6} };
-	static constexpr std::uint32_t header_arr_offset = 30u;
+	std::uint32_t header_arr_offset{};
 	std::uint32_t section_arr_offset{};
 	std::uint32_t section_arr_rva{};
 
 public:
-	explicit BytesToVaFixture()
+	explicit BytesToVaFixtureBase()
 		: instance(create_test_image({}))
 	{
 		instance.update_full_headers_buffer();
@@ -36,6 +36,9 @@ public:
 		test_image_options opts;
 		section_arr_rva = opts.sections[0].virtual_size
 			+ opts.start_section_rva + section_arr_offset;
+
+		header_arr_offset = static_cast<std::uint32_t>(
+			instance.get_full_headers_buffer().size() - header_arr.size());
 	}
 
 	void check_section_data_equals() const

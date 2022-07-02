@@ -11,9 +11,9 @@
 #include "buffers/input_container_buffer.h"
 #include "buffers/ref_buffer.h"
 
+#include "pe_bliss2/image/buffer_to_va.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/image_errc.h"
-#include "pe_bliss2/image/buffer_to_va.h"
 #include "pe_bliss2/pe_types.h"
 
 #include "tests/tests/pe_bliss2/bytes_to_va_fixture_base.h"
@@ -22,7 +22,7 @@
 namespace
 {
 
-class BufferToVaFixture : public BytesToVaFixture
+class BufferToVaFixture : public BytesToVaFixtureBase
 {
 public:
 	static constexpr std::uint32_t buffer_absolute_offset = 0x12u;

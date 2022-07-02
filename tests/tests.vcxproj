@@ -176,6 +176,7 @@
     <ClCompile Include="tests\pe_bliss2\address_converter_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\bit_stream_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\buffer_to_va_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\bytes_to_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\byte_array_from_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\byte_vector_from_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\compid_database_tests.cpp" />
