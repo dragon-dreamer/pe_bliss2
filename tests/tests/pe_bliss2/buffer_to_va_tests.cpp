@@ -72,7 +72,7 @@ TEST_P(BufferToVaFixture, BufferToHeaderTest)
 {
 	EXPECT_EQ(buffer_to_address(header_arr_offset, create_buffer(header_arr), true),
 		header_arr_offset + header_arr.size());
-	check_header_data_equals();
+	check_header_data_equals(header_arr_offset);
 }
 
 TEST_P(BufferToVaFixture, BufferToHeaderErrorTest)
@@ -92,7 +92,7 @@ TEST_P(BufferToVaFixture, BufferToSectionOverflowErrorTest)
 		create_buffer(extended), false), std::system_error);
 }
 
-TEST(BufferToVaTest, BufferToVaAddressConversionErrorTest)
+TEST(BufferToVaTests, BufferToVaAddressConversionErrorTest)
 {
 	auto instance = create_test_image({});
 	auto buf = BufferToVaFixture::create_buffer(BufferToVaFixture::section_arr);
@@ -108,11 +108,11 @@ TEST(BufferToVaTest, BufferToVaAddressConversionErrorTest)
 	}, pe_bliss::address_converter_errc::address_conversion_overflow);
 }
 
-TEST(BufferToVaTest, BufferToFileOffsetHeaderErrorTest)
+TEST(BufferToVaTests, BufferToFileOffsetHeaderErrorTest)
 {
 	auto instance = create_test_image({});
 	instance.update_full_headers_buffer();
-	auto buf = BufferToVaFixture::create_buffer(BufferToVaFixture::section_arr);
+	auto buf = BufferToVaFixture::create_buffer(BufferToVaFixture::header_arr);
 	expect_throw_pe_error([&instance, &buf]
 	{
 		(void)buffer_to_file_offset(instance, buf, false);
@@ -121,11 +121,11 @@ TEST(BufferToVaTest, BufferToFileOffsetHeaderErrorTest)
 
 TEST(BufferToVaTest, BufferToFileOffsetHeaderTest)
 {
-	auto instance = create_test_image({});
-	instance.update_full_headers_buffer();
-	auto buf = BufferToVaFixture::create_buffer(BufferToVaFixture::section_arr);
-	EXPECT_EQ(buffer_to_file_offset(instance, buf, true),
-		BufferToVaFixture::buffer_absolute_offset + BufferToVaFixture::section_arr.size());
+	BufferToVaFixture fixture;
+	auto buf = fixture.create_buffer(fixture.header_arr);
+	EXPECT_EQ(buffer_to_file_offset(fixture.instance, buf, true),
+		fixture.buffer_absolute_offset + fixture.header_arr.size());
+	fixture.check_header_data_equals(fixture.buffer_absolute_offset);
 }
 
 INSTANTIATE_TEST_SUITE_P(

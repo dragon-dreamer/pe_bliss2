@@ -131,7 +131,7 @@ TEST_P(BytesToVaFixture, ArrayToHeaderTest)
 {
 	EXPECT_EQ(bytes_to_address(header_arr_offset, create_array(header_arr), true, false),
 		header_arr_offset + header_arr.size());
-	check_header_data_equals();
+	check_header_data_equals(header_arr_offset);
 }
 
 TEST_P(BytesToVaFixture, PhysicalArrayToHeaderTest)
@@ -140,7 +140,7 @@ TEST_P(BytesToVaFixture, PhysicalArrayToHeaderTest)
 	arr.set_data_size(virtual_header_arr_size);
 	EXPECT_EQ(bytes_to_address(header_arr_offset, arr, true, false),
 		header_arr_offset + header_arr.size());
-	check_header_data_equals();
+	check_header_data_equals(header_arr_offset);
 }
 
 TEST_P(BytesToVaFixture, VirtualArrayToHeaderErrorTest)
@@ -155,7 +155,7 @@ TEST_P(BytesToVaFixture, VectorToHeaderTest)
 {
 	EXPECT_EQ(bytes_to_address(header_arr_offset, create_vector(header_arr), true, false),
 		header_arr_offset + header_arr.size());
-	check_header_data_equals();
+	check_header_data_equals(header_arr_offset);
 }
 
 TEST_P(BytesToVaFixture, PhysicalVectorToHeaderTest)
@@ -164,7 +164,7 @@ TEST_P(BytesToVaFixture, PhysicalVectorToHeaderTest)
 	arr.set_data_size(virtual_header_arr_size);
 	EXPECT_EQ(bytes_to_address(header_arr_offset, arr, true, false),
 		header_arr_offset + header_arr.size());
-	check_header_data_equals();
+	check_header_data_equals(header_arr_offset);
 }
 
 TEST_P(BytesToVaFixture, VirtualVectorToHeaderErrorTest)
@@ -193,7 +193,7 @@ TEST_P(BytesToVaFixture, VectorToHeaderErrorTest)
 	}, pe_bliss::image::image_errc::section_data_does_not_exist);
 }
 
-TEST(BytesToVaTest, BytesToVaAddressConversionErrorTest)
+TEST(BytesToVaTests, BytesToVaAddressConversionErrorTest)
 {
 	auto instance = create_test_image({});
 	auto arr = BytesToVaFixture::create_array(BytesToVaFixture::section_arr);
@@ -209,35 +209,35 @@ TEST(BytesToVaTest, BytesToVaAddressConversionErrorTest)
 	}, pe_bliss::address_converter_errc::address_conversion_overflow);
 }
 
-TEST(BytesToVaTest, BytesToFileOffsetHeaderErrorTest)
+TEST(BytesToVaTests, BytesToFileOffsetHeaderErrorTest)
 {
 	auto instance = create_test_image({});
 	instance.update_full_headers_buffer();
-	auto arr = BytesToVaFixture::create_array(BytesToVaFixture::section_arr);
+	auto arr = BytesToVaFixture::create_array(BytesToVaFixture::header_arr);
 	expect_throw_pe_error([&instance, &arr]
 	{
 		(void)bytes_to_file_offset(instance, arr, false, false);
 	}, pe_bliss::image::image_errc::section_data_does_not_exist);
 }
 
-TEST(BytesToVaTest, ArrayToFileOffsetHeaderTest)
+TEST(BytesToVaTests, ArrayToFileOffsetHeaderTest)
 {
-	auto instance = create_test_image({});
-	instance.update_full_headers_buffer();
-	auto arr = BytesToVaFixture::create_array(BytesToVaFixture::section_arr);
-	arr.get_state().set_absolute_offset(BytesToVaFixture::buffer_absolute_offset);
-	EXPECT_EQ(bytes_to_file_offset(instance, arr, true, false),
-		BytesToVaFixture::buffer_absolute_offset + BytesToVaFixture::section_arr.size());
+	BytesToVaFixture fixture;
+	auto arr = fixture.create_array(fixture.header_arr);
+	arr.get_state().set_absolute_offset(fixture.buffer_absolute_offset);
+	EXPECT_EQ(bytes_to_file_offset(fixture.instance, arr, true, false),
+		fixture.buffer_absolute_offset + fixture.section_arr.size());
+	fixture.check_header_data_equals(fixture.buffer_absolute_offset);
 }
 
-TEST(BytesToVaTest, VectorToFileOffsetHeaderTest)
+TEST(BytesToVaTests, VectorToFileOffsetHeaderTest)
 {
-	auto instance = create_test_image({});
-	instance.update_full_headers_buffer();
-	auto arr = BytesToVaFixture::create_vector(BytesToVaFixture::section_arr);
-	arr.get_state().set_absolute_offset(BytesToVaFixture::buffer_absolute_offset);
-	EXPECT_EQ(bytes_to_file_offset(instance, arr, true, false),
-		BytesToVaFixture::buffer_absolute_offset + BytesToVaFixture::section_arr.size());
+	BytesToVaFixture fixture;
+	auto arr = fixture.create_vector(fixture.header_arr);
+	arr.get_state().set_absolute_offset(fixture.buffer_absolute_offset);
+	EXPECT_EQ(bytes_to_file_offset(fixture.instance, arr, true, false),
+		fixture.buffer_absolute_offset + fixture.section_arr.size());
+	fixture.check_header_data_equals(fixture.buffer_absolute_offset);
 }
 
 INSTANTIATE_TEST_SUITE_P(

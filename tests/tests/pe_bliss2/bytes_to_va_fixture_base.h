@@ -53,16 +53,18 @@ public:
 		EXPECT_EQ(actual_data, section_arr);
 	}
 
-	void check_header_data_equals() const
+	void check_header_data_equals(std::uint32_t actual_offset) const
 	{
 		const auto& data = instance.get_full_headers_buffer().copied_data();
 		const std::array actual_data{
-			data[header_arr_offset],
-			data[header_arr_offset + 1],
-			data[header_arr_offset + 2]
+			data[actual_offset],
+			data[actual_offset + 1],
+			data[actual_offset + 2]
 		};
 		EXPECT_EQ(actual_data, header_arr);
 	}
+
+	void TestBody() override {}
 
 public:
 	pe_bliss::image::image instance;
