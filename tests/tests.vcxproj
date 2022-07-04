@@ -207,6 +207,7 @@
     <ClCompile Include="tests\pe_bliss2\section_search_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\section_table_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\string_from_va_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\string_to_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\struct_from_va_tests.cpp" />
     <ClCompile Include="tests\utilities\math_tests.cpp" />
     <ClCompile Include="tests\utilities\safe_uint_tests.cpp" />
