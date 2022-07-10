@@ -48,11 +48,18 @@ void dos_stub::deserialize(const buffers::input_buffer_ptr& buffer,
 	try
 	{
 		auto buffer_pos = buffer->rpos();
+		auto dos_stub_size = options.e_lfanew <= buffer_pos
+			? 0u : options.e_lfanew - buffer_pos;
 		auto buffer_section = std::make_shared<buffers::input_buffer_section>(
-			buffer, buffer_pos,
-			options.e_lfanew <= buffer_pos ? 0u : options.e_lfanew - buffer_pos);
+			buffer, buffer_pos, dos_stub_size);
 		buffer_section->set_relative_offset(0);
 		ref_buffer::deserialize(buffer_section, options.copy_memory);
+		if (!options.copy_memory)
+		{
+			//Verify that enough data is available
+			//and position buffer pointer to the end of the stub
+			buffer->set_rpos(buffer_pos + dos_stub_size);
+		}
 	}
 	catch (...)
 	{

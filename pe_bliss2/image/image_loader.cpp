@@ -48,15 +48,6 @@ std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
 			.e_lfanew = dos_hdr.base_struct()->e_lfanew
 		});
 
-		std::size_t pe_headers_start = dos_hdr.base_struct().get_state().buffer_pos();
-		if (!utilities::math::add_if_safe<std::size_t>(pe_headers_start,
-			dos_hdr.base_struct()->e_lfanew))
-		{
-			throw pe_error(dos::dos_header_errc::invalid_e_lfanew);
-		}
-
-		buffer->set_rpos(pe_headers_start);
-
 		instance.get_image_signature().deserialize(
 			*buffer, options.allow_virtual_headers);
 		if (auto err = validate(instance.get_image_signature()); err)

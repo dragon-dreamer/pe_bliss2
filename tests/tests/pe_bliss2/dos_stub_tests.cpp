@@ -34,11 +34,16 @@ TEST(DosStubTests, DeserializeDosStubTest)
 		.e_lfanew = static_cast<std::uint32_t>(data.size() + 1u) }); },
 		dos_stub_errc::unable_to_read_dos_stub);
 
-	buffer->set_rpos(1u);
-	ASSERT_NO_THROW(stub.deserialize(buffer, {
-		.e_lfanew = static_cast<std::uint32_t>(data.size() - 2u) }));
-	EXPECT_EQ(stub.data()->absolute_offset(), 1u);
-	EXPECT_EQ(stub.data()->relative_offset(), 0u);
-	EXPECT_EQ(stub.copied_data(),
-		(std::vector{ std::byte{2}, std::byte{3} }));
+	for (bool copy_buffer : {true, false})
+	{
+		buffer->set_rpos(1u);
+		ASSERT_NO_THROW(stub.deserialize(buffer, {
+			.copy_memory = copy_buffer,
+			.e_lfanew = static_cast<std::uint32_t>(data.size() - 2u) }));
+		EXPECT_EQ(stub.data()->absolute_offset(), 1u);
+		EXPECT_EQ(stub.data()->relative_offset(), 0u);
+		EXPECT_EQ(stub.copied_data(),
+			(std::vector{ std::byte{2}, std::byte{3} }));
+		EXPECT_EQ(buffer->rpos(), data.size() - 2u);
+	}
 }
