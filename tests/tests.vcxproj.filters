@@ -186,6 +186,9 @@
     <ClCompile Include="tests\pe_bliss2\string_to_va_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2</Filter>
     </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\struct_to_va_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">
