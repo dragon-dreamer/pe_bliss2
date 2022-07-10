@@ -104,7 +104,10 @@ input_buffer_ptr reduce(const input_buffer_ptr& buf,
 input_buffer_ptr reduce(const input_buffer_ptr& buf,
 	std::size_t offset)
 {
-	return reduce(buf, offset, buf->size() - offset);
+	auto size = buf->size();
+	if (offset > size)
+		throw std::system_error(utilities::generic_errc::buffer_overrun);
+	return reduce(buf, offset, size - offset);
 }
 
 } //namespace buffers
