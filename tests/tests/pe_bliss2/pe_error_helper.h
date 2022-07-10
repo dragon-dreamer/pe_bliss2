@@ -34,6 +34,13 @@ void expect_contains_errors(const pe_bliss::error_list& errs,
 	impl::expect_contains_error(errs, code...);
 }
 
+template<typename ErrorCode>
+void expect_contains_error(const pe_bliss::error_list& errs,
+	ErrorCode code)
+{
+	impl::expect_contains_error(errs, code);
+}
+
 template<typename Func, typename ErrorCode>
 	requires(std::is_error_code_enum_v<ErrorCode>)
 void expect_throw_pe_error(Func&& func, ErrorCode ec)
