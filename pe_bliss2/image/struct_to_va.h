@@ -70,10 +70,11 @@ Va struct_to_va(image& instance, Va va,
 
 template<detail::standard_layout T>
 rva_type struct_to_file_offset(image& instance, const packed_struct<T>& value,
-	bool include_headers = false, bool write_virtual_part = false)
+	bool include_headers = false, bool write_virtual_part = false,
+	bool cut_if_does_not_fit = false)
 {
 	return struct_to_rva(instance, absolute_offset_to_rva(instance, value),
-		value, include_headers, write_virtual_part);
+		value, include_headers, write_virtual_part, cut_if_does_not_fit);
 }
 
 } //namespace pe_bliss::image
