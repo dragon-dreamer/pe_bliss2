@@ -36,7 +36,7 @@ public:
 public:
 	constexpr packed_struct() noexcept = default;
 
-	explicit constexpr packed_struct(const value_type& value) noexcept
+	constexpr packed_struct(const value_type& value) noexcept
 		: value_(value)
 	{
 	}
