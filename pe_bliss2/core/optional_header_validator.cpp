@@ -31,15 +31,32 @@ pe_error_wrapper validate_image_base(
 	const optional_header& header, bool has_relocations) noexcept
 {
 	static constexpr std::uint32_t image_base_multiple = 0x10000u;
-	static constexpr std::uint64_t max_nonreloc_image_base = 0x80000000u;
+	static constexpr std::uint64_t max_nonreloc_image_base_pe = 0x80000000ull;
+	static constexpr std::uint64_t max_nonreloc_image_base_pe_plus = 0x800000000000ull;
 
-	//Can be zero under WinXP
+	//Can be zero under WinXP or with resource DLLs
 	if (header.get_raw_image_base() % image_base_multiple)
 		return optional_header_errc::unaligned_image_base;
+
+	std::uint64_t image_base_sum = header.get_raw_image_base();
+	if (!utilities::math::add_if_safe(image_base_sum,
+		static_cast<std::uint64_t>(header.get_raw_size_of_image())))
+	{
+		return optional_header_errc::too_large_image_base;
+	}
+
+	if (header.get_magic() == optional_header::magic::pe32
+		&& static_cast<std::uint32_t>(image_base_sum) != image_base_sum)
+	{
+		return optional_header_errc::too_large_image_base;
+	}
+
 	if (!has_relocations)
 	{
-		std::uint64_t image_base_sum = header.get_raw_image_base()
-			+ header.get_raw_size_of_image();
+		auto max_nonreloc_image_base
+			= header.get_magic() == optional_header::magic::pe64
+			? max_nonreloc_image_base_pe_plus
+			: max_nonreloc_image_base_pe;
 		if (image_base_sum >= max_nonreloc_image_base)
 			return optional_header_errc::too_large_image_base;
 	}

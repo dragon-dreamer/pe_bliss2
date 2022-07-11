@@ -364,9 +364,21 @@ TYPED_TEST(OptionalHeaderTests, ValidateImageBaseTest)
 	EXPECT_NO_THROW(validate_image_base(header, true).throw_on_error());
 	EXPECT_NO_THROW(validate_image_base(header, false).throw_on_error());
 
-	header.set_raw_image_base(0xf0000000u);
+	if (header.get_magic() == optional_header::magic::pe32)
+		header.set_raw_image_base(0xf0000000u);
+	else
+		header.set_raw_image_base(0xf000'00000000ull);
+
 	EXPECT_NO_THROW(validate_image_base(header, true).throw_on_error());
 	EXPECT_EQ(validate_image_base(header, false),
+		optional_header_errc::too_large_image_base);
+
+	header.set_raw_size_of_image(0x10000u);
+	if (header.get_magic() == optional_header::magic::pe32)
+		header.set_raw_image_base(0xfffff0000u);
+	else
+		header.set_raw_image_base(0xffffffff'ffff0000ull);
+	EXPECT_EQ(validate_image_base(header, true),
 		optional_header_errc::too_large_image_base);
 }
 
