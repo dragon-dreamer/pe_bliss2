@@ -14,13 +14,14 @@
 #include "pe_bliss2/core/optional_header_validator.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/section/section_data.h"
+#include "pe_bliss2/section/section_errc.h"
 #include "pe_bliss2/section/section_table_validator.h"
 #include "utilities/math.h"
 
 namespace pe_bliss::image
 {
 
-std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
+image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 	const image_load_options& options, error_list& errors)
 {
 	assert(!options.load_section_data || options.validate_sections);
@@ -28,8 +29,8 @@ std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
 
 	errors.clear_errors();
 
-	std::optional<image> result;
-	image& instance = result.emplace();
+	image_load_result result;
+	image& instance = result.result;
 
 	try
 	{
@@ -38,10 +39,7 @@ std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
 		auto& dos_hdr = instance.get_dos_header();
 		dos_hdr.deserialize(*buffer, options.allow_virtual_headers);
 		if (!dos::validate(dos_hdr, options.dos_header_validation, errors))
-		{
-			result.reset();
 			return result;
-		}
 
 		instance.get_dos_stub().deserialize(buffer, {
 			.copy_memory = options.eager_dos_stub_data_copy,
@@ -81,7 +79,15 @@ std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
 			}
 		}
 
-		buffer->set_rpos(file_hdr.get_section_table_buffer_pos());
+		try
+		{
+			buffer->set_rpos(file_hdr.get_section_table_buffer_pos());
+		}
+		catch (...)
+		{
+			std::throw_with_nested(pe_error(section::section_errc::unable_to_read_section_table));
+		}
+
 		auto& section_tbl = instance.get_section_table();
 		section_tbl.deserialize(*buffer, file_hdr.base_struct()->number_of_sections,
 			options.allow_virtual_headers);
@@ -156,11 +162,12 @@ std::optional<image> image_loader::load(const buffers::input_buffer_ptr& buffer,
 				std::make_shared<buffers::input_buffer_section>(buffer, start_pos, size),
 				options.eager_full_headers_buffer_copy);
 		}
+
+		result.is_partial = false;
 	}
 	catch (const pe_error& e)
 	{
 		errors.add_error(e.code());
-		result.reset();
 	}
 
 	return result;

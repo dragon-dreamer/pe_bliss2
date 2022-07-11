@@ -61,10 +61,10 @@ int main(int argc, char* argv[]) try
 		fmt.print_errors(errs);
 	}
 
-	if (!image)
+	if (image.is_partial)
 		return -2;
 
-	dump_pe(*image);
+	dump_pe(image.result);
 }
 catch (const std::system_error& e)
 {
