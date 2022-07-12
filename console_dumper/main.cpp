@@ -1,3 +1,4 @@
+#include <exception>
 #include <iostream>
 
 #include "color_provider.h"
@@ -52,27 +53,43 @@ int main(int argc, char* argv[]) try
 	}
 	const char* filename = argv[1];
 
-	pe_bliss::error_list errs;
-	auto image = load_image(filename, {}, errs);
-	if (errs.has_errors())
+	auto result = load_image(filename, {});
+	if (result.warnings.has_errors())
 	{
 		empty_color_provider color_provider;
 		formatter fmt(color_provider, std::cout, std::cerr);
-		fmt.print_errors(errs);
+		fmt.print_errors(result.warnings);
 	}
 
-	if (image.is_partial)
-		return -2;
+	if (!result)
+	{
+		empty_color_provider color_provider;
+		formatter fmt(color_provider, std::cout, std::cerr);
+		try
+		{
+			std::rethrow_exception(result.fatal_error);
+		}
+		catch (const pe_bliss::pe_error& e)
+		{
+			fmt.print_error("Error loading PE: ", e);
+		}
+		catch (const std::exception& e)
+		{
+			fmt.print_error("Error loading PE: ", e);
+		}
 
-	dump_pe(image.result);
+		return -2;
+	}
+
+	dump_pe(result.image);
 }
 catch (const std::system_error& e)
 {
 	std::cerr << "Error: " << e.code() << ", " << e.what() << "\n\n";
-	return -2;
+	return -3;
 }
 catch (const std::exception& e)
 {
 	std::cerr << "Error: " << e.what() << '\n';
-	return -2;
+	return -3;
 }

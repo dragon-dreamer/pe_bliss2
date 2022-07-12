@@ -22,15 +22,13 @@ namespace pe_bliss::image
 {
 
 image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
-	const image_load_options& options, error_list& errors)
+	const image_load_options& options)
 {
 	assert(!options.load_section_data || options.validate_sections);
 	assert(buffer);
 
-	errors.clear_errors();
-
 	image_load_result result;
-	image& instance = result.result;
+	image& instance = result.image;
 
 	try
 	{
@@ -38,8 +36,10 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 
 		auto& dos_hdr = instance.get_dos_header();
 		dos_hdr.deserialize(*buffer, options.allow_virtual_headers);
-		if (!dos::validate(dos_hdr, options.dos_header_validation, errors))
-			return result;
+		if (options.dos_header_validation.validate_magic)
+			dos::validate_magic(dos_hdr).throw_on_error();
+		if (options.dos_header_validation.validate_e_lfanew)
+			dos::validate_e_lfanew(dos_hdr).throw_on_error();
 
 		instance.get_dos_stub().deserialize(buffer, {
 			.copy_memory = options.eager_dos_stub_data_copy,
@@ -49,7 +49,7 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 		instance.get_image_signature().deserialize(
 			*buffer, options.allow_virtual_headers);
 		if (auto err = validate(instance.get_image_signature()); err)
-			errors.add_error(err);
+			result.warnings.add_error(err);
 
 		auto& file_hdr = instance.get_file_header();
 		auto& optional_hdr = instance.get_optional_header();
@@ -61,11 +61,11 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 				file_hdr.base_struct()->size_of_optional_header,
 				optional_hdr); err)
 			{
-				errors.add_error(err);
+				result.warnings.add_error(err);
 			}
 		}
 		validate(optional_hdr, options.optional_header_validation,
-			file_hdr.is_dll(), errors);
+			file_hdr.is_dll(), result.warnings);
 
 		instance.get_data_directories().deserialize(*buffer,
 			optional_hdr.get_number_of_rva_and_sizes(), options.allow_virtual_headers);
@@ -75,7 +75,7 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 			if (auto err = validate_image_base(optional_hdr,
 				instance.has_relocations()); err)
 			{
-				errors.add_error(err);
+				result.warnings.add_error(err);
 			}
 		}
 
@@ -95,7 +95,7 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 		const auto& section_headers = section_tbl.get_section_headers();
 		if (options.validate_sections)
 		{
-			section::validate_section_headers(optional_hdr, section_headers, errors);
+			section::validate_section_headers(optional_hdr, section_headers, result.warnings);
 		}
 
 		if (options.load_section_data)
@@ -117,7 +117,7 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 				}
 				catch (const pe_error& e)
 				{
-					errors.add_error(e.code(),
+					result.warnings.add_error(e.code(),
 						std::distance(section_headers.cbegin(), it));
 				}
 			}
@@ -149,7 +149,7 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 			const auto* last_section = section_headers.empty()
 				? nullptr : &section_headers.back();
 			if (auto err = validate_size_of_image(last_section, optional_hdr); err)
-				errors.add_error(err);
+				result.warnings.add_error(err);
 		}
 
 		//TODO: make dos, file, optional and other headers reference this data instead of copying its parts
@@ -162,12 +162,10 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 				std::make_shared<buffers::input_buffer_section>(buffer, start_pos, size),
 				options.eager_full_headers_buffer_copy);
 		}
-
-		result.is_partial = false;
 	}
-	catch (const pe_error& e)
+	catch (...)
 	{
-		errors.add_error(e.code());
+		result.fatal_error = std::current_exception();
 	}
 
 	return result;

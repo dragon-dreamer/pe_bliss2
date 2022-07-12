@@ -1,5 +1,7 @@
 #pragma once
 
+#include <exception>
+
 #include "buffers/input_buffer_interface.h"
 #include "pe_bliss2/core/optional_header_validator.h"
 #include "pe_bliss2/dos/dos_header_validator.h"
@@ -35,8 +37,15 @@ struct image_load_options
 
 struct image_load_result
 {
-	image result;
-	bool is_partial = true;
+	image image;
+	error_list warnings;
+	std::exception_ptr fatal_error;
+
+	[[nodiscard]]
+	explicit operator bool() const
+	{
+		return !fatal_error;
+	}
 };
 
 class image_loader final : public utilities::static_class
@@ -44,7 +53,7 @@ class image_loader final : public utilities::static_class
 public:
 	[[nodiscard]]
 	static image_load_result load(const buffers::input_buffer_ptr& buffer,
-		const image_load_options& options, error_list& errors);
+		const image_load_options& options = {});
 };
 
 } //namespace pe_bliss::image
