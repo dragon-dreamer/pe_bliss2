@@ -31,6 +31,7 @@ public:
 	using ref_buffer::copy_referenced_buffer;
 	using ref_buffer::empty;
 	using ref_buffer::size;
+	using ref_buffer::is_copied;
 
 	void deserialize(const section_header& header,
 		const buffers::input_buffer_ptr& buffer,
