@@ -191,6 +191,7 @@
     <ClCompile Include="tests\pe_bliss2\image_signature_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\optional_header_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\overlay_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\packed_byte_array_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\packed_byte_vector_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\packed_c_string_tests.cpp" />

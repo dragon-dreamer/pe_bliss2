@@ -138,6 +138,7 @@
     <ClCompile Include="core\optional_header.cpp" />
     <ClCompile Include="core\optional_header_errc.cpp" />
     <ClCompile Include="core\optional_header_validator.cpp" />
+    <ClCompile Include="core\overlay.cpp" />
     <ClCompile Include="detail\rich\rich_header_utils.cpp" />
     <ClCompile Include="dos\dos_header.cpp" />
     <ClCompile Include="dos\dos_header_errc.cpp" />

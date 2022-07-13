@@ -683,5 +683,8 @@
     <ClCompile Include="image\buffer_to_va.cpp">
       <Filter>Source Files\image</Filter>
     </ClCompile>
+    <ClCompile Include="core\overlay.cpp">
+      <Filter>Source Files\core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
