@@ -1,10 +1,13 @@
 #include "pe_bliss2/image/image_loader.h"
 
+#include <algorithm>
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <iterator>
 #include <string>
+#include <system_error>
 
 #include "buffers/input_buffer_section.h"
 #include "pe_bliss2/dos/dos_header.h"
@@ -18,17 +21,55 @@
 #include "pe_bliss2/section/section_table_validator.h"
 #include "utilities/math.h"
 
+namespace
+{
+
+struct image_loader_error_category : std::error_category
+{
+	const char* name() const noexcept override
+	{
+		return "image_loader";
+	}
+
+	std::string message(int ev) const override
+	{
+		using enum pe_bliss::image::image_loader_errc;
+		switch (static_cast<pe_bliss::image::image_loader_errc>(ev))
+		{
+		case unable_to_load_full_headers_buffer:
+			return "Unable to load full headers buffer";
+		default:
+			return {};
+		}
+	}
+};
+
+const image_loader_error_category image_loader_error_category_instance;
+
+} //namespace
+
 namespace pe_bliss::image
 {
 
-image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
+std::error_code make_error_code(image_loader_errc e) noexcept
+{
+	return { static_cast<int>(e), image_loader_error_category_instance };
+}
+
+image_load_result image_loader::load(buffers::input_buffer_ptr buffer,
 	const image_load_options& options)
 {
-	assert(!options.load_section_data || options.validate_sections);
 	assert(buffer);
+
+	{
+		auto initial_buffer_pos = buffer->rpos();
+		if (initial_buffer_pos)
+			buffer = buffers::reduce(buffer, initial_buffer_pos);
+	}
 
 	image_load_result result;
 	image& instance = result.image;
+	auto buffer_size = buffer->size();
 
 	try
 	{
@@ -48,8 +89,8 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 
 		instance.get_image_signature().deserialize(
 			*buffer, options.allow_virtual_headers);
-		if (auto err = validate(instance.get_image_signature()); err)
-			result.warnings.add_error(err);
+		if (options.validate_image_signature)
+			validate(instance.get_image_signature()).throw_on_error();
 
 		auto& file_hdr = instance.get_file_header();
 		auto& optional_hdr = instance.get_optional_header();
@@ -103,8 +144,7 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 			section::section_data_load_options load_opts{
 				.section_alignment = optional_hdr.get_raw_section_alignment(),
 				.copy_memory = options.eager_section_data_copy,
-				.image_loaded_to_memory = options.image_loaded_to_memory,
-				.image_start_buffer_pos = dos_hdr.base_struct().get_state().buffer_pos()
+				.image_loaded_to_memory = options.image_loaded_to_memory
 			};
 
 			auto& sections = instance.get_section_data_list();
@@ -125,23 +165,11 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 
 		if (options.load_overlay && !options.image_loaded_to_memory)
 		{
-			std::uint32_t last_section_offset = 0;
-			for (auto it = section_headers.cbegin(),
-				end = section_headers.cend(); it != end; ++it)
-			{
-				last_section_offset = (std::max)(last_section_offset,
-					it->get_pointer_to_raw_data() + it->get_raw_size(
-						optional_hdr.get_raw_section_alignment()));
-			}
-
-			if (buffer->size() > last_section_offset)
-			{
-				buffer->set_rpos(last_section_offset);
-				std::size_t overlay_size = buffer->size() - last_section_offset;
-				instance.get_overlay().deserialize(
-					std::make_shared<buffers::input_buffer_section>(buffer, last_section_offset, overlay_size),
-					options.eager_overlay_data_copy);
-			}
+			std::uint64_t section_data_end_offset = section_tbl.get_raw_data_end_offset(
+				optional_hdr.get_raw_section_alignment());
+			instance.get_overlay().deserialize(section_data_end_offset,
+				optional_hdr.get_raw_size_of_headers(),
+				0u, buffer, options.eager_overlay_data_copy);
 		}
 
 		if (options.validate_size_of_image)
@@ -152,15 +180,21 @@ image_load_result image_loader::load(const buffers::input_buffer_ptr& buffer,
 				result.warnings.add_error(err);
 		}
 
-		//TODO: make dos, file, optional and other headers reference this data instead of copying its parts
 		if (options.load_full_headers_buffer)
 		{
-			auto start_pos = dos_hdr.base_struct().get_state().buffer_pos();
-			auto size = optional_hdr.get_raw_size_of_headers(); //TODO may be invalid
-			buffer->set_rpos(start_pos);
-			instance.get_full_headers_buffer().deserialize(
-				std::make_shared<buffers::input_buffer_section>(buffer, start_pos, size),
-				options.eager_full_headers_buffer_copy);
+			std::size_t size = optional_hdr.get_raw_size_of_headers();
+			size = std::min(size, buffer_size);
+			try
+			{
+				instance.get_full_headers_buffer().deserialize(
+					buffers::reduce(buffer, 0u, size),
+					options.eager_full_headers_buffer_copy);
+			}
+			catch (...)
+			{
+				result.warnings.add_error(
+					image_loader_errc::unable_to_load_full_headers_buffer);
+			}
 		}
 	}
 	catch (...)
