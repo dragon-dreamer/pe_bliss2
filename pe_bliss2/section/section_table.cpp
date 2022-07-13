@@ -98,4 +98,21 @@ section_table::header_list section_table::get_section_headers() && noexcept
 	return std::move(headers_);
 }
 
+std::uint64_t section_table::get_raw_data_end_offset(
+	std::uint32_t section_alignment) const noexcept
+{
+	std::uint64_t result = 0;
+	for (const auto& header : headers_)
+	{
+		if (!header.base_struct()->pointer_to_raw_data)
+			continue;
+
+		std::uint64_t section_end = header.get_pointer_to_raw_data();
+		section_end += header.get_raw_size(section_alignment);
+		result = std::max(result, section_end);
+	}
+
+	return result;
+}
+
 } //namespace pe_bliss::section

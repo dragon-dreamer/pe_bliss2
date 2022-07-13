@@ -380,3 +380,26 @@ TEST(SectionTableTests, SectionSearchByReferenceTest)
 	EXPECT_EQ(std::as_const(table).by_reference(header),
 		table.get_section_headers().cend());
 }
+
+TEST(SectionTableTests, GetRawDataEndOffsetTest)
+{
+	section_table table;
+	EXPECT_EQ(table.get_raw_data_end_offset(0x1000), 0u);
+
+	auto& s1 = table.get_section_headers().emplace_back();
+	s1.base_struct()->size_of_raw_data = 0x200u;
+	s1.base_struct()->pointer_to_raw_data = 0x800u;
+	auto& s2 = table.get_section_headers().emplace_back();
+	s2.base_struct()->size_of_raw_data = 0x200u;
+	s2.base_struct()->pointer_to_raw_data = 0x400u;
+
+	EXPECT_EQ(table.get_raw_data_end_offset(0x1000), 0xa00u);
+
+	s2.base_struct()->size_of_raw_data
+		= (std::numeric_limits<std::uint32_t>::max)() - 1u;
+	s2.base_struct()->pointer_to_raw_data = s2.base_struct()->size_of_raw_data;
+
+	std::uint64_t expected = (std::numeric_limits<std::uint32_t>::max)() - 1u;
+	expected *= 2u;
+	EXPECT_EQ(table.get_raw_data_end_offset(0x1000), expected);
+}

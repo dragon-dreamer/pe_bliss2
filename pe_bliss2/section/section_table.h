@@ -45,6 +45,10 @@ public:
 		return headers_;
 	}
 
+	[[nodiscard]]
+	std::uint64_t get_raw_data_end_offset(
+		std::uint32_t section_alignment) const noexcept;
+
 public:
 	[[nodiscard]]
 	header_list::const_iterator by_rva(rva_type rva,
