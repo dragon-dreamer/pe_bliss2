@@ -688,3 +688,14 @@ TEST(OptionalHeaderTests, ValidateSizeOfImageTest2)
 	EXPECT_EQ(validate_size_of_image(&section_header, header),
 		optional_header_errc::invalid_size_of_image);
 }
+
+TEST(OptionalHeaderTests, ValidateSizeOfImageTest3)
+{
+	optional_header header;
+	header.set_raw_size_of_image(0x100);
+	EXPECT_EQ(validate_size_of_image(nullptr, header),
+		optional_header_errc::invalid_size_of_image);
+
+	header.set_raw_size_of_headers(0x100);
+	EXPECT_NO_THROW(validate_size_of_image(nullptr, header).throw_on_error());
+}

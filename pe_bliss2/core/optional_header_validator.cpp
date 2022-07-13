@@ -210,8 +210,15 @@ pe_error_wrapper validate_size_of_image(
 	const section::section_header* last_section,
 	const optional_header& oh) noexcept
 {
+	auto size_of_image = oh.get_raw_size_of_image();
+
 	if (!last_section) [[unlikely]]
+	{
+		if (size_of_image != oh.get_raw_size_of_headers())
+			return optional_header_errc::invalid_size_of_image;
+		
 		return {};
+	}
 
 	auto real_size_of_image = last_section->base_struct()->virtual_address;
 	if (!utilities::math::add_if_safe(real_size_of_image,
@@ -220,7 +227,7 @@ pe_error_wrapper validate_size_of_image(
 		return optional_header_errc::invalid_size_of_image;
 	}
 
-	if (oh.get_raw_size_of_image() != real_size_of_image)
+	if (size_of_image != real_size_of_image)
 		return optional_header_errc::invalid_size_of_image;
 
 	return {};
