@@ -1,6 +1,7 @@
 #pragma once
 
 #include <system_error>
+#include <type_traits>
 
 namespace pe_bliss::image
 {
