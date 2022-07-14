@@ -1,6 +1,5 @@
 #pragma once
 
-#include <optional>
 #include <system_error>
 #include <type_traits>
 
@@ -26,7 +25,6 @@ struct image_builder_options
 {
 	bool write_structure_virtual_parts = true;
 	bool fill_full_headers_data_gaps = true;
-	std::optional<std::size_t> rich_header_dos_stub_offset;
 };
 
 class image_builder : public utilities::static_class
