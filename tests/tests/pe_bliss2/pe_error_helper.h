@@ -30,7 +30,14 @@ template<typename... ErrorCode>
 void expect_contains_errors(const pe_bliss::error_list& errs,
 	ErrorCode... code)
 {
-	EXPECT_EQ(errs.get_errors().size(), sizeof...(code));
+	if (!sizeof...(code))
+	{
+		ASSERT_FALSE(errs.has_errors());
+		return;
+	}
+
+	ASSERT_TRUE(errs.has_errors());
+	ASSERT_EQ(errs.get_errors()->size(), sizeof...(code));
 	impl::expect_contains_error(errs, code...);
 }
 

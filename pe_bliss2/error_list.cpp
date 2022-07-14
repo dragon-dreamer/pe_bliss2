@@ -6,74 +6,76 @@
 namespace pe_bliss
 {
 
+void error_list::create_error_map()
+{
+	if (!errors_)
+		errors_ = std::make_unique<error_map_type>();
+}
+
 void error_list::add_error(std::error_code error)
 {
-	if (!has_error(error))
+	create_error_map();
+	auto it = errors_->find({ error });
+	if (it == errors_->end())
 	{
-		errors_.emplace_back(error_info{ error, {},
-			std::current_exception() });
+		errors_->emplace(error_context{ error },
+			std::current_exception());
 	}
 }
 
 void error_list::add_error(std::error_code error, std::string context)
 {
-	if (!has_error(error, context))
+	create_error_map();
+	auto ctx = error_context{ error, std::move(context) };
+	auto it = errors_->find(ctx);
+	if (it == errors_->end())
 	{
-		errors_.emplace_back(error_info{ error, std::move(context),
-			std::current_exception() });
+		errors_->emplace(std::move(ctx),
+			std::current_exception());
 	}
 }
 
 void error_list::add_error(std::error_code error, std::size_t context)
 {
-	if (!has_error(error, context))
+	create_error_map();
+	auto ctx = error_context{ error, context };
+	auto it = errors_->find(ctx);
+	if (it == errors_->end())
 	{
-		errors_.emplace_back(error_info{ error, context,
-			std::current_exception() });
+		errors_->emplace(std::move(ctx),
+			std::current_exception());
 	}
 }
 
 bool error_list::has_error(std::error_code error) const noexcept
 {
-	return std::find_if(errors_.cbegin(), errors_.cend(),
-		[error](const auto& info) {
-		if (info.context.code != error)
-			return false;
-		
-		return std::holds_alternative<std::monostate>(info.context.context);
-	}) != errors_.cend();
+	return errors_ && errors_->contains({ error });
 }
 
 bool error_list::has_error(std::error_code error,
 	std::string_view context) const noexcept
 {
-	return std::find_if(errors_.cbegin(), errors_.cend(),
-	[error, context](const auto& info) {
-		if (info.context.code != error)
-			return false;
-		auto* stored = std::get_if<std::string>(&info.context.context);
-		return stored && *stored == context;
-	}) != errors_.cend();
+	return errors_ && errors_->contains({ error, std::string(context) });
 }
 
 bool error_list::has_error(std::error_code error,
 	std::size_t context) const noexcept
 {
-	return std::find_if(errors_.cbegin(), errors_.cend(),
-		[error, context](const auto& info) {
-		if (info.context.code != error)
-			return false;
-		auto* stored = std::get_if<std::size_t>(&info.context.context);
-		return stored && *stored == context;
-	}) != errors_.cend();
+	return errors_ && errors_->contains({ error, context });
 }
 
 bool error_list::has_any_error(std::error_code error) const noexcept
 {
-	return std::find_if(errors_.cbegin(), errors_.cend(),
-	[error](const auto& info) {
-		return info.context.code == error;
-	}) != errors_.cend();
+	if (!errors_)
+		return false;
+
+	for (const auto& [key, val] : *errors_)
+	{
+		if (key.code == error)
+			return true;
+	}
+
+	return false;
 }
 
 } //namespace pe_bliss

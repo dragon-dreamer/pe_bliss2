@@ -243,7 +243,7 @@ void read_cf_guard_rva_table(const image::image& instance, const loader_options&
 	bool is_sorted = true;
 	while (function_count)
 	{
-		GuardFunction func;
+		GuardFunction& func = table.emplace_back();
 		struct_from_va(instance, table_va, func.get_rva(),
 			options.include_headers, options.allow_virtual_data);
 		table_va += static_cast<Va>(func.get_rva().packed_size);
@@ -253,7 +253,6 @@ void read_cf_guard_rva_table(const image::image& instance, const loader_options&
 				options.include_headers, options.allow_virtual_data);
 			table_va += static_cast<Va>(func.get_additional_data().data_size());
 		}
-		table.emplace_back(func);
 		--function_count;
 
 		if (is_sorted)
@@ -654,7 +653,7 @@ void load_arm64x_relocations(const image::image& instance, const loader_options&
 							options.include_headers, options.allow_virtual_data);
 						current_rva += static_cast<rva_type>(element.get_data().data_size());
 					}
-					fixups.get_fixups().emplace_back() = element;
+					fixups.get_fixups().emplace_back(std::move(element));
 				}
 				break;
 			case add_delta:
@@ -672,7 +671,7 @@ void load_arm64x_relocations(const image::image& instance, const loader_options&
 							struct_from_rva(instance, current_rva, element.get_value(),
 								options.include_headers, options.allow_virtual_data).packed_size);
 					}
-					fixups.get_fixups().emplace_back() = element;
+					fixups.get_fixups().emplace_back(std::move(element));
 				}
 				break;
 			default:

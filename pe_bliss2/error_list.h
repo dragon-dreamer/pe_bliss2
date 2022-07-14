@@ -3,13 +3,15 @@
 #include <compare>
 #include <cstddef>
 #include <exception>
+#include <functional>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <system_error>
 #include <type_traits>
+#include <unordered_map>
 #include <utility>
 #include <variant>
-#include <vector>
 
 namespace pe_bliss
 {
@@ -37,17 +39,29 @@ public:
 		friend auto operator<=>(const error_context&, const error_context&) = default;
 	};
 
+	struct error_context_hash final
+	{
+		[[nodiscard]]
+		std::size_t operator()(const error_context& context) const
+		{
+			auto hash = std::hash<std::error_code>{}(context.code);
+			hash ^= std::hash<context_type>{}(context.context)
+				+ 0x9e3779b9u + (hash << 6u) + (hash >> 2u);
+			return hash;
+		}
+	};
+
 	struct error_info
 	{
-		error_context context;
-		std::exception_ptr error{};
+		std::exception_ptr error;
 
 		[[nodiscard]]
 		friend bool operator==(const error_info&, const error_info&) = default;
 	};
 
 public:
-	using error_list_type = std::vector<error_info>;
+	using error_map_type = std::unordered_map<error_context, error_info, 
+		error_context_hash>;
 
 public:
 	void add_error(std::error_code error);
@@ -55,20 +69,20 @@ public:
 	void add_error(std::error_code error, std::size_t context);
 
 	[[nodiscard]]
-	constexpr const error_list_type& get_errors() const noexcept
+	const error_map_type* get_errors() const noexcept
 	{
-		return errors_;
+		return errors_.get();
 	}
 
 	[[nodiscard]]
-	constexpr bool has_errors() const noexcept
+	bool has_errors() const noexcept
 	{
-		return !errors_.empty();
+		return errors_ && !errors_->empty();
 	}
 
 	void clear_errors()
 	{
-		errors_.clear();
+		errors_.reset();
 	}
 
 	[[nodiscard]]
@@ -108,7 +122,10 @@ public:
 	}
 
 private:
-	error_list_type errors_;
+	void create_error_map();
+
+private:
+	std::unique_ptr<error_map_type> errors_;
 };
 
 } //namespace pe_bliss

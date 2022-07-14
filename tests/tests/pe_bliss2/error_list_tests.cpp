@@ -1,26 +1,36 @@
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
 #include <exception>
 #include <stdexcept>
 #include <string>
 #include <system_error>
+#include <variant>
 
 #include "pe_bliss2/error_list.h"
+
+using namespace ::testing;
 
 TEST(ErrorListTests, ErrorListTest1)
 {
 	pe_bliss::error_list errors;
 	ASSERT_FALSE(errors.has_errors());
 	EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::timed_out)));
-	EXPECT_TRUE(errors.has_errors());
-	ASSERT_EQ(errors.get_errors(), pe_bliss::error_list::error_list_type{
-		{ std::make_error_code(std::errc::timed_out) } });
-
+	ASSERT_TRUE(errors.has_errors());
+	ASSERT_EQ(errors.get_errors()->size(), 1u);
+	ASSERT_EQ(errors.get_errors()->begin()->first.code,
+		std::make_error_code(std::errc::timed_out));
+	ASSERT_TRUE(std::holds_alternative<std::monostate>(
+		errors.get_errors()->begin()->first.context));
+	ASSERT_FALSE(errors.get_errors()->begin()->second.error);
+	
 	EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::address_in_use)));
 	EXPECT_NO_THROW(errors.add_error(std::make_error_code(std::errc::timed_out)));
-	ASSERT_EQ(errors.get_errors(), (pe_bliss::error_list::error_list_type{
-		pe_bliss::error_list::error_info{ std::make_error_code(std::errc::timed_out) },
-		pe_bliss::error_list::error_info{ std::make_error_code(std::errc::address_in_use) } }));
+	ASSERT_THAT(*errors.get_errors(), UnorderedElementsAre(
+		Pair(pe_bliss::error_list::error_context{ std::make_error_code(std::errc::timed_out) },
+			pe_bliss::error_list::error_info{}),
+		Pair(pe_bliss::error_list::error_context{ std::make_error_code(std::errc::address_in_use) },
+			pe_bliss::error_list::error_info{})));
 
 	EXPECT_TRUE(errors.has_error(std::errc::timed_out));
 	EXPECT_TRUE(errors.has_error(std::errc::address_in_use));
@@ -39,9 +49,12 @@ TEST(ErrorListTests, ErrorListTest2)
 		"test"));
 	ASSERT_NO_THROW(errors.add_error(std::make_error_code(std::errc::address_in_use),
 		"test"));
-	EXPECT_EQ(errors.get_errors(), (pe_bliss::error_list::error_list_type{
-		{ std::make_error_code(std::errc::timed_out), "test" },
-		{ std::make_error_code(std::errc::address_in_use), "test" } }));
+	ASSERT_TRUE(errors.has_errors());
+	ASSERT_THAT(*errors.get_errors(), UnorderedElementsAre(
+		Pair(pe_bliss::error_list::error_context{ std::make_error_code(std::errc::timed_out), "test" },
+			pe_bliss::error_list::error_info{}),
+		Pair(pe_bliss::error_list::error_context{ std::make_error_code(std::errc::address_in_use), "test" },
+			pe_bliss::error_list::error_info{})));
 
 	EXPECT_FALSE(errors.has_error(std::errc::timed_out));
 	EXPECT_FALSE(errors.has_error(std::errc::address_in_use));
@@ -74,8 +87,8 @@ TEST(ErrorListTests, ErrorListTest3)
 
 	try
 	{
-		EXPECT_NE(errors.get_errors().at(0).error, std::exception_ptr());
-		std::rethrow_exception(errors.get_errors().at(0).error);
+		EXPECT_NE(errors.get_errors()->begin()->second.error, std::exception_ptr());
+		std::rethrow_exception(errors.get_errors()->begin()->second.error);
 	}
 	catch (const std::exception& e)
 	{

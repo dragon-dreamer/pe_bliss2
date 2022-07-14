@@ -210,9 +210,10 @@ TEST(SectionTableTests, SectionHeaderValidationTest1)
 		section_errc::invalid_section_virtual_address_alignment,
 		section_errc::invalid_section_low_alignment);
 
-	for (const auto& error : errors.get_errors()) {
-		EXPECT_EQ(error.error, std::exception_ptr{});
-		auto ctx = std::get_if<std::size_t>(&error.context.context);
+	ASSERT_TRUE(errors.has_errors());
+	for (const auto& [error, exc] : *errors.get_errors()) {
+		EXPECT_EQ(exc.error, std::exception_ptr{});
+		auto ctx = std::get_if<std::size_t>(&error.context);
 		ASSERT_NE(ctx, nullptr);
 		EXPECT_EQ(*ctx, 123u);
 	}

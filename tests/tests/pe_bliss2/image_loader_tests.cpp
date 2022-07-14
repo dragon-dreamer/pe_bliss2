@@ -351,7 +351,8 @@ TEST(ImageLoaderTests, LoadSectionTableNoSectionData)
 			data_directories, section_table_2_sections));
 	EXPECT_FALSE(result.fatal_error);
 
-	ASSERT_EQ(result.warnings.get_errors().size(), 1u);
+	ASSERT_TRUE(result.warnings.has_errors());
+	ASSERT_EQ(result.warnings.get_errors()->size(), 1u);
 	EXPECT_TRUE(result.warnings.has_error(
 		section::section_errc::unable_to_read_section_data, 1u));
 }

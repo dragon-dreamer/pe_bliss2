@@ -327,18 +327,18 @@ public:
 
 	void print_errors(const pe_bliss::error_list& errors)
 	{
-		if (errors.get_errors().empty())
+		if (!errors.has_errors())
 			return;
 
 		error_stream_ << "Errors:";
-		for (auto error : errors.get_errors())
+		for (auto error : *errors.get_errors())
 		{
 			error_stream_ << ' ';
 
 			color_changer changer(stream_, color_provider_,
 				error_fg_color, error_bg_color);
-			error_stream_ << error.context.code.category().name()
-				<< ": " << error.context.code.message();
+			error_stream_ << error.first.code.category().name()
+				<< ": " << error.first.code.message();
 		}
 
 		error_stream_ << "\n\n";
