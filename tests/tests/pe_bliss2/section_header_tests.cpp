@@ -245,6 +245,13 @@ TEST(SectionHeaderTests, VirtualSizeTest2)
 	EXPECT_EQ(header.get_virtual_size(0u), 123u);
 }
 
+TEST(SectionHeaderTests, VirtualSizeTest3)
+{
+	section_header header;
+	header.set_raw_size(123u);
+	EXPECT_FALSE(validate_virtual_size(header));
+}
+
 TEST(SectionHeaderTests, RawSizeTest1)
 {
 	section_header header;

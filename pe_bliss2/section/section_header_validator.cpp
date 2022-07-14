@@ -21,8 +21,13 @@ pe_error_wrapper validate_raw_size(const section_header& header,
 pe_error_wrapper validate_virtual_size(
 	const section_header& header) noexcept
 {
-	const auto size = header.base_struct()->virtual_size;
-	return size < section_header::two_gb_size && size
+	const auto virtual_size = header.base_struct()->virtual_size;
+	if (!virtual_size)
+	{
+		if (!header.base_struct()->size_of_raw_data)
+			return section_errc::invalid_section_virtual_size;
+	}
+	return virtual_size < section_header::two_gb_size
 		? pe_error_wrapper{} : section_errc::invalid_section_virtual_size;
 }
 
