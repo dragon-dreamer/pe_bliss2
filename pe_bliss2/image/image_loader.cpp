@@ -82,10 +82,18 @@ image_load_result image_loader::load(buffers::input_buffer_ptr buffer,
 		if (options.dos_header_validation.validate_e_lfanew)
 			dos::validate_e_lfanew(dos_hdr).throw_on_error();
 
-		instance.get_dos_stub().deserialize(buffer, {
-			.copy_memory = options.eager_dos_stub_data_copy,
-			.e_lfanew = dos_hdr.base_struct()->e_lfanew
-		});
+		auto e_lfanew = dos_hdr.base_struct()->e_lfanew;
+		if (e_lfanew < dos::dos_header::packed_struct_type::packed_size)
+		{
+			buffer->set_rpos(e_lfanew);
+		}
+		else
+		{
+			instance.get_dos_stub().deserialize(buffer, {
+				.copy_memory = options.eager_dos_stub_data_copy,
+				.e_lfanew = e_lfanew
+			});
+		}
 
 		instance.get_image_signature().deserialize(
 			*buffer, options.allow_virtual_headers);
