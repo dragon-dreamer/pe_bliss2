@@ -227,6 +227,12 @@ pe_error_wrapper validate_size_of_image(
 		return optional_header_errc::invalid_size_of_image;
 	}
 
+	if (std::has_single_bit(oh.get_raw_section_alignment()))
+	{
+		(void)utilities::math::align_up_if_safe(size_of_image,
+			oh.get_raw_section_alignment());
+	}
+
 	if (size_of_image != real_size_of_image)
 		return optional_header_errc::invalid_size_of_image;
 

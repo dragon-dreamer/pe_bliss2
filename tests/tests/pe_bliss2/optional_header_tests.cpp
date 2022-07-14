@@ -685,6 +685,9 @@ TEST(OptionalHeaderTests, ValidateSizeOfImageTest2)
 	EXPECT_NO_THROW(validate_size_of_image(&section_header, header).throw_on_error());
 
 	header.set_raw_size_of_image(0x1a00u);
+	EXPECT_NO_THROW(validate_size_of_image(&section_header, header).throw_on_error());
+
+	header.set_raw_size_of_image(0xfffu);
 	EXPECT_EQ(validate_size_of_image(&section_header, header),
 		optional_header_errc::invalid_size_of_image);
 }
