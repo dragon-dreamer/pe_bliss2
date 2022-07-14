@@ -167,9 +167,16 @@ image_load_result image_loader::load(buffers::input_buffer_ptr buffer,
 		{
 			std::uint64_t section_data_end_offset = section_tbl.get_raw_data_end_offset(
 				optional_hdr.get_raw_section_alignment());
-			instance.get_overlay().deserialize(section_data_end_offset,
-				optional_hdr.get_raw_size_of_headers(),
-				0u, buffer, options.eager_overlay_data_copy);
+			try
+			{
+				instance.get_overlay().deserialize(section_data_end_offset,
+					optional_hdr.get_raw_size_of_headers(),
+					0u, buffer, options.eager_overlay_data_copy);
+			}
+			catch (const pe_error& e)
+			{
+				result.warnings.add_error(e.code());
+			}
 		}
 
 		if (options.validate_size_of_image)
