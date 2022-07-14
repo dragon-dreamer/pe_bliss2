@@ -187,6 +187,7 @@
     <ClCompile Include="tests\pe_bliss2\error_list_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\file_header_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_helper.cpp" />
+    <ClCompile Include="tests\pe_bliss2\image_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_section_search_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_signature_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_tests.cpp" />
