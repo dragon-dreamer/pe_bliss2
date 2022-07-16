@@ -125,8 +125,12 @@ void ref_buffer::serialize(output_buffer_interface& buffer) const
 {
 	std::visit(
 		[this, &buffer](const auto& buf) {
+			auto size = buf.buffer->size();
+			if (!size)
+				return;
+
 			buf.buffer->set_rpos(0);
-			copy(*buf.buffer, buffer, buf.buffer->size());
+			copy(*buf.buffer, buffer, size);
 		}, buffer_
 	);
 }
