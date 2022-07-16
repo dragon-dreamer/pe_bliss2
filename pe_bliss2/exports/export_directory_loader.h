@@ -29,7 +29,7 @@ enum class export_directory_loader_errc
 
 std::error_code make_error_code(export_directory_loader_errc) noexcept;
 
-struct loader_options
+struct [[nodiscard]] loader_options
 {
 	bool include_headers = true;
 	bool allow_virtual_data = false;

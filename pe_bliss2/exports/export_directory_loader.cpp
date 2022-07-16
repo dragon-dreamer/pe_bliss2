@@ -28,10 +28,25 @@ struct export_directory_loader_error_category : std::error_category
 
 	std::string message(int ev) const override
 	{
+		using enum pe_bliss::exports::export_directory_loader_errc;
 		switch (static_cast<pe_bliss::exports::export_directory_loader_errc>(ev))
 		{
-		case pe_bliss::exports::export_directory_loader_errc::invalid_library_name:
-			return "Invalid library name";
+		case invalid_library_name:
+			return "Invalid exported library name";
+		case invalid_forwarded_name:
+			return "Invalid exported forwarded name";
+		case invalid_name_list:
+			return "Invalid exported name list";
+		case invalid_name_ordinal:
+			return "Invalid exported name ordinal";
+		case invalid_name_rva:
+			return "Invalid exported name RVA";
+		case empty_name:
+			return "Empty exported name";
+		case unsorted_names:
+			return "Unsorted exported names";
+		case invalid_rva:
+			return "Invalid exported RVA";
 		default:
 			return {};
 		}
