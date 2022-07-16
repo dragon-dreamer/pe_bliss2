@@ -23,7 +23,7 @@ enum class image_loader_errc
 	unable_to_load_full_headers_buffer = 1
 };
 
-struct image_load_options
+struct [[nodiscard]] image_load_options
 {
 	bool allow_virtual_headers = false;
 	bool validate_sections = true;
@@ -43,7 +43,7 @@ struct image_load_options
 	core::optional_header_validation_options optional_header_validation{};
 };
 
-struct image_load_result
+struct [[nodiscard]] image_load_result
 {
 	image image;
 	error_list warnings;

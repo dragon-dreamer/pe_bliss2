@@ -23,7 +23,7 @@ enum class image_builder_errc
 
 std::error_code make_error_code(image_builder_errc) noexcept;
 
-struct image_builder_options
+struct [[nodiscard]] image_builder_options
 {
 	bool write_structure_virtual_parts = false;
 	bool fill_full_headers_data_gaps = true;
