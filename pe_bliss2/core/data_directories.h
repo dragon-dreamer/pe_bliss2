@@ -32,8 +32,8 @@ public:
 	static constexpr auto directory_packed_size = detail::packed_reflection
 		::get_type_size<detail::image_data_directory>();
 
-	using base_struct_type = packed_struct<detail::image_data_directory>;
-	using directories_list = std::vector<base_struct_type>;
+	using packed_struct_type = packed_struct<detail::image_data_directory>;
+	using directories_list = std::vector<packed_struct_type>;
 
 public:
 	enum class directory_type : std::uint32_t
@@ -86,13 +86,13 @@ public:
 	}
 
 	[[nodiscard]]
-	base_struct_type& get_directory(directory_type type)
+	packed_struct_type& get_directory(directory_type type)
 	{
 		return directories_.at(static_cast<std::size_t>(type));
 	}
 
 	[[nodiscard]]
-	const base_struct_type& get_directory(directory_type type) const
+	const packed_struct_type& get_directory(directory_type type) const
 	{
 		return directories_.at(static_cast<std::size_t>(type));
 	}
