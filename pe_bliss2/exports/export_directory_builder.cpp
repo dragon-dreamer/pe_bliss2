@@ -154,10 +154,11 @@ std::size_t build_new_impl(buffers::output_buffer_interface& buf, Directory& dir
 	buf.advance_wpos(descriptor.packed_size);
 	current_rva += directory.get_library_name().serialize(buf, true);
 
-	directory.get_export_list().sort([] (const auto& l, const auto& r)
-		{
-			return l.get_rva_ordinal() < r.get_rva_ordinal();
-		});
+	auto& export_list = directory.get_export_list();
+	std::sort(export_list.begin(), export_list.end(), [](const auto& l, const auto& r)
+	{
+		return l.get_rva_ordinal() < r.get_rva_ordinal();
+	});
 
 	current_rva = build_new_functions_impl(buf, directory, current_rva);
 	build_new_names_impl(buf, directory, current_rva);

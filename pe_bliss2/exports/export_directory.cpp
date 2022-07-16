@@ -16,12 +16,12 @@ using namespace pe_bliss::exports;
 
 template<typename ExportedAddressList>
 auto symbol_by_ordinal_impl(ExportedAddressList& addresses,
-	ordinal_type ordinal) noexcept
+	ordinal_type rva_ordinal) noexcept
 {
 	return std::find_if(std::begin(addresses),
-		std::end(addresses), [ordinal] (const auto& addr)
+		std::end(addresses), [rva_ordinal] (const auto& addr)
 		{
-			return addr.get_rva_ordinal() == ordinal;
+			return addr.get_rva_ordinal() == rva_ordinal;
 		});
 }
 
@@ -53,16 +53,16 @@ namespace pe_bliss::exports
 
 template<typename ExportedAddressList>
 typename export_directory_base<ExportedAddressList>::export_list_type::const_iterator
-	export_directory_base<ExportedAddressList>::symbol_by_ordinal(ordinal_type ordinal) const noexcept
+	export_directory_base<ExportedAddressList>::symbol_by_ordinal(ordinal_type rva_ordinal) const noexcept
 {
-	return symbol_by_ordinal_impl(exported_addresses_, ordinal);
+	return symbol_by_ordinal_impl(exported_addresses_, rva_ordinal);
 }
 
 template<typename ExportedAddressList>
 typename export_directory_base<ExportedAddressList>::export_list_type::iterator
-	export_directory_base<ExportedAddressList>::symbol_by_ordinal(ordinal_type ordinal) noexcept
+	export_directory_base<ExportedAddressList>::symbol_by_ordinal(ordinal_type rva_ordinal) noexcept
 {
-	return symbol_by_ordinal_impl(exported_addresses_, ordinal);
+	return symbol_by_ordinal_impl(exported_addresses_, rva_ordinal);
 }
 
 template<typename ExportedAddressList>
@@ -150,7 +150,7 @@ ordinal_type export_directory_base<ExportedAddressList>::get_last_free_ordinal()
 	return it->get_rva_ordinal() + 1;
 }
 
-template class export_directory_base<std::list<exported_address>>;
-template class export_directory_base<std::list<exported_address_details>>;
+template class export_directory_base<std::vector<exported_address>>;
+template class export_directory_base<std::vector<exported_address_details>>;
 
 } //namespace pe_bliss::exports

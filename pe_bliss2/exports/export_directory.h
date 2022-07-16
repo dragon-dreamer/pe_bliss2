@@ -1,8 +1,8 @@
 #pragma once
 
-#include <list>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/packed_c_string.h"
@@ -15,7 +15,7 @@ namespace pe_bliss::exports
 {
 
 template<typename ExportedAddressList>
-class export_directory_base
+class [[nodiscard]] export_directory_base
 {
 public:
 	using packed_descriptor_type = packed_struct<detail::exports::image_export_directory>;
@@ -34,25 +34,37 @@ public:
 	}
 
 	[[nodiscard]]
-	packed_c_string& get_library_name() noexcept
+	packed_c_string& get_library_name() & noexcept
 	{
 		return library_name_;
 	}
 
 	[[nodiscard]]
-	const packed_c_string& get_library_name() const noexcept
+	packed_c_string get_library_name() && noexcept
+	{
+		return std::move(library_name_);
+	}
+
+	[[nodiscard]]
+	const packed_c_string& get_library_name() const & noexcept
 	{
 		return library_name_;
 	}
 
 	[[nodiscard]]
-	export_list_type& get_export_list() noexcept
+	export_list_type& get_export_list() & noexcept
 	{
 		return exported_addresses_;
 	}
 
 	[[nodiscard]]
-	const export_list_type& get_export_list() const noexcept
+	export_list_type get_export_list() && noexcept
+	{
+		return std::move(exported_addresses_);
+	}
+
+	[[nodiscard]]
+	const export_list_type& get_export_list() const & noexcept
 	{
 		return exported_addresses_;
 	}
@@ -66,9 +78,9 @@ public:
 	
 public:
 	[[nodiscard]]
-	export_list_type::const_iterator symbol_by_ordinal(ordinal_type ordinal) const noexcept;
+	export_list_type::const_iterator symbol_by_ordinal(ordinal_type rva_ordinal) const noexcept;
 	[[nodiscard]]
-	export_list_type::iterator symbol_by_ordinal(ordinal_type ordinal) noexcept;
+	export_list_type::iterator symbol_by_ordinal(ordinal_type rva_ordinal) noexcept;
 	[[nodiscard]]
 	export_list_type::const_iterator symbol_by_name(std::string_view name) const noexcept;
 	[[nodiscard]]
@@ -93,10 +105,10 @@ private:
 	export_list_type exported_addresses_;
 };
 
-using export_directory = export_directory_base<std::list<exported_address>>;
+using export_directory = export_directory_base<std::vector<exported_address>>;
 
-class export_directory_details
-	: public export_directory_base<std::list<exported_address_details>>
+class [[nodiscard]] export_directory_details
+	: public export_directory_base<std::vector<exported_address_details>>
 	, public error_list
 {
 };

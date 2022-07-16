@@ -1,10 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <list>
+#include <compare>
 #include <optional>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/packed_c_string.h"
@@ -19,7 +20,7 @@ using packed_ordinal_type = packed_struct<ordinal_type>;
 using packed_rva_type = packed_struct<rva_type>;
 using optional_c_string = std::optional<packed_c_string>;
 
-class exported_name
+class [[nodiscard]] exported_name
 {
 public:
 	exported_name() = default;
@@ -33,13 +34,19 @@ public:
 	}
 
 	[[nodiscard]]
-	optional_c_string& get_name() noexcept
+	optional_c_string& get_name() & noexcept
 	{
 		return name_;
 	}
+
+	[[nodiscard]]
+	optional_c_string get_name() && noexcept
+	{
+		return std::move(name_);
+	}
 	
 	[[nodiscard]]
-	const optional_c_string& get_name() const noexcept
+	const optional_c_string& get_name() const & noexcept
 	{
 		return name_;
 	}
@@ -74,17 +81,17 @@ private:
 	packed_ordinal_type name_ordinal_{};
 };
 
-class exported_name_details : public exported_name, public error_list
+class [[nodiscard]] exported_name_details : public exported_name, public error_list
 {
 public:
 	using exported_name::exported_name;
 };
 
-using exported_name_list = std::list<exported_name>;
-using exported_name_details_list = std::list<exported_name_details>;
+using exported_name_list = std::vector<exported_name>;
+using exported_name_details_list = std::vector<exported_name_details>;
 
 template<typename ExportedNameList>
-class exported_address_base
+class [[nodiscard]] exported_address_base
 {
 public:
 	using name_list_type = ExportedNameList;
@@ -114,27 +121,39 @@ public:
 	}
 
 	[[nodiscard]]
-	name_list_type& get_names() noexcept
+	name_list_type& get_names() & noexcept
 	{
 		return names_;
 	}
 
 	[[nodiscard]]
-	const name_list_type& get_names() const noexcept
+	const name_list_type& get_names() const & noexcept
 	{
 		return names_;
 	}
 
 	[[nodiscard]]
-	optional_c_string& get_forwarded_name() noexcept
+	name_list_type get_names() && noexcept
+	{
+		return std::move(names_);
+	}
+
+	[[nodiscard]]
+	optional_c_string& get_forwarded_name() & noexcept
 	{
 		return forwarded_name_;
 	}
 
 	[[nodiscard]]
-	const optional_c_string& get_forwarded_name() const noexcept
+	const optional_c_string& get_forwarded_name() const & noexcept
 	{
 		return forwarded_name_;
+	}
+
+	[[nodiscard]]
+	optional_c_string get_forwarded_name() && noexcept
+	{
+		return std::move(forwarded_name_);
 	}
 
 private:
@@ -146,16 +165,20 @@ private:
 
 using exported_address = exported_address_base<exported_name_list>;
 
-class exported_address_details
+class [[nodiscard]] exported_address_details
 	: public exported_address_base<exported_name_details_list>
 	, public error_list
 {
 };
 
-struct forwarded_name_info
+struct [[nodiscard]] forwarded_name_info
 {
 	std::string library_name;
 	std::string function_name;
+
+	[[nodiscard]]
+	friend auto operator<=>(const forwarded_name_info&,
+		const forwarded_name_info&) = default;
 };
 
 [[nodiscard]]
