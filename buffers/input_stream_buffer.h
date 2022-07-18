@@ -26,18 +26,6 @@ public:
 	[[nodiscard]]
 	virtual std::size_t rpos() override;
 
-	[[nodiscard]]
-	virtual std::size_t absolute_offset() const noexcept override
-	{
-		return 0;
-	}
-
-	[[nodiscard]]
-	virtual std::size_t relative_offset() const noexcept override
-	{
-		return 0;
-	}
-
 	[[nodiscard]] const std::shared_ptr<std::istream>& get_stream() const noexcept
 	{
 		return stream_;

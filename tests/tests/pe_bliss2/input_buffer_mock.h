@@ -12,6 +12,4 @@ public:
 	MOCK_METHOD(void, set_rpos, (std::size_t pos));
 	MOCK_METHOD(void, advance_rpos, (std::int32_t offset));
 	MOCK_METHOD(std::size_t, rpos, ());
-	MOCK_METHOD(std::size_t, absolute_offset, (), (const, noexcept));
-	MOCK_METHOD(std::size_t, relative_offset, (), (const, noexcept));
 };

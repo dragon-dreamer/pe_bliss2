@@ -17,10 +17,32 @@ public:
 	virtual void advance_rpos(std::int32_t offset) = 0;
 	[[nodiscard]]
 	virtual std::size_t rpos() = 0;
+	
 	[[nodiscard]]
-	virtual std::size_t absolute_offset() const noexcept = 0;
+	std::size_t absolute_offset() const noexcept
+	{
+		return absolute_offset_;
+	}
+
 	[[nodiscard]]
-	virtual std::size_t relative_offset() const noexcept = 0;
+	std::size_t relative_offset() const noexcept
+	{
+		return relative_offset_;
+	}
+
+	void set_absolute_offset(std::size_t absolute_offset) noexcept
+	{
+		absolute_offset_ = absolute_offset;
+	}
+
+	void set_relative_offset(std::size_t relative_offset) noexcept
+	{
+		relative_offset_ = relative_offset;
+	}
+
+private:
+	std::size_t absolute_offset_{};
+	std::size_t relative_offset_{};
 };
 
 using input_buffer_ptr = std::shared_ptr<input_buffer_interface>;

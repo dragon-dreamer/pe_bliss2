@@ -28,8 +28,8 @@ input_buffer_section::input_buffer_section(input_buffer_ptr buf,
 	if (max_offset > buf_->size())
 		throw std::system_error(utilities::generic_errc::buffer_overrun);
 
-	parent_absolute_offset_ = buf_->absolute_offset();
-	relative_offset_ = offset_ + buf_->relative_offset();
+	set_absolute_offset(offset_ + buf_->absolute_offset());
+	set_relative_offset(offset_ + buf_->relative_offset());
 }
 
 input_buffer_section input_buffer_section::reduce(
@@ -83,16 +83,6 @@ std::size_t input_buffer_section::rpos()
 std::size_t input_buffer_section::size()
 {
 	return size_;
-}
-
-std::size_t input_buffer_section::relative_offset() const noexcept
-{
-	return relative_offset_;
-}
-
-std::size_t input_buffer_section::absolute_offset() const noexcept
-{
-	return offset_ + parent_absolute_offset_;
 }
 
 input_buffer_ptr reduce(const input_buffer_ptr& buf,

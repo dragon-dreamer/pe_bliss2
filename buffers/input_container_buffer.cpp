@@ -10,9 +10,9 @@ namespace buffers
 
 input_container_buffer::input_container_buffer(std::size_t absolute_offset,
 	std::size_t relative_offset)
-	: absolute_offset_(absolute_offset)
-	, relative_offset_(relative_offset)
 {
+	set_absolute_offset(absolute_offset);
+	set_relative_offset(relative_offset);
 }
 
 std::size_t input_container_buffer::size()
@@ -50,16 +50,6 @@ void input_container_buffer::advance_rpos(std::int32_t offset)
 std::size_t input_container_buffer::rpos()
 {
 	return pos_;
-}
-
-std::size_t input_container_buffer::absolute_offset() const noexcept
-{
-	return absolute_offset_;
-}
-
-std::size_t input_container_buffer::relative_offset() const noexcept
-{
-	return relative_offset_;
 }
 
 } //namespace buffers

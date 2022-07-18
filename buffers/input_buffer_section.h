@@ -26,26 +26,15 @@ public:
 	virtual std::size_t rpos() override;
 	[[nodiscard]]
 	virtual std::size_t size() override;
-	[[nodiscard]]
-	virtual std::size_t absolute_offset() const noexcept override;
-	[[nodiscard]]
-	virtual std::size_t relative_offset() const noexcept override;
 
 	[[nodiscard]]
 	input_buffer_section reduce(std::size_t offset, std::size_t size) const;
-
-	void set_relative_offset(std::size_t relative_offset) noexcept
-	{
-		relative_offset_ = relative_offset;
-	}
 
 private:
 	input_buffer_ptr buf_;
 	std::size_t offset_;
 	std::size_t size_;
 	std::size_t pos_;
-	std::size_t parent_absolute_offset_ = 0;
-	std::size_t relative_offset_ = 0;
 };
 
 [[nodiscard]]

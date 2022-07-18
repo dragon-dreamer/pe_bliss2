@@ -28,10 +28,8 @@ auto create_buffer_mock(std::size_t size, std::size_t initial_rpos,
 	auto buffer_mock = std::make_shared<NiceMock<input_buffer_mock>>();
 	ON_CALL(*buffer_mock, size)
 		.WillByDefault(Return(size));
-	ON_CALL(*buffer_mock, absolute_offset)
-		.WillByDefault(Return(absolute_offset));
-	ON_CALL(*buffer_mock, relative_offset)
-		.WillByDefault(Return(relative_offset));
+	buffer_mock->set_absolute_offset(absolute_offset);
+	buffer_mock->set_relative_offset(relative_offset);
 	ON_CALL(*buffer_mock, set_rpos)
 		.WillByDefault([rpos](std::size_t value) {
 			*rpos = value;
