@@ -37,6 +37,8 @@ struct export_directory_loader_error_category : std::error_category
 			return "Invalid exported forwarded name";
 		case invalid_name_list:
 			return "Invalid exported name list";
+		case invalid_address_list:
+			return "Invalid exported address list";
 		case invalid_name_ordinal:
 			return "Invalid exported name ordinal";
 		case invalid_name_rva:
@@ -59,21 +61,19 @@ using namespace pe_bliss;
 using namespace pe_bliss::exports;
 
 void read_library_name(const image::image& instance,
-	const loader_options& options, export_directory_details& directory)
+	const loader_options& options, export_directory_details& directory) try
 {
-	try
-	{
-		string_from_rva(instance, directory.get_descriptor()->name,
-			directory.get_library_name(),
-			options.include_headers, options.allow_virtual_data);
-	}
-	catch (const pe_error&)
-	{
-		directory.add_error(export_directory_loader_errc::invalid_library_name);
-	}
+	string_from_rva(instance, directory.get_descriptor()->name,
+		directory.get_library_name(),
+		options.include_headers, options.allow_virtual_data);
+}
+catch (...)
+{
+	directory.add_error(export_directory_loader_errc::invalid_library_name);
 }
 
-void read_forwarded_name(const image::image& instance, const loader_options& options,
+void read_forwarded_name_or_rva(const image::image& instance,
+	const loader_options& options,
 	const core::data_directories::packed_struct_type& export_dir_info,
 	rva_type exported_addr, exported_address_details& exported_symbol)
 {
@@ -83,10 +83,11 @@ void read_forwarded_name(const image::image& instance, const loader_options& opt
 	{
 		try
 		{
-			string_from_rva(instance, exported_addr, exported_symbol.get_forwarded_name().emplace(),
+			string_from_rva(instance, exported_addr,
+				exported_symbol.get_forwarded_name().emplace(),
 				options.include_headers, options.allow_virtual_data);
 		}
-		catch (const pe_error&)
+		catch (...)
 		{
 			exported_symbol.add_error(export_directory_loader_errc::invalid_forwarded_name);
 		}
@@ -98,28 +99,27 @@ void read_forwarded_name(const image::image& instance, const loader_options& opt
 			(void)struct_from_rva<std::byte>(instance, exported_addr,
 				options.include_headers, options.allow_virtual_data);
 		}
-		catch (const pe_error&)
+		catch (...)
 		{
 			exported_symbol.add_error(export_directory_loader_errc::invalid_rva);
 		}
 	}
 }
 
-using ordinal_to_exported_address_map = std::vector<
-	export_directory_details::export_list_type::iterator>;
+using ordinal_to_exported_address_map = std::vector<exported_address_details*>;
 
 ordinal_to_exported_address_map load_addresses(
 	const image::image& instance, const loader_options& options,
 	const core::data_directories::packed_struct_type& export_dir_info,
-	export_directory_details& directory)
+	export_directory_details& directory) try
 {
 	auto& descriptor = directory.get_descriptor();
 	auto number_of_functions = (std::min<std::uint32_t>)(descriptor->number_of_functions,
 		options.max_number_of_functions);
 	utilities::safe_uint address_of_functions = descriptor->address_of_functions;
 	auto& export_list = directory.get_export_list();
-	ordinal_to_exported_address_map ordinal_to_exported_address(
-		number_of_functions, std::end(export_list));
+	export_list.reserve(number_of_functions);
+	ordinal_to_exported_address_map ordinal_to_exported_address(number_of_functions);
 	for (std::uint32_t i = 0; i != number_of_functions; ++i)
 	{
 		auto exported_addr = struct_from_rva<rva_type>(instance, address_of_functions.value(),
@@ -131,14 +131,21 @@ ordinal_to_exported_address_map load_addresses(
 		auto& exported_symbol = export_list.emplace_back();
 		exported_symbol.get_rva() = exported_addr;
 		exported_symbol.set_rva_ordinal(static_cast<ordinal_type>(i));
-		ordinal_to_exported_address[i] = std::prev(std::end(export_list));
-		read_forwarded_name(instance, options, export_dir_info, exported_addr.get(), exported_symbol);
+		ordinal_to_exported_address[i] = &exported_symbol;
+		read_forwarded_name_or_rva(instance, options, export_dir_info,
+			exported_addr.get(), exported_symbol);
 	}
 	return ordinal_to_exported_address;
 }
+catch (...)
+{
+	directory.add_error(export_directory_loader_errc::invalid_address_list);
+	return {};
+}
 
-auto load_names(const image::image& instance, const loader_options& options, export_directory_details& directory,
-	const ordinal_to_exported_address_map& ordinal_to_exported_address)
+auto load_names(const image::image& instance, const loader_options& options,
+	export_directory_details& directory,
+	const ordinal_to_exported_address_map& ordinal_to_exported_address) try
 {
 	auto& descriptor = directory.get_descriptor();
 	auto number_of_names = (std::min<std::uint32_t>)(descriptor->number_of_names,
@@ -147,53 +154,50 @@ auto load_names(const image::image& instance, const loader_options& options, exp
 	utilities::safe_uint address_of_name_ordinals = descriptor->address_of_name_ordinals;
 	const std::string empty;
 	const std::string* prev_name = &empty;
-	auto exported_item_end = std::end(directory.get_export_list());
-	try
+	for (std::uint32_t i = 0; i != number_of_names; ++i)
 	{
-		for (std::uint32_t i = 0; i != number_of_names; ++i)
+		auto name_ordinal = struct_from_rva<ordinal_type>(instance,
+			address_of_name_ordinals.value(),
+			options.include_headers, options.allow_virtual_data);
+		auto name_rva = struct_from_rva<rva_type>(instance, address_of_names.value(),
+			options.include_headers, options.allow_virtual_data);
+		address_of_name_ordinals += sizeof(ordinal_type);
+		address_of_names += sizeof(rva_type);
+
+		if (name_ordinal.get() >= ordinal_to_exported_address.size()
+			|| !ordinal_to_exported_address[name_ordinal.get()])
 		{
-			auto name_ordinal = struct_from_rva<ordinal_type>(instance, address_of_name_ordinals.value(),
-				options.include_headers, options.allow_virtual_data);
-			if (name_ordinal.get() >= ordinal_to_exported_address.size()
-				|| ordinal_to_exported_address[name_ordinal.get()] == exported_item_end)
-			{
-				directory.add_error(export_directory_loader_errc::invalid_name_ordinal);
-				continue;
-			}
-
-			auto addr = ordinal_to_exported_address[name_ordinal.get()];
-			auto name_rva = struct_from_rva<rva_type>(instance, address_of_names.value(),
-				options.include_headers, options.allow_virtual_data);
-
-			packed_c_string name;
-			bool name_read = false;
-			try
-			{
-				string_from_rva(instance, name_rva.get(), name,
-					options.include_headers, options.allow_virtual_data);
-				if (name.value().empty())
-					addr->add_error(export_directory_loader_errc::empty_name);
-				if (*prev_name > name.value())
-					directory.add_error(export_directory_loader_errc::unsorted_names);
-				name_read = true;
-			}
-			catch (const pe_error&)
-			{
-				addr->add_error(export_directory_loader_errc::invalid_name_rva);
-			}
-
-			address_of_name_ordinals += sizeof(ordinal_type);
-			address_of_names += sizeof(rva_type);
-
-			addr->get_names().push_back({ std::move(name), name_rva, name_ordinal });
-			if (name_read)
-				prev_name = &addr->get_names().back().get_name().value().value();
+			directory.add_error(export_directory_loader_errc::invalid_name_ordinal);
+			continue;
 		}
+
+		auto addr = ordinal_to_exported_address[name_ordinal.get()];
+
+		optional_c_string name;
+		try
+		{
+			string_from_rva(instance, name_rva.get(), name.emplace(),
+				options.include_headers, options.allow_virtual_data);
+			if (name.value().value().empty())
+				addr->add_error(export_directory_loader_errc::empty_name);
+			if (*prev_name > name.value().value())
+				directory.add_error(export_directory_loader_errc::unsorted_names);
+		}
+		catch (...)
+		{
+			name.reset();
+			addr->add_error(export_directory_loader_errc::invalid_name_rva);
+		}
+
+		const auto& last_name = addr->get_names().emplace_back(
+			std::move(name), name_rva, name_ordinal).get_name();
+		if (last_name)
+			prev_name = &last_name.value().value();
 	}
-	catch (const pe_error&)
-	{
-		directory.add_error(export_directory_loader_errc::invalid_name_list);
-	}
+}
+catch (...)
+{
+	directory.add_error(export_directory_loader_errc::invalid_name_list);
 }
 
 } //namespace
@@ -216,12 +220,11 @@ std::optional<export_directory_details> load(const image::image& instance,
 	const auto& export_dir_info = instance.get_data_directories().get_directory(
 		core::data_directories::directory_type::exports);
 
-	result.emplace();
-	auto& directory = *result;
-	auto& descriptor = directory.get_descriptor();
+	auto& directory = result.emplace();
 
 	struct_from_rva(instance, export_dir_info->virtual_address,
-		descriptor, options.include_headers, options.allow_virtual_data);
+		directory.get_descriptor(), options.include_headers, options.allow_virtual_data);
+
 	read_library_name(instance, options, directory);
 
 	auto ordinal_to_exported_address = load_addresses(

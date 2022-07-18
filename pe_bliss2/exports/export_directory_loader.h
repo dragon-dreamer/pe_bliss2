@@ -20,6 +20,7 @@ enum class export_directory_loader_errc
 	invalid_library_name = 1,
 	invalid_forwarded_name,
 	invalid_name_list,
+	invalid_address_list,
 	invalid_name_ordinal,
 	invalid_name_rva,
 	empty_name,
