@@ -25,6 +25,9 @@
     <Filter Include="Source Files\tests\pe_bliss2">
       <UniqueIdentifier>{66b88b02-814d-4817-9697-431466b4ec28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\pe_bliss2\directories">
+      <UniqueIdentifier>{e34f309e-3d1e-4178-bd26-cca9afef4023}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -197,6 +200,15 @@
     </ClCompile>
     <ClCompile Include="tests\pe_bliss2\image_builder_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\export_loader_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\export_directory_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\exported_address_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -181,6 +181,9 @@
     <ClCompile Include="tests\pe_bliss2\byte_vector_from_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\compid_database_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\data_directories_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\exported_address_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\export_directory_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\export_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\dos_header_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\dos_stub_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\endian_convert_tests.cpp" />
