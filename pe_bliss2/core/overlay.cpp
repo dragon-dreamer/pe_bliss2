@@ -51,11 +51,12 @@ void overlay::deserialize(std::uint64_t section_raw_data_last_offset,
 	const buffers::input_buffer_ptr& buffer,
 	bool eager_copy)
 {
-	utilities::safe_uint<std::uint64_t> last_image_offset = section_raw_data_last_offset;
-	last_image_offset = (std::max<std::uint64_t>)(last_image_offset.value(), size_of_headers);
-
 	try
 	{
+		utilities::safe_uint<std::size_t> last_image_offset;
+		last_image_offset += section_raw_data_last_offset;
+		last_image_offset = (std::max<std::size_t>)(last_image_offset.value(), size_of_headers);
+
 		last_image_offset += initial_buffer_pos;
 		auto buffer_size = buffer->size();
 		if (last_image_offset >= buffer_size)
