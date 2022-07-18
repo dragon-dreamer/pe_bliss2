@@ -49,6 +49,8 @@ struct export_directory_loader_error_category : std::error_category
 			return "Unsorted exported names";
 		case invalid_rva:
 			return "Invalid exported RVA";
+		case invalid_directory:
+			return "Invalid export directory";
 		default:
 			return {};
 		}
@@ -222,8 +224,16 @@ std::optional<export_directory_details> load(const image::image& instance,
 
 	auto& directory = result.emplace();
 
-	struct_from_rva(instance, export_dir_info->virtual_address,
-		directory.get_descriptor(), options.include_headers, options.allow_virtual_data);
+	try
+	{
+		struct_from_rva(instance, export_dir_info->virtual_address,
+			directory.get_descriptor(), options.include_headers, options.allow_virtual_data);
+	}
+	catch (...)
+	{
+		directory.add_error(export_directory_loader_errc::invalid_directory);
+		return result;
+	}
 
 	read_library_name(instance, options, directory);
 
