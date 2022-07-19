@@ -1,8 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include <list>
+#include <utility>
 #include <variant>
+#include <vector>
 
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/error_list.h"
@@ -17,7 +18,7 @@ namespace pe_bliss::imports
 //TODO: apisetschema.dll redirects parser
 
 template<typename ImportedAddressList>
-class imported_library_base
+class [[nodiscard]] imported_library_base
 {
 public:
 	using imported_address_list = ImportedAddressList;
@@ -54,15 +55,21 @@ public:
 
 public:
 	[[nodiscard]]
-	const packed_c_string& get_library_name() const noexcept
+	const packed_c_string& get_library_name() const & noexcept
 	{
 		return library_name_;
 	}
 
 	[[nodiscard]]
-	packed_c_string& get_library_name() noexcept
+	packed_c_string& get_library_name() & noexcept
 	{
 		return library_name_;
+	}
+
+	[[nodiscard]]
+	packed_c_string get_library_name() && noexcept
+	{
+		return std::move(library_name_);
 	}
 
 	[[nodiscard]]
@@ -78,15 +85,21 @@ public:
 	}
 	
 	[[nodiscard]]
-	const imported_address_list& get_imports() const noexcept
+	const imported_address_list& get_imports() const & noexcept
 	{
 		return imports_;
 	}
 
 	[[nodiscard]]
-	imported_address_list& get_imports() noexcept
+	imported_address_list& get_imports() & noexcept
 	{
 		return imports_;
+	}
+
+	[[nodiscard]]
+	imported_address_list get_imports() && noexcept
+	{
+		return std::move(imports_);
 	}
 
 public:
@@ -96,35 +109,40 @@ public:
 };
 
 template<detail::executable_pointer Va>
-class imported_library : public imported_library_base<imported_address_list<Va>>
+class [[nodiscard]] imported_library : public imported_library_base<imported_address_list<Va>>
 {
 };
 
 template<detail::executable_pointer Va>
-class imported_library_details
+class [[nodiscard]] imported_library_details
 	: public imported_library_base<imported_address_details_list<Va>>
 	, public error_list
 {
 };
 
 template<template <detail::executable_pointer> typename ImportedLibrary>
-class import_directory_base
+class [[nodiscard]] import_directory_base
 {
 public:
 	using imported_library_list_type = std::variant<
-		std::list<ImportedLibrary<std::uint32_t>>,
-		std::list<ImportedLibrary<std::uint64_t>>
+		std::vector<ImportedLibrary<std::uint32_t>>,
+		std::vector<ImportedLibrary<std::uint64_t>>
 	>;
 
 public:
-	[[nodiscard]] imported_library_list_type& get_list() noexcept
+	[[nodiscard]] imported_library_list_type& get_list() & noexcept
 	{
 		return list_;
 	}
 
-	[[nodiscard]] const imported_library_list_type& get_list() const noexcept
+	[[nodiscard]] const imported_library_list_type& get_list() const & noexcept
 	{
 		return list_;
+	}
+
+	[[nodiscard]] imported_library_list_type get_list() && noexcept
+	{
+		return std::move(list_);
 	}
 
 private:
@@ -132,7 +150,7 @@ private:
 };
 
 using import_directory = import_directory_base<imported_library>;
-class import_directory_details
+class [[nodiscard]] import_directory_details
 	: public import_directory_base<imported_library_details>
 	, public error_list
 {

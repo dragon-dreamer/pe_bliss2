@@ -1,10 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <list>
 #include <optional>
 #include <type_traits>
+#include <utility>
 #include <variant>
+#include <vector>
 
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/error_list.h"
@@ -16,10 +17,8 @@
 namespace pe_bliss::imports
 {
 
-using optional_c_string = std::optional<pe_bliss::packed_c_string>;
-
 template<detail::executable_pointer Va>
-class imported_function_address
+class [[nodiscard]] imported_function_address
 {
 public:
 	using optional_va_type = std::optional<packed_struct<Va>>;
@@ -44,7 +43,7 @@ private:
 using ordinal_type = std::uint16_t;
 
 template<detail::executable_pointer Va>
-class imported_function_ordinal : public imported_function_address<Va>
+class [[nodiscard]] imported_function_ordinal : public imported_function_address<Va>
 {
 public:
 	[[nodiscard]]
@@ -74,14 +73,14 @@ private:
 };
 
 template<detail::executable_pointer Va>
-class imported_function_ordinal_details
+class [[nodiscard]] imported_function_ordinal_details
 	: public imported_function_ordinal<Va>
 	, public error_list
 {
 };
 
 template<detail::executable_pointer Va>
-class imported_function_hint_and_name : public imported_function_address<Va>
+class [[nodiscard]] imported_function_hint_and_name : public imported_function_address<Va>
 {
 public:
 	using hint_type = packed_struct<std::uint16_t>;
@@ -114,13 +113,19 @@ public:
 	}
 
 	[[nodiscard]]
-	name_type& get_name() noexcept
+	name_type& get_name() & noexcept
 	{
 		return name_;
 	}
 
 	[[nodiscard]]
-	const name_type& get_name() const noexcept
+	name_type get_name() && noexcept
+	{
+		return std::move(name_);
+	}
+
+	[[nodiscard]]
+	const name_type& get_name() const & noexcept
 	{
 		return name_;
 	}
@@ -132,7 +137,7 @@ private:
 };
 
 template<detail::executable_pointer Va>
-class imported_function_hint_and_name_details
+class [[nodiscard]] imported_function_hint_and_name_details
 	: public imported_function_hint_and_name<Va>
 	, public error_list
 {
@@ -140,7 +145,7 @@ class imported_function_hint_and_name_details
 
 template<detail::executable_pointer Va,
 	typename Ordinal, typename HintName>
-class imported_address
+class [[nodiscard]] imported_address
 {
 public:
 	using va_type = Va;
@@ -197,7 +202,7 @@ private:
 };
 
 template<detail::executable_pointer Va>
-class imported_address_details
+class [[nodiscard]] imported_address_details
 	: public imported_address<Va,
 		imported_function_ordinal_details<Va>, imported_function_hint_and_name_details<Va>>
 	, public error_list
@@ -205,9 +210,9 @@ class imported_address_details
 };
 
 template<detail::executable_pointer Va>
-using imported_address_list = std::list<imported_address<Va,
+using imported_address_list = std::vector<imported_address<Va,
 	imported_function_ordinal<Va>, imported_function_hint_and_name<Va>>>;
 template<detail::executable_pointer Va>
-using imported_address_details_list = std::list<imported_address_details<Va>>;
+using imported_address_details_list = std::vector<imported_address_details<Va>>;
 
 } //namespace pe_bliss::imports

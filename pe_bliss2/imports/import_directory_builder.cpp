@@ -35,7 +35,7 @@ struct thunk_count_names_size
 
 template<template <typename> typename ImportedLibrary, detail::executable_pointer Va>
 thunk_count_names_size get_thunk_count_and_names_size(
-	const std::list<ImportedLibrary<Va>>& libraries)
+	const std::vector<ImportedLibrary<Va>>& libraries)
 {
 	utilities::safe_uint<std::uint32_t> iat_thunk_count;
 	utilities::safe_uint<std::uint32_t> ilt_thunk_count;
@@ -86,7 +86,7 @@ std::uint32_t get_aligned_thunk_offset(std::uint32_t base, std::uint32_t offset)
 
 template<template <detail::executable_pointer> typename ImportedLibrary,
 	detail::executable_pointer Va>
-built_size get_built_size_impl(const std::list<ImportedLibrary<Va>>& libraries,
+built_size get_built_size_impl(const std::vector<ImportedLibrary<Va>>& libraries,
 	const builder_options& options)
 {
 	static constexpr auto descriptor_size = ImportedLibrary<Va>::packed_descriptor_type::packed_size;
@@ -155,7 +155,7 @@ void update_data_directory(image::image& instance, const builder_options& option
 
 template<template <detail::executable_pointer> typename ImportedLibrary,
 	detail::executable_pointer Va>
-void build_in_place_impl(image::image& instance, const std::list<ImportedLibrary<Va>>& libraries,
+void build_in_place_impl(image::image& instance, const std::vector<ImportedLibrary<Va>>& libraries,
 	const builder_options& options)
 {
 	auto last_descriptor_rva = options.directory_rva;
@@ -245,7 +245,7 @@ using safe_rva_type = utilities::safe_uint<rva_type>;
 template<template <detail::executable_pointer> typename ImportedLibrary,
 	detail::executable_pointer Va>
 safe_rva_type build_library_names(buffers::output_buffer_interface& buf,
-	std::list<ImportedLibrary<Va>>& libraries, safe_rva_type strings_rva)
+	std::vector<ImportedLibrary<Va>>& libraries, safe_rva_type strings_rva)
 {
 	for (auto& library : libraries)
 	{
@@ -259,7 +259,7 @@ safe_rva_type build_library_names(buffers::output_buffer_interface& buf,
 template<template <detail::executable_pointer> typename ImportedLibrary,
 	detail::executable_pointer Va>
 safe_rva_type build_address_tables(buffers::output_buffer_interface& buf,
-	std::list<ImportedLibrary<Va>>& libraries,
+	std::vector<ImportedLibrary<Va>>& libraries,
 	safe_rva_type strings_rva, safe_rva_type thunk_rva)
 {
 	packed_struct<Va> thunk;
@@ -319,7 +319,7 @@ safe_rva_type build_address_tables(buffers::output_buffer_interface& buf,
 template<template <detail::executable_pointer> typename ImportedLibrary,
 	detail::executable_pointer Va>
 safe_rva_type build_lookup_tables(buffers::output_buffer_interface& buf,
-	std::list<ImportedLibrary<Va>>& libraries,
+	std::vector<ImportedLibrary<Va>>& libraries,
 	safe_rva_type strings_rva, safe_rva_type thunk_rva)
 {
 	packed_struct<Va> thunk;
@@ -365,7 +365,7 @@ safe_rva_type build_lookup_tables(buffers::output_buffer_interface& buf,
 template<template <detail::executable_pointer> typename ImportedLibrary,
 	detail::executable_pointer Va>
 void build_hints_with_names(buffers::output_buffer_interface& buf,
-	const std::list<ImportedLibrary<Va>>& libraries, safe_rva_type strings_rva)
+	const std::vector<ImportedLibrary<Va>>& libraries, safe_rva_type strings_rva)
 {
 	for (auto& library : libraries)
 	{
@@ -386,7 +386,7 @@ template<template <detail::executable_pointer> typename ImportedLibrary,
 	detail::executable_pointer Va>
 build_result build_new_impl(buffers::output_buffer_interface& buf,
 	buffers::output_buffer_interface* iat_buf,
-	std::list<ImportedLibrary<Va>>& libraries, const builder_options& options)
+	std::vector<ImportedLibrary<Va>>& libraries, const builder_options& options)
 {
 	build_result result{};
 	utilities::safe_uint<std::size_t> base_wpos = buf.wpos();

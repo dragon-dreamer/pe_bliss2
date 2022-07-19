@@ -31,7 +31,7 @@ enum class import_table_loader_errc
 
 std::error_code make_error_code(import_table_loader_errc) noexcept;
 
-struct loader_options
+struct [[nodiscard]] loader_options
 {
 	bool include_headers = true;
 	bool allow_virtual_data = false;
@@ -39,6 +39,7 @@ struct loader_options
 		= core::data_directories::directory_type::imports;
 };
 
+[[nodiscard]]
 std::optional<import_directory_details> load(const image::image& instance,
 	const loader_options& options);
 

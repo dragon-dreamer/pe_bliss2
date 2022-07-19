@@ -5,6 +5,7 @@
 #include <functional>
 #include <system_error>
 #include <variant>
+#include <vector>
 
 #include "formatter.h"
 
@@ -68,7 +69,7 @@ void dump_import_info(formatter& fmt,
 
 template<typename Va>
 void dump_imports(formatter& fmt,
-	const std::list<pe_bliss::imports::imported_library_details<Va>>& imports) try
+	const std::vector<pe_bliss::imports::imported_library_details<Va>>& imports) try
 {
 	for (const auto& lib : imports)
 	{

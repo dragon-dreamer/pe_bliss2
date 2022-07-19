@@ -4,6 +4,7 @@
 #include <system_error>
 #include <type_traits>
 #include <variant>
+#include <vector>
 
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/detail/imports/image_import_descriptor.h"
@@ -37,6 +38,8 @@ struct import_table_loader_error_category : std::error_category
 			return "Invalid import name";
 		case invalid_hint_name_rva:
 			return "Invalid hint and name RVA";
+		case lookup_and_address_table_thunks_differ:
+			return "Import lookup and address table thunks differ";
 		case invalid_import_directory:
 			return "Invalid import directory";
 		case zero_iat_and_ilt:
@@ -234,7 +237,7 @@ bool load_import(const image::image& instance, const loader_options& options,
 
 template<typename Va, typename Directory>
 void load_impl(const image::image& instance, const loader_options& options,
-	rva_type current_descriptor_rva, std::list<imported_library_details<Va>>& import_list,
+	rva_type current_descriptor_rva, std::vector<imported_library_details<Va>>& import_list,
 	Directory& directory)
 {
 	packed_struct<Va> thunk;
@@ -292,13 +295,13 @@ std::optional<import_directory_details> load(const image::image& instance,
 	if (instance.is_64bit())
 	{
 		load_impl(instance, options, import_dir_info->virtual_address,
-			directory.get_list().emplace<std::list<imported_library_details<std::uint64_t>>>(),
+			directory.get_list().emplace<std::vector<imported_library_details<std::uint64_t>>>(),
 			directory);
 	}
 	else
 	{
 		load_impl(instance, options, import_dir_info->virtual_address,
-			directory.get_list().emplace<std::list<imported_library_details<std::uint32_t>>>(),
+			directory.get_list().emplace<std::vector<imported_library_details<std::uint32_t>>>(),
 			directory);
 	}
 
