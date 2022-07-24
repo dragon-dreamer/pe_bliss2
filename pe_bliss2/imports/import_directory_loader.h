@@ -15,7 +15,7 @@ class image;
 namespace pe_bliss::imports
 {
 
-enum class import_table_loader_errc
+enum class import_directory_loader_errc
 {
 	invalid_library_name = 1,
 	invalid_import_hint,
@@ -26,10 +26,12 @@ enum class import_table_loader_errc
 	zero_iat_and_ilt,
 	invalid_import_ordinal,
 	zero_iat,
-	invalid_imported_library_iat_ilt
+	invalid_imported_library_iat_ilt,
+	empty_library_name,
+	empty_import_name
 };
 
-std::error_code make_error_code(import_table_loader_errc) noexcept;
+std::error_code make_error_code(import_directory_loader_errc) noexcept;
 
 struct [[nodiscard]] loader_options
 {
@@ -41,12 +43,12 @@ struct [[nodiscard]] loader_options
 
 [[nodiscard]]
 std::optional<import_directory_details> load(const image::image& instance,
-	const loader_options& options);
+	const loader_options& options = {});
 
 } //namespace pe_bliss::imports
 
 namespace std
 {
 template<>
-struct is_error_code_enum<pe_bliss::imports::import_table_loader_errc> : true_type {};
+struct is_error_code_enum<pe_bliss::imports::import_directory_loader_errc> : true_type {};
 } //namespace std

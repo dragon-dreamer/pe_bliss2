@@ -73,33 +73,13 @@ private:
 };
 
 template<detail::executable_pointer Va>
-class [[nodiscard]] imported_function_ordinal_details
-	: public imported_function_ordinal<Va>
-	, public error_list
-{
-};
-
-template<detail::executable_pointer Va>
 class [[nodiscard]] imported_function_hint_and_name : public imported_function_address<Va>
 {
 public:
 	using hint_type = packed_struct<std::uint16_t>;
 	using name_type = packed_c_string;
-	using bound_function_va = packed_struct<Va>;
 
 public:
-	[[nodiscard]]
-	bound_function_va& get_bound_function_va() noexcept
-	{
-		return bound_function_va_;
-	}
-
-	[[nodiscard]]
-	const bound_function_va& get_bound_function_va() const noexcept
-	{
-		return bound_function_va_;
-	}
-
 	[[nodiscard]]
 	hint_type& get_hint() noexcept
 	{
@@ -131,20 +111,11 @@ public:
 	}
 
 private:
-	bound_function_va bound_function_va_;
 	hint_type hint_;
 	name_type name_;
 };
 
 template<detail::executable_pointer Va>
-class [[nodiscard]] imported_function_hint_and_name_details
-	: public imported_function_hint_and_name<Va>
-	, public error_list
-{
-};
-
-template<detail::executable_pointer Va,
-	typename Ordinal, typename HintName>
 class [[nodiscard]] imported_address
 {
 public:
@@ -152,8 +123,8 @@ public:
 	using packed_va_type = packed_struct<va_type>;
 	using optional_va_type = std::optional<packed_va_type>;
 	
-	using ordinal_type = Ordinal;
-	using hint_name_type = HintName;
+	using ordinal_type = imported_function_ordinal<Va>;
+	using hint_name_type = imported_function_hint_and_name<Va>;
 	using imported_function_address_type = imported_function_address<va_type>;
 	using import_info_type = std::variant<imported_function_address_type,
 		ordinal_type, hint_name_type>;
@@ -203,15 +174,13 @@ private:
 
 template<detail::executable_pointer Va>
 class [[nodiscard]] imported_address_details
-	: public imported_address<Va,
-		imported_function_ordinal_details<Va>, imported_function_hint_and_name_details<Va>>
+	: public imported_address<Va>
 	, public error_list
 {
 };
 
 template<detail::executable_pointer Va>
-using imported_address_list = std::vector<imported_address<Va,
-	imported_function_ordinal<Va>, imported_function_hint_and_name<Va>>>;
+using imported_address_list = std::vector<imported_address<Va>>;
 template<detail::executable_pointer Va>
 using imported_address_details_list = std::vector<imported_address_details<Va>>;
 

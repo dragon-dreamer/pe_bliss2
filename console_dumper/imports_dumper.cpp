@@ -42,7 +42,7 @@ void dump_import_info(formatter& fmt,
 
 template<typename Va>
 void dump_import_info(formatter& fmt,
-	const pe_bliss::imports::imported_function_ordinal_details<Va>& ordinal)
+	const pe_bliss::imports::imported_function_ordinal<Va>& ordinal)
 {
 	fmt.print_field_name("Ordinal");
 	fmt.get_stream() << ' ';
@@ -50,12 +50,11 @@ void dump_import_info(formatter& fmt,
 
 	dump_import_info(fmt,
 		static_cast<const pe_bliss::imports::imported_function_address<Va>&>(ordinal));
-	fmt.print_errors(ordinal);
 }
 
 template<typename Va>
 void dump_import_info(formatter& fmt,
-	const pe_bliss::imports::imported_function_hint_and_name_details<Va>& hint_name)
+	const pe_bliss::imports::imported_function_hint_and_name<Va>& hint_name)
 {
 	fmt.print_field_name("Hint");
 	fmt.print_offsets_and_value(hint_name.get_hint(), true);
@@ -64,7 +63,6 @@ void dump_import_info(formatter& fmt,
 	fmt.print_packed_string(hint_name.get_name());
 	dump_import_info(fmt,
 		static_cast<const pe_bliss::imports::imported_function_address<Va>&>(hint_name));
-	fmt.print_errors(hint_name);
 }
 
 template<typename Va>

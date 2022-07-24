@@ -22,7 +22,8 @@ class [[nodiscard]] imported_library_base
 {
 public:
 	using imported_address_list = ImportedAddressList;
-	using packed_descriptor_type = packed_struct<detail::imports::image_import_descriptor>;
+	using packed_descriptor_type = packed_struct<
+		detail::imports::image_import_descriptor>;
 
 public:
 	[[nodiscard]]
@@ -34,7 +35,8 @@ public:
 	[[nodiscard]]
 	bool has_lookup_table() const noexcept
 	{
-		return descriptor_->lookup_table && descriptor_->lookup_table != descriptor_->address_table;
+		return descriptor_->lookup_table
+			&& descriptor_->lookup_table != descriptor_->address_table;
 	}
 
 public:
@@ -46,11 +48,6 @@ public:
 	void remove_lookup_table() noexcept
 	{
 		descriptor_->lookup_table = 0u;
-	}
-
-	void enable_lookup_table() noexcept
-	{
-		descriptor_->lookup_table = 0xffffffffu;
 	}
 
 public:
@@ -109,7 +106,8 @@ public:
 };
 
 template<detail::executable_pointer Va>
-class [[nodiscard]] imported_library : public imported_library_base<imported_address_list<Va>>
+class [[nodiscard]] imported_library
+	: public imported_library_base<imported_address_list<Va>>
 {
 };
 
