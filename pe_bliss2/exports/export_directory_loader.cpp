@@ -69,7 +69,7 @@ void read_library_name(const image::image& instance,
 		directory.get_library_name(),
 		options.include_headers, options.allow_virtual_data);
 }
-catch (...)
+catch (const std::system_error&)
 {
 	directory.add_error(export_directory_loader_errc::invalid_library_name);
 }
@@ -89,7 +89,7 @@ void read_forwarded_name_or_rva(const image::image& instance,
 				exported_symbol.get_forwarded_name().emplace(),
 				options.include_headers, options.allow_virtual_data);
 		}
-		catch (...)
+		catch (const std::system_error&)
 		{
 			exported_symbol.add_error(export_directory_loader_errc::invalid_forwarded_name);
 		}
@@ -101,7 +101,7 @@ void read_forwarded_name_or_rva(const image::image& instance,
 			(void)struct_from_rva<std::byte>(instance, exported_addr,
 				options.include_headers, options.allow_virtual_data);
 		}
-		catch (...)
+		catch (const std::system_error&)
 		{
 			exported_symbol.add_error(export_directory_loader_errc::invalid_rva);
 		}
@@ -139,7 +139,7 @@ ordinal_to_exported_address_map load_addresses(
 	}
 	return ordinal_to_exported_address;
 }
-catch (...)
+catch (const std::system_error&)
 {
 	directory.add_error(export_directory_loader_errc::invalid_address_list);
 	return {};
@@ -185,7 +185,7 @@ auto load_names(const image::image& instance, const loader_options& options,
 			if (*prev_name > name.value().value())
 				directory.add_error(export_directory_loader_errc::unsorted_names);
 		}
-		catch (...)
+		catch (const std::system_error&)
 		{
 			name.reset();
 			addr->add_error(export_directory_loader_errc::invalid_name_rva);
@@ -197,7 +197,7 @@ auto load_names(const image::image& instance, const loader_options& options,
 			prev_name = &last_name.value().value();
 	}
 }
-catch (...)
+catch (const std::system_error&)
 {
 	directory.add_error(export_directory_loader_errc::invalid_name_list);
 }
@@ -229,7 +229,7 @@ std::optional<export_directory_details> load(const image::image& instance,
 		struct_from_rva(instance, export_dir_info->virtual_address,
 			directory.get_descriptor(), options.include_headers, options.allow_virtual_data);
 	}
-	catch (...)
+	catch (const std::system_error&)
 	{
 		directory.add_error(export_directory_loader_errc::invalid_directory);
 		return result;

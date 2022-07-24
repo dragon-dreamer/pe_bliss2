@@ -21,7 +21,8 @@ class ExportLoaderTestFixture : public ::testing::Test
 {
 public:
 	ExportLoaderTestFixture()
-		: instance(create_test_image({ .sections = { { 0x1000u, 0x1000u } } }))
+		: instance(create_test_image({ .start_section_rva = section_rva,
+			.sections = { { 0x1000u, 0x1000u } } }))
 	{
 		instance.get_section_data_list()[0].data()
 			->set_absolute_offset(absolute_offset);
@@ -206,13 +207,13 @@ public:
 
 TEST_F(ExportLoaderTestFixture, GetExportsAbsentDirectory)
 {
-	EXPECT_FALSE(exports::load(instance, {}));
+	EXPECT_FALSE(exports::load(instance));
 }
 
 TEST_F(ExportLoaderTestFixture, GetExportsZeroedDirectory)
 {
 	add_export_dir();
-	auto dir = exports::load(instance, {});
+	auto dir = exports::load(instance);
 	ASSERT_TRUE(dir);
 	expect_contains_errors(*dir,
 		exports::export_directory_loader_errc::invalid_library_name);
@@ -223,7 +224,7 @@ TEST_F(ExportLoaderTestFixture, GetExportsDirectoryLibraryName)
 {
 	add_export_dir();
 	add_library_name();
-	auto dir = exports::load(instance, {});
+	auto dir = exports::load(instance);
 	ASSERT_TRUE(dir);
 	validate_library_name(*dir);
 	expect_contains_errors(*dir,
@@ -236,7 +237,7 @@ TEST_F(ExportLoaderTestFixture, GetExportsDirectoryAddresses)
 	add_export_dir();
 	add_library_name();
 	add_exported_addresses();
-	auto dir = exports::load(instance, {});
+	auto dir = exports::load(instance);
 	ASSERT_TRUE(dir);
 	validate_library_name(*dir);
 	expect_contains_errors(*dir,
@@ -271,7 +272,7 @@ TEST_F(ExportLoaderTestFixture, GetExportsDirectoryNamesEmpty)
 	add_library_name();
 	add_exported_addresses();
 	add_exported_name_table();
-	auto dir = exports::load(instance, {});
+	auto dir = exports::load(instance);
 	ASSERT_TRUE(dir);
 	validate_library_name(*dir);
 	expect_contains_errors(*dir);
@@ -355,7 +356,7 @@ TEST_F(ExportLoaderTestFixture, GetExportsDirectoryNames)
 	add_exported_addresses();
 	add_exported_name_table();
 	add_exported_names();
-	auto dir = exports::load(instance, {});
+	auto dir = exports::load(instance);
 	ASSERT_TRUE(dir);
 	validate_library_name(*dir);
 	expect_contains_errors(*dir,
@@ -378,7 +379,7 @@ TEST_F(ExportLoaderTestFixture, GetExportsDirectoryNamesWithStrings)
 	add_exported_name_table();
 	add_exported_names();
 	add_name_strings();
-	auto dir = exports::load(instance, {});
+	auto dir = exports::load(instance);
 	ASSERT_TRUE(dir);
 	validate_library_name(*dir);
 	expect_contains_errors(*dir,
@@ -398,7 +399,7 @@ TEST_F(ExportLoaderTestFixture, GetExportsDirectoryAddressesForwarded)
 	add_export_dir();
 	add_library_name();
 	add_fwd_addresses();
-	auto dir = exports::load(instance, {});
+	auto dir = exports::load(instance);
 	ASSERT_TRUE(dir);
 	validate_library_name(*dir);
 	expect_contains_errors(*dir,
@@ -491,7 +492,7 @@ TEST_F(ExportLoaderTestFixture, GetExportsDirectoryNamesLimited)
 TEST_F(ExportLoaderTestFixture, GetExportsZeroedVitualDirectoryError)
 {
 	add_virtual_export_dir();
-	auto dir = exports::load(instance, {});
+	auto dir = exports::load(instance);
 	ASSERT_TRUE(dir);
 	expect_contains_errors(*dir,
 		exports::export_directory_loader_errc::invalid_directory);

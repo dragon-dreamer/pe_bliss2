@@ -41,7 +41,7 @@ struct [[nodiscard]] loader_options
 
 [[nodiscard]]
 std::optional<export_directory_details> load(const image::image& instance,
-	const loader_options& options);
+	const loader_options& options = {});
 
 } //namespace pe_bliss::exports
 
