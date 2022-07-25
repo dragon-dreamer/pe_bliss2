@@ -1,6 +1,7 @@
 #include "pe_bliss2/tls/tls_directory_loader.h"
 
 #include <algorithm>
+#include <cstddef>
 #include <limits>
 #include <system_error>
 
@@ -34,6 +35,8 @@ struct tls_directory_loader_error_category : std::error_category
 			return "Invalid TLS directory";
 		case invalid_callbacks:
 			return "Invalid TLS callbacks array";
+		case invalid_callback_va:
+			return "Invalid TLS callback virtual address";
 		default:
 			return {};
 		}
@@ -77,7 +80,19 @@ void load_impl(const image::image& instance, const loader_options& options,
 				address_of_callback.value(), options.include_headers,
 				options.allow_virtual_data)).get())
 			{
-				directory.get_callbacks().emplace_back(callback_va);
+				auto& callback = directory.get_callbacks().emplace_back(callback_va);
+
+				try
+				{
+					(void)struct_from_va<std::byte>(instance,
+						callback_va.get(), options.include_headers,
+						options.allow_virtual_data);
+				}
+				catch (const std::system_error&)
+				{
+					callback.add_error(tls_directory_loader_errc::invalid_callback_va);
+				}
+
 				address_of_callback += sizeof(va_type);
 			}
 		}

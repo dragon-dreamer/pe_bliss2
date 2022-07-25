@@ -18,7 +18,8 @@ enum class tls_directory_loader_errc
 {
 	invalid_raw_data = 1,
 	invalid_directory,
-	invalid_callbacks
+	invalid_callbacks,
+	invalid_callback_va
 };
 
 std::error_code make_error_code(tls_directory_loader_errc) noexcept;

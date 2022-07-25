@@ -14,7 +14,17 @@
 namespace pe_bliss::tls
 {
 
-template<typename Directory>
+template<typename Va>
+using tls_callback = packed_struct<Va>;
+
+template<typename Va>
+class [[nodiscard]] tls_callback_details
+	: public packed_struct<Va>
+	, public error_list
+{
+};
+
+template<typename Directory, typename TlsCallback>
 class [[nodiscard]] tls_directory_base
 {
 public:
@@ -22,7 +32,7 @@ public:
 	using packed_descriptor_type = packed_struct<Directory>;
 
 	using index_type = std::uint32_t;
-	using callback_type = packed_struct<va_type>;
+	using callback_type = TlsCallback;
 	using callback_list_type = std::vector<callback_type>;
 
 public:
@@ -74,17 +84,21 @@ private:
 	callback_list_type callbacks_;
 };
 
-template<typename Directory>
+template<typename Directory, typename TlsCallback>
 class [[nodiscard]] tls_directory_details_base
-	: public tls_directory_base<Directory>
+	: public tls_directory_base<Directory, TlsCallback>
 	, public error_list
 {
 };
 
-using tls_directory_details32 = tls_directory_details_base<detail::tls::image_tls_directory32>;
-using tls_directory_details64 = tls_directory_details_base<detail::tls::image_tls_directory64>;
-using tls_directory32 = tls_directory_base<detail::tls::image_tls_directory32>;
-using tls_directory64 = tls_directory_base<detail::tls::image_tls_directory64>;
+using tls_directory_details32 = tls_directory_details_base<detail::tls::image_tls_directory32,
+	tls_callback_details<std::uint32_t>>;
+using tls_directory_details64 = tls_directory_details_base<detail::tls::image_tls_directory64,
+	tls_callback_details<std::uint64_t>>;
+using tls_directory32 = tls_directory_base<detail::tls::image_tls_directory32,
+	tls_callback<std::uint32_t>>;
+using tls_directory64 = tls_directory_base<detail::tls::image_tls_directory64,
+	tls_callback<std::uint64_t>>;
 
 using tls_directory = std::variant<tls_directory32, tls_directory64>;
 using tls_directory_details = std::variant<tls_directory_details32, tls_directory_details64>;

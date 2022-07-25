@@ -33,6 +33,7 @@ void dump_tls_impl(formatter& fmt, const Directory& directory)
 		fmt.print_structure("TLS callback", cb, std::array{
 			value_info{"VA"}
 		});
+		fmt.print_errors(cb);
 	}
 
 	if (directory.get_callbacks().empty())
