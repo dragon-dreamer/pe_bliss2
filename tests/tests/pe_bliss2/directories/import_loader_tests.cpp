@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
 
-
 #include <algorithm>
 #include <array>
 #include <cstddef>
@@ -75,9 +74,9 @@ public:
 	template<typename Func>
 	void with_imports(const imports::import_directory_details& dir, Func&& func)
 	{
-		bool is_32bit = !!std::get_if<std::vector<
-			imports::imported_library_details<std::uint32_t>>>(&dir.get_list());
-		ASSERT_EQ(is_32bit, GetParam() == core::optional_header::magic::pe32);
+		bool is_64bit = !!std::get_if<std::vector<
+			imports::imported_library_details<std::uint64_t>>>(&dir.get_list());
+		ASSERT_EQ(is_64bit, is_x64());
 		std::visit(std::forward<Func>(func), dir.get_list());
 	}
 
