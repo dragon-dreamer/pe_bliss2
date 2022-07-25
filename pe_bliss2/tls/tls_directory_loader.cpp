@@ -37,6 +37,8 @@ struct tls_directory_loader_error_category : std::error_category
 			return "Invalid TLS callbacks array";
 		case invalid_callback_va:
 			return "Invalid TLS callback virtual address";
+		case invalid_index_va:
+			return "Invalid TLS index virtual address";
 		default:
 			return {};
 		}
@@ -68,10 +70,21 @@ void load_impl(const image::image& instance, const loader_options& options,
 		directory.add_error(tls_directory_loader_errc::invalid_directory);
 		return;
 	}
+
+	using va_type = typename Directory::va_type;
+	try
+	{
+		(void)struct_from_va<va_type>(instance,
+			descriptor->address_of_index, options.include_headers,
+			options.allow_virtual_data);
+	}
+	catch (const std::system_error&)
+	{
+		directory.add_error(tls_directory_loader_errc::invalid_index_va);
+	}
 	
 	if (descriptor->address_of_callbacks)
 	{
-		using va_type = typename Directory::va_type;
 		packed_struct<va_type> callback_va{};
 		utilities::safe_uint address_of_callback = descriptor->address_of_callbacks;
 		try
