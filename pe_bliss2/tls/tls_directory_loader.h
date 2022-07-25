@@ -16,7 +16,9 @@ namespace pe_bliss::tls
 
 enum class tls_directory_loader_errc
 {
-	invalid_raw_data = 1
+	invalid_raw_data = 1,
+	invalid_directory,
+	invalid_callbacks
 };
 
 std::error_code make_error_code(tls_directory_loader_errc) noexcept;
@@ -29,7 +31,7 @@ struct loader_options
 };
 
 std::optional<tls_directory_details> load(const image::image& instance,
-	const loader_options& options);
+	const loader_options& options = {});
 
 } //namespace pe_bliss::tls
 

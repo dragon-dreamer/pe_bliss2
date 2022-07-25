@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdint>
-#include <list>
 #include <utility>
 #include <variant>
+#include <vector>
 
 #include "buffers/ref_buffer.h"
 #include "pe_bliss2/detail/concepts.h"
@@ -15,7 +15,7 @@ namespace pe_bliss::tls
 {
 
 template<typename Directory>
-class tls_directory_base
+class [[nodiscard]] tls_directory_base
 {
 public:
 	using va_type = decltype(Directory::address_of_callbacks);
@@ -23,7 +23,7 @@ public:
 
 	using index_type = std::uint32_t;
 	using callback_type = packed_struct<va_type>;
-	using callback_list_type = std::list<callback_type>;
+	using callback_list_type = std::vector<callback_type>;
 
 public:
 	[[nodiscard]]
@@ -51,21 +51,21 @@ public:
 	}
 
 	[[nodiscard]]
-	const callback_list_type& get_callbacks() const noexcept
+	const callback_list_type& get_callbacks() const & noexcept
 	{
 		return callbacks_;
 	}
 
 	[[nodiscard]]
-	callback_list_type& get_callbacks() noexcept
+	callback_list_type& get_callbacks() & noexcept
 	{
 		return callbacks_;
 	}
 
-	void set_raw_data_size(std::uint32_t size) noexcept
+	[[nodiscard]]
+	callback_list_type get_callbacks() && noexcept
 	{
-		descriptor_.start_address_of_raw_data = 0;
-		descriptor_.end_address_of_raw_data = size;
+		return std::move(callbacks_);
 	}
 
 private:
@@ -75,12 +75,10 @@ private:
 };
 
 template<typename Directory>
-class tls_directory_details_base
+class [[nodiscard]] tls_directory_details_base
 	: public tls_directory_base<Directory>
 	, public error_list
 {
-public:
-	using tls_directory_base<Directory>::tls_directory_base;
 };
 
 using tls_directory_details32 = tls_directory_details_base<detail::tls::image_tls_directory32>;
