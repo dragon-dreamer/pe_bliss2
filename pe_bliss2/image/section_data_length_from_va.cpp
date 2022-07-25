@@ -24,7 +24,13 @@ std::uint32_t section_data_length_from_rva(const image& instance,
 
 	auto [header_it, data_it] = section_from_rva(instance, rva, 1u);
 	if (data_it == std::end(instance.get_section_data_list()))
-		throw pe_error(image_errc::section_data_does_not_exist);
+	{
+		auto [empty_header_it, empty_data_it] = section_from_rva(instance, rva, 0u);
+		if (empty_data_it == std::end(instance.get_section_data_list()))
+			throw pe_error(image_errc::section_data_does_not_exist);
+
+		return 0u;
+	}
 
 	std::uint32_t data_offset = rva - header_it->get_rva();
 	if (allow_virtual_data)

@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <span>
 #include <utility>
+#include <vector>
 
 #include "buffers/input_buffer_section.h"
 
@@ -28,22 +29,20 @@ bool spans_equal(Span1 span1, Span2 span2)
 bool buffers_equal(const buffers::input_buffer_ptr& buf1,
 	const buffers::input_buffer_ptr& buf2)
 {
-	buf1->set_rpos(0);
-	buf2->set_rpos(0);
 	if (buf1->size() != buf2->size())
 		return false;
 
-	std::byte byte1{}, byte2{};
-	while (buf1->read(1, &byte1))
-	{
-		if (!buf2->read(1, &byte2))
-			return false;
+	buf1->set_rpos(0);
+	std::vector<std::byte> buf1_data;
+	buf1_data.resize(buf1->size());
+	buf1->read(buf1->size(), buf1_data.data());
 
-		if (byte1 != byte2)
-			return false;
-	}
+	buf2->set_rpos(0);
+	std::vector<std::byte> buf2_data;
+	buf2_data.resize(buf2->size());
+	buf2->read(buf2->size(), buf2_data.data());
 
-	return true;
+	return buf1_data == buf2_data;
 }
 
 enum class function_type
@@ -66,6 +65,11 @@ public:
 				byte = std::byte{ value++ };
 		}
 	}
+
+public:
+	static constexpr std::uint32_t last_section_last_rva = 0x7000u;
+	static constexpr std::uint32_t inexistent_rva = 0x8000u;
+	static constexpr std::uint32_t second_section_rva = 0x2000u;
 
 protected:
 	pe_bliss::image::image instance;
@@ -150,11 +154,7 @@ TEST_P(SectionDataFromRvaFullFixture, SectionDataFromRvaTestNonConst2)
 			section.copied_data().size() - 0x10u)));
 
 	expect_throw_pe_error([this] {
-		(void)section_data_from_address(instance, 0x4010u, false);
-	}, pe_bliss::image::image_errc::section_data_does_not_exist);
-
-	expect_throw_pe_error([this] {
-		(void)section_data_from_address(instance, 0x4000u, false);
+		(void)section_data_from_address(instance, inexistent_rva, false);
 	}, pe_bliss::image::image_errc::section_data_does_not_exist);
 }
 
@@ -166,12 +166,31 @@ TEST_P(SectionDataFromRvaFullFixture, SectionDataFromRvaTestConst2)
 		buffers::reduce(section.data(), 0x10u)));
 
 	expect_throw_pe_error([this] {
-		(void)section_data_from_address(std::as_const(instance), 0x4010u, false);
+		(void)section_data_from_address(std::as_const(instance), inexistent_rva, false);
 	}, pe_bliss::image::image_errc::section_data_does_not_exist);
+}
 
-	expect_throw_pe_error([this] {
-		(void)section_data_from_address(std::as_const(instance), 0x4000u, false);
-	}, pe_bliss::image::image_errc::section_data_does_not_exist);
+TEST_P(SectionDataFromRvaFullFixture, SectionDataFromRvaTestSectionEnd)
+{
+	const auto& section = instance.get_section_data_list()[2];
+	EXPECT_TRUE(buffers_equal(section_data_from_address(
+		std::as_const(instance), last_section_last_rva, true),
+		section.data()));
+	EXPECT_TRUE(buffers_equal(section_data_from_address(
+		std::as_const(instance), last_section_last_rva, false),
+		section.data()));
+}
+
+TEST_P(SectionDataFromRvaFullFixture, SectionDataFromRvaCutVirtualBuffer)
+{
+	auto& section = instance.get_section_data_list()[1];
+	section.copied_data().resize(section.copied_data().size() - 0x10u);
+	const std::uint32_t second_section_size = static_cast<std::uint32_t>(
+		section.copied_data().size());
+	//TODO
+	EXPECT_TRUE(buffers_equal(section_data_from_address(
+		std::as_const(instance), second_section_rva + second_section_size, false),
+		buffers::reduce(section.data(), second_section_size)));
 }
 
 TEST(SectionDataFromRvaFull, SectionDataFromVaTest)
@@ -195,6 +214,17 @@ INSTANTIATE_TEST_SUITE_P(
 		function_type::va32,
 		function_type::va64
 	));
+
+TEST_P(SectionDataFromRvaWithSizeFixture, SectionDataFromRvaCutBuffer)
+{
+	auto& section = instance.get_section_data_list()[1];
+	section.copied_data().resize(section.copied_data().size() - 0x10u);
+	const std::uint32_t second_section_size = static_cast<std::uint32_t>(
+		section.copied_data().size());
+	EXPECT_TRUE(buffers_equal(section_data_from_address(
+		std::as_const(instance), second_section_rva, second_section_size, false),
+		section.data()));
+}
 
 TEST_P(SectionDataFromRvaWithSizeFixture, SectionDataFromRvaTestNonConst1)
 {

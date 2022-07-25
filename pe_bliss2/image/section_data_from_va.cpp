@@ -47,10 +47,16 @@ data_result<std::is_const_v<Image>> section_data_from_rva_impl(
 
 	auto [header_it, data_it] = section_from_rva(instance, rva, 1u);
 	if (data_it == std::cend(instance.get_section_data_list()))
-		throw pe_error(image_errc::section_data_does_not_exist);
+	{
+		auto [empty_header_it, empty_data_it] = section_from_rva(instance, rva, 0u);
+		if (empty_data_it == std::cend(instance.get_section_data_list()))
+			throw pe_error(image_errc::section_data_does_not_exist);
+
+		return { empty_data_it->get_buffer(), empty_data_it->size(), 0u };
+	}
 
 	std::uint32_t data_offset = rva - header_it->get_rva();
-	if (data_it->size() <= data_offset)
+	if (data_it->size() < data_offset)
 		throw pe_error(image_errc::section_data_does_not_exist);
 
 	return { data_it->get_buffer(), data_offset, data_it->size() - data_offset };

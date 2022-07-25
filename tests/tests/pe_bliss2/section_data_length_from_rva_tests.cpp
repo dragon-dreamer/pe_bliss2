@@ -47,6 +47,15 @@ TEST(SectionDataLengthFromRvaTests, SectionDataLengthFromRvaTest2)
 		0x3000u);
 }
 
+TEST(SectionDataLengthFromRvaTests, SectionDataLengthFromVaSectionEntTest)
+{
+	auto instance = create_test_image({});
+
+	static constexpr std::uint32_t last_section_last_rva = 0x7000u;
+	EXPECT_EQ(section_data_length_from_rva(instance, last_section_last_rva, false, true),
+		0u);
+}
+
 namespace
 {
 template<typename T>
@@ -105,6 +114,18 @@ TYPED_TEST(SectionDataLengthFromRvaTypedTests, SectionDataLengthFromVaTest2)
 		0u);
 	EXPECT_EQ(section_data_length_from_va(instance, image_base + 0x4000u, false, true),
 		0x3000u);
+}
+
+TYPED_TEST(SectionDataLengthFromRvaTypedTests, SectionDataLengthFromVaSectionEntTest)
+{
+	using va_type = typename TestFixture::type;
+	test_image_options options;
+	auto instance = create_test_image(options);
+	va_type image_base = options.image_base;
+
+	static constexpr std::uint32_t last_section_last_rva = 0x7000u;
+	EXPECT_EQ(section_data_length_from_va(instance,
+		image_base + last_section_last_rva, false, true), 0u);
 }
 
 TEST(SectionDataLengthFromRvaTests, SectionDataLengthFromVaTest3)
