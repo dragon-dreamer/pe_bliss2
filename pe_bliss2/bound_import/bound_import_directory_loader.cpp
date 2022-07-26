@@ -72,10 +72,13 @@ rva_type read_bound_import_entry(rva_type current_rva, rva_type start_rva,
 }
 
 template<typename Entry>
-void check_name_offset(Entry& entry, rva_type start_rva, std::uint64_t descriptors_end_rva)
+void check_name_offset(Entry& entry, std::uint32_t descriptors_end_offset)
 {
+	if (entry.has_errors())
+		return;
+
 	auto offset = entry.get_descriptor()->offset_module_name;
-	if (offset >= start_rva && offset < descriptors_end_rva)
+	if (offset < descriptors_end_offset)
 		entry.add_error(bound_import_directory_loader_errc::name_offset_overlaps_descriptors);
 }
 
@@ -155,14 +158,14 @@ std::optional<bound_library_details_list> load(const image::image& instance,
 	{
 	}
 
-	auto descriptors_end_rva = (descriptor_count + 1u)
-		* static_cast<std::uint64_t>(
+	auto descriptors_end_offset = (descriptor_count + 1u)
+		* static_cast<std::uint32_t>(
 			bound_library_details_list::value_type::packed_descriptor_type::packed_size);
 	for (auto& entry : list)
 	{
-		check_name_offset(entry, start_rva, descriptors_end_rva);
+		check_name_offset(entry, descriptors_end_offset);
 		for (auto& ref : entry.get_references())
-			check_name_offset(ref, start_rva, descriptors_end_rva);
+			check_name_offset(ref, descriptors_end_offset);
 	}
 
 	return result;
