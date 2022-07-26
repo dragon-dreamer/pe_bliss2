@@ -28,6 +28,8 @@ struct bound_import_directory_loader_error_category : std::error_category
 			return "Invalid bound import library name";
 		case name_offset_overlaps_descriptors:
 			return "Library name offset overlaps bound import descriptors";
+		case invalid_bound_import_entry:
+			return "Invalid bound import entry";
 		default:
 			return {};
 		}
@@ -44,7 +46,8 @@ rva_type read_bound_import_entry(rva_type current_rva, rva_type start_rva,
 	const image::image& instance, const loader_options& options, ListElem& elem)
 {
 	auto& descriptor = elem.get_descriptor();
-	struct_from_rva(instance, current_rva, descriptor, options.include_headers, options.allow_virtual_data);
+	struct_from_rva(instance, current_rva, descriptor,
+		options.include_headers, options.allow_virtual_data);
 	current_rva += descriptor.packed_size;
 	if (!descriptor->offset_module_name)
 		return current_rva;
@@ -53,27 +56,75 @@ rva_type read_bound_import_entry(rva_type current_rva, rva_type start_rva,
 	if (!utilities::math::add_if_safe<rva_type>(name_rva, descriptor->offset_module_name))
 	{
 		elem.add_error(bound_import_directory_loader_errc::invalid_library_name);
+		return current_rva;
 	}
-	else
+
+	try
 	{
-		try
-		{
-			string_from_rva(instance, name_rva, elem.get_library_name(),
-				options.include_headers, options.allow_virtual_data);
-		}
-		catch (const pe_error&)
-		{
-			elem.add_error(bound_import_directory_loader_errc::invalid_library_name);
-		}
+		string_from_rva(instance, name_rva, elem.get_library_name(),
+			options.include_headers, options.allow_virtual_data);
+	}
+	catch (const std::system_error&)
+	{
+		elem.add_error(bound_import_directory_loader_errc::invalid_library_name);
 	}
 	return current_rva;
 }
 
 template<typename Entry>
-void check_name_offset(Entry& entry, rva_type descriptors_end_rva)
+void check_name_offset(Entry& entry, rva_type start_rva, std::uint64_t descriptors_end_rva)
 {
-	if (entry.get_descriptor()->offset_module_name < descriptors_end_rva)
+	auto offset = entry.get_descriptor()->offset_module_name;
+	if (offset >= start_rva && offset < descriptors_end_rva)
 		entry.add_error(bound_import_directory_loader_errc::name_offset_overlaps_descriptors);
+}
+
+bool load_next_entry(rva_type start_rva, const image::image& instance,
+	const loader_options& options, bound_library_details_list& list,
+	rva_type& current_rva, std::uint32_t& descriptor_count)
+{
+	auto& elem = list.emplace_back();
+	const auto& descriptor = elem.get_descriptor();
+	try
+	{
+		current_rva = read_bound_import_entry(
+			current_rva, start_rva, instance, options, elem);
+		++descriptor_count;
+	}
+	catch (const std::system_error&)
+	{
+		elem.add_error(bound_import_directory_loader_errc::invalid_bound_import_entry);
+		return false;
+	}
+
+	if (!descriptor->offset_module_name)
+	{
+		list.pop_back();
+		--descriptor_count;
+		return false;
+	}
+
+	auto& references = elem.get_references();
+	for (std::uint32_t i = 0; i != descriptor->number_of_module_forwarder_refs; ++i)
+	{
+		auto& ref = references.emplace_back();
+		try
+		{
+			current_rva = read_bound_import_entry(
+				current_rva, start_rva, instance, options, ref);
+		}
+		catch (const std::system_error&)
+		{
+			ref.add_error(bound_import_directory_loader_errc::invalid_bound_import_entry);
+			return false;
+		}
+
+		if (!ref.get_descriptor()->offset_module_name)
+			ref.add_error(bound_import_directory_loader_errc::invalid_library_name);
+	}
+
+	descriptor_count += descriptor->number_of_module_forwarder_refs;
+	return true;
 }
 
 } //namespace
@@ -93,45 +144,25 @@ std::optional<bound_library_details_list> load(const image::image& instance,
 	if (!instance.get_data_directories().has_bound_import())
 		return result;
 
-	const auto& bound_import_dir_info = instance.get_data_directories().get_directory(
-		core::data_directories::directory_type::bound_import);
+	auto& list = result.emplace();
 
-	result.emplace();
-	auto& list = *result;
-
-	auto start_rva = bound_import_dir_info->virtual_address;
+	auto start_rva = instance.get_data_directories().get_directory(
+		core::data_directories::directory_type::bound_import)->virtual_address;
 	auto current_rva = start_rva;
 	std::uint32_t descriptor_count = 0;
-	while (true)
+	while (load_next_entry(start_rva, instance, options,
+		list, current_rva, descriptor_count))
 	{
-		auto& elem = list.emplace_back();
-		const auto& descriptor = elem.get_descriptor();
-		current_rva = read_bound_import_entry(current_rva, start_rva, instance, options, elem);
-		if (!descriptor->offset_module_name)
-		{
-			list.pop_back();
-			break;
-		}
-
-		auto& references = elem.get_references();
-		for (std::uint16_t i = 0; i != descriptor->number_of_module_forwarder_refs; ++i)
-		{
-			auto& ref = references.emplace_back();
-			current_rva = read_bound_import_entry(current_rva, start_rva, instance, options, ref);
-			if (!ref.get_descriptor()->offset_module_name)
-				ref.add_error(bound_import_directory_loader_errc::invalid_library_name);
-		}
-
-		descriptor_count += 1 + descriptor->number_of_module_forwarder_refs;
 	}
 
-	rva_type descriptors_end_rva = (descriptor_count + 1)
-		* bound_library_details_list::value_type::packed_descriptor_type::packed_size;
+	auto descriptors_end_rva = (descriptor_count + 1u)
+		* static_cast<std::uint64_t>(
+			bound_library_details_list::value_type::packed_descriptor_type::packed_size);
 	for (auto& entry : list)
 	{
-		check_name_offset(entry, descriptors_end_rva);
+		check_name_offset(entry, start_rva, descriptors_end_rva);
 		for (auto& ref : entry.get_references())
-			check_name_offset(ref, descriptors_end_rva);
+			check_name_offset(ref, start_rva, descriptors_end_rva);
 	}
 
 	return result;

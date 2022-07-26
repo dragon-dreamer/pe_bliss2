@@ -17,19 +17,20 @@ namespace pe_bliss::bound_import
 enum class bound_import_directory_loader_errc
 {
 	invalid_library_name = 1,
-	name_offset_overlaps_descriptors
+	name_offset_overlaps_descriptors,
+	invalid_bound_import_entry
 };
 
 std::error_code make_error_code(bound_import_directory_loader_errc) noexcept;
 
-struct loader_options
+struct [[nodiscard]] loader_options
 {
 	bool include_headers = true;
 	bool allow_virtual_data = false;
 };
 
 std::optional<bound_library_details_list> load(const image::image& instance,
-	const loader_options& options);
+	const loader_options& options = {});
 
 } //namespace pe_bliss::bound_import
 
