@@ -209,6 +209,7 @@
     <ClCompile Include="tests\pe_bliss2\packed_struct_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\packed_utf16_string_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\pe_error_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\relocation_entry_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\rich_header_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\rva_file_offset_converter_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\section_data_length_from_rva_tests.cpp" />
