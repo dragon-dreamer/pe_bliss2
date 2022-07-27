@@ -1,5 +1,7 @@
 #include "pe_bliss2/relocations/relocation_entry.h"
 
+#include <cassert>
+#include <string>
 #include <system_error>
 
 #include "pe_bliss2/pe_error.h"
@@ -23,6 +25,8 @@ struct relocation_entry_error_category : std::error_category
 			return "Relocation parameter is required for this type of relocation, but absent";
 		case unsupported_relocation_type:
 			return "Unsupported relocation type";
+		case too_large_relocation_address:
+			return "Too large relocation address";
 		default:
 			return {};
 		}
@@ -57,14 +61,18 @@ relocation_entry::address_type relocation_entry::get_address() const noexcept
 	return static_cast<address_type>(descriptor_.get() & 0xfffu);
 }
 
-void relocation_entry::set_address(address_type address) noexcept
+void relocation_entry::set_address(address_type address)
 {
+	static constexpr std::uint16_t max_address = 0xfffu;
+	if (address > max_address)
+		throw pe_error(relocation_entry_errc::too_large_relocation_address);
+
 	descriptor_.get() &= ~0xfffu;
 	descriptor_.get() |= address;
 }
 
 std::uint64_t relocation_entry::apply_to(std::uint64_t value,
-	std::uint64_t real_base_image_base_diff) const
+	std::uint64_t image_base_difference) const
 {
 	using enum relocation_type;
 	switch (get_type())
@@ -73,25 +81,29 @@ std::uint64_t relocation_entry::apply_to(std::uint64_t value,
 		return value;
 
 	case highlow:
-		return static_cast<std::uint32_t>(value + real_base_image_base_diff);
+		assert(value <= (std::numeric_limits<std::uint32_t>::max)());
+		return static_cast<std::uint32_t>(value + image_base_difference);
 
 	case dir64:
-		return value + real_base_image_base_diff;
+		return value + image_base_difference;
 
 	case high:
-		return static_cast<std::uint16_t>(((value >> 16u) + (real_base_image_base_diff >> 16u)) << 16u);
+		assert(value <= (std::numeric_limits<std::uint16_t>::max)());
+		return static_cast<std::uint16_t>(value + (image_base_difference >> 16u));
 
 	case low:
-		return static_cast<std::uint16_t>(value + real_base_image_base_diff);
+		assert(value <= (std::numeric_limits<std::uint16_t>::max)());
+		return static_cast<std::uint16_t>(value + image_base_difference);
 
 	case highadj:
 	{
 		if (!param_)
 			throw pe_error(relocation_entry_errc::relocation_param_is_absent);
 
-		std::uint32_t result = static_cast<std::uint16_t>(value << 16u);
+		assert(value <= (std::numeric_limits<std::uint16_t>::max)());
+		std::uint32_t result = static_cast<std::uint32_t>(value) << 16u;
 		result += param_->get();
-		result += static_cast<std::uint32_t>(real_base_image_base_diff);
+		result += static_cast<std::uint32_t>(image_base_difference);
 		result += 0x8000u;
 		return static_cast<std::uint16_t>(result >> 16u);
 	}
@@ -114,7 +126,7 @@ std::uint8_t relocation_entry::get_affected_size_in_bytes() const
 	switch (get_type())
 	{
 	case absolute:
-		return 0;
+		return 0u;
 
 	case highlow:
 	case highadj:

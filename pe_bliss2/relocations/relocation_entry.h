@@ -16,7 +16,8 @@ namespace pe_bliss::relocations
 enum class relocation_entry_errc
 {
 	relocation_param_is_absent = 1,
-	unsupported_relocation_type
+	unsupported_relocation_type,
+	too_large_relocation_address
 };
 
 std::error_code make_error_code(relocation_entry_errc) noexcept;
@@ -39,12 +40,14 @@ enum class relocation_type : std::uint8_t
 	high3adj = 11
 };
 
-class relocation_entry
+class [[nodiscard]] relocation_entry
 {
 public:
-	using packed_descriptor_type = packed_struct<detail::relocations::type_or_offset_entry>;
+	using packed_descriptor_type = packed_struct<
+		detail::relocations::type_or_offset_entry>;
 	using address_type = std::uint16_t;
-	using optional_param_type = std::optional<packed_struct<std::uint16_t>>;
+	using optional_param_type = std::optional<
+		packed_struct<std::uint16_t>>;
 
 public:
 	[[nodiscard]]
@@ -79,11 +82,13 @@ public:
 	[[nodiscard]]
 	address_type get_address() const noexcept;
 
-	void set_address(address_type address) noexcept;
+	void set_address(address_type address);
 
+	// image_base_difference is
+	// (real image base) minus (image base from image headers)
 	[[nodiscard("Discarding relocated value")]]
 	std::uint64_t apply_to(std::uint64_t value,
-		std::uint64_t real_base_image_base_diff) const;
+		std::uint64_t image_base_difference) const;
 
 	[[nodiscard]]
 	std::uint8_t get_affected_size_in_bytes() const;
@@ -99,7 +104,7 @@ private:
 	optional_param_type param_;
 };
 
-class relocation_entry_details
+class [[nodiscard]] relocation_entry_details
 	: public relocation_entry
 	, public error_list
 {
