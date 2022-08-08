@@ -129,7 +129,6 @@ std::uint8_t relocation_entry::get_affected_size_in_bytes() const
 		return 0u;
 
 	case highlow:
-	case highadj:
 		return sizeof(std::uint32_t);
 
 	case dir64:
@@ -137,6 +136,7 @@ std::uint8_t relocation_entry::get_affected_size_in_bytes() const
 
 	case high:
 	case low:
+	case highadj:
 		return sizeof(std::uint16_t);
 
 	case thumb_mov32:
