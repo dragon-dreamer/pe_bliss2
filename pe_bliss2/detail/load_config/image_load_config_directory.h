@@ -164,6 +164,7 @@ struct extended_flow_guard32
 	std::uint32_t guard_xfg_table_dispatch_function_pointer;
 };
 
+//Vibranium 4 (21H2)
 //CastGuard OS determined failure mode
 //CastGuard: Checks for static casts of objects to prevent illegal downcasts.
 //Causes illegal casts to fast fail.
@@ -171,6 +172,12 @@ struct extended_flow_guard32
 struct cast_guard_os_determined_failure_mode32
 {
 	std::uint32_t cast_guard_os_determined_failure_mode; // VA
+};
+
+//Windows 10 version 22H2 (?)
+struct guard_memcpy_function_pointer32
+{
+	std::uint32_t guard_memcpy_function_pointer; // VA
 };
 
 struct image_load_config_directory32
@@ -191,6 +198,7 @@ struct image_load_config_directory32
 	guard_exception_handling32 guard_exception_handling;
 	extended_flow_guard32 extended_flow_guard;
 	cast_guard_os_determined_failure_mode32 mode;
+	guard_memcpy_function_pointer32 memcpy_function_pointer;
 };
 
 struct image_load_config_directory_base64
@@ -291,10 +299,16 @@ struct extended_flow_guard64
 	std::uint64_t guard_xfg_table_dispatch_function_pointer;
 };
 
-//CastGuard OS determined failure mode
+//Vibranium 4 (21H2)
 struct cast_guard_os_determined_failure_mode64
 {
 	std::uint64_t cast_guard_os_determined_failure_mode; // VA
+};
+
+//Windows 10 version 22H2 (?)
+struct guard_memcpy_function_pointer64
+{
+	std::uint64_t guard_memcpy_function_pointer; // VA
 };
 
 struct image_load_config_directory64
@@ -315,6 +329,7 @@ struct image_load_config_directory64
 	guard_exception_handling64 guard_exception_handling;
 	extended_flow_guard64 extended_flow_guard;
 	cast_guard_os_determined_failure_mode64 mode;
+	guard_memcpy_function_pointer64 memcpy_function_pointer;
 };
 
 struct image_dynamic_relocation_table
