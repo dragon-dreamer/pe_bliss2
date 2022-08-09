@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <climits>
 
 #include "pe_bliss2/core/optional_header.h"
 #include "pe_bliss2/detail/packed_serialization.h"
@@ -22,7 +23,7 @@ class ImageRebaseTestFixture : public ::testing::Test
 public:
 	ImageRebaseTestFixture()
 		: instance(create_test_image({ .start_section_rva = section_rva,
-			.sections = { { section_size, section_size } } }))
+			.sections = { { virtual_section_size, raw_section_size } } }))
 	{
 		instance.get_optional_header().initialize_with<
 			core::optional_header::optional_header_64_type>();
@@ -74,7 +75,8 @@ public:
 
 public:
 	static constexpr std::uint32_t section_rva = 0x1000u;
-	static constexpr std::uint32_t section_size = 0x1000u;
+	static constexpr std::uint32_t raw_section_size = 0x1000u;
+	static constexpr std::uint32_t virtual_section_size = 0x2000u;
 	static constexpr std::uint32_t rel_absolute_offset = 0u;
 	static constexpr std::uint32_t rel_highlow_offset = 4u;
 	static constexpr std::uint32_t rel_high_offset = 8u;
@@ -109,7 +111,7 @@ TEST_F(ImageRebaseTestFixture, RebaseEmpty)
 	EXPECT_NO_THROW(relocations::rebase(instance,
 		relocations::base_relocation_list{}, { .new_base = new_image_base }));
 	EXPECT_EQ(instance.get_section_data_list()[0].copied_data(),
-		std::vector<std::byte>(section_size));
+		std::vector<std::byte>(raw_section_size));
 }
 
 TEST_F(ImageRebaseTestFixture, Rebase)
@@ -149,7 +151,7 @@ TEST_F(ImageRebaseTestFixture, RebaseInvalid)
 		relocations::rebase(instance, dir, {});
 	}, relocations::relocation_entry_errc::unsupported_relocation_type);
 	EXPECT_EQ(instance.get_section_data_list()[0].copied_data(),
-		std::vector<std::byte>(section_size));
+		std::vector<std::byte>(raw_section_size));
 }
 
 TEST_F(ImageRebaseTestFixture, RebaseAbsentData)
@@ -170,7 +172,6 @@ TEST_F(ImageRebaseTestFixture, RebaseAbsentData)
 
 TEST_F(ImageRebaseTestFixture, RebaseVirtualDataError)
 {
-	
 	auto dir = create_relocation_directory();
 
 	relocations::relocation_entry entry;
@@ -178,10 +179,40 @@ TEST_F(ImageRebaseTestFixture, RebaseVirtualDataError)
 	entry.set_address(0u);
 	auto& reloc = dir.emplace_back();
 	reloc.get_relocations().emplace_back(entry);
-	reloc.get_descriptor()->virtual_address = section_rva + section_size - 3u;
+	reloc.get_descriptor()->virtual_address
+		= section_rva + virtual_section_size - 3u;
 
 	expect_throw_pe_error([this, &dir] {
 		relocations::rebase(instance, dir, { .ignore_virtual_data = true });
 	}, relocations::rebase_errc::unable_to_rebase_inexistent_data);
-	
+}
+
+TEST_F(ImageRebaseTestFixture, RebaseVirtualDataIgnored)
+{
+	auto dir = create_relocation_directory();
+
+	relocations::relocation_entry entry;
+	entry.set_type(relocations::relocation_type::dir64);
+	entry.set_address(0u);
+	auto& reloc = dir.emplace_back();
+	reloc.get_relocations().emplace_back(entry);
+	reloc.get_descriptor()->virtual_address
+		= section_rva + raw_section_size - 3u;
+
+	expect_throw_pe_error([this, &dir] {
+		relocations::rebase(instance, dir, { .ignore_virtual_data = false });
+	}, relocations::rebase_errc::unable_to_rebase_inexistent_data);
+
+	EXPECT_NO_THROW(relocations::rebase(instance, dir, {
+		.new_base = new_image_base,
+		.ignore_virtual_data = true
+	}));
+
+	const auto& data = instance.get_section_data_list()[0].copied_data();
+	std::uint64_t delta = new_image_base - image_base;
+	auto end = data.cend();
+	// 3 bytes are physical, check them
+	EXPECT_EQ(*--end, static_cast<std::byte>((delta & 0xff0000ull) >> (CHAR_BIT * 2u)));
+	EXPECT_EQ(*--end, static_cast<std::byte>((delta & 0xff00ull) >> (CHAR_BIT * 1u)));
+	EXPECT_EQ(*--end, static_cast<std::byte>((delta & 0xffull)));
 }
