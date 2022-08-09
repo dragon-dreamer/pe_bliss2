@@ -7,7 +7,7 @@
 
 namespace buffers
 {
-class input_buffer_interface;
+class input_buffer_stateful_wrapper_ref;
 } //namespace buffers
 
 namespace pe_bliss::rich
@@ -24,7 +24,7 @@ enum class rich_header_loader_errc
 std::error_code make_error_code(rich_header_loader_errc) noexcept;
 
 // buffer should contain DOS stub data
-std::optional<rich_header> load(buffers::input_buffer_interface& buffer);
+std::optional<rich_header> load(buffers::input_buffer_stateful_wrapper_ref& buffer);
 
 } // namespace pe_bliss::rich
 

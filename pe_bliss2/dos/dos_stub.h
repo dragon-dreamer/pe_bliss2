@@ -4,8 +4,12 @@
 #include <system_error>
 #include <type_traits>
 
-#include "buffers/input_buffer_interface.h"
 #include "buffers/ref_buffer.h"
+
+namespace buffers
+{
+class input_buffer_stateful_wrapper;
+} //namespace buffers
 
 namespace pe_bliss::dos
 {
@@ -31,12 +35,14 @@ public:
 	using ref_buffer::data;
 	using ref_buffer::copied_data;
 	using ref_buffer::copy_referenced_buffer;
-	using ref_buffer::empty;
+	using ref_buffer::virtual_size;
+	using ref_buffer::physical_size;
+	using ref_buffer::is_stateless;
 	using ref_buffer::size;
 	using ref_buffer::is_copied;
 
 	//When deserializing, buf should point to DOS stub start (right after DOS header)
-	void deserialize(const buffers::input_buffer_ptr& buffer,
+	void deserialize(buffers::input_buffer_stateful_wrapper& buffer,
 		const dos_stub_load_options& options);
 };
 

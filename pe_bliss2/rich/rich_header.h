@@ -13,7 +13,7 @@
 
 namespace buffers
 {
-class input_buffer_interface;
+class input_buffer_stateful_wrapper_ref;
 } //namespace buffers
 
 namespace pe_bliss::rich
@@ -81,7 +81,7 @@ public:
 	//with already serialized DOS header and DOS stub.
 	[[nodiscard]]
 	checksum_type calculate_checksum(
-		buffers::input_buffer_interface& image_buffer) const;
+		buffers::input_buffer_stateful_wrapper_ref& image_buffer) const;
 
 private:
 	checksum_type checksum_ = 0;

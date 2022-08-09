@@ -115,8 +115,9 @@ void load_extended_unwind_record(const image::image& instance, const LoaderOptio
 				if (current_rva + (code.length - 1u) > last_rva)
 					throw pe_error(exception_directory_loader_errc::invalid_unwind_info);
 
+				//Set allow_virtual_data=true, as the check is done on the next line
 				auto bytes_read = section_data_from_rva(instance, current_rva.value(),
-					options.include_headers)->read(code.length - 1u, &descriptor.value()[1]);
+					options.include_headers, true)->read(0u, code.length - 1u, &descriptor.value()[1]);
 				//TODO: add error to uwop code and not the func
 				if (bytes_read != code.length - 1u && !options.allow_virtual_data)
 					func.add_error(exception_directory_loader_errc::invalid_runtime_function_entry);

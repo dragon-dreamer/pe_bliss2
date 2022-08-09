@@ -17,7 +17,7 @@ rva_type bytes_to_rva(image& instance, rva_type rva, const ArrayOrVector& arr,
 		return rva;
 
 	auto buf = section_data_from_rva(instance, rva, include_headers);
-	return rva + static_cast<rva_type>(
+	return static_cast<rva_type>(rva +
 		arr.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
 }
 
@@ -29,7 +29,7 @@ Va bytes_to_va(image& instance, Va va, const ArrayOrVector& arr,
 		return va;
 
 	auto buf = section_data_from_va(instance, va, include_headers);
-	return va + static_cast<Va>(
+	return static_cast<Va>(va +
 		arr.serialize(buf.data(), buf.size_bytes(), write_virtual_part));
 }
 

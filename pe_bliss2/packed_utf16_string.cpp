@@ -8,7 +8,7 @@
 
 #include <boost/endian/conversion.hpp>
 
-#include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/output_buffer_interface.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
@@ -20,7 +20,7 @@ static_assert(sizeof(packed_utf16_string::string_type::value_type)
 	== sizeof(std::uint16_t),
 	"This facility only supports strings with size of a character equal to 2 bytes");
 
-void packed_utf16_string::deserialize(buffers::input_buffer_interface& buf,
+void packed_utf16_string::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 	bool allow_virtual_memory)
 {
 	buffers::serialized_data_state state(buf);

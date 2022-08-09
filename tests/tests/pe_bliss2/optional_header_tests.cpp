@@ -4,10 +4,13 @@
 #include <cstddef>
 #include <cstdint>
 #include <iterator>
+#include <memory>
 #include <type_traits>
 #include <vector>
 
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_virtual_buffer.h"
 #include "buffers/output_memory_buffer.h"
 
 #include "pe_bliss2/core/optional_header.h"
@@ -290,25 +293,27 @@ TYPED_TEST(OptionalHeaderTests, SerializeDeserializeTest)
 	if constexpr (TestFixture::is_32bit)
 		header_data[1] = '\x01';
 
-	buffers::input_memory_buffer buf(
+	auto buf = std::make_shared<buffers::input_memory_buffer>(
 		reinterpret_cast<const std::byte*>(header_data),
 		std::size(header_data) - 1);
+	buffers::input_buffer_stateful_wrapper_ref ref(*buf);
 
 	{
 		optional_header header;
-		expect_throw_pe_error([&header, &buf] { header.deserialize(buf, false); },
+		expect_throw_pe_error([&header, &ref] { header.deserialize(ref, false); },
 			optional_header_errc::unable_to_read_optional_header);
 	}
 	{
-		buf.set_rpos(1);
+		ref.set_rpos(1);
 		optional_header header;
-		expect_throw_pe_error([&header, &buf] { header.deserialize(buf, false); },
+		expect_throw_pe_error([&header, &ref] { header.deserialize(ref, false); },
 			optional_header_errc::invalid_pe_magic);
 	}
 	{
-		buf.set_rpos(0);
+		buffers::input_virtual_buffer virtual_buffer(buf, 1000u);
+		buffers::input_buffer_stateful_wrapper_ref virtual_ref(virtual_buffer);
 		optional_header header;
-		ASSERT_NO_THROW(header.deserialize(buf, true));
+		ASSERT_NO_THROW(header.deserialize(virtual_ref, true));
 		EXPECT_EQ(header.get_magic(), TestFixture::is_32bit
 			? optional_header::magic::pe32 : optional_header::magic::pe64);
 		EXPECT_EQ(header.get_raw_major_linker_version(), 0x12u);
@@ -317,7 +322,7 @@ TYPED_TEST(OptionalHeaderTests, SerializeDeserializeTest)
 		std::vector<std::byte> outdata;
 		buffers::output_memory_buffer outbuf(outdata);
 		ASSERT_NO_THROW(header.serialize(outbuf, false));
-		ASSERT_EQ(outdata.size(), buf.size());
+		ASSERT_EQ(outdata.size(), buf->size());
 		EXPECT_TRUE(std::equal(outdata.cbegin(), outdata.cend(),
 			reinterpret_cast<const std::byte*>(header_data)));
 	}

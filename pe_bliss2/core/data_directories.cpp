@@ -9,7 +9,7 @@
 
 #include "pe_bliss2/pe_error.h"
 
-#include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/output_buffer_interface.h"
 
 namespace
@@ -47,7 +47,7 @@ std::error_code make_error_code(data_directories_errc e) noexcept
 	return { static_cast<int>(e), data_directories_error_category_instance };
 }
 
-void data_directories::deserialize(buffers::input_buffer_interface& buf,
+void data_directories::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 	std::uint32_t number_of_rva_and_sizes, bool allow_virtual_memory)
 {
 	directories_.clear();
@@ -61,7 +61,7 @@ void data_directories::deserialize(buffers::input_buffer_interface& buf,
 		{
 			directories_[i].deserialize(buf, allow_virtual_memory);
 		}
-		catch (...)
+		catch (const std::system_error&)
 		{
 			std::throw_with_nested(pe_error(
 				data_directories_errc::unable_to_read_data_directory));

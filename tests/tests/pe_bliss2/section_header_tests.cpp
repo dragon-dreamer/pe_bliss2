@@ -4,6 +4,7 @@
 #include <iterator>
 
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 
 #include "pe_bliss2/section/section_errc.h"
 #include "pe_bliss2/section/section_header.h"
@@ -349,8 +350,9 @@ TEST(SectionHeaderTests, DeserializeErrorTest)
 	section_header header;
 	buffers::input_memory_buffer buf(
 		reinterpret_cast<const std::byte*>(""), 0u);
+	buffers::input_buffer_stateful_wrapper_ref ref(buf);
 	expect_throw_pe_error(
-		[&header, &buf] { header.deserialize(buf, false); },
+		[&header, &ref] { header.deserialize(ref, false); },
 		section_errc::unable_to_read_section_table);
 }
 

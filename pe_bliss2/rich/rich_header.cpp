@@ -7,7 +7,7 @@
 #include <string>
 #include <system_error>
 
-#include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 
 #include "pe_bliss2/detail/image_dos_header.h"
 #include "pe_bliss2/detail/packed_reflection.h"
@@ -57,7 +57,7 @@ std::error_code make_error_code(rich_header_errc e) noexcept
 }
 
 rich_header::checksum_type rich_header::calculate_checksum(
-	buffers::input_buffer_interface& image_buffer) const
+	buffers::input_buffer_stateful_wrapper_ref& image_buffer) const
 {
 	static constexpr auto e_lfanew_offset = detail::packed_reflection
 		::get_field_offset<&detail::image_dos_header::e_lfanew>();

@@ -20,7 +20,7 @@ class BoundImportLoaderTestFixture : public ::testing::Test
 public:
 	BoundImportLoaderTestFixture()
 		: instance(create_test_image({ .start_section_rva = section_rva,
-			.sections = { { 0x1000u, 0x1000u } } }))
+			.sections = { { section_virtual_size, section_raw_size } } }))
 	{
 		instance.get_section_data_list()[0].data()
 			->set_absolute_offset(absolute_offset);
@@ -37,7 +37,7 @@ public:
 	{
 		instance.get_data_directories().get_directory(
 			core::data_directories::directory_type::bound_import).get()
-			= { .virtual_address = section_rva + section_virtual_size - 5u,
+			= { .virtual_address = section_rva + section_raw_size - 5u,
 			.size = 0x500u };
 	}
 
@@ -72,6 +72,7 @@ public:
 	static constexpr std::uint32_t absolute_offset = 0x1000u;
 	static constexpr std::uint32_t section_rva = 0x1000u;
 	static constexpr std::uint32_t section_virtual_size = 0x1000u;
+	static constexpr std::uint32_t section_raw_size = 0x800u;
 	static constexpr std::uint32_t module1_name_offset = 0x500;
 	static constexpr std::uint32_t module1_fwd1_name_offset = 0x510;
 	static constexpr std::uint32_t module1_fwd2_name_offset = 0x520;

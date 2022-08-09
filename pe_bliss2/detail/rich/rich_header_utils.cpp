@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <iterator>
 
-#include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 
 #include "pe_bliss2/detail/packed_serialization.h"
 #include "pe_bliss2/pe_error.h"
@@ -28,7 +28,7 @@ namespace pe_bliss::detail::rich
 {
 
 std::size_t rich_header_utils::find_checksum(
-	buffers::input_buffer_interface& buffer)
+	buffers::input_buffer_stateful_wrapper_ref& buffer)
 {
 	auto size = buffer.size();
 	auto pos = size;
@@ -62,7 +62,7 @@ std::size_t rich_header_utils::find_checksum(
 }
 
 rich_header_utils::checksum_type rich_header_utils::decode_checksum(
-	buffers::input_buffer_interface& buffer)
+	buffers::input_buffer_stateful_wrapper_ref& buffer)
 {
 	checksum_type result{};
 	std::array<std::byte, 4u> buf{};
@@ -72,7 +72,7 @@ rich_header_utils::checksum_type rich_header_utils::decode_checksum(
 }
 
 std::size_t rich_header_utils::find_dans_signature(
-	buffers::input_buffer_interface& buffer,
+	buffers::input_buffer_stateful_wrapper_ref& buffer,
 	checksum_type checksum)
 {
 	std::uint32_t dans{};
@@ -100,7 +100,7 @@ std::size_t rich_header_utils::find_dans_signature(
 }
 
 void rich_header_utils::decode_compids(
-	buffers::input_buffer_interface& buffer,
+	buffers::input_buffer_stateful_wrapper_ref& buffer,
 	std::size_t checksum_pos, checksum_type checksum,
 	std::vector<pe_bliss::rich::rich_compid>& compids)
 {

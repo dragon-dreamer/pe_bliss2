@@ -66,7 +66,7 @@ public:
 
 	auto get_data_span() const
 	{
-		return std::span(data.begin() + buffer_offset, data.end());;
+		return std::span(data.begin() + buffer_offset, data.end());
 	}
 
 	std::size_t validate_pe_headers() const
@@ -114,7 +114,6 @@ public:
 	image::image instance;
 	std::size_t full_headers_length{};
 	std::size_t buffer_offset{};
-
 };
 } //namespace
 

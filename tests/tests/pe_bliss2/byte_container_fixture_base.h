@@ -40,7 +40,8 @@ public:
 		for (auto byte : header_arr)
 			headers_data[offset++] = byte;
 
-		offset = static_cast<std::uint32_t>(section.size() - section_arr.size());
+		offset = static_cast<std::uint32_t>(
+			section.physical_size() - section_arr.size());
 		section_arr_offset = offset;
 		for (auto byte : section_arr)
 			section_data[offset++] = byte;

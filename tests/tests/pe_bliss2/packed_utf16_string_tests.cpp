@@ -2,6 +2,7 @@
 #include <array>
 #include <cstddef>
 #include <limits>
+#include <memory>
 #include <string>
 #include <system_error>
 #include <type_traits>
@@ -11,7 +12,9 @@
 #include "gtest/gtest.h"
 
 #include "buffers/input_buffer_state.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_virtual_buffer.h"
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/packed_utf16_string.h"
 
@@ -223,20 +226,19 @@ TEST(PackedUtf16StringTests, DeserializeTest)
 	{
 		buffers::input_memory_buffer buffer(
 			serialized_view.data(), serialized_view.size());
+		buffers::input_buffer_stateful_wrapper_ref ref(buffer);
 		buffer.set_absolute_offset(absolute_offset);
 		buffer.set_relative_offset(relative_offset);
 
-		expect_throw_pe_error([&] {
-			str.deserialize(buffer, false); },
-			utilities::generic_errc::buffer_overrun);
+		EXPECT_THROW(str.deserialize(ref, false), std::system_error);
 		EXPECT_EQ(str.value(), pe_bliss::packed_utf16_string::string_type{});
 		EXPECT_EQ(str.get_state(), buffers::serialized_data_state{});
 		EXPECT_EQ(str.physical_size(), 0u);
 		EXPECT_EQ(str.data_size(), 0u);
 		EXPECT_FALSE(str.is_virtual());
 
-		buffer.set_rpos(buffer_pos);
-		ASSERT_NO_THROW(str.deserialize(buffer, false));
+		ref.set_rpos(buffer_pos);
+		ASSERT_NO_THROW(str.deserialize(ref, false));
 
 		EXPECT_EQ(str.get_state().absolute_offset(), absolute_offset + buffer_pos);
 		EXPECT_EQ(str.get_state().relative_offset(), relative_offset + buffer_pos);
@@ -249,13 +251,14 @@ TEST(PackedUtf16StringTests, DeserializeTest)
 
 	{
 		static constexpr std::size_t cut_size = 5u;
-		buffers::input_memory_buffer buffer(
+		auto buffer = std::make_shared<buffers::input_memory_buffer>(
 			serialized_view.data() + sizeof(std::byte{}),
 			serialized_view.size() - sizeof(std::byte{}) - cut_size);
-		ASSERT_NO_THROW(str.deserialize(buffer, true));
-		EXPECT_EQ(buffer.rpos(), buffer.size());
+		buffers::input_virtual_buffer virtual_buffer(buffer, cut_size);
+		buffers::input_buffer_stateful_wrapper_ref ref(virtual_buffer);
+		ASSERT_NO_THROW(str.deserialize(ref, true));
 		EXPECT_TRUE(str.is_virtual());
-		EXPECT_EQ(str.physical_size(), buffer.size());
+		EXPECT_EQ(str.physical_size(), buffer->size());
 		EXPECT_EQ(str.data_size(), max_physical_size);
 
 		auto cut_deserialized_string = deserialized_string;
@@ -265,12 +268,14 @@ TEST(PackedUtf16StringTests, DeserializeTest)
 	}
 
 	{
-		buffers::input_memory_buffer buffer(
+		auto buffer = std::make_shared<buffers::input_memory_buffer>(
 			serialized_view.data() + sizeof(std::byte{}), 1u);
-		ASSERT_NO_THROW(str.deserialize(buffer, true));
-		EXPECT_EQ(buffer.rpos(), buffer.size());
+		buffers::input_virtual_buffer virtual_buffer(buffer,
+			serialized_view.size() - 1u);
+		buffers::input_buffer_stateful_wrapper_ref ref(virtual_buffer);
+		ASSERT_NO_THROW(str.deserialize(ref, true));
 		EXPECT_TRUE(str.is_virtual());
-		EXPECT_EQ(str.physical_size(), buffer.size());
+		EXPECT_EQ(str.physical_size(), buffer->size());
 		EXPECT_EQ(str.data_size(), max_physical_size);
 		EXPECT_EQ(str.value(), pe_bliss::packed_utf16_string::string_type{});
 	}

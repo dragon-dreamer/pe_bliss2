@@ -2,7 +2,7 @@
 
 #include <cstring>
 
-#include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/output_buffer_interface.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
@@ -11,7 +11,7 @@ namespace pe_bliss::detail
 {
 
 void packed_byte_array_base::deserialize_impl(
-	buffers::input_buffer_interface& buf, std::byte* data,
+	buffers::input_buffer_stateful_wrapper_ref& buf, std::byte* data,
 	std::size_t size, std::size_t max_size, bool allow_virtual_memory)
 {
 	if (size > max_size)

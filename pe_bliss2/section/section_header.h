@@ -11,7 +11,7 @@
 
 namespace buffers
 {
-class input_buffer_interface;
+class input_buffer_stateful_wrapper_ref;
 class output_buffer_interface;
 } //namespace buffers
 
@@ -45,7 +45,7 @@ public:
 
 public:
 	//When deserializing, buf should point to the image_section_header structure
-	void deserialize(buffers::input_buffer_interface& buf,
+	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 		bool allow_virtual_memory = false);
 	void serialize(buffers::output_buffer_interface& buf,
 		bool write_virtual_part = true) const;

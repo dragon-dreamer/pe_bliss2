@@ -20,36 +20,20 @@ std::size_t input_container_buffer::size()
 	return container_.size();
 }
 
-std::size_t input_container_buffer::read(std::size_t count, std::byte* data)
+std::size_t input_container_buffer::read(std::size_t pos,
+	std::size_t count, std::byte* data)
 {
-	if (pos_ > size()) //Container may be modified externally
-		pos_ = size();
+	if (!count)
+		return 0u;
 
-	count = (std::min)(count, size() - pos_);
-	std::memcpy(data, container_.data() + pos_, count);
-	pos_ += count;
+	if (!utilities::math::is_sum_safe(pos, count)
+		|| pos + count > container_.size())
+	{
+		throw std::system_error(utilities::generic_errc::buffer_overrun);
+	}
+
+	std::memcpy(data, container_.data() + pos, count);
 	return count;
-}
-
-void input_container_buffer::set_rpos(std::size_t pos)
-{
-	if (pos > size())
-		throw std::system_error(utilities::generic_errc::buffer_overrun);
-
-	pos_ = pos;
-}
-
-void input_container_buffer::advance_rpos(std::int32_t offset)
-{
-	auto new_pos = pos_;
-	if (!utilities::math::add_offset_if_safe(new_pos, offset))
-		throw std::system_error(utilities::generic_errc::buffer_overrun);
-	set_rpos(new_pos);
-}
-
-std::size_t input_container_buffer::rpos()
-{
-	return pos_;
 }
 
 } //namespace buffers

@@ -9,7 +9,7 @@
 
 #include <boost/endian/conversion.hpp>
 
-#include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/input_buffer_state.h"
 #include "buffers/output_buffer_interface.h"
 #include "pe_bliss2/detail/concepts.h"
@@ -47,7 +47,7 @@ public:
 		return *this;
 	}
 
-	void deserialize(buffers::input_buffer_interface& buf, bool allow_virtual_memory)
+	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf, bool allow_virtual_memory)
 	{
 		buffers::serialized_data_state state(buf);
 		std::array<std::byte, packed_size> data{};
@@ -62,7 +62,7 @@ public:
 		state_ = state;
 	}
 
-	void deserialize_until(buffers::input_buffer_interface& buf,
+	void deserialize_until(buffers::input_buffer_stateful_wrapper_ref& buf,
 		std::size_t size, bool allow_virtual_memory)
 	{
 		buffers::serialized_data_state state(buf);

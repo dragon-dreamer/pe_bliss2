@@ -6,11 +6,14 @@
 #include <cstring>
 #include <exception>
 #include <limits>
+#include <memory>
 #include <tuple>
 #include <utility>
 #include <vector>
 
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
+#include "buffers/input_virtual_buffer.h"
 #include "buffers/output_memory_buffer.h"
 
 #include "pe_bliss2/detail/image_section_header.h"
@@ -56,7 +59,8 @@ TEST(SectionTableTests, DeserializeTest1)
 	section_table table;
 	table.get_section_headers().emplace_back();
 	buffers::input_memory_buffer buf(nullptr, 0);
-	EXPECT_NO_THROW(table.deserialize(buf, 0u, true));
+	buffers::input_buffer_stateful_wrapper_ref ref(buf);
+	EXPECT_NO_THROW(table.deserialize(ref, 0u, true));
 	EXPECT_TRUE(table.get_section_headers().empty());
 }
 
@@ -72,8 +76,11 @@ bool operator==(const image_section_header& l,
 TEST(SectionTableTests, DeserializeTest2)
 {
 	section_table table;
-	buffers::input_memory_buffer buf(nullptr, 0);
-	ASSERT_NO_THROW(table.deserialize(buf, 3u, true));
+	auto buf = std::make_shared<buffers::input_memory_buffer>(nullptr, 0);
+	buffers::input_virtual_buffer virtual_buf(buf, 3u
+		* detail::packed_reflection::get_type_size<detail::image_section_header>());
+	buffers::input_buffer_stateful_wrapper_ref ref(virtual_buf);
+	ASSERT_NO_THROW(table.deserialize(ref, 3u, true));
 	EXPECT_EQ(table.get_section_headers().size(), 3u);
 	for (const auto& header : table.get_section_headers()) {
 		EXPECT_EQ(header.base_struct().get(), detail::image_section_header{});
@@ -135,9 +142,11 @@ constexpr std::array section_header_data{
 TEST(SectionTableTests, DeserializeTest3)
 {
 	section_table table;
-	buffers::input_memory_buffer buf(section_header_data.data(),
-		section_header_data.size());
-	ASSERT_NO_THROW(table.deserialize(buf, 3u, true));
+	auto buf = std::make_shared<buffers::input_memory_buffer>(
+		section_header_data.data(), section_header_data.size());
+	buffers::input_virtual_buffer virtual_buf(buf, 100u);
+	buffers::input_buffer_stateful_wrapper_ref ref(virtual_buf);
+	ASSERT_NO_THROW(table.deserialize(ref, 3u, true));
 	ASSERT_EQ(table.get_section_headers().size(), 3u);
 
 	const auto& headers = table.get_section_headers();
@@ -149,11 +158,13 @@ TEST(SectionTableTests, DeserializeTest3)
 TEST(SectionTableTests, DeserializeTest4)
 {
 	section_table table;
-	buffers::input_memory_buffer buf(section_header_data.data(),
-		section_header_data.size());
+	auto buf = std::make_shared<buffers::input_memory_buffer>(
+		section_header_data.data(), section_header_data.size());
+	buffers::input_virtual_buffer virtual_buf(buf, 100u);
+	buffers::input_buffer_stateful_wrapper_ref ref(virtual_buf);
 
 	expect_throw_pe_error([&]() {
-		table.deserialize(buf, 3u, false);
+		table.deserialize(ref, 3u, false);
 	}, section_errc::unable_to_read_section_table);
 
 	ASSERT_EQ(table.get_section_headers().size(), 2u);

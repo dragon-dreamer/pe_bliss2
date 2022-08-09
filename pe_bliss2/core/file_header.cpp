@@ -5,6 +5,7 @@
 #include <system_error>
 #include <type_traits>
 
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/pe_error.h"
 
@@ -51,14 +52,14 @@ std::size_t file_header::get_section_table_buffer_pos() const noexcept
 		+ base_struct().get_state().buffer_pos();
 }
 
-void file_header::deserialize(buffers::input_buffer_interface& buf,
+void file_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 	bool allow_virtual_memory)
 {
 	try
 	{
 		base_struct().deserialize(buf, allow_virtual_memory);
 	}
-	catch (...)
+	catch (const std::system_error&)
 	{
 		std::throw_with_nested(pe_error(
 			file_header_errc::unable_to_read_file_header));

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <vector>
 
 #include "buffers/input_buffer_interface.h"
@@ -9,7 +8,8 @@
 namespace buffers
 {
 
-class [[nodiscard]] input_container_buffer : public input_buffer_interface
+class [[nodiscard]] input_container_buffer final
+	: public input_buffer_interface
 {
 public:
 	using container_type = std::vector<std::byte>;
@@ -21,13 +21,8 @@ public:
 	[[nodiscard]]
 	virtual std::size_t size() override;
 
-	virtual std::size_t read(std::size_t count, std::byte* data) override;
-
-	virtual void set_rpos(std::size_t pos) override;
-	virtual void advance_rpos(std::int32_t offset) override;
-
-	[[nodiscard]]
-	virtual std::size_t rpos() override;
+	virtual std::size_t read(std::size_t pos,
+		std::size_t count, std::byte* data) override;
 
 	[[nodiscard]]
 	container_type& get_container() noexcept
@@ -43,7 +38,6 @@ public:
 
 private:
 	container_type container_;
-	std::size_t pos_ = 0;
 };
 
 } //namespace buffers

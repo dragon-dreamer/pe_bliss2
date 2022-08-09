@@ -4,6 +4,7 @@
 #include <memory>
 #include <system_error>
 
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/input_buffer_section.h"
 #include "pe_bliss2/pe_error.h"
 
@@ -42,26 +43,23 @@ std::error_code make_error_code(dos_stub_errc e) noexcept
 	return { static_cast<int>(e), dos_stub_error_category_instance };
 }
 
-void dos_stub::deserialize(const buffers::input_buffer_ptr& buffer,
+void dos_stub::deserialize(buffers::input_buffer_stateful_wrapper& buffer,
 	const dos_stub_load_options& options)
 {
 	try
 	{
-		auto buffer_pos = buffer->rpos();
+		auto buffer_pos = buffer.rpos();
 		auto dos_stub_size = options.e_lfanew <= buffer_pos
 			? 0u : options.e_lfanew - buffer_pos;
 		auto buffer_section = std::make_shared<buffers::input_buffer_section>(
-			buffer, buffer_pos, dos_stub_size);
+			buffer.get_buffer(), buffer_pos, dos_stub_size);
 		buffer_section->set_relative_offset(0);
 		ref_buffer::deserialize(buffer_section, options.copy_memory);
-		if (!options.copy_memory)
-		{
-			//Verify that enough data is available
-			//and position buffer pointer to the end of the stub
-			buffer->set_rpos(buffer_pos + dos_stub_size);
-		}
+
+		//Position buffer pointer to the end of the stub
+		buffer.set_rpos(buffer_pos + dos_stub_size);
 	}
-	catch (...)
+	catch (const std::system_error&)
 	{
 		std::throw_with_nested(pe_error(dos_stub_errc::unable_to_read_dos_stub));
 	}

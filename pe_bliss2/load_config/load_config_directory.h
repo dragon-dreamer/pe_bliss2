@@ -64,7 +64,8 @@ enum class version
 	volatile_metadata,
 	eh_guard,
 	xf_guard,
-	cast_guard_os_determined_failure_mode
+	cast_guard_os_determined_failure_mode,
+	guard_memcpy_function_pointer
 };
 
 const char* version_to_min_required_windows_version(version value) noexcept;

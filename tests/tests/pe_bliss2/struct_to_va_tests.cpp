@@ -48,14 +48,14 @@ public:
 	{
 		instance.update_full_headers_buffer();
 		auto& section = instance.get_section_data_list()[1];
-		section_struct_offset = static_cast<std::uint32_t>(section.size()
+		section_struct_offset = static_cast<std::uint32_t>(section.physical_size()
 			- test_struct_size);
 		test_image_options opts;
 		section_struct_rva = opts.sections[0].virtual_size
 			+ opts.start_section_rva + section_struct_offset;
 
 		header_struct_offset = static_cast<std::uint32_t>(
-			instance.get_full_headers_buffer().size()
+			instance.get_full_headers_buffer().physical_size()
 			- test_struct_size);
 	}
 

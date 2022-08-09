@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstddef>
-#include <cstdint>
 #include <memory>
 
 #include "buffers/buffer_interface.h"
@@ -9,14 +8,19 @@
 namespace buffers
 {
 
-class input_buffer_interface : public buffer_interface
+class [[nodiscard]] input_buffer_interface : public buffer_interface
 {
 public:
-	virtual std::size_t read(std::size_t count, std::byte* data) = 0;
-	virtual void set_rpos(std::size_t pos) = 0;
-	virtual void advance_rpos(std::int32_t offset) = 0;
 	[[nodiscard]]
-	virtual std::size_t rpos() = 0;
+	virtual bool is_stateless() const noexcept { return true; }
+
+	[[nodiscard]]
+	virtual std::size_t virtual_size() const noexcept { return 0u; }
+
+	[[nodiscard]]
+	std::size_t physical_size() { return size() - virtual_size(); }
+
+	virtual std::size_t read(std::size_t pos, std::size_t count, std::byte* data) = 0;
 	
 	[[nodiscard]]
 	std::size_t absolute_offset() const noexcept

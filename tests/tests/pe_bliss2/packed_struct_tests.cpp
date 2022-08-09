@@ -1,13 +1,17 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <memory>
+#include <system_error>
 #include <vector>
 
 #include <boost/endian.hpp>
 
 #include "gtest/gtest.h"
 
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_virtual_buffer.h"
 #include "buffers/output_memory_buffer.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/packed_reflection.h"
@@ -206,28 +210,29 @@ TYPED_TEST(PackedStructTestsWithEndianness, DeserializeTest)
 		test_struct, result.data() + 1);
 
 	buffers::input_memory_buffer buffer(result.data(), result.size());
+	buffers::input_buffer_stateful_wrapper_ref ref(buffer);
 	static constexpr std::size_t rpos = 1u;
 	static constexpr std::size_t absolute_offset = 2u;
 	static constexpr std::size_t relative_offset = 3u;
-	buffer.set_rpos(rpos);
+	ref.set_rpos(rpos);
 	buffer.set_absolute_offset(absolute_offset);
 	buffer.set_relative_offset(relative_offset);
 
 	pe_bliss::packed_struct<nested, TestFixture::endianness> wrapped;
-	ASSERT_NO_THROW(wrapped.deserialize(buffer, false));
+	ASSERT_NO_THROW(wrapped.deserialize(ref, false));
 	ASSERT_EQ(wrapped.physical_size(), total_size);
 	EXPECT_FALSE(wrapped.is_virtual());
-	EXPECT_EQ(buffer.rpos(), rpos + total_size);
+	EXPECT_EQ(ref.rpos(), rpos + total_size);
 	EXPECT_EQ(wrapped.get(), test_struct);
 	EXPECT_EQ(wrapped.get_state().absolute_offset(), rpos + absolute_offset);
 	EXPECT_EQ(wrapped.get_state().relative_offset(), rpos + relative_offset);
 	EXPECT_EQ(wrapped.get_state().buffer_pos(), rpos);
 
-	buffer.set_rpos(rpos);
+	ref.set_rpos(rpos);
 	wrapped.get() = {};
-	ASSERT_NO_THROW(wrapped.deserialize_until(buffer, total_size / 2, false));
+	ASSERT_NO_THROW(wrapped.deserialize_until(ref, total_size / 2, false));
 	ASSERT_EQ(wrapped.physical_size(), total_size / 2);
-	EXPECT_EQ(buffer.rpos(), rpos + total_size / 2);
+	EXPECT_EQ(ref.rpos(), rpos + total_size / 2);
 	EXPECT_TRUE(wrapped.is_virtual());
 
 	decltype(test_struct) original{};
@@ -235,17 +240,12 @@ TYPED_TEST(PackedStructTestsWithEndianness, DeserializeTest)
 		original, result.data() + 1, total_size / 2);
 	EXPECT_EQ(wrapped.get(), original);
 
-	buffers::input_memory_buffer truncated_buffer(result.data(), result.size() / 2);
-	expect_throw_pe_error([&] {
-		wrapped.deserialize(buffer, false); },
-		utilities::generic_errc::buffer_overrun);
+	EXPECT_THROW(wrapped.deserialize(ref, false), std::system_error);
 	EXPECT_EQ(wrapped.get(), original);
 	EXPECT_EQ(wrapped.physical_size(), total_size / 2);
 
-	buffer.set_rpos(buffer.size());
-	expect_throw_pe_error([&] {
-		wrapped.deserialize_until(buffer, total_size, false); },
-		utilities::generic_errc::buffer_overrun);
+	ref.set_rpos(ref.size());
+	EXPECT_THROW(wrapped.deserialize_until(ref, total_size, false), std::system_error);
 	EXPECT_EQ(wrapped.get(), original);
 	EXPECT_EQ(wrapped.physical_size(), total_size / 2);
 }
@@ -261,15 +261,18 @@ TYPED_TEST(PackedStructTestsWithEndianness, DeserializeVirtualTest)
 		original, result.data(), result.size());
 
 	pe_bliss::packed_struct<nested, TestFixture::endianness> wrapped;
-	buffers::input_memory_buffer truncated_buffer(result.data(), result.size());
+	auto truncated_buffer = std::make_shared<buffers::input_memory_buffer>(
+		result.data(), result.size());
+	buffers::input_virtual_buffer virtual_buffer(truncated_buffer, total_size / 2);
+	buffers::input_buffer_stateful_wrapper_ref ref(virtual_buffer);
 	expect_throw_pe_error([&] {
-		wrapped.deserialize(truncated_buffer, false); },
+		wrapped.deserialize(ref, false); },
 		utilities::generic_errc::buffer_overrun);
 
-	truncated_buffer.set_rpos(0u);
-	ASSERT_NO_THROW(wrapped.deserialize(truncated_buffer, true));
+	ref.set_rpos(0u);
+	ASSERT_NO_THROW(wrapped.deserialize(ref, true));
 	EXPECT_EQ(wrapped.physical_size(), result.size());
 	EXPECT_EQ(wrapped.get(), original);
 	EXPECT_TRUE(wrapped.is_virtual());
-	EXPECT_EQ(truncated_buffer.rpos(), result.size());
+	EXPECT_EQ(ref.rpos(), total_size);
 }

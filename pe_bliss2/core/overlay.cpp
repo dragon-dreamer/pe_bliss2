@@ -7,6 +7,7 @@
 #include <system_error>
 
 #include "buffers/input_buffer_section.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/safe_uint.h"
 
@@ -48,7 +49,7 @@ std::error_code make_error_code(overlay_errc e) noexcept
 void overlay::deserialize(std::uint64_t section_raw_data_last_offset,
 	std::uint32_t size_of_headers,
 	std::size_t initial_buffer_pos,
-	const buffers::input_buffer_ptr& buffer,
+	buffers::input_buffer_stateful_wrapper& buffer,
 	bool eager_copy)
 {
 	try
@@ -58,16 +59,16 @@ void overlay::deserialize(std::uint64_t section_raw_data_last_offset,
 		last_image_offset = (std::max<std::size_t>)(last_image_offset.value(), size_of_headers);
 
 		last_image_offset += initial_buffer_pos;
-		auto buffer_size = buffer->size();
+		auto buffer_size = buffer.size();
 		if (last_image_offset >= buffer_size)
 			return;
 
 		std::size_t overlay_size = buffer_size - last_image_offset.value();
 		ref_buffer::deserialize(
-			buffers::reduce(buffer, last_image_offset.value(), overlay_size),
+			buffers::reduce(buffer.get_buffer(), last_image_offset.value(), overlay_size),
 			eager_copy);
 	}
-	catch (...)
+	catch (const std::system_error&)
 	{
 		std::throw_with_nested(pe_error(overlay_errc::unable_to_read_overlay));
 	}

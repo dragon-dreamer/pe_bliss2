@@ -18,4 +18,6 @@ TEST(BufferTests, InputMemoryBufferTest)
 
 	buffers::input_memory_buffer buffer(data.data(), data.size());
 	test_input_buffer(buffer, data);
+	EXPECT_TRUE(buffer.is_stateless());
+	EXPECT_EQ(buffer.virtual_size(), 0u);
 }

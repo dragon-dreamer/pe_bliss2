@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <string>
 
-#include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/output_buffer_interface.h"
 #include "pe_bliss2/pe_error.h"
 #include "utilities/generic_error.h"
@@ -11,7 +11,7 @@
 namespace pe_bliss
 {
 
-void packed_c_string::deserialize(buffers::input_buffer_interface& buf,
+void packed_c_string::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 	bool allow_virtual_memory)
 {
 	buffers::serialized_data_state state(buf);

@@ -6,13 +6,13 @@
 namespace buffers
 {
 
-class input_buffer_interface;
+class input_buffer_stateful_wrapper_ref;
 
 class [[nodiscard]] input_buffer_state
 {
 public:
 	constexpr input_buffer_state() noexcept = default;
-	explicit input_buffer_state(input_buffer_interface& buffer);
+	explicit input_buffer_state(const input_buffer_stateful_wrapper_ref& wrapper);
 
 	[[nodiscard]]
 	constexpr std::size_t buffer_pos() const noexcept
@@ -60,7 +60,7 @@ class [[nodiscard]] serialized_data_state : public input_buffer_state
 {
 public:
 	serialized_data_state() = default;
-	explicit serialized_data_state(input_buffer_interface& buffer);
+	explicit serialized_data_state(const input_buffer_stateful_wrapper_ref& wrapper);
 };
 
 } //namespace buffers

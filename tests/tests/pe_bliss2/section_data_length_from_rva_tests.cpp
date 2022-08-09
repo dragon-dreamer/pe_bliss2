@@ -1,3 +1,5 @@
+#include <cstdint>
+
 #include "gtest/gtest.h"
 
 #include "pe_bliss2/address_converter.h"
@@ -47,7 +49,7 @@ TEST(SectionDataLengthFromRvaTests, SectionDataLengthFromRvaTest2)
 		0x3000u);
 }
 
-TEST(SectionDataLengthFromRvaTests, SectionDataLengthFromVaSectionEntTest)
+TEST(SectionDataLengthFromRvaTests, SectionDataLengthFromVaSectionEndTest)
 {
 	auto instance = create_test_image({});
 
@@ -116,7 +118,7 @@ TYPED_TEST(SectionDataLengthFromRvaTypedTests, SectionDataLengthFromVaTest2)
 		0x3000u);
 }
 
-TYPED_TEST(SectionDataLengthFromRvaTypedTests, SectionDataLengthFromVaSectionEntTest)
+TYPED_TEST(SectionDataLengthFromRvaTypedTests, SectionDataLengthFromVaSectionEndTest)
 {
 	using va_type = typename TestFixture::type;
 	test_image_options options;
@@ -135,4 +137,37 @@ TEST(SectionDataLengthFromRvaTests, SectionDataLengthFromVaTest3)
 	expect_throw_pe_error([&instance] {
 		(void)section_data_length_from_va(instance, 1u, false, false);
 	}, pe_bliss::address_converter_errc::address_conversion_overflow);
+}
+
+TEST(SectionDataLengthFromRvaTests, SectionVirtualDataLengthFromVaTest)
+{
+	static constexpr std::uint32_t virtual_size = 0x2000u;
+	static constexpr std::uint32_t physical_size = 0x1000u;
+	static constexpr std::uint32_t section_rva = 0x1000u;
+
+	auto instance = create_test_image({ .sections = {{
+			.virtual_size = virtual_size, .raw_size = physical_size}} });
+
+	EXPECT_EQ(section_data_length_from_rva(instance,
+		section_rva + 1u, false, false), physical_size - 1u);
+	EXPECT_EQ(section_data_length_from_rva(instance,
+		section_rva + physical_size, false, false), 0u);
+	EXPECT_EQ(section_data_length_from_rva(instance,
+		section_rva + virtual_size, false, false), 0u);
+	expect_throw_pe_error([&instance] {
+		(void)section_data_length_from_rva(instance,
+			section_rva + virtual_size + 1u, false, false);
+	}, pe_bliss::image::image_errc::section_data_does_not_exist);
+
+	EXPECT_EQ(section_data_length_from_rva(instance,
+		section_rva + 1u, false, true), virtual_size - 1u);
+	EXPECT_EQ(section_data_length_from_rva(instance,
+		section_rva + physical_size, false, true),
+		virtual_size - physical_size);
+	EXPECT_EQ(section_data_length_from_rva(instance,
+		section_rva + virtual_size, false, true), 0u);
+	expect_throw_pe_error([&instance] {
+		(void)section_data_length_from_rva(instance,
+			section_rva + virtual_size + 1u, false, true);
+	}, pe_bliss::image::image_errc::section_data_does_not_exist);
 }

@@ -22,7 +22,7 @@ class ExportLoaderTestFixture : public ::testing::Test
 public:
 	ExportLoaderTestFixture()
 		: instance(create_test_image({ .start_section_rva = section_rva,
-			.sections = { { 0x1000u, 0x1000u } } }))
+			.sections = { { section_virtual_size, section_raw_size } } }))
 	{
 		instance.get_section_data_list()[0].data()
 			->set_absolute_offset(absolute_offset);
@@ -32,7 +32,7 @@ public:
 	{
 		instance.get_data_directories().get_directory(
 			core::data_directories::directory_type::exports).get()
-			= { .virtual_address = 0x1000u, .size = 0x500u };
+			= { .virtual_address = section_rva, .size = 0x500u };
 	}
 
 	void add_export_dir_to_headers()
@@ -47,7 +47,7 @@ public:
 	{
 		instance.get_data_directories().get_directory(
 			core::data_directories::directory_type::exports).get()
-			= { .virtual_address = 0x1fff, .size = 0x500u };
+			= { .virtual_address = section_rva + section_raw_size - 1u, .size = 0x500u };
 	}
 
 	void add_library_name()
@@ -155,6 +155,8 @@ public:
 	static constexpr const char name1[] = "name2";
 	static constexpr const char name2[] = "name1";
 	static constexpr const char fwd_name0[] = "fwd_name0";
+	static constexpr std::uint32_t section_virtual_size = 0x2000u;
+	static constexpr std::uint32_t section_raw_size = 0x1000u;
 
 	static constexpr std::array export_dir_part1{
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //characteristics

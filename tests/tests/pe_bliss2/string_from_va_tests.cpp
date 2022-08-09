@@ -150,7 +150,8 @@ public:
 		offset = header_string_offset;
 		write_string(headers_data, offset, header_string);
 
-		offset = static_cast<std::uint32_t>(section.size() - cut_string.size());
+		offset = static_cast<std::uint32_t>(
+			section.physical_size() - cut_string.size());
 		cut_string_offset = offset;
 		cut_string_rva = get_section_string_rva(offset);
 		write_string(data, offset, cut_string);
@@ -193,7 +194,7 @@ public:
 			header_string.size()), offset);
 		write_string(headers_data, offset, header_string);
 
-		offset = static_cast<std::uint32_t>(section.size()
+		offset = static_cast<std::uint32_t>(section.physical_size()
 			- cut_string.size() * sizeof(char16_t))
 			- sizeof(std::uint16_t) /* length encoded */;
 		cut_string_offset = offset;
@@ -263,11 +264,8 @@ void test_with_fixture_header(Fixture& fixture)
 template<typename Fixture>
 void test_with_fixture_cut_string_error(Fixture& fixture)
 {
-	typename Fixture::string_type str;
-
-	expect_throw_pe_error([&fixture] {
-		(void)fixture.string_from_address(fixture.cut_string_rva, false, false);
-	}, utilities::generic_errc::buffer_overrun);
+	EXPECT_THROW((void)fixture.string_from_address(fixture.cut_string_rva, false, false),
+		std::system_error);
 }
 
 template<typename Fixture>

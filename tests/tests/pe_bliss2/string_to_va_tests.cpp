@@ -49,14 +49,14 @@ public:
 	{
 		instance.update_full_headers_buffer();
 		auto& section = instance.get_section_data_list()[1];
-		section_arr_offset = static_cast<std::uint32_t>(section.size()
+		section_arr_offset = static_cast<std::uint32_t>(section.physical_size()
 			- section_str.size() * sizeof(CharType));
 		test_image_options opts;
 		section_arr_rva = opts.sections[0].virtual_size
 			+ opts.start_section_rva + section_arr_offset;
 
 		header_arr_offset = static_cast<std::uint32_t>(
-			instance.get_full_headers_buffer().size()
+			instance.get_full_headers_buffer().physical_size()
 			- header_str.size() * sizeof(CharType));
 	}
 

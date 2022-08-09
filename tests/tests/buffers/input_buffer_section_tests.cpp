@@ -4,11 +4,13 @@
 #include <memory>
 #include <ranges>
 #include <system_error>
+#include <vector>
 
 #include "gtest/gtest.h"
 
 #include "buffers/input_buffer_section.h"
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_virtual_buffer.h"
 #include "tests/tests/buffers/input_buffer_helpers.h"
 
 namespace
@@ -73,6 +75,8 @@ TEST(BufferTests, InputBufferSectionReduceTest)
 	std::size_t offset = 1u;
 	static constexpr std::size_t size = 7u;
 	buffers::input_buffer_section section(buffer, offset, size);
+	EXPECT_EQ(section.virtual_size(), 0u);
+	EXPECT_TRUE(section.is_stateless());
 
 	EXPECT_THROW((void)section.reduce(100u, 0u), std::system_error);
 	EXPECT_THROW((void)section.reduce(1u, 100u), std::system_error);
@@ -88,4 +92,45 @@ TEST(BufferTests, InputBufferSectionReduceTest)
 		data | std::views::drop(reduced_offset + offset)
 		| std::views::take(reduced_size),
 		reduced_offset + offset, reduced_offset + offset);
+	EXPECT_TRUE(reduced_section.is_stateless());
+}
+
+TEST(BufferTests, InputBufferSectionVirtualTest)
+{
+	auto buffer = std::make_shared<buffers::input_memory_buffer>(
+		data.data(), data.size());
+	static constexpr std::size_t extra_virtual_size = 5u;
+	auto virtual_buf = std::make_shared<buffers::input_virtual_buffer>(buffer,
+		extra_virtual_size);
+
+	buffers::input_buffer_section section(virtual_buf, 3u, 7u);
+	EXPECT_EQ(section.size(), 7u);
+	EXPECT_EQ(section.virtual_size(), 2u);
+	std::vector<std::byte> vec(section.size(), std::byte{ 1 });
+	EXPECT_EQ(section.read(0u, section.size(), vec.data()), 
+		section.size() - section.virtual_size());
+	EXPECT_EQ(vec, (std::vector<std::byte>{
+		std::byte{ 4 },
+		std::byte{ 5 },
+		std::byte{ 6 },
+		std::byte{ 7 },
+		std::byte{ 8 },
+		std::byte{},
+		std::byte{}
+	}));
+	EXPECT_TRUE(section.is_stateless());
+}
+
+TEST(BufferTests, InputBufferSectionEmptyTest)
+{
+	auto buffer = std::make_shared<buffers::input_memory_buffer>(
+		data.data(), data.size());
+	static constexpr std::size_t extra_virtual_size = 1000u;
+	auto virtual_buf = std::make_shared<buffers::input_virtual_buffer>(buffer,
+		extra_virtual_size);
+
+	buffers::input_buffer_section section(virtual_buf, 500u, 0u);
+	EXPECT_EQ(section.size(), 0u);
+	EXPECT_EQ(section.virtual_size(), 0u);
+	EXPECT_EQ(section.physical_size(), 0u);
 }

@@ -8,6 +8,7 @@
 #include <system_error>
 #include <variant>
 
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/core/file_header.h"
 #include "pe_bliss2/core/optional_header.h"
@@ -442,9 +443,11 @@ void load_chpe_metadata(const image::image& instance,
 		break;
 	}
 
-	auto buf = section_data_from_va(instance, metadata_va.value(), options.include_headers);
+	auto buf = section_data_from_va(instance, metadata_va.value(),
+		options.include_headers, options.allow_virtual_data);
 	auto& metadata_descriptor = metadata.get_metadata();
-	metadata_descriptor.deserialize_until(*buf, metadata_size, options.allow_virtual_data);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(*buf);
+	metadata_descriptor.deserialize_until(wrapper, metadata_size, options.allow_virtual_data);
 
 	load_chpe_range_entries(instance, options, metadata);
 }
@@ -1197,12 +1200,15 @@ void load_impl(const image::image& instance,
 	auto size = directory.get_descriptor_size();
 
 	rva_type struct_rva = load_config_dir_info->virtual_address + sizeof(size);
-	auto struct_buf = section_data_from_rva(instance, struct_rva, options.include_headers);
-	directory.get_descriptor().deserialize_until(*struct_buf, size, options.allow_virtual_data);
+	auto struct_buf = section_data_from_rva(instance, struct_rva,
+		options.include_headers, options.allow_virtual_data);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(*struct_buf);
+	directory.get_descriptor().deserialize_until(wrapper, size, options.allow_virtual_data);
 
 	using enum load_config::version;
 	switch (directory.get_version())
 	{
+	case guard_memcpy_function_pointer: [[fallthrough]];
 	case cast_guard_os_determined_failure_mode: [[fallthrough]];
 	case xf_guard: [[fallthrough]];
 	case eh_guard:

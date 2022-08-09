@@ -3,6 +3,7 @@
 #include <iterator>
 
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 
 #include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/dos/dos_header_errc.h"
@@ -46,7 +47,8 @@ TEST(DosHeaderTests, ValidationTest1)
 		reinterpret_cast<const std::byte*>(header_data),
 		std::size(header_data));
 
-	header.deserialize(buf, false);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(buf);
+	header.deserialize(wrapper, false);
 	EXPECT_NO_THROW(validate_magic(header).throw_on_error());
 	EXPECT_NO_THROW(validate_e_lfanew(header).throw_on_error());
 	error_list errs;
@@ -63,7 +65,8 @@ TEST(DosHeaderTests, ValidationTest2)
 		reinterpret_cast<const std::byte*>(header_data),
 		std::size(header_data));
 
-	header.deserialize(buf, false);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(buf);
+	header.deserialize(wrapper, false);
 	EXPECT_EQ(validate_magic(header),
 		dos_header_errc::invalid_dos_header_signature);
 	EXPECT_EQ(validate_e_lfanew(header),
@@ -80,7 +83,8 @@ TEST(DosHeaderTests, DeserializeErrorTest)
 	dos_header header;
 	buffers::input_memory_buffer buf(
 		reinterpret_cast<const std::byte*>(""), 0u);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(buf);
 	expect_throw_pe_error(
-		[&header, &buf] { header.deserialize(buf, false); },
+		[&header, &wrapper] { header.deserialize(wrapper, false); },
 		dos_header_errc::unable_to_read_dos_header);
 }

@@ -134,7 +134,7 @@ void load_impl(const image::image& instance, const loader_options& options,
 			if (raw_length)
 			{
 				auto buf = section_data_from_va(instance, descriptor->start_address_of_raw_data, raw_length,
-					options.include_headers);
+					options.include_headers, options.allow_virtual_data);
 				directory.get_raw_data().deserialize(buf, options.copy_raw_data);
 			}
 		}

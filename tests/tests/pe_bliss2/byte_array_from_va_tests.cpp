@@ -142,16 +142,11 @@ TEST_P(ByteArrayFromVaFixture, PackedByteArrayHeaderTest)
 
 TEST_P(ByteArrayFromVaFixture, PackedByteArrayCutErrorTest)
 {
-	expect_throw_pe_error([this] {
-		(void)byte_array_from_address<10u>(
-			section_arr_rva, section_arr.size() + 1u, false, false);
-	}, utilities::generic_errc::buffer_overrun);
-
-	expect_throw_pe_error([this] {
-		pe_bliss::packed_byte_array<10u> arr;
-		(void)byte_array_from_address(
-			section_arr_rva, section_arr.size() + 1u, arr, false, false);
-	}, utilities::generic_errc::buffer_overrun);
+	EXPECT_THROW((void)byte_array_from_address<10u>(
+		section_arr_rva, section_arr.size() + 1u, false, false), std::system_error);
+	pe_bliss::packed_byte_array<10u> arr;
+	EXPECT_THROW((void)byte_array_from_address(
+		section_arr_rva, section_arr.size() + 1u, arr, false, false), std::system_error);
 }
 
 TEST_P(ByteArrayFromVaFixture, PackedByteArraySectionVirtualDataTest)

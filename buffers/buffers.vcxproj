@@ -179,9 +179,11 @@
     <ClInclude Include="input_buffer_interface.h" />
     <ClInclude Include="input_buffer_section.h" />
     <ClInclude Include="input_buffer_state.h" />
+    <ClInclude Include="input_buffer_stateful_wrapper.h" />
     <ClInclude Include="input_container_buffer.h" />
     <ClInclude Include="input_memory_buffer.h" />
     <ClInclude Include="input_stream_buffer.h" />
+    <ClInclude Include="input_virtual_buffer.h" />
     <ClInclude Include="output_buffer_interface.h" />
     <ClInclude Include="output_memory_buffer.h" />
     <ClInclude Include="output_memory_ref_buffer.h" />
@@ -192,9 +194,11 @@
     <ClCompile Include="buffer_copy.cpp" />
     <ClCompile Include="input_buffer_section.cpp" />
     <ClCompile Include="input_buffer_state.cpp" />
+    <ClCompile Include="input_buffer_stateful_wrapper.cpp" />
     <ClCompile Include="input_container_buffer.cpp" />
     <ClCompile Include="input_memory_buffer.cpp" />
     <ClCompile Include="input_stream_buffer.cpp" />
+    <ClCompile Include="input_virtual_buffer.cpp" />
     <ClCompile Include="output_memory_buffer.cpp" />
     <ClCompile Include="output_memory_ref_buffer.cpp" />
     <ClCompile Include="output_stream_buffer.cpp" />

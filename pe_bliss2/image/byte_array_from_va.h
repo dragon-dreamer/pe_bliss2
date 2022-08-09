@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdint>
 
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/address_converter.h"
@@ -30,8 +31,10 @@ void byte_array_from_rva(const image& instance, rva_type rva,
 	std::uint32_t size, packed_byte_array<MaxSize>& arr,
 	bool include_headers, bool allow_virtual_data)
 {
-	auto buf = section_data_from_rva(instance, rva, include_headers);
-	arr.deserialize(*buf, size, allow_virtual_data);
+	auto buf = section_data_from_rva(instance, rva,
+		include_headers, allow_virtual_data);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(*buf);
+	arr.deserialize(wrapper, size, allow_virtual_data);
 }
 
 template<std::size_t MaxSize, detail::executable_pointer Va>

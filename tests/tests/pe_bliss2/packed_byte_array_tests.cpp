@@ -1,12 +1,16 @@
 #include <algorithm>
 #include <array>
 #include <cstddef>
+#include <memory>
+#include <system_error>
 #include <utility>
 
 #include "gtest/gtest.h"
 
 #include "buffers/input_buffer_state.h"
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
+#include "buffers/input_virtual_buffer.h"
 #include "buffers/output_memory_ref_buffer.h"
 #include "pe_bliss2/packed_byte_array.h"
 
@@ -150,23 +154,31 @@ TEST(PackedByteArrayTests, DeserializeTest)
 		std::byte{50}
 	};
 
+	auto buffer = std::make_shared<buffers::input_memory_buffer>(
+		test_array.data(), test_array.size());
+	static constexpr std::size_t extra_virtual_bytes = size;
+	buffers::input_virtual_buffer virtual_buffer(buffer, extra_virtual_bytes);
+	buffers::input_buffer_stateful_wrapper_ref ref(virtual_buffer);
+
 	{
-		buffers::input_memory_buffer buffer(test_array.data(), test_array.size());
-		buffer.set_rpos(buffer_pos);
-		buffer.set_absolute_offset(absolute_offset);
-		buffer.set_relative_offset(relative_offset);
+		ref.set_rpos(buffer_pos);
+		virtual_buffer.set_absolute_offset(absolute_offset);
+		virtual_buffer.set_relative_offset(relative_offset);
 
 		expect_throw_pe_error([&] {
-			arr.deserialize(buffer, size + 1, false); },
+			arr.deserialize(ref, size + 1, false); },
 			utilities::generic_errc::buffer_overrun);
 
-		buffer.set_rpos(size);
+		ref.set_rpos(size);
 		expect_throw_pe_error([&] {
-			arr.deserialize(buffer, size, false); },
+			arr.deserialize(ref, extra_virtual_bytes, false); },
 			utilities::generic_errc::buffer_overrun);
 
-		buffer.set_rpos(buffer_pos);
-		ASSERT_NO_THROW(arr.deserialize(buffer, size, false));
+		ref.set_rpos(ref.size());
+		EXPECT_THROW(arr.deserialize(ref, 1u, false), std::system_error);
+
+		ref.set_rpos(buffer_pos);
+		ASSERT_NO_THROW(arr.deserialize(ref, size, false));
 
 		EXPECT_EQ(arr.get_state().absolute_offset(), absolute_offset + buffer_pos);
 		EXPECT_EQ(arr.get_state().relative_offset(), relative_offset + buffer_pos);
@@ -180,9 +192,10 @@ TEST(PackedByteArrayTests, DeserializeTest)
 	}
 
 	{
-		buffers::input_memory_buffer buffer(test_array.data(), test_array.size());
-		buffer.set_rpos(size);
-		ASSERT_NO_THROW(arr.deserialize(buffer, size, true));
+		virtual_buffer.set_absolute_offset(0u);
+		virtual_buffer.set_relative_offset(0u);
+		ref.set_rpos(size);
+		ASSERT_NO_THROW(arr.deserialize(ref, extra_virtual_bytes, true));
 		EXPECT_EQ(arr.get_state().absolute_offset(), size);
 		EXPECT_EQ(arr.get_state().relative_offset(), size);
 		EXPECT_EQ(arr.get_state().buffer_pos(), size);

@@ -114,7 +114,10 @@ constexpr std::array data_directories{
 };
 
 constexpr std::size_t second_section_raw_offset = 0x2000u;
-constexpr std::size_t second_section_raw_size = 0x210;
+constexpr std::size_t second_section_raw_size = 0x210u;
+constexpr std::size_t first_section_raw_size = 0u;
+constexpr std::size_t second_section_virtual_size = 0x2000u;
+constexpr std::size_t first_section_virtual_size = 0x5000u;
 
 constexpr std::array section_table_2_sections{
 	std::byte{'t'}, std::byte{'e'}, std::byte{'s'}, std::byte{'t'}, //name
@@ -389,8 +392,17 @@ void test_full_image(const buffers::input_buffer_ptr& buf,
 
 	auto& section_data_list = result.image.get_section_data_list();
 	ASSERT_EQ(section_data_list.size(), 2u);
+	EXPECT_EQ(section_data_list[0].is_copied(), options.sections_copied);
+	ASSERT_EQ(section_data_list[0].data()->physical_size(), first_section_raw_size);
+	ASSERT_EQ(section_data_list[0].data()->virtual_size(),
+		first_section_virtual_size - first_section_raw_size);
+	EXPECT_TRUE(section_data_list[0].data()->is_stateless());
+
 	EXPECT_EQ(section_data_list[1].is_copied(), options.sections_copied);
-	ASSERT_EQ(section_data_list[1].copied_data().size(), second_section_raw_size);
+	ASSERT_EQ(section_data_list[1].data()->physical_size(), second_section_raw_size);
+	ASSERT_EQ(section_data_list[1].data()->virtual_size(),
+		second_section_virtual_size - second_section_raw_size);
+	EXPECT_TRUE(section_data_list[1].data()->is_stateless());
 	EXPECT_EQ(section_data_list[1].copied_data()[0], std::byte{ 0xab });
 
 	auto& section_headers = result.image.get_section_table().get_section_headers();
@@ -414,9 +426,8 @@ void test_full_image(const buffers::input_buffer_ptr& buf,
 	EXPECT_EQ(result.image.get_data_directories().get_directory(
 		core::data_directories::directory_type::imports)->virtual_address, 0x3u);
 
-	EXPECT_TRUE(result.image.get_overlay().empty());
+	EXPECT_EQ(result.image.get_overlay().size(), 0u);
 
-	ASSERT_FALSE(result.image.get_full_headers_buffer().empty());
 	EXPECT_EQ(result.image.get_full_headers_buffer().is_copied(),
 		options.full_headers_copied);
 	// size of headers = 0x400 = 1024
@@ -436,30 +447,9 @@ TEST(ImageLoaderTests, LoadFullImage)
 	container[second_section_raw_offset] = std::byte{ 0xab };
 
 	test_full_image(buf, {});
-	buf->set_rpos(0);
 	test_full_image(buf, { .sections_copied = true });
-	buf->set_rpos(0);
 	test_full_image(buf, { .dos_stub_copied = true });
-	buf->set_rpos(0);
 	test_full_image(buf, { .full_headers_copied = true });
-}
-
-TEST(ImageLoaderTests, LoadFullImageNonZeroBufferPos)
-{
-	static constexpr std::size_t buffer_pos = 5;
-	auto buf = buffer_for(std::array<std::byte, buffer_pos>{},
-		dos_header_data, dos_stub_data,
-		pe_signature, file_header_2_sections, optional_header,
-		data_directories, section_table_2_sections);
-
-	auto& container = buf->get_container();
-	container.resize(buffer_pos + second_section_raw_offset
-		+ second_section_raw_size);
-	container[second_section_raw_offset
-		+ buffer_pos] = std::byte{ 0xab };
-
-	buf->set_rpos(buffer_pos);
-	test_full_image(buf, {});
 }
 
 namespace
@@ -527,7 +517,7 @@ TEST(ImageLoaderTests, LoadSectionTableNoFullHeadersBuffer)
 			pe_signature, file_header_2_sections, optional_header,
 			data_directories, section_table_2_sections),
 		{ .load_section_data = false, .load_full_headers_buffer = false });
-	EXPECT_TRUE(result.image.get_full_headers_buffer().empty());
+	EXPECT_EQ(result.image.get_full_headers_buffer().size(), 0u);
 }
 
 TEST(ImageLoaderTests, LoadOverlay)
@@ -546,13 +536,12 @@ TEST(ImageLoaderTests, LoadOverlay)
 
 	for (bool copy_overlay : { false, true })
 	{
-		buf->set_rpos(0);
 		auto result = image_loader::load(buf,
 			{ .eager_overlay_data_copy = copy_overlay });
 		EXPECT_FALSE(result.fatal_error);
 		expect_contains_errors(result.warnings);
 
-		ASSERT_FALSE(result.image.get_overlay().empty());
+		EXPECT_NE(result.image.get_overlay().physical_size(), 0u);
 		EXPECT_EQ(result.image.get_overlay().is_copied(), copy_overlay);
 
 		ASSERT_EQ(result.image.get_overlay().copied_data(),
@@ -575,5 +564,5 @@ TEST(ImageLoaderTests, IgnoreOverlay)
 	EXPECT_FALSE(result.fatal_error);
 	expect_contains_errors(result.warnings);
 
-	EXPECT_TRUE(result.image.get_overlay().empty());
+	EXPECT_EQ(result.image.get_overlay().size(), 0u);
 }

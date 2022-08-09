@@ -24,6 +24,7 @@ std::string get_features(pe_bliss::load_config::version version)
 	using enum pe_bliss::load_config::version;
 	switch (version)
 	{
+	case guard_memcpy_function_pointer: [[fallthrough]];
 	case cast_guard_os_determined_failure_mode: [[fallthrough]];
 	case xf_guard:  features += "XF Guard, CastGuard, "; [[fallthrough]];
 	case eh_guard: features += "EH Guard, "; [[fallthrough]];
@@ -1083,7 +1084,8 @@ void dump_load_config_impl(formatter& fmt, const LoadConfig& directory)
 		value_info{"guard_xfg_check_function_pointer"},
 		value_info{"guard_xfg_dispatch_function_pointer"},
 		value_info{"guard_xfg_table_dispatch_function_pointer"},
-		value_info{"cast_guard_os_determined_failure_mode"}
+		value_info{"cast_guard_os_determined_failure_mode"},
+		value_info{"guard_memcpy_function_pointer"}
 	}, directory.get_descriptor_size());
 
 	fmt.print_errors(directory);

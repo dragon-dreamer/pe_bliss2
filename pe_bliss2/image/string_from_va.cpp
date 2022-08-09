@@ -1,5 +1,6 @@
 #include "pe_bliss2/image/string_from_va.h"
 
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/packed_c_string.h"
@@ -21,8 +22,10 @@ template<packed_string_type PackedString>
 void string_from_rva(const image& instance, rva_type rva, PackedString& str,
 	bool include_headers, bool allow_virtual_data)
 {
-	auto buf = section_data_from_rva(instance, rva, include_headers);
-	str.deserialize(*buf, allow_virtual_data);
+	auto buf = section_data_from_rva(instance, rva,
+		include_headers, allow_virtual_data);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(*buf);
+	str.deserialize(wrapper, allow_virtual_data);
 }
 
 template<packed_string_type PackedString>

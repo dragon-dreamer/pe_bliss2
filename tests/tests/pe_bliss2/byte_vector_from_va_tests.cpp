@@ -90,16 +90,11 @@ TEST_P(ByteVectorFromVaFixture, PackedByteVectorSectionTest)
 
 TEST_P(ByteVectorFromVaFixture, PackedByteVectorHeaderErrorTest)
 {
-	expect_throw_pe_error([this] {
-		(void)byte_vector_from_address(
-			header_arr_offset, header_arr.size(), false, false);
-	}, pe_bliss::image::image_errc::section_data_does_not_exist);
-
-	expect_throw_pe_error([this] {
-		pe_bliss::packed_byte_vector arr;
-		(void)byte_vector_from_address(
-			header_arr_offset, header_arr.size(), arr, false, false);
-	}, pe_bliss::image::image_errc::section_data_does_not_exist);
+	EXPECT_THROW((void)byte_vector_from_address(
+		header_arr_offset, header_arr.size(), false, false), std::system_error);
+	pe_bliss::packed_byte_vector arr;
+	EXPECT_THROW((void)byte_vector_from_address(
+		header_arr_offset, header_arr.size(), arr, false, false), std::system_error);
 }
 
 TEST_P(ByteVectorFromVaFixture, PackedByteVectorHeaderTest)
@@ -124,16 +119,11 @@ TEST_P(ByteVectorFromVaFixture, PackedByteVectorHeaderTest)
 
 TEST_P(ByteVectorFromVaFixture, PackedByteVectorCutErrorTest)
 {
-	expect_throw_pe_error([this] {
-		(void)byte_vector_from_address(
-			section_arr_rva, section_arr.size() + 1u, false, false);
-	}, utilities::generic_errc::buffer_overrun);
-
-	expect_throw_pe_error([this] {
-		pe_bliss::packed_byte_vector arr;
-		(void)byte_vector_from_address(
-			section_arr_rva, section_arr.size() + 1u, arr, false, false);
-	}, utilities::generic_errc::buffer_overrun);
+	EXPECT_THROW((void)byte_vector_from_address(
+		section_arr_rva, section_arr.size() + 1u, false, false), std::system_error);
+	pe_bliss::packed_byte_vector arr;
+	EXPECT_THROW((void)byte_vector_from_address(
+		section_arr_rva, section_arr.size() + 1u, arr, false, false), std::system_error);
 }
 
 TEST_P(ByteVectorFromVaFixture, PackedByteVectorSectionVirtualDataTest)

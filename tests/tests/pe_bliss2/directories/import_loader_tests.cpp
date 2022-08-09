@@ -40,7 +40,7 @@ public:
 		: instance(create_test_image({
 			.is_x64 = is_x64(),
 			.start_section_rva = section_rva,
-			.sections = { { 0x1000u, 0x1000u } } }))
+			.sections = { { 0x2000u, 0x1000u } } }))
 	{
 		instance.get_section_data_list()[0].data()
 			->set_absolute_offset(absolute_offset);

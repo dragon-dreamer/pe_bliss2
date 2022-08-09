@@ -8,7 +8,7 @@
 
 namespace buffers
 {
-class input_buffer_interface;
+class input_buffer_stateful_wrapper_ref;
 class output_buffer_interface;
 } //namespace buffers
 
@@ -46,8 +46,8 @@ public:
 	}
 
 protected:
-	void deserialize_impl(buffers::input_buffer_interface& buf,
-		std::byte* data, std::size_t size,std::size_t max_size,
+	void deserialize_impl(buffers::input_buffer_stateful_wrapper_ref& buf,
+		std::byte* data, std::size_t size, std::size_t max_size,
 		bool allow_virtual_memory);
 	std::size_t serialize_impl(buffers::output_buffer_interface& buf,
 		const std::byte* data, bool write_virtual_part) const;
@@ -75,7 +75,7 @@ public:
 	using array_type = std::array<std::byte, MaxSize>;
 
 public:
-	void deserialize(buffers::input_buffer_interface& buf,
+	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 		std::size_t size, bool allow_virtual_memory)
 	{
 		value_ = {};

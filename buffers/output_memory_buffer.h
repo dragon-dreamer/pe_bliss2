@@ -9,7 +9,8 @@
 namespace buffers
 {
 
-class [[nodiscard]] output_memory_buffer : public output_buffer_interface
+class [[nodiscard]] output_memory_buffer
+	: public output_buffer_interface
 {
 public:
 	using buffer_type = std::vector<std::byte>;

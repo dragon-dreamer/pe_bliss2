@@ -5,7 +5,7 @@
 namespace buffers
 {
 
-class buffer_interface
+class [[nodiscard]] buffer_interface
 {
 public:
 	virtual ~buffer_interface() = default;

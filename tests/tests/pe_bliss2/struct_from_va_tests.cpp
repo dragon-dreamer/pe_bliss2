@@ -143,16 +143,11 @@ TEST_P(StructFromVaFixture, PackedStructHeaderTest)
 
 TEST_P(StructFromVaFixture, PackedStructCutErrorTest)
 {
-	expect_throw_pe_error([this] {
-		(void)struct_from_address<test_virtual_struct>(
-			section_arr_rva, false, false);
-	}, utilities::generic_errc::buffer_overrun);
-
-	expect_throw_pe_error([this] {
-		test_packed_virtual_struct obj;
-		struct_from_address(
-			section_arr_rva, obj, false, false);
-	}, utilities::generic_errc::buffer_overrun);
+	EXPECT_THROW((void)struct_from_address<test_virtual_struct>(
+		section_arr_rva, false, false), std::system_error);
+	test_packed_virtual_struct obj;
+	EXPECT_THROW(struct_from_address(
+		section_arr_rva, obj, false, false), std::system_error);
 }
 
 TEST_P(StructFromVaFixture, PackedStructSectionVirtualDataTest)

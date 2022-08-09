@@ -60,7 +60,8 @@ class image_loader final : public utilities::static_class
 {
 public:
 	[[nodiscard]]
-	static image_load_result load(buffers::input_buffer_ptr buffer,
+	static image_load_result load(
+		const buffers::input_buffer_ptr& buffer,
 		const image_load_options& options = {});
 };
 

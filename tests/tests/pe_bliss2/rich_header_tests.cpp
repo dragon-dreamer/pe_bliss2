@@ -7,9 +7,10 @@
 #include <memory>
 #include <vector>
 
-#include "buffers/input_memory_buffer.h"
-#include "buffers/input_container_buffer.h"
 #include "buffers/input_buffer_section.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
+#include "buffers/input_container_buffer.h"
+#include "buffers/input_memory_buffer.h"
 #include "buffers/output_memory_buffer.h"
 
 #include "pe_bliss2/detail/rich/rich_header_utils.h"
@@ -47,7 +48,8 @@ TEST(RichHeaderTests, FindChecksumTests)
 {
 	{
 		buffers::input_container_buffer buffer;
-		EXPECT_EQ(rich_header_utils::find_checksum(buffer), 0u);
+		buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+		EXPECT_EQ(rich_header_utils::find_checksum(ref), 0u);
 	}
 
 	{
@@ -58,18 +60,21 @@ TEST(RichHeaderTests, FindChecksumTests)
 
 		{
 			buffers::input_memory_buffer buffer(data.data(), data.size() - 1);
-			EXPECT_EQ(rich_header_utils::find_checksum(buffer), 0u);
+			buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+			EXPECT_EQ(rich_header_utils::find_checksum(ref), 0u);
 		}
 
 		{
 			buffers::input_memory_buffer buffer(data.data(), data.size());
-			EXPECT_EQ(rich_header_utils::find_checksum(buffer), 4u);
+			buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+			EXPECT_EQ(rich_header_utils::find_checksum(ref), 4u);
 		}
 
 		{
 			buffers::input_memory_buffer buffer(data.data(), data.size());
-			buffer.set_rpos(1);
-			EXPECT_EQ(rich_header_utils::find_checksum(buffer), 0u);
+			buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+			ref.set_rpos(1);
+			EXPECT_EQ(rich_header_utils::find_checksum(ref), 0u);
 		}
 	}
 
@@ -81,7 +86,8 @@ TEST(RichHeaderTests, FindChecksumTests)
 			std::byte{1}, std::byte{2}, std::byte{3}, std::byte{4}
 		};
 		buffers::input_memory_buffer buffer(data.data(), data.size());
-		EXPECT_EQ(rich_header_utils::find_checksum(buffer), 12u);
+		buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+		EXPECT_EQ(rich_header_utils::find_checksum(ref), 12u);
 	}
 	
 	{
@@ -90,7 +96,8 @@ TEST(RichHeaderTests, FindChecksumTests)
 			std::byte{1}, std::byte{2}, std::byte{3}, std::byte{4}
 		};
 		buffers::input_memory_buffer buffer(data.data(), data.size());
-		EXPECT_EQ(rich_header_utils::find_checksum(buffer), 0u);
+		buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+		EXPECT_EQ(rich_header_utils::find_checksum(ref), 0u);
 	}
 }
 
@@ -101,8 +108,9 @@ TEST(RichHeaderTests, DecodeChecksumTest)
 		std::byte{1}, std::byte{2}, std::byte{3}, std::byte{4}
 	};
 	buffers::input_memory_buffer buffer(data.data(), data.size());
-	buffer.set_rpos(1u);
-	EXPECT_EQ(rich_header_utils::decode_checksum(buffer), 0x04030201u);
+	buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+	ref.set_rpos(1u);
+	EXPECT_EQ(rich_header_utils::decode_checksum(ref), 0x04030201u);
 }
 
 namespace
@@ -159,21 +167,22 @@ TEST(RichHeaderTests, DecodeDansSignatureTest)
 {
 	std::vector<std::byte> data(dos_stub.cbegin(), dos_stub.cend());
 	buffers::input_memory_buffer buffer(data.data(), data.size());
-	buffer.set_rpos(buffer.size());
+	buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+	ref.set_rpos(buffer.size());
 	EXPECT_EQ(rich_header_utils::find_dans_signature(
-		buffer, dos_stub_checksum), 16u);
+		ref, dos_stub_checksum), 16u);
 
 	data[16u] = std::byte{};
-	buffer.set_rpos(buffer.size());
+	ref.set_rpos(ref.size());
 	expect_throw_pe_error([&] {
 		(void)rich_header_utils::find_dans_signature(
-			buffer, dos_stub_checksum);
+			ref, dos_stub_checksum);
 	}, rich_header_loader_errc::no_dans_signature);
 
-	buffer.set_rpos(0u);
+	ref.set_rpos(0u);
 	expect_throw_pe_error([&] {
 		(void)rich_header_utils::find_dans_signature(
-			buffer, dos_stub_checksum);
+			ref, dos_stub_checksum);
 	}, rich_header_loader_errc::no_dans_signature);
 }
 
@@ -181,16 +190,17 @@ TEST(RichHeaderTests, DecodeCompidsTest)
 {
 	std::vector<rich_compid> compids;
 	buffers::input_memory_buffer buffer(dos_stub.data(), dos_stub.size());
-	buffer.set_rpos(16u);
+	buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+	ref.set_rpos(16u);
 	expect_throw_pe_error([&] {
-		rich_header_utils::decode_compids(buffer,
-			buffer.size() - 5u, dos_stub_checksum, compids);
+		rich_header_utils::decode_compids(ref,
+			ref.size() - 5u, dos_stub_checksum, compids);
 	}, rich_header_loader_errc::unable_to_decode_compids);
 	EXPECT_TRUE(compids.empty());
 
-	buffer.set_rpos(15u); //Check alignment
-	ASSERT_NO_THROW(rich_header_utils::decode_compids(buffer,
-		buffer.size() - 4u, dos_stub_checksum, compids));
+	ref.set_rpos(15u); //Check alignment
+	ASSERT_NO_THROW(rich_header_utils::decode_compids(ref,
+		ref.size() - 4u, dos_stub_checksum, compids));
 	ASSERT_EQ(compids.size(), 2u);
 	EXPECT_EQ(compids.at(0), compid1);
 	EXPECT_EQ(compids.at(1), compid2);
@@ -199,8 +209,9 @@ TEST(RichHeaderTests, DecodeCompidsTest)
 TEST(RichHeaderTests, DeserializeTest1)
 {
 	buffers::input_memory_buffer buffer(dos_stub.data(), dos_stub.size());
+	buffers::input_buffer_stateful_wrapper_ref ref(buffer);
 	buffer.set_absolute_offset(100u);
-	auto header = load(buffer);
+	auto header = load(ref);
 	ASSERT_TRUE(header.has_value());
 	EXPECT_EQ(header->get_dos_stub_offset(), 16u);
 	EXPECT_EQ(header->get_absolute_offset(), buffer.absolute_offset() + 16u);
@@ -213,8 +224,9 @@ TEST(RichHeaderTests, DeserializeTest1)
 TEST(RichHeaderTests, DeserializeTest2)
 {
 	buffers::input_memory_buffer buffer(dos_stub.data(), dos_stub.size());
-	buffer.set_rpos(buffer.size() - 6u);
-	EXPECT_FALSE(load(buffer).has_value());
+	buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+	ref.set_rpos(ref.size() - 6u);
+	EXPECT_FALSE(load(ref).has_value());
 }
 
 TEST(RichHeaderTests, DeserializeTest3)
@@ -223,15 +235,17 @@ TEST(RichHeaderTests, DeserializeTest3)
 	buffers::input_memory_buffer buffer(data.data(), data.size());
 	data[16u] = std::byte{};
 
+	buffers::input_buffer_stateful_wrapper_ref ref(buffer);
 	expect_throw_pe_error([&] {
-		(void)load(buffer);
+		(void)load(ref);
 	}, rich_header_loader_errc::no_dans_signature);
 }
 
 TEST(RichHeaderTests, CalculateSize1)
 {
 	buffers::input_memory_buffer buffer(dos_stub.data(), dos_stub.size());
-	auto header = load(buffer);
+	buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+	auto header = load(ref);
 	ASSERT_TRUE(header.has_value());
 	EXPECT_EQ(get_built_size(*header), 40u);
 }
@@ -315,29 +329,32 @@ TEST(RichHeaderTests, CalculateChecksum1)
 		std::cend(dos_header_with_stub));
 
 	auto dos_stub_buffer = buffers::reduce(buffer, dos_header_size);
-	auto header = load(*dos_stub_buffer);
+	buffers::input_buffer_stateful_wrapper_ref dos_stub_ref(*dos_stub_buffer);
+	auto header = load(dos_stub_ref);
 	ASSERT_TRUE(header.has_value());
 
+	buffers::input_buffer_stateful_wrapper_ref ref(*buffer);
 	std::uint32_t checksum = 0x40 + 16;
 	checksum += get_checksum(compid1) + get_checksum(compid2);
-	EXPECT_EQ(header->calculate_checksum(*buffer), checksum);
+	EXPECT_EQ(header->calculate_checksum(ref), checksum);
 
 	buffer->get_container()[5u] = std::byte{ 0x12u };
 	buffer->get_container()[45u] = std::byte{ 0x34u };
 	checksum += std::rotl(0x12u, 5u);
 	checksum += std::rotl(0x34u, 45u);
-	EXPECT_EQ(header->calculate_checksum(*buffer), checksum);
+	EXPECT_EQ(header->calculate_checksum(ref), checksum);
 }
 
 TEST(RichHeaderTests, CalculateChecksum2)
 {
 	buffers::input_memory_buffer buffer(
 		dos_header_with_stub.data(), dos_header_with_stub.size());
+	buffers::input_buffer_stateful_wrapper_ref ref(buffer);
 
 	rich_header header;
 	header.set_dos_stub_offset(0x11u, 0x11u);
 	expect_throw_pe_error([&] {
-		(void)header.calculate_checksum(buffer);
+		(void)header.calculate_checksum(ref);
 	}, rich_header_errc::unaligned_rich_header_offset);
 }
 
@@ -345,11 +362,12 @@ TEST(RichHeaderTests, CalculateChecksum3)
 {
 	buffers::input_memory_buffer buffer(
 		dos_header_with_stub.data(), dos_header_with_stub.size());
+	buffers::input_buffer_stateful_wrapper_ref ref(buffer);
 
 	rich_header header;
 	header.set_dos_stub_offset(0x1000u, 0x1000u);
 	expect_throw_pe_error([&] {
-		(void)header.calculate_checksum(buffer);
+		(void)header.calculate_checksum(ref);
 	}, rich_header_errc::invalid_rich_header_offset);
 }
 

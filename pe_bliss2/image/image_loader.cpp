@@ -1,7 +1,6 @@
 #include "pe_bliss2/image/image_loader.h"
 
 #include <algorithm>
-#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -10,6 +9,7 @@
 #include <system_error>
 
 #include "buffers/input_buffer_section.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/dos/dos_header_errc.h"
 #include "pe_bliss2/dos/dos_header_validator.h"
@@ -56,27 +56,22 @@ std::error_code make_error_code(image_loader_errc e) noexcept
 	return { static_cast<int>(e), image_loader_error_category_instance };
 }
 
-image_load_result image_loader::load(buffers::input_buffer_ptr buffer,
+image_load_result image_loader::load(
+	const buffers::input_buffer_ptr& buffer,
 	const image_load_options& options)
 {
-	assert(buffer);
-
-	{
-		auto initial_buffer_pos = buffer->rpos();
-		if (initial_buffer_pos)
-			buffer = buffers::reduce(buffer, initial_buffer_pos);
-	}
+	buffers::input_buffer_stateful_wrapper wrapper(buffer);
 
 	image_load_result result;
 	image& instance = result.image;
-	auto buffer_size = buffer->size();
+	auto buffer_size = wrapper.size();
 
 	try
 	{
 		instance.set_loaded_to_memory(options.image_loaded_to_memory);
 
 		auto& dos_hdr = instance.get_dos_header();
-		dos_hdr.deserialize(*buffer, options.allow_virtual_headers);
+		dos_hdr.deserialize(wrapper, options.allow_virtual_headers);
 		if (options.dos_header_validation.validate_magic)
 			dos::validate_magic(dos_hdr).throw_on_error();
 		if (options.dos_header_validation.validate_e_lfanew)
@@ -85,25 +80,25 @@ image_load_result image_loader::load(buffers::input_buffer_ptr buffer,
 		auto e_lfanew = dos_hdr.base_struct()->e_lfanew;
 		if (e_lfanew < dos::dos_header::packed_struct_type::packed_size)
 		{
-			buffer->set_rpos(e_lfanew);
+			wrapper.set_rpos(e_lfanew);
 		}
 		else
 		{
-			instance.get_dos_stub().deserialize(buffer, {
+			instance.get_dos_stub().deserialize(wrapper, {
 				.copy_memory = options.eager_dos_stub_data_copy,
 				.e_lfanew = e_lfanew
 			});
 		}
 
 		instance.get_image_signature().deserialize(
-			*buffer, options.allow_virtual_headers);
+			wrapper, options.allow_virtual_headers);
 		if (options.validate_image_signature)
 			validate(instance.get_image_signature()).throw_on_error();
 
 		auto& file_hdr = instance.get_file_header();
 		auto& optional_hdr = instance.get_optional_header();
-		file_hdr.deserialize(*buffer, options.allow_virtual_headers);
-		optional_hdr.deserialize(*buffer, options.allow_virtual_headers);
+		file_hdr.deserialize(wrapper, options.allow_virtual_headers);
+		optional_hdr.deserialize(wrapper, options.allow_virtual_headers);
 		if (options.validate_size_of_optional_header)
 		{
 			if (auto err = validate_size_of_optional_header(
@@ -116,7 +111,7 @@ image_load_result image_loader::load(buffers::input_buffer_ptr buffer,
 		validate(optional_hdr, options.optional_header_validation,
 			file_hdr.is_dll(), result.warnings);
 
-		instance.get_data_directories().deserialize(*buffer,
+		instance.get_data_directories().deserialize(wrapper,
 			optional_hdr.get_number_of_rva_and_sizes(), options.allow_virtual_headers);
 
 		if (options.validate_image_base)
@@ -130,15 +125,15 @@ image_load_result image_loader::load(buffers::input_buffer_ptr buffer,
 
 		try
 		{
-			buffer->set_rpos(file_hdr.get_section_table_buffer_pos());
+			wrapper.set_rpos(file_hdr.get_section_table_buffer_pos());
 		}
-		catch (...)
+		catch (const std::system_error&)
 		{
 			std::throw_with_nested(pe_error(section::section_errc::unable_to_read_section_table));
 		}
 
 		auto& section_tbl = instance.get_section_table();
-		section_tbl.deserialize(*buffer, file_hdr.base_struct()->number_of_sections,
+		section_tbl.deserialize(wrapper, file_hdr.base_struct()->number_of_sections,
 			options.allow_virtual_headers);
 
 		const auto& section_headers = section_tbl.get_section_headers();
@@ -161,7 +156,7 @@ image_load_result image_loader::load(buffers::input_buffer_ptr buffer,
 			{
 				try
 				{
-					sections.emplace_back().deserialize(*it, buffer, load_opts);
+					sections.emplace_back().deserialize(*it, wrapper, load_opts);
 				}
 				catch (const pe_error& e)
 				{
@@ -179,7 +174,7 @@ image_load_result image_loader::load(buffers::input_buffer_ptr buffer,
 			{
 				instance.get_overlay().deserialize(section_data_end_offset,
 					optional_hdr.get_raw_size_of_headers(),
-					0u, buffer, options.eager_overlay_data_copy);
+					0u, wrapper, options.eager_overlay_data_copy);
 			}
 			catch (const pe_error& e)
 			{
@@ -212,7 +207,7 @@ image_load_result image_loader::load(buffers::input_buffer_ptr buffer,
 			}
 		}
 	}
-	catch (...)
+	catch (const std::system_error&)
 	{
 		result.fatal_error = std::current_exception();
 	}

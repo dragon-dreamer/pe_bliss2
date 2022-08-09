@@ -4,6 +4,8 @@
 #include <cstddef>
 #include <system_error>
 
+#include "buffers/input_buffer_stateful_wrapper.h"
+
 template<typename Buffer>
 concept has_offset_setters = requires(Buffer buffer)
 {
@@ -11,16 +13,16 @@ concept has_offset_setters = requires(Buffer buffer)
 	{ buffer.set_relative_offset({}) };
 };
 
-template<typename Exception = std::system_error,
-	typename Buffer, typename SourceData>
+template<typename Buffer, typename SourceData>
 void test_input_buffer(Buffer& buffer, const SourceData& data,
 	std::size_t initial_absolute_offset = 0u,
 	std::size_t initial_relative_offset = 0u)
 {
 	static constexpr std::size_t test_buffer_size = 5u;
-	EXPECT_EQ(buffer.size(), std::size(data));
-	EXPECT_EQ(buffer.size(), test_buffer_size);
-	EXPECT_EQ(buffer.rpos(), 0u);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(buffer);
+	EXPECT_EQ(wrapper.size(), std::size(data));
+	EXPECT_EQ(wrapper.size(), test_buffer_size);
+	EXPECT_EQ(wrapper.rpos(), 0u);
 	EXPECT_EQ(buffer.absolute_offset(), initial_absolute_offset);
 	EXPECT_EQ(buffer.relative_offset(), initial_relative_offset);
 
@@ -33,33 +35,33 @@ void test_input_buffer(Buffer& buffer, const SourceData& data,
 	}
 	
 	std::array<std::byte, 2u> copy{};
-	ASSERT_EQ(buffer.read(copy.size(), copy.data()), copy.size());
-	EXPECT_EQ(buffer.rpos(), 2u);
+	ASSERT_EQ(wrapper.read(copy.size(), copy.data()), copy.size());
+	EXPECT_EQ(wrapper.rpos(), 2u);
 	EXPECT_EQ(copy[0], data[0]);
 	EXPECT_EQ(copy[1], data[1]);
 
 	std::array<std::byte, 3u> copy2{};
-	ASSERT_EQ(buffer.read(10u, copy2.data()), copy2.size());
-	EXPECT_EQ(buffer.rpos(), test_buffer_size);
+	ASSERT_EQ(wrapper.read(copy2.size(), copy2.data()), copy2.size());
+	EXPECT_EQ(wrapper.rpos(), test_buffer_size);
 	EXPECT_EQ(copy2[0], data[2]);
 	EXPECT_EQ(copy2[1], data[3]);
 	EXPECT_EQ(copy2[2], data[4]);
 
-	ASSERT_EQ(buffer.read(10u, copy.data()), 0u);
+	ASSERT_THROW(wrapper.read(10u, copy.data()), std::system_error);
 	EXPECT_EQ(copy[0], data[0]);
 	EXPECT_EQ(copy[1], data[1]);
 
-	ASSERT_NO_THROW(buffer.set_rpos(test_buffer_size));
-	EXPECT_EQ(buffer.rpos(), test_buffer_size);
-	ASSERT_NO_THROW(buffer.set_rpos(1u));
-	EXPECT_EQ(buffer.rpos(), 1u);
-	EXPECT_THROW(buffer.set_rpos(test_buffer_size + 1u), Exception);
-	EXPECT_EQ(buffer.rpos(), 1u);
+	ASSERT_NO_THROW(wrapper.set_rpos(test_buffer_size));
+	EXPECT_EQ(wrapper.rpos(), test_buffer_size);
+	ASSERT_NO_THROW(wrapper.set_rpos(1u));
+	EXPECT_EQ(wrapper.rpos(), 1u);
+	EXPECT_THROW(wrapper.set_rpos(test_buffer_size + 1u), std::system_error);
+	EXPECT_EQ(wrapper.rpos(), 1u);
 
-	EXPECT_THROW(buffer.advance_rpos(-2), Exception);
-	EXPECT_THROW(buffer.advance_rpos(test_buffer_size), Exception);
-	ASSERT_NO_THROW(buffer.advance_rpos(-1));
-	EXPECT_EQ(buffer.rpos(), 0u);
-	ASSERT_NO_THROW(buffer.advance_rpos(3u));
-	EXPECT_EQ(buffer.rpos(), 3u);
+	EXPECT_THROW(wrapper.advance_rpos(-2), std::system_error);
+	EXPECT_THROW(wrapper.advance_rpos(test_buffer_size), std::system_error);
+	ASSERT_NO_THROW(wrapper.advance_rpos(-1));
+	EXPECT_EQ(wrapper.rpos(), 0u);
+	ASSERT_NO_THROW(wrapper.advance_rpos(3u));
+	EXPECT_EQ(wrapper.rpos(), 3u);
 }

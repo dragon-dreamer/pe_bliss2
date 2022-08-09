@@ -37,9 +37,11 @@ public:
 	ref_buffer& operator=(ref_buffer&&) = default;
 
 	void deserialize(const input_buffer_ptr& buffer, bool copy_memory);
-	void serialize(output_buffer_interface& buffer) const;
-	std::size_t serialize(output_buffer_interface& buffer,
-		std::size_t offset, std::size_t size = npos) const;
+	void serialize(output_buffer_interface& buffer,
+		bool write_virtual_data = false) const;
+	std::size_t serialize_until(output_buffer_interface& buffer,
+		std::size_t offset, std::size_t size = npos,
+		bool write_virtual_data = false) const;
 
 	[[nodiscard]]
 	input_buffer_ptr data() const;
@@ -52,8 +54,10 @@ public:
 
 	void copy_referenced_buffer();
 
-	[[nodiscard]] bool empty() const noexcept;
-	[[nodiscard]] std::size_t size() const noexcept;
+	[[nodiscard]] std::size_t size() const;
+	[[nodiscard]] std::size_t virtual_size() const noexcept;
+	[[nodiscard]] std::size_t physical_size() const;
+	[[nodiscard]] bool is_stateless() const noexcept;
 
 	[[nodiscard]] bool is_copied() const noexcept;
 
@@ -65,13 +69,16 @@ private:
 
 	struct copied_buffer
 	{
-		std::shared_ptr<input_container_buffer> buffer;
+		input_container_buffer* container;
+		input_buffer_ptr buffer;
 	};
 
 private:
 	void read_buffer(input_buffer_interface& buf);
-	std::size_t serialize_buffer(const input_buffer_ptr& buf, output_buffer_interface& buffer,
-		std::size_t offset, std::size_t size) const;
+	std::size_t serialize_buffer(const input_buffer_ptr& buf,
+		output_buffer_interface& buffer,
+		std::size_t offset, std::size_t size,
+		bool write_virtual_data) const;
 
 private:
 	std::variant<copied_buffer, buffer_ref> buffer_;

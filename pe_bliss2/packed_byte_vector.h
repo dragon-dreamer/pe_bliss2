@@ -9,7 +9,7 @@
 
 namespace buffers
 {
-class input_buffer_interface;
+class input_buffer_stateful_wrapper_ref;
 class output_buffer_interface;
 } //namespace buffers
 
@@ -22,7 +22,7 @@ public:
 	using vector_type = std::vector<std::byte>;
 
 public:
-	void deserialize(buffers::input_buffer_interface& buf,
+	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 		std::size_t size, bool allow_virtual_memory);
 	std::size_t serialize(buffers::output_buffer_interface& buf,
 		bool write_virtual_part) const;

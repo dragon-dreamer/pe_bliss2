@@ -2,9 +2,12 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <memory>
 #include <vector>
 
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
+#include "buffers/input_virtual_buffer.h"
 #include "buffers/output_memory_buffer.h"
 
 #include "pe_bliss2/core/image_signature.h"
@@ -32,20 +35,22 @@ TEST(ImageSignatureTests, DeserializeSerializeTest)
 		std::byte{'P'}, std::byte{'E'}, std::byte{}
 	};
 
-	buffers::input_memory_buffer buf(data, sizeof(data));
+	auto buf = std::make_shared<buffers::input_memory_buffer>(data, sizeof(data));
+	buffers::input_virtual_buffer virtual_buf(buf, 1u);
+	buffers::input_buffer_stateful_wrapper_ref ref(virtual_buf);
 
 	image_signature signature;
-	expect_throw_pe_error([&signature, &buf] {
-		signature.deserialize(buf, false);
+	expect_throw_pe_error([&signature, &ref] {
+		signature.deserialize(ref, false);
 	}, image_signature_errc::unable_to_read_pe_signature);
-	buf.set_rpos(0u);
-	ASSERT_NO_THROW(signature.deserialize(buf, true));
+	ref.set_rpos(0u);
+	ASSERT_NO_THROW(signature.deserialize(ref, true));
 	EXPECT_EQ(signature.get_signature(), image_signature::pe_signature);
 
 	std::vector<std::byte> outdata;
 	buffers::output_memory_buffer outbuf(outdata);
 	ASSERT_NO_THROW(signature.serialize(outbuf, false));
-	ASSERT_EQ(outdata.size(), buf.size());
+	ASSERT_EQ(outdata.size(), buf->size());
 	EXPECT_TRUE(std::equal(outdata.cbegin(), outdata.cend(), data));
 }
 

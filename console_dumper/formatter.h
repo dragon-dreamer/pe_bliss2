@@ -19,6 +19,7 @@
 #include "color_provider.h"
 
 #include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/input_memory_buffer.h"
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/packed_byte_array.h"
@@ -380,8 +381,9 @@ public:
 			stream_ << '\n';
 		}
 
-		auto buf_length = buf.size() - buf.rpos();
+		auto buf_length = buf.physical_size();
 		auto length = (std::min)(max_length, buf_length);
+		buffers::input_buffer_stateful_wrapper_ref wrapper(buf);
 		while (length)
 		{
 			print_offsets(buf);
@@ -393,7 +395,7 @@ public:
 			while (length)
 			{
 				std::byte data{};
-				if (buf.read(1u, &data) != sizeof(data))
+				if (wrapper.read(1u, &data) != sizeof(data))
 					data = {};
 				stream_ << std::hex << std::setw(2) << std::setfill('0')
 					<< std::to_integer<std::uint32_t>(data) << ' ';

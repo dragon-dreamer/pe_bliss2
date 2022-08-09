@@ -3,11 +3,14 @@
 #include <algorithm>
 #include <cstddef>
 #include <iterator>
+#include <memory>
 #include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
+#include "buffers/input_virtual_buffer.h"
 #include "buffers/output_memory_buffer.h"
 
 #include "pe_bliss2/core/data_directories.h"
@@ -65,17 +68,19 @@ TEST(DataDirectoriesTests, DeserializeSerializeTest)
 		"\x50\x00\x00\x00" "\x09"             //security
 	};
 
-	buffers::input_memory_buffer buffer(
+	auto buffer = std::make_shared<buffers::input_memory_buffer>(
 		reinterpret_cast<const std::byte*>(data),
 		std::size(data) - 1u);
+	buffers::input_virtual_buffer virtual_buffer(buffer, virtual_byte_count);
+	buffers::input_buffer_stateful_wrapper_ref ref(virtual_buffer);
 
 	data_directories dirs;
-	expect_throw_pe_error([&] { dirs.deserialize(buffer, dir_count, false); },
+	expect_throw_pe_error([&] { dirs.deserialize(ref, dir_count, false); },
 		data_directories_errc::unable_to_read_data_directory);
 	dirs.get_directories().clear();
 
-	buffer.set_rpos(0);
-	ASSERT_NO_THROW(dirs.deserialize(buffer, dir_count, true));
+	ref.set_rpos(0);
+	ASSERT_NO_THROW(dirs.deserialize(ref, dir_count, true));
 
 	EXPECT_EQ(dirs.size(), dir_count);
 

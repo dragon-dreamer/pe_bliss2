@@ -2,9 +2,12 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <memory>
 #include <vector>
 
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
+#include "buffers/input_virtual_buffer.h"
 #include "buffers/output_memory_buffer.h"
 
 #include "pe_bliss2/detail/packed_reflection.h"
@@ -59,18 +62,20 @@ TEST(FileHeaderTests, DeserializeSerializeTest)
 		std::byte{0x09}, std::byte{0x0a}, //number_of_symbols
 		std::byte{0x0b}, std::byte{0x0c},
 		std::byte{0x56}, std::byte{0x78}, //size_of_optional_header
-		std::byte{0x02} //characteristics (last byte cut)
+		std::byte{0x02} //characteristics (last byte cut, virtual)
 	};
 
-	buffers::input_memory_buffer buf(data, sizeof(data));
+	auto buf = std::make_shared<buffers::input_memory_buffer>(data, sizeof(data));
+	buffers::input_virtual_buffer virtual_buf(buf, 1u);
+	buffers::input_buffer_stateful_wrapper_ref ref(virtual_buf);
 
 	file_header header;
-	expect_throw_pe_error([&header, &buf] {
-		header.deserialize(buf, false);
+	expect_throw_pe_error([&header, &ref] {
+		header.deserialize(ref, false);
 	}, file_header_errc::unable_to_read_file_header);
-	buf.set_rpos(0u);
+	ref.set_rpos(0u);
 
-	ASSERT_NO_THROW(header.deserialize(buf, true));
+	ASSERT_NO_THROW(header.deserialize(ref, true));
 	EXPECT_EQ(header.get_machine_type(), file_header::machine_type::i386);
 	EXPECT_EQ(header.base_struct()->number_of_sections, 0x250u);
 	EXPECT_EQ(header.base_struct()->time_date_stamp, 0x04030201u);
@@ -83,6 +88,6 @@ TEST(FileHeaderTests, DeserializeSerializeTest)
 	std::vector<std::byte> outdata;
 	buffers::output_memory_buffer outbuf(outdata);
 	ASSERT_NO_THROW(header.serialize(outbuf, false));
-	ASSERT_EQ(outdata.size(), buf.size());
+	ASSERT_EQ(outdata.size(), sizeof(data));
 	EXPECT_TRUE(std::equal(outdata.cbegin(), outdata.cend(), data));
 }

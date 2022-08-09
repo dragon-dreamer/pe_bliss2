@@ -1,5 +1,7 @@
 #include "tests/tests/pe_bliss2/image_helper.h"
 
+#include "buffers/input_container_buffer.h"
+#include "buffers/input_virtual_buffer.h"
 #include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/core/image_signature.h"
@@ -72,7 +74,20 @@ pe_bliss::image::image create_test_image(const test_image_options& options)
 			section_headers_it->set_pointer_to_raw_data(current_raw_pos);
 			current_raw_pos += rsize;
 		}
-		section_data_it->copied_data().resize(rsize);
+
+		if (vsize > rsize)
+		{
+			auto container_buf = std::make_shared<buffers::input_container_buffer>();
+			container_buf->get_container().resize(rsize);
+			auto virtual_buf = std::make_shared<buffers::input_virtual_buffer>(
+				container_buf, vsize - rsize);
+			section_data_it->get_buffer().deserialize(virtual_buf, false);
+		}
+		else
+		{
+			section_data_it->copied_data().resize(rsize);
+		}
+
 		++section_headers_it;
 		++section_data_it;
 	}

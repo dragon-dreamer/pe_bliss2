@@ -1,13 +1,17 @@
 #include <array>
 #include <cstdint>
 #include <cstring>
+#include <memory>
 #include <string>
+#include <system_error>
 #include <vector>
 
 #include "gtest/gtest.h"
 
 #include "buffers/input_buffer_state.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_virtual_buffer.h"
 #include "buffers/output_memory_buffer.h"
 #include "pe_bliss2/packed_c_string.h"
 
@@ -146,12 +150,14 @@ TEST(PackedCStringTests, DeserializeTest)
 	{
 		str.set_virtual_nullbyte(true);
 
-		buffers::input_memory_buffer buffer(reinterpret_cast<const std::byte*>(test_string),
+		buffers::input_memory_buffer buffer(
+			reinterpret_cast<const std::byte*>(test_string),
 			test_string_length + 1u);
-		buffer.set_rpos(buffer_pos);
+		buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+		ref.set_rpos(buffer_pos);
 		buffer.set_absolute_offset(absolute_offset);
 		buffer.set_relative_offset(relative_offset);
-		ASSERT_NO_THROW(str.deserialize(buffer, false));
+		ASSERT_NO_THROW(str.deserialize(ref, false));
 		EXPECT_EQ(str.get_state().absolute_offset(), absolute_offset + buffer_pos);
 		EXPECT_EQ(str.get_state().relative_offset(), relative_offset + buffer_pos);
 		EXPECT_EQ(str.get_state().buffer_pos(), buffer_pos);
@@ -160,10 +166,23 @@ TEST(PackedCStringTests, DeserializeTest)
 	}
 
 	{
-		buffers::input_memory_buffer buffer(reinterpret_cast<const std::byte*>(test_string),
+		buffers::input_memory_buffer buffer(
+			reinterpret_cast<const std::byte*>(test_string),
 			test_string_length);
+		buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+		// Not allowed to go out of the buffer bounds
+		EXPECT_THROW(str.deserialize(ref, true), std::system_error);
+	}
+
+	auto buffer_ptr = std::make_shared<buffers::input_memory_buffer>(
+		reinterpret_cast<const std::byte*>(test_string),
+		test_string_length);
+	buffers::input_virtual_buffer virtual_buffer(buffer_ptr, 1u); //virtual nullbyte
+	buffers::input_buffer_stateful_wrapper_ref ref(virtual_buffer);
+
+	{
 		expect_throw_pe_error([&] {
-			str.deserialize(buffer, false); },
+			str.deserialize(ref, false); },
 			utilities::generic_errc::buffer_overrun);
 		EXPECT_EQ(str.get_state().absolute_offset(), absolute_offset + buffer_pos);
 		EXPECT_EQ(str.get_state().relative_offset(), relative_offset + buffer_pos);
@@ -173,9 +192,8 @@ TEST(PackedCStringTests, DeserializeTest)
 	}
 
 	{
-		buffers::input_memory_buffer buffer(reinterpret_cast<const std::byte*>(test_string),
-			test_string_length);
-		ASSERT_NO_THROW(str.deserialize(buffer, true));
+		ref.set_rpos(0);
+		ASSERT_NO_THROW(str.deserialize(ref, true));
 		EXPECT_EQ(str.get_state().absolute_offset(), 0u);
 		EXPECT_EQ(str.get_state().relative_offset(), 0u);
 		EXPECT_EQ(str.get_state().buffer_pos(), 0u);

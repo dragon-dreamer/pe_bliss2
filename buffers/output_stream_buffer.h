@@ -9,7 +9,8 @@
 namespace buffers
 {
 
-class [[nodiscard]] output_stream_buffer : public output_buffer_interface
+class [[nodiscard]] output_stream_buffer
+	: public output_buffer_interface
 {
 public:
 	explicit output_stream_buffer(std::ostream& stream);

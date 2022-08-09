@@ -5,7 +5,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <system_error>
 
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/section/section_errc.h"
 #include "pe_bliss2/section/section_table.h"
@@ -14,14 +16,14 @@
 namespace pe_bliss::section
 {
 
-void section_header::deserialize(buffers::input_buffer_interface& buf,
+void section_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 	bool allow_virtual_memory)
 {
 	try
 	{
 		base_struct().deserialize(buf, allow_virtual_memory);
 	}
-	catch (...)
+	catch (const std::system_error&)
 	{
 		std::throw_with_nested(pe_error(
 			section_errc::unable_to_read_section_table));

@@ -19,4 +19,6 @@ TEST(BufferTests, InputContainerBufferTest)
 	buffers::input_container_buffer buffer;
 	buffer.get_container() = data;
 	test_input_buffer(buffer, data);
+	EXPECT_TRUE(buffer.is_stateless());
+	EXPECT_EQ(buffer.virtual_size(), 0u);
 }

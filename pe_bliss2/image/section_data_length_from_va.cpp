@@ -18,8 +18,10 @@ std::uint32_t section_data_length_from_rva(const image& instance,
 		if (!include_headers)
 			throw pe_error(image_errc::section_data_does_not_exist);
 
-		return static_cast<std::uint32_t>(
-			instance.get_full_headers_buffer().size()) - rva;
+		auto size = instance.get_full_headers_buffer().size();
+		if (!allow_virtual_data)
+			size -= instance.get_full_headers_buffer().virtual_size();
+		return static_cast<std::uint32_t>(size - rva);
 	}
 
 	auto [header_it, data_it] = section_from_rva(instance, rva, 1u);
@@ -33,17 +35,14 @@ std::uint32_t section_data_length_from_rva(const image& instance,
 	}
 
 	std::uint32_t data_offset = rva - header_it->get_rva();
-	if (allow_virtual_data)
-	{
-		return header_it->get_virtual_size(
-			instance.get_optional_header().get_raw_section_alignment())
-			- data_offset;
-	}
+	std::size_t real_size = data_it->size();
+	if (!allow_virtual_data)
+		real_size -= data_it->virtual_size();
 
-	if (data_offset >= data_it->size())
+	if (data_offset >= real_size)
 		return 0u;
 
-	return static_cast<std::uint32_t>(data_it->size()) - data_offset;
+	return static_cast<std::uint32_t>(real_size - data_offset);
 }
 
 std::uint32_t section_data_length_from_va(const image& instance,

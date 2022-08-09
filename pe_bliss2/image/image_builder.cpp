@@ -102,7 +102,7 @@ void image_builder::build(const image& instance, buffers::output_buffer_interfac
 	{
 		auto written_size = buffer.wpos() - buffer_start_pos;
 		if (full_headers.size() > written_size)
-			full_headers.serialize(buffer, written_size);
+			full_headers.serialize_until(buffer, written_size);
 	}
 
 	if (sections.empty())

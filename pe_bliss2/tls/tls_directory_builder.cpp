@@ -84,8 +84,8 @@ void build_in_place_impl(image::image& instance, const Directory& directory,
 	}
 
 	const auto& raw_data = directory.get_raw_data();
-	if (descriptor->start_address_of_raw_data && !raw_data.empty())
-		buffer_to_file_offset(instance, raw_data, true);
+	if (descriptor->start_address_of_raw_data && raw_data.size())
+		buffer_to_file_offset(instance, raw_data, true, options.write_virtual_part);
 
 	update_data_directory(instance, options, descriptor.packed_size);
 }
@@ -130,9 +130,9 @@ build_result get_built_size_impl(const Directory& directory, const builder_optio
 	full_size += sizeof(va_type); //Callback terminator
 
 	if (options.write_virtual_part)
-		full_size += descriptor->end_address_of_raw_data - descriptor->start_address_of_raw_data;
-	else
 		full_size += directory.get_raw_data().size();
+	else
+		full_size += directory.get_raw_data().physical_size();
 
 	return {
 		.full_size = full_size.value(),
@@ -194,16 +194,9 @@ build_result build_new_impl(buffers::output_buffer_interface& buf, Directory& di
 
 	const auto& raw_data = directory.get_raw_data();
 	auto raw_data_size = raw_data.size();
-	raw_data.serialize(buf, 0, (std::min)(static_cast<std::size_t>(data_length), raw_data_size));
-	if (options.write_virtual_part)
-	{
-		std::array<std::byte, 1> empty{};
-		while (data_length > raw_data_size)
-		{
-			++raw_data_size;
-			buf.write(empty.size(), empty.data());
-		}
-	}
+	if (!options.write_virtual_part)
+		raw_data_size -= raw_data.virtual_size();
+	raw_data.serialize_until(buf, 0, (std::min)(static_cast<std::size_t>(data_length), raw_data_size));
 
 	auto last_pos = buf.wpos();
 	buf.set_wpos(base_pos);

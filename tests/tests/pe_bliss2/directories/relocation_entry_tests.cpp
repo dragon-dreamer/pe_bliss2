@@ -40,7 +40,7 @@ TEST(RelocationEntryTests, AffectedSizeTests)
 	EXPECT_EQ(entry.get_affected_size_in_bytes(), 0u);
 
 	entry.set_type(relocation_type::highadj);
-	EXPECT_EQ(entry.get_affected_size_in_bytes(), sizeof(std::uint32_t));
+	EXPECT_EQ(entry.get_affected_size_in_bytes(), sizeof(std::uint16_t));
 
 	entry.set_type(relocation_type::highlow);
 	EXPECT_EQ(entry.get_affected_size_in_bytes(), sizeof(std::uint32_t));

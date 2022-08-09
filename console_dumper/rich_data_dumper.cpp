@@ -4,6 +4,7 @@
 
 #include "formatter.h"
 
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/rich/compid_database.h"
@@ -12,7 +13,9 @@
 
 void dump_rich_data(formatter& fmt, const pe_bliss::image::image& image) try
 {
-	auto result = pe_bliss::rich::load(*image.get_dos_stub().data());
+	buffers::input_buffer_stateful_wrapper_ref dos_stub_ref(
+		*image.get_dos_stub().data());
+	auto result = pe_bliss::rich::load(dos_stub_ref);
 	if (!result)
 		return;
 
@@ -27,7 +30,9 @@ void dump_rich_data(formatter& fmt, const pe_bliss::image::image& image) try
 	fmt.get_stream() << "\n  ";
 	fmt.print_field_name("Calculated checksum");
 	fmt.get_stream() << ' ';
-	fmt.print_value(header.calculate_checksum(*image.get_full_headers_buffer().data()),
+	buffers::input_buffer_stateful_wrapper_ref full_headers_ref(
+		*image.get_full_headers_buffer().data());
+	fmt.print_value(header.calculate_checksum(full_headers_ref),
 		true);
 	fmt.get_stream() << '\n';
 

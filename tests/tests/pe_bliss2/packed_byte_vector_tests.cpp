@@ -1,5 +1,7 @@
 #include <algorithm>
 #include <cstddef>
+#include <memory>
+#include <system_error>
 #include <utility>
 #include <vector>
 
@@ -7,6 +9,8 @@
 
 #include "buffers/input_buffer_state.h"
 #include "buffers/input_memory_buffer.h"
+#include "buffers/input_virtual_buffer.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/output_memory_ref_buffer.h"
 
 #include "pe_bliss2/packed_byte_vector.h"
@@ -142,23 +146,31 @@ TEST(PackedByteVectorTests, DeserializeTest)
 		std::byte{50}
 	};
 
+	auto buffer = std::make_shared<buffers::input_memory_buffer>(
+		test_vector.data(), test_vector.size());
+	static constexpr std::size_t extra_virtual_bytes = size;
+	buffers::input_virtual_buffer virtual_buffer(buffer, extra_virtual_bytes);
+	buffers::input_buffer_stateful_wrapper_ref ref(virtual_buffer);
+
 	{
-		buffers::input_memory_buffer buffer(test_vector.data(), test_vector.size());
-		buffer.set_rpos(buffer_pos);
-		buffer.set_absolute_offset(absolute_offset);
-		buffer.set_relative_offset(relative_offset);
+		ref.set_rpos(buffer_pos);
+		virtual_buffer.set_absolute_offset(absolute_offset);
+		virtual_buffer.set_relative_offset(relative_offset);
 
 		expect_throw_pe_error([&] {
-			vec.deserialize(buffer, size + 1, false); },
+			vec.deserialize(ref, size + 1, false); },
 			utilities::generic_errc::buffer_overrun);
 
-		buffer.set_rpos(size);
+		ref.set_rpos(size);
 		expect_throw_pe_error([&] {
-			vec.deserialize(buffer, size, false); },
+			vec.deserialize(ref, size, false); },
 			utilities::generic_errc::buffer_overrun);
 
-		buffer.set_rpos(buffer_pos);
-		ASSERT_NO_THROW(vec.deserialize(buffer, size, false));
+		ref.set_rpos(ref.size());
+		EXPECT_THROW(vec.deserialize(ref, 1u, false), std::system_error);
+
+		ref.set_rpos(buffer_pos);
+		ASSERT_NO_THROW(vec.deserialize(ref, size, false));
 
 		EXPECT_EQ(vec.get_state().absolute_offset(), absolute_offset + buffer_pos);
 		EXPECT_EQ(vec.get_state().relative_offset(), relative_offset + buffer_pos);
@@ -172,9 +184,10 @@ TEST(PackedByteVectorTests, DeserializeTest)
 	}
 
 	{
-		buffers::input_memory_buffer buffer(test_vector.data(), test_vector.size());
-		buffer.set_rpos(size);
-		ASSERT_NO_THROW(vec.deserialize(buffer, size, true));
+		ref.set_rpos(size);
+		virtual_buffer.set_absolute_offset(0u);
+		virtual_buffer.set_relative_offset(0u);
+		ASSERT_NO_THROW(vec.deserialize(ref, size, true));
 		EXPECT_EQ(vec.get_state().absolute_offset(), size);
 		EXPECT_EQ(vec.get_state().relative_offset(), size);
 		EXPECT_EQ(vec.get_state().buffer_pos(), size);

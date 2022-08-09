@@ -25,7 +25,7 @@ public:
 		: instance(create_test_image({
 			.is_x64 = is_x64(),
 			.start_section_rva = section_rva,
-			.sections = { { 0x1000u, 0x1000u } } }))
+			.sections = { { section_virtual_size, section_raw_size } } }))
 	{
 		instance.get_section_data_list()[0].data()
 			->set_absolute_offset(absolute_offset);
@@ -150,6 +150,8 @@ public:
 	static constexpr std::uint32_t callback1_offset = 0x50u;
 	static constexpr std::uint32_t callback2_offset = 0x1150u;
 	static constexpr std::uint32_t callback_count = 2u;
+	static constexpr std::uint32_t section_virtual_size = 0x2000u;
+	static constexpr std::uint32_t section_raw_size = 0x1000u;
 
 	static constexpr std::array tls_descriptor_invalid_raw_data{
 		std::byte{0x00}, std::byte{0x01}, std::byte{}, std::byte{}, //start_address_of_raw_data
@@ -215,7 +217,7 @@ TEST_P(TlsLoaderTestFixture, LoadZeroTlsDirectory)
 		EXPECT_EQ(dir.get_descriptor().get_state().absolute_offset(),
 			absolute_offset);
 		EXPECT_EQ(dir.get_descriptor().get_state().relative_offset(), 0u);
-		EXPECT_TRUE(dir.get_raw_data().empty());
+		EXPECT_EQ(dir.get_raw_data().size(), 0u);
 		EXPECT_TRUE(dir.get_callbacks().empty());
 	});
 }
@@ -269,7 +271,7 @@ TEST_P(TlsLoaderTestFixture, LoadZeroTlsDirectoryHeaders)
 			headers_directory_rva);
 		EXPECT_EQ(dir.get_descriptor().get_state().relative_offset(),
 			headers_directory_rva);
-		EXPECT_TRUE(dir.get_raw_data().empty());
+		EXPECT_EQ(dir.get_raw_data().size(), 0u);
 		EXPECT_TRUE(dir.get_callbacks().empty());
 	});
 }

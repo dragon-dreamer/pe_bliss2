@@ -1,5 +1,7 @@
 #pragma once
 
+#include "buffers/input_buffer_stateful_wrapper.h"
+
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/packed_struct.h"
@@ -16,8 +18,10 @@ packed_struct<T> struct_from_rva(const image& instance, rva_type rva,
 	bool include_headers = false, bool allow_virtual_data = false)
 {
 	packed_struct<T> value{};
-	auto buf = section_data_from_rva(instance, rva, include_headers);
-	value.deserialize(*buf, allow_virtual_data);
+	auto buf = section_data_from_rva(
+		instance, rva, include_headers, allow_virtual_data);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(*buf);
+	value.deserialize(wrapper, allow_virtual_data);
 	return value;
 }
 
@@ -27,8 +31,10 @@ packed_struct<T> struct_from_va(const image& instance, Va va,
 	bool include_headers = false, bool allow_virtual_data = false)
 {
 	packed_struct<T> value{};
-	auto buf = section_data_from_va(instance, va, include_headers);
-	value.deserialize(*buf, allow_virtual_data);
+	auto buf = section_data_from_va(
+		instance, va, include_headers, allow_virtual_data);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(*buf);
+	value.deserialize(wrapper, allow_virtual_data);
 	return value;
 }
 
@@ -37,8 +43,10 @@ packed_struct<T>& struct_from_rva(const image& instance,
 	rva_type rva, packed_struct<T>& value,
 	bool include_headers = false, bool allow_virtual_data = false)
 {
-	auto buf = section_data_from_rva(instance, rva, include_headers);
-	value.deserialize(*buf, allow_virtual_data);
+	auto buf = section_data_from_rva(
+		instance, rva, include_headers, allow_virtual_data);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(*buf);
+	value.deserialize(wrapper, allow_virtual_data);
 	return value;
 }
 
@@ -47,8 +55,10 @@ packed_struct<T>& struct_from_va(const image& instance,
 	Va va, packed_struct<T>& value,
 	bool include_headers = false, bool allow_virtual_data = false)
 {
-	auto buf = section_data_from_va(instance, va, include_headers);
-	value.deserialize(*buf, allow_virtual_data);
+	auto buf = section_data_from_va(
+		instance, va, include_headers, allow_virtual_data);
+	buffers::input_buffer_stateful_wrapper_ref wrapper(*buf);
+	value.deserialize(wrapper, allow_virtual_data);
 	return value;
 }
 

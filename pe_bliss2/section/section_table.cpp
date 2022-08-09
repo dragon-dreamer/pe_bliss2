@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <utility>
 
-#include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/output_buffer_interface.h"
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/section/section_search.h"
@@ -13,7 +13,7 @@
 namespace pe_bliss::section
 {
 
-void section_table::deserialize(buffers::input_buffer_interface& buf,
+void section_table::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 	std::uint16_t number_of_sections, bool allow_virtual_memory)
 {
 	headers_.clear();

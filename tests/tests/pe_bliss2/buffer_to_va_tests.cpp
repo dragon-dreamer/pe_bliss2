@@ -2,15 +2,17 @@
 
 #include <algorithm>
 #include <array>
+#include <cstddef>
 #include <cstdint>
 #include <memory>
 #include <tuple>
 #include <system_error>
 
-#include "pe_bliss2/address_converter.h"
 #include "buffers/input_container_buffer.h"
+#include "buffers/input_virtual_buffer.h"
 #include "buffers/ref_buffer.h"
 
+#include "pe_bliss2/address_converter.h"
 #include "pe_bliss2/image/buffer_to_va.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/image_errc.h"
@@ -29,7 +31,8 @@ public:
 	static constexpr std::uint32_t buffer_absolute_offset = 0x12u;
 
 	std::uint32_t buffer_to_address(pe_bliss::rva_type rva,
-		const buffers::ref_buffer& buf, bool include_headers)
+		const buffers::ref_buffer& buf, bool include_headers,
+		bool write_virtual_data = false)
 	{
 		auto image_base = instance.get_optional_header().get_raw_image_base();
 		switch (GetParam())
@@ -37,24 +40,35 @@ public:
 		case function_type::va32:
 			return static_cast<std::uint32_t>(buffer_to_va(
 				instance, static_cast<std::uint32_t>(rva
-				+ image_base), buf, include_headers) - image_base);
+				+ image_base), buf, include_headers, write_virtual_data)
+				- image_base);
 		case function_type::va64:
 			return static_cast<std::uint32_t>(buffer_to_va(
 				instance, static_cast<std::uint64_t>(rva
-				+ image_base), buf, include_headers) - image_base);
+				+ image_base), buf, include_headers, write_virtual_data)
+				- image_base);
 		default: //rva
-			return buffer_to_rva(instance, rva, buf, include_headers);
+			return buffer_to_rva(instance, rva, buf, include_headers,
+				write_virtual_data);
 		}
 	}
 
 	template<typename Arr>
-	static buffers::ref_buffer create_buffer(const Arr& arr)
+	static buffers::ref_buffer create_buffer(const Arr& arr,
+		std::size_t virtual_size = 0u)
 	{
 		auto buf = std::make_shared<buffers::input_container_buffer>();
+		std::shared_ptr<buffers::input_buffer_interface> buf_interface = buf;
 		buf->set_absolute_offset(buffer_absolute_offset);
 		buf->get_container() = std::vector(arr.begin(), arr.end());
+		if (virtual_size)
+		{
+			buf_interface = std::make_shared<buffers::input_virtual_buffer>(
+				std::move(buf), virtual_size);
+		}
+
 		buffers::ref_buffer result;
-		result.deserialize(buf, false);
+		result.deserialize(buf_interface, false);
 		return result;
 	}
 };
@@ -117,6 +131,32 @@ TEST(BufferToVaTests, BufferToFileOffsetHeaderErrorTest)
 	{
 		(void)buffer_to_file_offset(instance, buf, false);
 	}, pe_bliss::image::image_errc::section_data_does_not_exist);
+}
+
+TEST_P(BufferToVaFixture, VirtualBufferToSectionTest1)
+{
+	static constexpr std::size_t virtual_size = 10u;
+	EXPECT_EQ(buffer_to_address(section_arr_rva,
+		create_buffer(section_arr, virtual_size), false, false),
+		section_arr_rva + section_arr.size());
+	check_section_data_equals();
+}
+
+TEST_P(BufferToVaFixture, VirtualBufferToSectionTest2)
+{
+	static constexpr std::size_t virtual_size = 10u;
+	EXPECT_EQ(buffer_to_address(section_arr_rva - virtual_size,
+		create_buffer(section_arr, virtual_size), false, true),
+		section_arr_rva + section_arr.size());
+
+	const auto& section = instance.get_section_data_list()[1];
+	const auto& section_data = section.copied_data();
+	const std::array actual_data{
+		section_data[section_arr_offset - virtual_size],
+		section_data[section_arr_offset + 1 - virtual_size],
+		section_data[section_arr_offset + 2 - virtual_size]
+	};
+	EXPECT_EQ(actual_data, section_arr);
 }
 
 TEST(BufferToVaTest, BufferToFileOffsetHeaderTest)

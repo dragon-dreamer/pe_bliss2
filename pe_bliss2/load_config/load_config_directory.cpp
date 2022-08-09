@@ -66,7 +66,8 @@ constexpr std::array field_offsets{
 	detail::packed_reflection::get_field_offset<&Descriptor::volatile_metadata>(),
 	detail::packed_reflection::get_field_offset<&Descriptor::guard_exception_handling>(),
 	detail::packed_reflection::get_field_offset<&Descriptor::extended_flow_guard>(),
-	detail::packed_reflection::get_field_offset<&Descriptor::mode>()
+	detail::packed_reflection::get_field_offset<&Descriptor::mode>(),
+	detail::packed_reflection::get_field_offset<&Descriptor::memcpy_function_pointer>()
 };
 
 constexpr std::array versions{
@@ -81,7 +82,8 @@ constexpr std::array versions{
 	version::enclave,
 	version::volatile_metadata,
 	version::eh_guard,
-	version::xf_guard
+	version::xf_guard,
+	version::cast_guard_os_determined_failure_mode
 };
 
 static_assert(std::tuple_size_v<decltype(field_offsets<detail::load_config::image_load_config_directory32>)>
@@ -106,7 +108,7 @@ version load_config_directory_impl<Descriptor, Bases...>::get_version() const no
 		if (size <= field_offsets<Descriptor>[i])
 			return versions[i];
 	}
-	return version::cast_guard_os_determined_failure_mode;
+	return version::guard_memcpy_function_pointer;
 }
 
 template<typename Descriptor, typename... Bases>
@@ -126,7 +128,7 @@ bool load_config_directory_impl<Descriptor, Bases...>::version_exactly_matches()
 template<typename Descriptor, typename... Bases>
 void load_config_directory_impl<Descriptor, Bases...>::set_version(version ver)
 {
-	if (ver == version::cast_guard_os_determined_failure_mode)
+	if (ver == version::guard_memcpy_function_pointer)
 	{
 		size_ = packed_descriptor_type::packed_size;
 		return;
@@ -286,10 +288,11 @@ const char* version_to_min_required_windows_version(version value) noexcept
 	case enclave: return "Windows 10 Redstone 3 (1709) (build 16237)";
 	case volatile_metadata: return "Windows 10 Redstone 4 (1803)";
 	case eh_guard: return "Windows 10 Redstone 5 (1809)";
-	case xf_guard: [[fallthrough]];
+	case xf_guard: return "Windows 10 Vibranium 3 (21H1)";
 	case cast_guard_os_determined_failure_mode:
-		return "Windows 10 Vibranium 3 (21H1)";
-	default: return "Windows 10 Vibranium 3 (21H1) or later";
+		return "Windows 10 Vibranium 4 (21H2)";
+	case guard_memcpy_function_pointer: [[fallthrough]];
+	default: return "Windows 10 Vibranium 4 (21H2) or later";
 	}
 }
 

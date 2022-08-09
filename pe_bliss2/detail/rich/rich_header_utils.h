@@ -12,7 +12,7 @@
 
 namespace buffers
 {
-class input_buffer_interface;
+class input_buffer_stateful_wrapper_ref;
 } //namespace buffers
 
 namespace pe_bliss::detail::rich
@@ -26,21 +26,21 @@ public:
 public:
 	[[nodiscard]]
 	static std::size_t find_checksum(
-		buffers::input_buffer_interface& buffer);
+		buffers::input_buffer_stateful_wrapper_ref& buffer);
 
 	//Buffer should point to checksum bytes.
 	[[nodiscard]]
 	static checksum_type decode_checksum(
-		buffers::input_buffer_interface& buffer);
+		buffers::input_buffer_stateful_wrapper_ref& buffer);
 
 	//Buffer should point to end of checksum bytes
 	[[nodiscard]]
 	static std::size_t find_dans_signature(
-		buffers::input_buffer_interface& buffer,
+		buffers::input_buffer_stateful_wrapper_ref& buffer,
 		checksum_type checksum);
 
 	//Buffer should point to dans signature
-	static void decode_compids(buffers::input_buffer_interface& buffer,
+	static void decode_compids(buffers::input_buffer_stateful_wrapper_ref& buffer,
 		std::size_t checksum_pos, checksum_type checksum,
 		std::vector<pe_bliss::rich::rich_compid>& compids);
 

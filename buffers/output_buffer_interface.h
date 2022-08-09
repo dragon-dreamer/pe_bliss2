@@ -8,7 +8,7 @@
 namespace buffers
 {
 
-class output_buffer_interface : public buffer_interface
+class [[nodiscard]] output_buffer_interface : public buffer_interface
 {
 public:
 	virtual void write(std::size_t count, const std::byte* data) = 0;

@@ -5,8 +5,12 @@
 #include <system_error>
 #include <type_traits>
 
-#include "buffers/input_buffer_interface.h"
 #include "buffers/ref_buffer.h"
+
+namespace buffers
+{
+class input_buffer_stateful_wrapper;
+} //namespace buffers
 
 namespace pe_bliss::core
 {
@@ -23,14 +27,16 @@ public:
 	using ref_buffer::data;
 	using ref_buffer::copied_data;
 	using ref_buffer::copy_referenced_buffer;
-	using ref_buffer::empty;
 	using ref_buffer::size;
+	using ref_buffer::virtual_size;
+	using ref_buffer::physical_size;
+	using ref_buffer::is_stateless;
 	using ref_buffer::is_copied;
 
 	void deserialize(std::uint64_t section_raw_data_last_offset,
 		std::uint32_t size_of_headers,
 		std::size_t initial_buffer_pos,
-		const buffers::input_buffer_ptr& buffer,
+		buffers::input_buffer_stateful_wrapper& buffer,
 		bool eager_copy);
 
 	[[nodiscard]]

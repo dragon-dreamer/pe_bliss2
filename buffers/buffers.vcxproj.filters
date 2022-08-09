@@ -66,6 +66,12 @@
     <ClInclude Include="input_buffer_state.h">
       <Filter>Header Files\input</Filter>
     </ClInclude>
+    <ClInclude Include="input_virtual_buffer.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="input_buffer_stateful_wrapper.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ref_buffer.cpp">
@@ -96,6 +102,12 @@
       <Filter>Source Files\input</Filter>
     </ClCompile>
     <ClCompile Include="input_buffer_state.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="input_virtual_buffer.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="input_buffer_stateful_wrapper.cpp">
       <Filter>Source Files\input</Filter>
     </ClCompile>
   </ItemGroup>

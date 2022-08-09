@@ -1,8 +1,11 @@
 #include "pe_bliss2/core/optional_header.h"
 
 #include <algorithm>
+#include <exception>
+#include <system_error>
+#include <variant>
 
-#include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/output_buffer_interface.h"
 #include "pe_bliss2/core/optional_header_errc.h"
 #include "pe_bliss2/detail/packed_reflection.h"
@@ -12,7 +15,7 @@
 namespace pe_bliss::core
 {
 
-void optional_header::deserialize(buffers::input_buffer_interface& buf,
+void optional_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 	bool allow_virtual_memory)
 {
 	packed_struct<std::uint16_t> magic_value;
@@ -20,7 +23,7 @@ void optional_header::deserialize(buffers::input_buffer_interface& buf,
 	{
 		magic_value.deserialize(buf, false);
 	}
-	catch (...)
+	catch (const std::system_error&)
 	{
 		std::throw_with_nested(pe_error(
 			optional_header_errc::unable_to_read_optional_header));
@@ -39,7 +42,7 @@ void optional_header::deserialize(buffers::input_buffer_interface& buf,
 			obj.deserialize(buf, allow_virtual_memory);
 		}, header_);
 	}
-	catch (...)
+	catch (const std::system_error&)
 	{
 		std::throw_with_nested(pe_error(
 			optional_header_errc::unable_to_read_optional_header));
