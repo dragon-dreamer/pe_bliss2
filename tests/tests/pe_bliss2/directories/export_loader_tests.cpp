@@ -85,7 +85,6 @@ public:
 		auto fwd_name0_ptr = reinterpret_cast<const std::byte*>(fwd_name0);
 		std::copy(fwd_name0_ptr, fwd_name0_ptr + sizeof(fwd_name0),
 			data.begin() + fwd_name0_offset);
-		
 	}
 
 	void add_exported_name_table()
