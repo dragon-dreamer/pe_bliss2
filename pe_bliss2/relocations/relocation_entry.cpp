@@ -27,6 +27,8 @@ struct relocation_entry_error_category : std::error_category
 			return "Unsupported relocation type";
 		case too_large_relocation_address:
 			return "Too large relocation address";
+		case invalid_relocation_entry:
+			return "Invalid relocation entry";
 		default:
 			return {};
 		}

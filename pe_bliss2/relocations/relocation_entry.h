@@ -17,7 +17,8 @@ enum class relocation_entry_errc
 {
 	relocation_param_is_absent = 1,
 	unsupported_relocation_type,
-	too_large_relocation_address
+	too_large_relocation_address,
+	invalid_relocation_entry
 };
 
 std::error_code make_error_code(relocation_entry_errc) noexcept;
