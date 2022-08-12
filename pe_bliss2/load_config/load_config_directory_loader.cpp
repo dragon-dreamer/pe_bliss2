@@ -127,6 +127,12 @@ struct load_config_directory_loader_error_category : std::error_category
 			return "Unsorted exception handling continuation target RVAs";
 		case invalid_xfg_type_based_hash_rva:
 			return "Invalid XFG type-based hash RVA";
+		case invalid_func_override_size:
+			return "Invalid func override block size";
+		case invalid_func_override_rvas_size:
+			return "Invalid func override RVAs size";
+		case invalid_bdd_info_size:
+			return "Invalid func override BDD info size";
 		default:
 			return {};
 		}
@@ -521,6 +527,8 @@ using switchtable_branch_dynamic_relocation_list_type
 	= dynamic_relocation_table_v1_details<std::uint64_t>::switchtable_branch_dynamic_relocation_list_type;
 using arm64x_dynamic_relocation_list_type
 	= dynamic_relocation_table_v1_details<std::uint64_t>::arm64x_dynamic_relocation_list_type;
+using function_override_dynamic_relocation_list_type
+	= dynamic_relocation_table_v1_details<std::uint64_t>::function_override_dynamic_relocation_list_type;
 
 template<typename DynamicRelocationList>
 bool load_base_relocation(const image::image& instance, const loader_options& options,
@@ -688,6 +696,163 @@ void load_arm64x_relocations(const image::image& instance, const loader_options&
 	}
 }
 
+void load_func_overrides(const image::image& instance,
+	const loader_options& options,
+	rva_type current_rva, rva_type block_end_rva,
+	function_override_dynamic_relocation_details& fixup)
+{
+	auto last_override_rva = fixup.get_header()->func_override_size;
+	if (!utilities::math::add_if_safe(last_override_rva, current_rva)
+		|| last_override_rva > block_end_rva)
+	{
+		fixup.add_error(load_config_directory_loader_errc::invalid_func_override_size);
+		return;
+	}
+
+	auto& funcs = fixup.get_relocations();
+	while (last_override_rva - current_rva >=
+		function_override_dynamic_relocation_item<>::descriptor_type::packed_size)
+	{
+		auto& func = funcs.emplace_back();
+		auto& descriptor = func.get_descriptor();
+		current_rva += static_cast<rva_type>(
+			struct_from_rva(instance, current_rva, descriptor,
+				options.include_headers, options.allow_virtual_data).packed_size);
+
+		auto rva_size = descriptor->rva_size;
+		if (rva_size % sizeof(rva_type))
+		{
+			func.add_error(load_config_directory_loader_errc::invalid_func_override_rvas_size);
+			return;
+		}
+
+		auto last_rvas_rva = rva_size;
+		if (!utilities::math::add_if_safe(last_rvas_rva, current_rva)
+			|| last_rvas_rva > last_override_rva)
+		{
+			fixup.add_error(load_config_directory_loader_errc::invalid_func_override_rvas_size);
+			return;
+		}
+
+		rva_size /= sizeof(rva_type);
+
+		auto& rvas = func.get_rvas();
+		while (rva_size--)
+		{
+			auto& rva = rvas.emplace_back();
+			current_rva += static_cast<rva_type>(
+				struct_from_rva(instance, current_rva, rva,
+					options.include_headers, options.allow_virtual_data).packed_size);
+		}
+
+		auto base_relocs_size = descriptor->base_reloc_size;
+		if (base_relocs_size
+			% function_override_dynamic_relocation_item<>::base_relocation_type::packed_size)
+		{
+			func.add_error(load_config_directory_loader_errc::invalid_base_relocation_size);
+			return;
+		}
+
+		auto last_base_relocs_rva = base_relocs_size;
+		if (!utilities::math::add_if_safe(last_base_relocs_rva, current_rva)
+			|| last_base_relocs_rva > last_override_rva)
+		{
+			fixup.add_error(load_config_directory_loader_errc::invalid_base_relocation_size);
+			return;
+		}
+
+		base_relocs_size
+			/= function_override_dynamic_relocation_item<>::base_relocation_type::packed_size;
+
+		auto& base_relocs = func.get_relocations();
+		while (base_relocs_size--)
+		{
+			auto& base_reloc = base_relocs.emplace_back();
+			current_rva += static_cast<rva_type>(
+				struct_from_rva(instance, current_rva, base_reloc,
+					options.include_headers, options.allow_virtual_data).packed_size);
+		}
+	}
+
+	if (last_override_rva != current_rva)
+		fixup.add_error(load_config_directory_loader_errc::invalid_func_override_size);
+}
+
+bool load_bdd_info(const image::image& instance,
+	const loader_options& options,
+	rva_type current_rva, rva_type block_end_rva,
+	bdd_info<error_list>& bdd)
+{
+	rva_type last_bdd_descriptor_rva = bdd_info<error_list>::descriptor_type::packed_size;
+	if (!utilities::math::add_if_safe(last_bdd_descriptor_rva, current_rva)
+		|| last_bdd_descriptor_rva > block_end_rva)
+	{
+		bdd.add_error(load_config_directory_loader_errc::invalid_bdd_info_size);
+		return false;
+	}
+
+	current_rva += static_cast<rva_type>(
+		struct_from_rva(instance, current_rva, bdd.get_descriptor(),
+			options.include_headers, options.allow_virtual_data).packed_size);
+
+	auto remaining_size = block_end_rva - current_rva;
+	while (remaining_size >= bdd_info<error_list>::dynamic_relocation_type::packed_size)
+	{
+		auto& reloc = bdd.get_relocations().emplace_back();
+		remaining_size -= static_cast<rva_type>(
+			struct_from_rva(instance, current_rva, reloc,
+				options.include_headers, options.allow_virtual_data).packed_size);
+	}
+
+	if (remaining_size)
+	{
+		bdd.add_error(load_config_directory_loader_errc::invalid_bdd_info_size);
+		return false;
+	}
+
+	return true;
+}
+
+void load_function_override_relocations(const image::image& instance,
+	const loader_options& options,
+	rva_type current_rva, rva_type last_base_reloc_rva,
+	function_override_dynamic_relocation_list_type& list)
+{
+	while (load_base_relocation(instance, options, current_rva, last_base_reloc_rva, list))
+	{
+		auto& fixups = list.back();
+		//size_of_block is validated by load_base_relocation() call
+		auto block_end_rva = current_rva + fixups.get_base_relocation()->size_of_block;
+		current_rva += static_cast<rva_type>(fixups.get_base_relocation().packed_size);
+
+		auto& fixup_list = fixups.get_fixups();
+		if (block_end_rva - current_rva
+			>= function_override_dynamic_relocation::relocation_header_type::packed_size)
+		{
+			auto& fixup = fixup_list.emplace_back();
+
+			current_rva += static_cast<rva_type>(
+				struct_from_rva(instance, current_rva, fixup.get_header(),
+					options.include_headers, options.allow_virtual_data).packed_size);
+
+			load_func_overrides(instance, options, current_rva, block_end_rva, fixup);
+			if (!utilities::math::add_if_safe(current_rva, fixup.get_header()->func_override_size)
+				|| current_rva > block_end_rva)
+			{
+				break;
+			}
+
+			if (load_bdd_info(instance, options, current_rva,
+				block_end_rva, fixup.get_bdd_info()))
+			{
+				current_rva = block_end_rva;
+			}
+		}
+		check_fixup_end_block_rva(current_rva, block_end_rva, fixups);
+		current_rva = block_end_rva;
+	}
+}
+
 void load_dynamic_relocation_list(const image::image& instance, const loader_options& options,
 	rva_type current_rva, dynamic_relocation_table_details<std::uint64_t>& table,
 	dynamic_relocation_table_details<std::uint64_t>::relocation_v1_list_type& list)
@@ -731,6 +896,11 @@ void load_dynamic_relocation_list(const image::image& instance, const loader_opt
 		case detail::load_config::dynamic_relocation_symbol::guard_arm64x:
 			load_arm64x_relocations(instance, options, current_rva, last_base_reloc_rva,
 				list.back().get_fixup_lists().emplace<arm64x_dynamic_relocation_list_type>());
+			break;
+
+		case detail::load_config::dynamic_relocation_symbol::function_override:
+			load_function_override_relocations(instance, options, current_rva, last_base_reloc_rva,
+				list.back().get_fixup_lists().emplace<function_override_dynamic_relocation_list_type>());
 			break;
 
 		default:

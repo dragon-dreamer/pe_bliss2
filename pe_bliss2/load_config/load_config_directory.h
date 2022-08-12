@@ -2,11 +2,12 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <list>
 #include <optional>
 #include <system_error>
 #include <type_traits>
+#include <utility>
 #include <variant>
+#include <vector>
 
 #include "pe_bliss2/bit_stream.h"
 #include "pe_bliss2/error_list.h"
@@ -68,45 +69,34 @@ enum class version
 	guard_memcpy_function_pointer
 };
 
+[[nodiscard]]
 const char* version_to_min_required_windows_version(version value) noexcept;
 
 template<detail::executable_pointer Pointer>
-class lock_prefix_table
+class [[nodiscard]] lock_prefix_table
 {
 public:
 	using pointer_type = Pointer;
-	using lock_prefix_list_type = std::list<packed_struct<pointer_type>>;
+	using lock_prefix_list_type = std::vector<packed_struct<pointer_type>>;
 
 public:
-	[[nodiscard]] lock_prefix_list_type& get_prefix_va_list() noexcept
-	{
-		return prefixes_;
-	}
-
-	[[nodiscard]] const lock_prefix_list_type& get_prefix_va_list() const noexcept
-	{
-		return prefixes_;
-	}
+	[[nodiscard]] lock_prefix_list_type& get_prefix_va_list() & noexcept;
+	[[nodiscard]] const lock_prefix_list_type& get_prefix_va_list() const& noexcept;
+	[[nodiscard]] lock_prefix_list_type get_prefix_va_list() && noexcept;
 
 private:
 	lock_prefix_list_type prefixes_;
 };
 
-class handler_table
+class [[nodiscard]] handler_table
 {
 public:
-	using handler_list_type = std::list<packed_struct<rva_type>>;
+	using handler_list_type = std::vector<packed_struct<rva_type>>;
 
 public:
-	[[nodiscard]] handler_list_type& get_handler_list() noexcept
-	{
-		return handlers_;
-	}
-
-	[[nodiscard]] const handler_list_type& get_handler_list() const noexcept
-	{
-		return handlers_;
-	}
+	[[nodiscard]] inline handler_list_type& get_handler_list() & noexcept;
+	[[nodiscard]] inline const handler_list_type& get_handler_list() const& noexcept;
+	[[nodiscard]] inline handler_list_type get_handler_list() && noexcept;
 
 private:
 	handler_list_type handlers_;
@@ -123,7 +113,7 @@ struct gfids_flags final : utilities::static_class
 	};
 };
 
-class guard_function_common
+class [[nodiscard]] guard_function_common
 {
 public:
 	static constexpr std::uint8_t max_guard_function_table_stride = 0xfu;
@@ -134,28 +124,14 @@ public:
 
 public:
 	[[nodiscard]]
-	const packed_rva_type& get_rva() const noexcept
-	{
-		return rva_;
-	}
+	inline const packed_rva_type& get_rva() const noexcept;
+	[[nodiscard]]
+	inline packed_rva_type& get_rva() noexcept;
 
 	[[nodiscard]]
-	packed_rva_type& get_rva() noexcept
-	{
-		return rva_;
-	}
-
+	inline const additional_data_type& get_additional_data() const noexcept;
 	[[nodiscard]]
-	const additional_data_type& get_additional_data() const noexcept
-	{
-		return flags_;
-	}
-
-	[[nodiscard]]
-	additional_data_type& get_additional_data() noexcept
-	{
-		return flags_;
-	}
+	inline additional_data_type& get_additional_data() noexcept;
 	
 private:
 	packed_rva_type rva_;
@@ -163,7 +139,7 @@ private:
 };
 
 template<typename... Bases>
-class guard_function_base
+class [[nodiscard]] guard_function_base
 	: public guard_function_common
 	, public Bases...
 {
@@ -172,27 +148,13 @@ public:
 	using optional_type_based_hash_type = std::optional<type_based_hash_type>;
 
 public:
-	[[nodiscard]] gfids_flags::value get_flags() const noexcept
-	{
-		return static_cast<gfids_flags::value>(get_additional_data()[0]);
-	}
-
-	void set_flags(gfids_flags::value flags) noexcept
-	{
-		get_additional_data()[0] = static_cast<std::byte>(flags);
-	}
+	[[nodiscard]] gfids_flags::value get_flags() const noexcept;
+	void set_flags(gfids_flags::value flags) noexcept;
 
 	[[nodiscard]]
-	const optional_type_based_hash_type& get_type_based_hash() const noexcept
-	{
-		return type_based_hash_;
-	}
-
+	const optional_type_based_hash_type& get_type_based_hash() const noexcept;
 	[[nodiscard]]
-	optional_type_based_hash_type& get_type_based_hash() noexcept
-	{
-		return type_based_hash_;
-	}
+	optional_type_based_hash_type& get_type_based_hash() noexcept;
 
 private:
 	optional_type_based_hash_type type_based_hash_;
@@ -283,7 +245,9 @@ struct guard_flags final : utilities::static_class
 		retpoline_present = detail::load_config::guard_flags::retpoline_present,
 		eh_continuation_table_present_20h1 = detail::load_config::guard_flags::eh_continuation_table_present_20h1,
 		eh_continuation_table_present = detail::load_config::guard_flags::eh_continuation_table_present,
-		xfg_enabled = detail::load_config::guard_flags::xfg_enabled
+		xfg_enabled = detail::load_config::guard_flags::xfg_enabled,
+		castguard_present = detail::load_config::guard_flags::castguard_present,
+		memcpy_present = detail::load_config::guard_flags::memcpy_present
 	};
 };
 
@@ -294,7 +258,8 @@ enum class dynamic_relocation_symbol
 	guard_import_control_transfer = detail::load_config::dynamic_relocation_symbol::guard_import_control_transfer,
 	guard_indir_control_transfer = detail::load_config::dynamic_relocation_symbol::guard_indir_control_transfer,
 	guard_switchtable_branch = detail::load_config::dynamic_relocation_symbol::guard_switchtable_branch,
-	guard_arm64x = detail::load_config::dynamic_relocation_symbol::guard_arm64x
+	guard_arm64x = detail::load_config::dynamic_relocation_symbol::guard_arm64x,
+	function_override = detail::load_config::dynamic_relocation_symbol::function_override,
 };
 
 constexpr auto code_integrity_catalog_not_available = detail::load_config::code_integrity_catalog_not_available;
@@ -306,23 +271,16 @@ enum class chpe_arm64x_range_code_type : std::uint8_t
 	x64 = detail::load_config::chpe_arm64x_range_code_type_x64
 };
 
-class chpe_arm64x_code_range_entry
+class [[nodiscard]] chpe_arm64x_code_range_entry
 {
 public:
 	using range_entry_type = packed_struct<detail::load_config::image_chpe_arm64x_range_entry>;
 
 public:
 	[[nodiscard]]
-	range_entry_type& get_entry() noexcept
-	{
-		return entry_;
-	}
-
+	inline range_entry_type& get_entry() noexcept;
 	[[nodiscard]]
-	const range_entry_type& get_entry() const noexcept
-	{
-		return entry_;
-	}
+	inline const range_entry_type& get_entry() const noexcept;
 
 	[[nodiscard]]
 	chpe_arm64x_range_code_type get_code_type() const noexcept;
@@ -337,48 +295,29 @@ private:
 };
 
 template<typename... Bases>
-class chpe_arm64x_metadata_base : public Bases...
+class [[nodiscard]] chpe_arm64x_metadata_base : public Bases...
 {
 public:
-	using range_entry_list_type = std::list<chpe_arm64x_code_range_entry>;
+	using range_entry_list_type = std::vector<chpe_arm64x_code_range_entry>;
 	using metadata_type = packed_struct<detail::load_config::image_chpe_metadata_arm64x>;
 
 public:
 	[[nodiscard]]
-	range_entry_list_type& get_range_entries() noexcept
-	{
-		return range_entries_;
-	}
+	range_entry_list_type& get_range_entries() & noexcept;
+	[[nodiscard]]
+	const range_entry_list_type& get_range_entries() const& noexcept;
+	[[nodiscard]]
+	range_entry_list_type get_range_entries() && noexcept;
 
 	[[nodiscard]]
-	const range_entry_list_type& get_range_entries() const noexcept
-	{
-		return range_entries_;
-	}
+	packed_struct<std::uint32_t>& get_version() noexcept;
+	[[nodiscard]]
+	const packed_struct<std::uint32_t>& get_version() const noexcept;
 
 	[[nodiscard]]
-	packed_struct<std::uint32_t>& get_version() noexcept
-	{
-		return version_;
-	}
-
+	metadata_type& get_metadata() noexcept;
 	[[nodiscard]]
-	const packed_struct<std::uint32_t>& get_version() const noexcept
-	{
-		return version_;
-	}
-
-	[[nodiscard]]
-	metadata_type& get_metadata() noexcept
-	{
-		return metadata_;
-	}
-
-	[[nodiscard]]
-	const metadata_type& get_metadata() const noexcept
-	{
-		return metadata_;
-	}
+	const metadata_type& get_metadata() const noexcept;
 
 private:
 	packed_struct<std::uint32_t> version_;
@@ -392,23 +331,16 @@ enum class chpe_x86_range_code_type : std::uint8_t
 	x86 = detail::load_config::chpe_x86_range_code_type_x86
 };
 
-class chpe_x86_code_range_entry
+class [[nodiscard]] chpe_x86_code_range_entry
 {
 public:
 	using range_entry_type = packed_struct<detail::load_config::image_chpe_x86_range_entry>;
 
 public:
 	[[nodiscard]]
-	range_entry_type& get_entry() noexcept
-	{
-		return entry_;
-	}
-
+	inline range_entry_type& get_entry() noexcept;
 	[[nodiscard]]
-	const range_entry_type& get_entry() const noexcept
-	{
-		return entry_;
-	}
+	inline const range_entry_type& get_entry() const noexcept;
 
 	[[nodiscard]]
 	chpe_x86_range_code_type get_code_type() const noexcept;
@@ -423,48 +355,29 @@ private:
 };
 
 template<typename... Bases>
-class chpe_x86_metadata_base : public Bases...
+class [[nodiscard]] chpe_x86_metadata_base : public Bases...
 {
 public:
-	using range_entry_list_type = std::list<chpe_x86_code_range_entry>;
+	using range_entry_list_type = std::vector<chpe_x86_code_range_entry>;
 	using metadata_type = packed_struct<detail::load_config::image_chpe_metadata_x86>;
 
 public:
 	[[nodiscard]]
-	range_entry_list_type& get_range_entries() noexcept
-	{
-		return range_entries_;
-	}
+	range_entry_list_type& get_range_entries() & noexcept;
+	[[nodiscard]]
+	const range_entry_list_type& get_range_entries() const& noexcept;
+	[[nodiscard]]
+	range_entry_list_type get_range_entries() && noexcept;
 
 	[[nodiscard]]
-	const range_entry_list_type& get_range_entries() const noexcept
-	{
-		return range_entries_;
-	}
+	packed_struct<std::uint32_t>& get_version() noexcept;
+	[[nodiscard]]
+	const packed_struct<std::uint32_t>& get_version() const noexcept;
 
 	[[nodiscard]]
-	packed_struct<std::uint32_t>& get_version() noexcept
-	{
-		return version_;
-	}
-
+	metadata_type& get_metadata() noexcept;
 	[[nodiscard]]
-	const packed_struct<std::uint32_t>& get_version() const noexcept
-	{
-		return version_;
-	}
-
-	[[nodiscard]]
-	metadata_type& get_metadata() noexcept
-	{
-		return metadata_;
-	}
-
-	[[nodiscard]]
-	const metadata_type& get_metadata() const noexcept
-	{
-		return metadata_;
-	}
+	const metadata_type& get_metadata() const noexcept;
 
 	[[nodiscard]]
 	std::uint32_t get_metadata_size() const noexcept;
@@ -476,7 +389,7 @@ private:
 };
 
 template<typename RelocationType>
-class dynamic_relocation_base
+class [[nodiscard]] dynamic_relocation_base
 {
 public:
 	using relocation_type = packed_struct<RelocationType>;
@@ -489,56 +402,27 @@ public:
 	//Relative offset from image_base_relocation RVA
 	[[nodiscard]]
 	std::uint32_t get_page_relative_offset() const noexcept
-		requires (!std::is_scalar_v<RelocationType>)
-	{
-		return get_relocation()->metadata & page_relative_offset_mask;
-	}
-
+		requires (!std::is_scalar_v<RelocationType>);
 	[[nodiscard]]
 	std::uint32_t get_page_relative_offset() const noexcept
-		requires (std::is_scalar_v<RelocationType>)
-	{
-		return get_relocation().get() & page_relative_offset_mask;
-	}
+		requires (std::is_scalar_v<RelocationType>);
 
-	std::uint32_t set_page_relative_offset(std::uint32_t offset)
-		requires (!std::is_scalar_v<RelocationType>)
-	{
-		if (offset > max_page_reative_offset)
-			throw pe_error(load_config_errc::invalid_page_relative_offset);
-
-		get_relocation()->metadata &= ~page_relative_offset_mask;
-		get_relocation()->metadata |= (offset & page_relative_offset_mask);
-	}
-
-	std::uint32_t set_page_relative_offset(std::uint32_t offset)
-		requires (std::is_scalar_v<RelocationType>)
-	{
-		if (offset > max_page_reative_offset)
-			throw pe_error(load_config_errc::invalid_page_relative_offset);
-
-		get_relocation().get() &= ~page_relative_offset_mask;
-		get_relocation().get() |= (offset & page_relative_offset_mask);
-	}
+	void set_page_relative_offset(std::uint32_t offset)
+		requires (!std::is_scalar_v<RelocationType>);
+	void set_page_relative_offset(std::uint32_t offset)
+		requires (std::is_scalar_v<RelocationType>);
 
 public:
 	[[nodiscard]]
-	relocation_type& get_relocation() noexcept
-	{
-		return relocation_;
-	}
-
+	relocation_type& get_relocation() noexcept;
 	[[nodiscard]]
-	const relocation_type& get_relocation() const noexcept
-	{
-		return relocation_;
-	}
+	const relocation_type& get_relocation() const noexcept;
 
 private:
 	relocation_type relocation_;
 };
 
-class import_control_transfer_dynamic_relocation
+class [[nodiscard]] import_control_transfer_dynamic_relocation
 	: public dynamic_relocation_base<
 	detail::load_config::image_import_control_transfer_dynamic_relocation>
 {
@@ -547,84 +431,38 @@ public:
 
 public:
 	[[nodiscard]]
-	bool is_indirect_call() const noexcept
-	{
-		return static_cast<bool>(get_relocation()->metadata & 0x1000u);
-	}
+	inline bool is_indirect_call() const noexcept;
 
 	[[nodiscard]]
-	std::uint32_t get_iat_index() const noexcept
-	{
-		return (get_relocation()->metadata & 0xffffe000u) >> 13u;
-	}
+	inline std::uint32_t get_iat_index() const noexcept;
 
-	void set_indirect_call(bool is_indirect_call) noexcept
-	{
-		if (is_indirect_call)
-			get_relocation()->metadata &= ~0x1000u;
-		else
-			get_relocation()->metadata |= 0x1000u;
-	}
+	inline void set_indirect_call(bool is_indirect_call) noexcept;
 
-	void set_iat_index(std::uint32_t iat_index)
-	{
-		if (iat_index > max_iat_index)
-			throw pe_error(load_config_errc::invalid_iat_index);
-
-		get_relocation()->metadata &= ~0xffffe000u;
-		get_relocation()->metadata |= (iat_index & 0xffffeu) << 13u;
-	}
+	inline void set_iat_index(std::uint32_t iat_index);
 };
 
-class indir_control_transfer_dynamic_relocation
+class [[nodiscard]] indir_control_transfer_dynamic_relocation
 	: public dynamic_relocation_base<
 	detail::load_config::image_indir_control_transfer_dynamic_relocation>
 {
 public:
 	[[nodiscard]]
-	bool is_indirect_call() const noexcept
-	{
-		return static_cast<bool>(get_relocation()->metadata & 0x1000u);
-	}
+	inline bool is_indirect_call() const noexcept;
 
 	[[nodiscard]]
-	bool is_rex_w_prefix() const noexcept
-	{
-		return static_cast<bool>(get_relocation()->metadata & 0x2000u);
-	}
+	inline bool is_rex_w_prefix() const noexcept;
 
 	[[nodiscard]]
-	bool is_cfg_check() const noexcept
-	{
-		return static_cast<bool>(get_relocation()->metadata & 0x4000u);
-	}
+	inline bool is_cfg_check() const noexcept;
 
-	void set_indirect_call(bool is_indirect_call) noexcept
-	{
-		if (is_indirect_call)
-			get_relocation()->metadata &= ~0x1000u;
-		else
-			get_relocation()->metadata |= 0x1000u;
-	}
+	inline void set_indirect_call(bool is_indirect_call) noexcept;
 
-	void set_rex_w_prefix(bool is_indirect_call) noexcept
-	{
-		if (is_indirect_call)
-			get_relocation()->metadata &= ~0x2000u;
-		else
-			get_relocation()->metadata |= 0x2000u;
-	}
+	inline void set_rex_w_prefix(bool is_indirect_call) noexcept;
 
-	void set_cfg_check(bool is_indirect_call) noexcept
-	{
-		if (is_indirect_call)
-			get_relocation()->metadata &= ~0x4000u;
-		else
-			get_relocation()->metadata |= 0x4000u;
-	}
+	inline void set_cfg_check(bool is_indirect_call) noexcept;
 };
 
-class switchtable_branch_dynamic_relocation
+class [[nodiscard]] switchtable_branch_dynamic_relocation
 	: public dynamic_relocation_base<
 	detail::load_config::image_switchtable_branch_dynamic_relocation>
 {
@@ -651,19 +489,11 @@ public:
 
 public:
 	[[nodiscard]]
-	cpu_register get_register() const noexcept
-	{
-		return static_cast<cpu_register>((get_relocation()->metadata & 0xf000u) >> 12u);
-	}
-
-	void set_register(cpu_register reg) noexcept
-	{
-		get_relocation()->metadata &= ~0xf000u;
-		get_relocation()->metadata |= (static_cast<std::uint8_t>(reg) & 0xfu) << 12u;
-	}
+	inline cpu_register get_register() const noexcept;
+	inline void set_register(cpu_register reg) noexcept;
 };
 
-class arm64x_dynamic_relocation_base
+class [[nodiscard]] arm64x_dynamic_relocation_base
 	: public dynamic_relocation_base<detail::load_config::image_arm64x_dynamic_relocation>
 {
 public:
@@ -676,21 +506,15 @@ public:
 
 public:
 	[[nodiscard]]
-	std::uint8_t get_meta() const noexcept
-	{
-		return static_cast<std::uint8_t>((get_relocation()->metadata & 0xf000u) >> 12u);
-	}
-
+	inline std::uint8_t get_meta() const noexcept;
 	[[nodiscard]]
-	type get_type() const noexcept
-	{
-		return static_cast<type>(get_meta() & 0b11u);
-	}
+	inline type get_type() const noexcept;
 
 	void set_meta(std::uint8_t meta);
 };
 
-class arm64x_dynamic_relocation_sized_base : public arm64x_dynamic_relocation_base
+class [[nodiscard]] arm64x_dynamic_relocation_sized_base
+	: public arm64x_dynamic_relocation_base
 {
 public:
 	static constexpr std::size_t max_size = 8;
@@ -702,12 +526,13 @@ public:
 	void set_size(std::uint8_t size);
 };
 
-class arm64x_dynamic_relocation_zero_fill : public arm64x_dynamic_relocation_sized_base
+class [[nodiscard]] arm64x_dynamic_relocation_zero_fill
+	: public arm64x_dynamic_relocation_sized_base
 {
 };
 
 template<typename... Bases>
-class arm64x_dynamic_relocation_copy_data_base
+class [[nodiscard]] arm64x_dynamic_relocation_copy_data_base
 	: public arm64x_dynamic_relocation_sized_base
 	, public Bases...
 {
@@ -716,23 +541,16 @@ public:
 
 public:
 	[[nodiscard]]
-	data_type& get_data() noexcept
-	{
-		return data_;
-	}
-
+	data_type& get_data() noexcept;
 	[[nodiscard]]
-	const data_type& get_data() const noexcept
-	{
-		return data_;
-	}
+	const data_type& get_data() const noexcept;
 
 private:
 	data_type data_;
 };
 
 template<typename... Bases>
-class arm64x_dynamic_relocation_add_delta_base
+class [[nodiscard]] arm64x_dynamic_relocation_add_delta_base
 	: public arm64x_dynamic_relocation_base
 	, public Bases...
 {
@@ -753,16 +571,9 @@ public:
 
 public:
 	[[nodiscard]]
-	const value_type& get_value() const noexcept
-	{
-		return value_;
-	}
-
+	const value_type& get_value() const noexcept;
 	[[nodiscard]]
-	value_type& get_value() noexcept
-	{
-		return value_;
-	}
+	value_type& get_value() noexcept;
 
 	[[nodiscard]]
 	multiplier get_multiplier() const noexcept;
@@ -781,68 +592,148 @@ private:
 	packed_struct<std::uint16_t> value_;
 };
 
+template<typename... Bases>
+class [[nodiscard]] bdd_info : public Bases...
+{
+public:
+	using descriptor_type = packed_struct<
+		detail::load_config::image_bdd_info>;
+	using dynamic_relocation_type = packed_struct<
+		detail::load_config::image_bdd_dynamic_relocation>;
+	using dynamic_relocation_list_type = std::vector<
+		dynamic_relocation_type>;
+
+public:
+	[[nodiscard]]
+	const descriptor_type& get_descriptor() const noexcept;
+	[[nodiscard]]
+	descriptor_type& get_descriptor() noexcept;
+
+	[[nodiscard]]
+	const dynamic_relocation_list_type& get_relocations() const& noexcept;
+	[[nodiscard]]
+	dynamic_relocation_list_type& get_relocations() & noexcept;
+	[[nodiscard]]
+	dynamic_relocation_list_type get_relocations() && noexcept;
+
+private:
+	descriptor_type descriptor_;
+	dynamic_relocation_list_type relocations_;
+};
+
+template<typename... Bases>
+class [[nodiscard]] function_override_dynamic_relocation_item : public Bases...
+{
+public:
+	using descriptor_type = packed_struct<
+		detail::load_config::image_function_override_dynamic_relocation>;
+	using rva_type = packed_struct<std::uint32_t>;
+	using rva_list_type = std::vector<rva_type>;
+	using base_relocation_type = packed_struct<detail::relocations::image_base_relocation>;
+	using base_relocation_list_type = std::vector<base_relocation_type>;
+
+public:
+	[[nodiscard]]
+	const descriptor_type& get_descriptor() const noexcept;
+	[[nodiscard]]
+	descriptor_type& get_descriptor() noexcept;
+
+	[[nodiscard]]
+	const rva_list_type& get_rvas() const& noexcept;
+	[[nodiscard]]
+	rva_list_type& get_rvas() & noexcept;
+	[[nodiscard]]
+	rva_list_type get_rvas() && noexcept;
+
+	[[nodiscard]]
+	const base_relocation_list_type& get_relocations() const& noexcept;
+	[[nodiscard]]
+	base_relocation_list_type& get_relocations() & noexcept;
+	[[nodiscard]]
+	base_relocation_list_type get_relocations() && noexcept;
+
+private:
+	descriptor_type descriptor_;
+	rva_list_type rvas_;
+	base_relocation_list_type base_relocations_;
+};
+
+template<typename... Bases>
+class [[nodiscard]] function_override_dynamic_relocation_base : public Bases...
+{
+public:
+	using relocation_header_type = packed_struct<
+		detail::load_config::image_function_override_header>;
+	using item_list_type = std::vector<
+		function_override_dynamic_relocation_item<Bases...>>;
+	using bdd_info_type = bdd_info<Bases...>;
+
+public:
+	[[nodiscard]]
+	const relocation_header_type& get_header() const noexcept;
+	[[nodiscard]]
+	relocation_header_type& get_header() noexcept;
+
+	[[nodiscard]]
+	const item_list_type& get_relocations() const& noexcept;
+	[[nodiscard]]
+	item_list_type& get_relocations() & noexcept;
+	[[nodiscard]]
+	item_list_type get_relocations() && noexcept;
+
+	[[nodiscard]]
+	const bdd_info_type& get_bdd_info() const& noexcept;
+	[[nodiscard]]
+	bdd_info_type& get_bdd_info() & noexcept;
+	[[nodiscard]]
+	bdd_info_type get_bdd_info() && noexcept;
+
+private:
+	relocation_header_type header_;
+	item_list_type relocations_;
+	bdd_info_type bdd_info_;
+};
+
 template<typename DynamicRelocation>
-class dynamic_relocation_table_common
+class [[nodiscard]] dynamic_relocation_table_common
 {
 public:
 	using dynamic_relocation_type = packed_struct<DynamicRelocation>;
 
 public:
 	[[nodiscard]]
-	const dynamic_relocation_type& get_dynamic_relocation() const noexcept
-	{
-		return dynamic_relocation_;
-	}
-
+	const dynamic_relocation_type& get_dynamic_relocation() const noexcept;
 	[[nodiscard]]
-	dynamic_relocation_type& get_dynamic_relocation() noexcept
-	{
-		return dynamic_relocation_;
-	}
+	dynamic_relocation_type& get_dynamic_relocation() noexcept;
 
 public:
 	[[nodiscard]]
-	dynamic_relocation_symbol get_symbol() const noexcept
-	{
-		return static_cast<dynamic_relocation_symbol>(dynamic_relocation_->symbol);
-	}
+	dynamic_relocation_symbol get_symbol() const noexcept;
 
 private:
 	dynamic_relocation_type dynamic_relocation_;
 };
 
 template<typename Symbol, typename... Bases>
-class dynamic_relocation_list_base : public Bases...
+class [[nodiscard]] dynamic_relocation_list_base : public Bases...
 {
 public:
 	using symbol_type = Symbol;
-	using list_type = std::list<symbol_type>;
+	using list_type = std::vector<symbol_type>;
 	using base_relocation_type = packed_struct<detail::relocations::image_base_relocation>;
 
 public:
 	[[nodiscard]]
-	const base_relocation_type& get_base_relocation() const noexcept
-	{
-		return base_relocation_;
-	}
+	const base_relocation_type& get_base_relocation() const noexcept;
+	[[nodiscard]]
+	base_relocation_type& get_base_relocation() noexcept;
 
 	[[nodiscard]]
-	base_relocation_type& get_base_relocation() noexcept
-	{
-		return base_relocation_;
-	}
-
+	const list_type& get_fixups() const& noexcept;
 	[[nodiscard]]
-	const list_type& get_fixups() const noexcept
-	{
-		return fixups_;
-	}
-
+	list_type& get_fixups() & noexcept;
 	[[nodiscard]]
-	list_type& get_fixups() noexcept
-	{
-		return fixups_;
-	}
+	list_type get_fixups() && noexcept;
 
 private:
 	base_relocation_type base_relocation_;
@@ -850,8 +741,9 @@ private:
 };
 
 template<detail::executable_pointer Pointer, typename... Bases>
-class dynamic_relocation_table_base_v1
-	: public dynamic_relocation_table_common<detail::load_config::image_dynamic_relocation<Pointer>>
+class [[nodiscard]] dynamic_relocation_table_base_v1
+	: public dynamic_relocation_table_common<
+		detail::load_config::image_dynamic_relocation<Pointer>>
 	, public Bases...
 {
 public:
@@ -862,43 +754,46 @@ public:
 	using switchtable_branch_dynamic_fixup_list_type
 		= dynamic_relocation_list_base<switchtable_branch_dynamic_relocation, Bases...>;
 	using arm64x_dynamic_fixup_list_type
-		= dynamic_relocation_list_base<std::variant<arm64x_dynamic_relocation_zero_fill,
-		arm64x_dynamic_relocation_copy_data_base<Bases...>, arm64x_dynamic_relocation_add_delta_base<Bases...>>, Bases...>;
+		= dynamic_relocation_list_base<std::variant<
+		arm64x_dynamic_relocation_zero_fill,
+		arm64x_dynamic_relocation_copy_data_base<Bases...>,
+		arm64x_dynamic_relocation_add_delta_base<Bases...>>, Bases...>;
+	using function_override_dynamic_fixup_list_type
+		= dynamic_relocation_list_base<function_override_dynamic_relocation_base<Bases...>,
+		Bases...>;
 
 	using import_control_transfer_dynamic_relocation_list_type
-		= std::list<import_control_transfer_dynamic_fixup_list_type>;
+		= std::vector<import_control_transfer_dynamic_fixup_list_type>;
 	using indir_control_transfer_dynamic_relocation_list_type
-		= std::list<indir_control_transfer_dynamic_fixup_list_type>;
+		= std::vector<indir_control_transfer_dynamic_fixup_list_type>;
 	using switchtable_branch_dynamic_relocation_list_type
-		= std::list<switchtable_branch_dynamic_fixup_list_type>;
+		= std::vector<switchtable_branch_dynamic_fixup_list_type>;
 	using arm64x_dynamic_relocation_list_type
-		= std::list<arm64x_dynamic_fixup_list_type>;
+		= std::vector<arm64x_dynamic_fixup_list_type>;
+	using function_override_dynamic_relocation_list_type
+		= std::vector<function_override_dynamic_fixup_list_type>;
 
 	using fixup_list_type = std::variant<
 		import_control_transfer_dynamic_relocation_list_type,
 		indir_control_transfer_dynamic_relocation_list_type,
 		switchtable_branch_dynamic_relocation_list_type,
-		arm64x_dynamic_relocation_list_type
+		arm64x_dynamic_relocation_list_type,
+		function_override_dynamic_relocation_list_type
 	>;
 
 public:
 	[[nodiscard]]
-	const fixup_list_type& get_fixup_lists() const noexcept
-	{
-		return fixups_;
-	}
-
+	const fixup_list_type& get_fixup_lists() const& noexcept;
 	[[nodiscard]]
-	fixup_list_type& get_fixup_lists() noexcept
-	{
-		return fixups_;
-	}
+	fixup_list_type& get_fixup_lists() & noexcept;
+	[[nodiscard]]
+	fixup_list_type get_fixup_lists() && noexcept;
 
 private:
 	fixup_list_type fixups_;
 };
 
-class prologue_dynamic_relocation_header
+class [[nodiscard]] prologue_dynamic_relocation_header
 {
 public:
 	using header_type = packed_struct<detail::load_config::image_prologue_dynamic_relocation_header>;
@@ -906,35 +801,23 @@ public:
 
 public:
 	[[nodiscard]]
-	const header_type& get_header() const noexcept
-	{
-		return header_;
-	}
+	inline const header_type& get_header() const noexcept;
+	[[nodiscard]]
+	inline header_type& get_header() noexcept;
 
 	[[nodiscard]]
-	header_type& get_header() noexcept
-	{
-		return header_;
-	}
-
+	inline const data_type& get_data() const& noexcept;
 	[[nodiscard]]
-	const data_type& get_data() const noexcept
-	{
-		return data_;
-	}
-
+	inline data_type& get_data() & noexcept;
 	[[nodiscard]]
-	data_type& get_data() noexcept
-	{
-		return data_;
-	}
+	inline data_type get_data() && noexcept;
 
 private:
 	header_type header_;
 	data_type data_;
 };
 
-class epilogue_branch_descriptor
+class [[nodiscard]] epilogue_branch_descriptor
 {
 public:
 	using descriptor_type = packed_struct<std::uint16_t>;
@@ -942,48 +825,25 @@ public:
 
 public:
 	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
+	inline const descriptor_type& get_descriptor() const noexcept;
+	[[nodiscard]]
+	inline descriptor_type& get_descriptor() noexcept;
 
 	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
+	inline const value_type& get_value() const& noexcept;
 	[[nodiscard]]
-	const value_type& get_value() const noexcept
-	{
-		return value_;
-	}
-
+	inline value_type& get_value() & noexcept;
 	[[nodiscard]]
-	value_type& get_value() noexcept
-	{
-		return value_;
-	}
+	inline value_type get_value() && noexcept;
 
 public:
 	//Based on dumpbin output
 	[[nodiscard]]
-	std::uint8_t get_instr_size() const noexcept
-	{
-		return static_cast<std::uint8_t>(descriptor_.get() & 0xfu);
-	}
-	
+	inline std::uint8_t get_instr_size() const noexcept;
 	[[nodiscard]]
-	std::uint8_t get_disp_offset() const noexcept
-	{
-		return static_cast<std::uint8_t>((descriptor_.get() & 0xf0u) >> 4u);
-	}
-
+	inline std::uint8_t get_disp_offset() const noexcept;
 	[[nodiscard]]
-	std::uint8_t get_disp_size() const noexcept
-	{
-		return static_cast<std::uint8_t>((descriptor_.get() & 0xf00u) >> 8u);
-	}
+	inline std::uint8_t get_disp_size() const noexcept;
 
 	void set_instr_size(std::uint8_t instr_size);
 	void set_disp_offset(std::uint8_t disp_offset);
@@ -994,48 +854,29 @@ private:
 	value_type value_;
 };
 
-class epilogue_branch_descriptor_bit_map
+class [[nodiscard]] epilogue_branch_descriptor_bit_map
 {
 public:
 	using data_type = packed_byte_vector;
 
 public:
 	[[nodiscard]]
-	const data_type& get_data() const noexcept
-	{
-		return data_;
-	}
+	inline const data_type& get_data() const& noexcept;
+	[[nodiscard]]
+	inline data_type& get_data() & noexcept;
+	[[nodiscard]]
+	inline data_type get_data() && noexcept;
 
 	[[nodiscard]]
-	data_type& get_data() noexcept
-	{
-		return data_;
-	}
+	inline std::uint32_t get_bit_width() const noexcept;
+	inline void set_bit_width(std::uint32_t bit_width) noexcept;
 
 	[[nodiscard]]
-	std::uint32_t get_bit_width() const noexcept
-	{
-		return bit_width_;
-	}
-	
-	void set_bit_width(std::uint32_t bit_width) noexcept
-	{
-		bit_width_ = bit_width;
-	}
-
+	inline bit_stream<const data_type::vector_type> to_bit_stream() const
+		noexcept(noexcept(bit_stream(data_.value())));
 	[[nodiscard]]
-	bit_stream<const data_type::vector_type> to_bit_stream() const
-		noexcept(noexcept(bit_stream(data_.value())))
-	{
-		return bit_stream(data_.value());
-	}
-
-	[[nodiscard]]
-	bit_stream<data_type::vector_type> to_bit_stream()
-		noexcept(noexcept(bit_stream(data_.value())))
-	{
-		return bit_stream(data_.value());
-	}
+	inline bit_stream<data_type::vector_type> to_bit_stream()
+		noexcept(noexcept(bit_stream(data_.value())));
 
 private:
 	data_type data_;
@@ -1043,51 +884,33 @@ private:
 };
 
 template<typename... Bases>
-class epilogue_dynamic_relocation_header_base
+class [[nodiscard]] epilogue_dynamic_relocation_header_base
 	: public Bases...
 {
 public:
 	using header_type = packed_struct<detail::load_config::image_epilogue_dynamic_relocation_header>;
 	//count of elements in this list is get_header()->branch_descriptor_count
-	using epilogue_branch_descriptor_list_type = std::list<epilogue_branch_descriptor>;
+	using epilogue_branch_descriptor_list_type = std::vector<epilogue_branch_descriptor>;
 
 public:
 	[[nodiscard]]
-	const header_type& get_header() const noexcept
-	{
-		return header_;
-	}
+	const header_type& get_header() const noexcept;
+	[[nodiscard]]
+	header_type& get_header() noexcept;
 
 	[[nodiscard]]
-	header_type& get_header() noexcept
-	{
-		return header_;
-	}
-
+	const epilogue_branch_descriptor_list_type& get_branch_descriptors() const& noexcept;
 	[[nodiscard]]
-	const epilogue_branch_descriptor_list_type& get_branch_descriptors() const noexcept
-	{
-		return branch_descriptors_;
-	}
-
+	epilogue_branch_descriptor_list_type& get_branch_descriptors() & noexcept;
 	[[nodiscard]]
-	epilogue_branch_descriptor_list_type& get_branch_descriptors() noexcept
-	{
-		return branch_descriptors_;
-	}
+	epilogue_branch_descriptor_list_type get_branch_descriptors() && noexcept;
 
 	//count of elements (branch index) in this bitmap is get_header()->epilogue_count
 	[[nodiscard]]
-	const epilogue_branch_descriptor_bit_map& get_branch_descriptor_bit_map() const noexcept
-	{
-		return branch_descriptor_bit_map_;
-	}
+	const epilogue_branch_descriptor_bit_map& get_branch_descriptor_bit_map() const noexcept;
 
 	[[nodiscard]]
-	epilogue_branch_descriptor_bit_map& get_branch_descriptor_bit_map() noexcept
-	{
-		return branch_descriptor_bit_map_;
-	}
+	epilogue_branch_descriptor_bit_map& get_branch_descriptor_bit_map() noexcept;
 
 private:
 	header_type header_;
@@ -1096,40 +919,30 @@ private:
 };
 
 template<detail::executable_pointer Pointer, typename... Bases>
-class dynamic_relocation_table_base_v2
+class [[nodiscard]] dynamic_relocation_table_base_v2
 	: public dynamic_relocation_table_common<detail::load_config::image_dynamic_relocation_v2<Pointer>>
 	, public Bases...
 {
 public:
 	using fixup_list_type = dynamic_relocation_list_base<dynamic_relocation_base<std::uint16_t>, Bases...>;
-	using relocation_list_type = std::list<fixup_list_type>;
+	using relocation_list_type = std::vector<fixup_list_type>;
 	using header_type = std::variant<std::monostate, prologue_dynamic_relocation_header,
 		epilogue_dynamic_relocation_header_base<Bases...>>;
 
 public:
 	[[nodiscard]]
-	const relocation_list_type& get_fixup_lists() const noexcept
-	{
-		return fixups_;
-	}
+	const relocation_list_type& get_fixup_lists() const& noexcept;
+	[[nodiscard]]
+	relocation_list_type& get_fixup_lists() & noexcept;
+	[[nodiscard]]
+	relocation_list_type get_fixup_lists() && noexcept;
 
 	[[nodiscard]]
-	relocation_list_type& get_fixup_lists() noexcept
-	{
-		return fixups_;
-	}
-
+	const header_type& get_header() const& noexcept;
 	[[nodiscard]]
-	const header_type& get_header() const noexcept
-	{
-		return header_;
-	}
-
+	header_type& get_header() & noexcept;
 	[[nodiscard]]
-	header_type& get_header() noexcept
-	{
-		return header_;
-	}
+	header_type get_header() && noexcept;
 
 private:
 	relocation_list_type fixups_;
@@ -1137,38 +950,26 @@ private:
 };
 
 template<detail::executable_pointer Pointer, typename... Bases>
-class dynamic_relocation_table_base : public Bases...
+class [[nodiscard]] dynamic_relocation_table_base : public Bases...
 {
 public:
 	using table_type = packed_struct<detail::load_config::image_dynamic_relocation_table>;
-	using relocation_v1_list_type = std::list<dynamic_relocation_table_base_v1<Pointer, Bases...>>;
-	using relocation_v2_list_type = std::list<dynamic_relocation_table_base_v2<Pointer, Bases...>>;
+	using relocation_v1_list_type = std::vector<dynamic_relocation_table_base_v1<Pointer, Bases...>>;
+	using relocation_v2_list_type = std::vector<dynamic_relocation_table_base_v2<Pointer, Bases...>>;
 	using relocation_list_type = std::variant<relocation_v1_list_type, relocation_v2_list_type>;
 
 public:
 	[[nodiscard]]
-	const table_type& get_table() const noexcept
-	{
-		return table_;
-	}
-
+	const table_type& get_table() const noexcept;
 	[[nodiscard]]
-	table_type& get_table() noexcept
-	{
-		return table_;
-	}
+	table_type& get_table() noexcept;
 	
 	[[nodiscard]]
-	const relocation_list_type& get_relocations() const noexcept
-	{
-		return relocations_;
-	}
-
+	const relocation_list_type& get_relocations() const& noexcept;
 	[[nodiscard]]
-	relocation_list_type& get_relocations() noexcept
-	{
-		return relocations_;
-	}
+	relocation_list_type& get_relocations() & noexcept;
+	[[nodiscard]]
+	relocation_list_type get_relocations() && noexcept;
 
 private:
 	table_type table_;
@@ -1185,7 +986,7 @@ enum class enclave_import_match : std::uint32_t
 };
 
 template<typename... Bases>
-class enclave_import_base
+class [[nodiscard]] enclave_import_base
 	: public Bases...
 {
 public:
@@ -1194,52 +995,28 @@ public:
 
 public:
 	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
+	const descriptor_type& get_descriptor() const noexcept;
+	[[nodiscard]]
+	descriptor_type& get_descriptor() noexcept;
 
 	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
+	const packed_c_string& get_name() const& noexcept;
+	[[nodiscard]]
+	packed_c_string& get_name() & noexcept;
+	[[nodiscard]]
+	packed_c_string get_name() && noexcept;
 
 	[[nodiscard]]
-	const packed_c_string& get_name() const noexcept
-	{
-		return name_;
-	}
-
+	const extra_data_type& get_extra_data() const& noexcept;
 	[[nodiscard]]
-	packed_c_string& get_name() noexcept
-	{
-		return name_;
-	}
-
+	extra_data_type& get_extra_data() & noexcept;
 	[[nodiscard]]
-	const extra_data_type& get_extra_data() const noexcept
-	{
-		return extra_data_;
-	}
-
-	[[nodiscard]]
-	extra_data_type& get_extra_data() noexcept
-	{
-		return extra_data_;
-	}
+	extra_data_type get_extra_data() && noexcept;
 
 public:
 	[[nodiscard]]
-	enclave_import_match get_match() const noexcept
-	{
-		return static_cast<enclave_import_match>(descriptor_->match_type);
-	}
-
-	void set_match(enclave_import_match match) noexcept
-	{
-		descriptor_->match_type = static_cast<std::uint32_t>(match);
-	}
+	enclave_import_match get_match() const noexcept;
+	void set_match(enclave_import_match match) noexcept;
 
 private:
 	descriptor_type descriptor_;
@@ -1264,73 +1041,42 @@ struct enclave_flags final : utilities::static_class
 };
 
 template<detail::executable_pointer Va, typename... Bases>
-class enclave_config_base
+class [[nodiscard]] enclave_config_base
 	: public Bases...
 {
 public:
 	using descriptor_type = packed_struct<detail::load_config::image_enclave_config<Va>>;
-	using enclave_import_list_type = std::list<enclave_import_base<Bases...>>;
+	using enclave_import_list_type = std::vector<enclave_import_base<Bases...>>;
 	using extra_data_type = packed_byte_vector;
 
 public:
 	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
+	const descriptor_type& get_descriptor() const noexcept;
 	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
+	descriptor_type& get_descriptor() noexcept;
 	
 	[[nodiscard]]
-	const enclave_import_list_type& get_imports() const noexcept
-	{
-		return import_list_;
-	}
+	const enclave_import_list_type& get_imports() const& noexcept;
+	[[nodiscard]]
+	enclave_import_list_type& get_imports() & noexcept;
+	[[nodiscard]]
+	enclave_import_list_type get_imports() && noexcept;
 
 	[[nodiscard]]
-	enclave_import_list_type& get_imports() noexcept
-	{
-		return import_list_;
-	}
-
+	const extra_data_type& get_extra_data() const& noexcept;
 	[[nodiscard]]
-	const extra_data_type& get_extra_data() const noexcept
-	{
-		return extra_data_;
-	}
-
+	extra_data_type& get_extra_data() & noexcept;
 	[[nodiscard]]
-	extra_data_type& get_extra_data() noexcept
-	{
-		return extra_data_;
-	}
+	extra_data_type& get_extra_data() && noexcept;
 
 public:
 	[[nodiscard]]
-	enclave_policy_flags::value get_policy_flags() const noexcept
-	{
-		return static_cast<enclave_policy_flags::value>(descriptor_->policy_flags);
-	}
-	
-	void set_policy_flags(enclave_policy_flags::value flags) noexcept
-	{
-		descriptor_->policy_flags = flags;
-	}
+	enclave_policy_flags::value get_policy_flags() const noexcept;
+	void set_policy_flags(enclave_policy_flags::value flags) noexcept;
 	
 	[[nodiscard]]
-	enclave_flags::value get_flags() const noexcept
-	{
-		return static_cast<enclave_flags::value>(descriptor_->enclave_flags);
-	}
-
-	void set_flags(enclave_flags::value flags) noexcept
-	{
-		descriptor_->enclave_flags = flags;
-	}
+	enclave_flags::value get_flags() const noexcept;
+	void set_flags(enclave_flags::value flags) noexcept;
 
 private:
 	descriptor_type descriptor_;
@@ -1339,52 +1085,35 @@ private:
 };
 
 template<typename... Bases>
-class volatile_metadata_base
+class [[nodiscard]] volatile_metadata_base
 	: public Bases...
 {
 public:
 	using descriptor_type = packed_struct<detail::load_config::image_volatile_metadata>;
 	using packed_rva_type = packed_struct<rva_type>;
 	using range_entry_type = packed_struct<detail::load_config::range_table_entry>;
-	using packed_rva_list_type = std::list<packed_rva_type>;
-	using range_entry_list_type = std::list<range_entry_type>;
+	using packed_rva_list_type = std::vector<packed_rva_type>;
+	using range_entry_list_type = std::vector<range_entry_type>;
 
 public:
 	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
+	const descriptor_type& get_descriptor() const noexcept;
+	[[nodiscard]]
+	descriptor_type& get_descriptor() noexcept;
 
 	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
+	const packed_rva_list_type& get_access_rva_table() const& noexcept;
+	[[nodiscard]]
+	packed_rva_list_type& get_access_rva_table() & noexcept;
+	[[nodiscard]]
+	packed_rva_list_type get_access_rva_table() && noexcept;
 
 	[[nodiscard]]
-	const packed_rva_list_type& get_access_rva_table() const noexcept
-	{
-		return access_rva_table_;
-	}
-
+	const range_entry_list_type& get_range_table() const& noexcept;
 	[[nodiscard]]
-	packed_rva_list_type& get_access_rva_table() noexcept
-	{
-		return access_rva_table_;
-	}
-
+	range_entry_list_type& get_range_table() & noexcept;
 	[[nodiscard]]
-	const range_entry_list_type& get_range_table() const noexcept
-	{
-		return range_table_;
-	}
-
-	[[nodiscard]]
-	range_entry_list_type& get_range_table() noexcept
-	{
-		return range_table_;
-	}
+	range_entry_list_type get_range_table() && noexcept;
 
 private:
 	descriptor_type descriptor_;
@@ -1393,20 +1122,20 @@ private:
 };
 
 template<typename Descriptor, typename... Bases>
-class load_config_directory_impl : public Bases...
+class [[nodiscard]] load_config_directory_impl : public Bases...
 {
 public:
 	using size_type = packed_struct<std::uint32_t>;
 	using packed_descriptor_type = packed_struct<Descriptor>;
 	using pointer_type = typename Descriptor::pointer_type;
 	using packed_rva_type = packed_struct<rva_type>;
-	using packed_rva_optional_list_type = std::optional<std::list<packed_rva_type>>;
+	using packed_rva_optional_list_type = std::optional<std::vector<packed_rva_type>>;
 
 	using lock_prefix_table_type = std::optional<lock_prefix_table<pointer_type>>;
 	using handler_table_type = std::optional<handler_table>;
-	using guard_function_table_type = std::optional<std::list<guard_function_base<Bases...>>>;
-	using guard_address_taken_iat_entry_table_type = std::optional<std::list<guard_function_common>>;
-	using guard_long_jump_target_table_type = std::optional<std::list<guard_function_common>>;
+	using guard_function_table_type = std::optional<std::vector<guard_function_base<Bases...>>>;
+	using guard_address_taken_iat_entry_table_type = std::optional<std::vector<guard_function_common>>;
+	using guard_long_jump_target_table_type = std::optional<std::vector<guard_function_common>>;
 	using chpe_metadata_type = std::variant<std::monostate,
 		chpe_x86_metadata_base<Bases...>, chpe_arm64x_metadata_base<Bases...>>;
 	using dynamic_relocation_table_type = std::optional<dynamic_relocation_table_base<pointer_type, Bases...>>;
@@ -1421,208 +1150,99 @@ public:
 	bool version_exactly_matches() const noexcept;
 
 	[[nodiscard]]
-	const packed_descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
+	const packed_descriptor_type& get_descriptor() const noexcept;
 
 	[[nodiscard]]
-	std::uint32_t get_descriptor_size() const noexcept
-	{
-		return size_.get() - size_.packed_size;
-	}
+	std::uint32_t get_descriptor_size() const noexcept;
 
 	[[nodiscard]]
-	size_type& get_size() noexcept
-	{
-		return size_;
-	}
-
+	size_type& get_size() noexcept;
 	[[nodiscard]]
-	const size_type& get_size() const noexcept
-	{
-		return size_;
-	}
+	const size_type& get_size() const noexcept;
 
 public:
 	[[nodiscard]]
-	packed_descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
+	packed_descriptor_type& get_descriptor() noexcept;
 
 	void set_version(version ver);
 
 public:
-	[[nodiscard]] lock_prefix_table_type& get_lock_prefix_table() noexcept
-	{
-		return lock_prefixes_;
-	}
+	[[nodiscard]] lock_prefix_table_type& get_lock_prefix_table() & noexcept;
+	[[nodiscard]] const lock_prefix_table_type& get_lock_prefix_table() const& noexcept;
+	[[nodiscard]] lock_prefix_table_type get_lock_prefix_table() && noexcept;
 
-	[[nodiscard]] const lock_prefix_table_type& get_lock_prefix_table() const noexcept
-	{
-		return lock_prefixes_;
-	}
+	[[nodiscard]] global_flags::value get_global_flags_set() const noexcept;
+	[[nodiscard]] global_flags::value get_global_flags_clear() const noexcept;
+	void set_global_flags_set(global_flags::value flags) noexcept;
+	void set_global_flags_clear(global_flags::value flags) noexcept;
 
-	[[nodiscard]] global_flags::value get_global_flags_set() const noexcept
-	{
-		return static_cast<global_flags::value>(descriptor_->base.global_flags_set);
-	}
+	[[nodiscard]] process_heap_flags::value get_process_heap_flags() const noexcept;
+	void set_process_heap_flags(process_heap_flags::value flags) noexcept;
 
-	[[nodiscard]] global_flags::value get_global_flags_clear() const noexcept
-	{
-		return static_cast<global_flags::value>(descriptor_->base.global_flags_clear);
-	}
-
-	void set_global_flags_set(global_flags::value flags) noexcept
-	{
-		descriptor_->base.global_flags_set = flags;
-	}
-	
-	void set_global_flags_clear(global_flags::value flags) noexcept
-	{
-		descriptor_->base.global_flags_clear = flags;
-	}
-
-	[[nodiscard]] process_heap_flags::value get_process_heap_flags() const noexcept
-	{
-		return static_cast<process_heap_flags::value>(descriptor_->base.process_heap_flags);
-	}
-
-	void set_process_heap_flags(process_heap_flags::value flags) noexcept
-	{
-		descriptor_->base.process_heap_flags = flags;
-	}
-
-	[[nodiscard]] dependent_load_flags::value get_dependent_load_flags() const noexcept
-	{
-		return static_cast<dependent_load_flags::value>(descriptor_->base.dependent_load_flags);
-	}
-
-	void set_dependent_load_flags(dependent_load_flags::value flags) noexcept
-	{
-		descriptor_->base.dependent_load_flags = flags;
-	}
+	[[nodiscard]] dependent_load_flags::value get_dependent_load_flags() const noexcept;
+	void set_dependent_load_flags(dependent_load_flags::value flags) noexcept;
 
 public: //SafeSEH
-	[[nodiscard]] handler_table_type& get_safeseh_handler_table() noexcept
-	{
-		return safeseh_handler_table_;
-	}
-
-	[[nodiscard]] const handler_table_type& get_safeseh_handler_table() const noexcept
-	{
-		return safeseh_handler_table_;
-	}
+	[[nodiscard]] handler_table_type& get_safeseh_handler_table() & noexcept;
+	[[nodiscard]] const handler_table_type& get_safeseh_handler_table() const& noexcept;
+	[[nodiscard]] handler_table_type get_safeseh_handler_table() && noexcept;
 
 public: //GuardCF
-	[[nodiscard]] guard_flags::value get_guard_flags() const noexcept
-	{
-		return static_cast<guard_flags::value>(descriptor_->cf_guard.guard_flags);
-	}
-
-	void set_guard_flags(guard_flags::value flags) noexcept
-	{
-		descriptor_->cf_guard.guard_flags = flags;
-	}
+	[[nodiscard]] guard_flags::value get_guard_flags() const noexcept;
+	void set_guard_flags(guard_flags::value flags) noexcept;
 
 	[[nodiscard]] std::uint8_t get_guard_cf_function_table_stride() const noexcept;
-	
 	void set_guard_cf_function_table_stride(std::uint8_t stride);
 	
-	[[nodiscard]] guard_function_table_type& get_guard_cf_function_table() noexcept
-	{
-		return guard_cf_function_table_;
-	}
-
-	[[nodiscard]] const guard_function_table_type& get_guard_cf_function_table() const noexcept
-	{
-		return guard_cf_function_table_;
-	}
+	[[nodiscard]] guard_function_table_type& get_guard_cf_function_table() & noexcept;
+	[[nodiscard]] const guard_function_table_type& get_guard_cf_function_table() const& noexcept;
+	[[nodiscard]] guard_function_table_type get_guard_cf_function_table() && noexcept;
 
 public: //GuardCF extended
 	[[nodiscard]] guard_address_taken_iat_entry_table_type&
-		get_guard_address_taken_iat_entry_table() noexcept
-	{
-		return guard_address_taken_iat_entry_table_;
-	}
-
+		get_guard_address_taken_iat_entry_table() & noexcept;
 	[[nodiscard]] const guard_address_taken_iat_entry_table_type&
-		get_guard_address_taken_iat_entry_table() const noexcept
-	{
-		return guard_address_taken_iat_entry_table_;
-	}
+		get_guard_address_taken_iat_entry_table() const& noexcept;
+	[[nodiscard]] guard_address_taken_iat_entry_table_type
+		get_guard_address_taken_iat_entry_table() && noexcept;
 
 	[[nodiscard]] guard_long_jump_target_table_type&
-		get_guard_long_jump_target_table() noexcept
-	{
-		return guard_long_jump_target_table_;
-	}
-
+		get_guard_long_jump_target_table() & noexcept;
 	[[nodiscard]] const guard_long_jump_target_table_type&
-		get_guard_long_jump_target_table() const noexcept
-	{
-		return guard_long_jump_target_table_;
-	}
+		get_guard_long_jump_target_table() const& noexcept;
+	[[nodiscard]] guard_long_jump_target_table_type
+		get_guard_long_jump_target_table() && noexcept;
 
 public: //HybridPE (CHPE)
 	[[nodiscard]]
-	chpe_metadata_type& get_chpe_metadata() noexcept
-	{
-		return chpe_metadata_;
-	}
-
+	chpe_metadata_type& get_chpe_metadata() & noexcept;
 	[[nodiscard]]
-	const chpe_metadata_type& get_chpe_metadata() const noexcept
-	{
-		return chpe_metadata_;
-	}
+	const chpe_metadata_type& get_chpe_metadata() const& noexcept;
+	[[nodiscard]]
+	chpe_metadata_type get_chpe_metadata() && noexcept;
 
 public: //GuardRF, Retpoline
 	[[nodiscard]] dynamic_relocation_table_type&
-		get_dynamic_relocation_table() noexcept
-	{
-		return dynamic_relocation_table_;
-	}
-
+		get_dynamic_relocation_table() & noexcept;
 	[[nodiscard]] const dynamic_relocation_table_type&
-		get_dynamic_relocation_table() const noexcept
-	{
-		return dynamic_relocation_table_;
-	}
+		get_dynamic_relocation_table() const& noexcept;
+	[[nodiscard]] dynamic_relocation_table_type
+		get_dynamic_relocation_table() && noexcept;
 
 public: //Enclave
-	[[nodiscard]] enclave_config_type& get_enclave_config() noexcept
-	{
-		return enclave_config_;
-	}
-
-	[[nodiscard]] const enclave_config_type& get_enclave_config() const noexcept
-	{
-		return enclave_config_;
-	}
+	[[nodiscard]] enclave_config_type& get_enclave_config() & noexcept;
+	[[nodiscard]] const enclave_config_type& get_enclave_config() const& noexcept;
+	[[nodiscard]] enclave_config_type get_enclave_config() && noexcept;
 
 public: //Volatile metadata
-	[[nodiscard]] volatile_metadata_type& get_volatile_metadata() noexcept
-	{
-		return volatile_metadata_;
-	}
-
-	[[nodiscard]] const volatile_metadata_type& get_volatile_metadata() const noexcept
-	{
-		return volatile_metadata_;
-	}
+	[[nodiscard]] volatile_metadata_type& get_volatile_metadata() & noexcept;
+	[[nodiscard]] const volatile_metadata_type& get_volatile_metadata() const& noexcept;
+	[[nodiscard]] volatile_metadata_type get_volatile_metadata() && noexcept;
 
 public: //GuardEH
-	[[nodiscard]] packed_rva_optional_list_type& get_eh_continuation_targets() noexcept
-	{
-		return eh_continuation_targets_;
-	}
-
-	[[nodiscard]] const packed_rva_optional_list_type& get_eh_continuation_targets() const noexcept
-	{
-		return eh_continuation_targets_;
-	}
+	[[nodiscard]] packed_rva_optional_list_type& get_eh_continuation_targets() & noexcept;
+	[[nodiscard]] const packed_rva_optional_list_type& get_eh_continuation_targets() const& noexcept;
+	[[nodiscard]] packed_rva_optional_list_type get_eh_continuation_targets() && noexcept;
 
 private:
 	size_type size_{};
@@ -1640,7 +1260,7 @@ private:
 };
 
 template<typename... Bases>
-class load_config_directory_base
+class [[nodiscard]] load_config_directory_base
 {
 public:
 	using underlying_type32 = load_config_directory_impl<
@@ -1650,24 +1270,18 @@ public:
 	using underlying_type = std::variant<underlying_type32, underlying_type64>;
 
 public:
-	explicit load_config_directory_base(bool is_64bit) noexcept
-	{
-		if (is_64bit)
-			value_.emplace<underlying_type64>();
-	}
+	explicit load_config_directory_base(bool is_64bit);
 
 public:
 	[[nodiscard]]
-	underlying_type& get_value() noexcept
-	{
-		return value_;
-	}
-
+	underlying_type& get_value() & noexcept;
 	[[nodiscard]]
-	const underlying_type& get_value() const noexcept
-	{
-		return value_;
-	}
+	const underlying_type& get_value() const& noexcept;
+	[[nodiscard]]
+	underlying_type get_value() && noexcept;
+
+private:
+	static underlying_type create_underlying(bool is_64bit);
 
 private:
 	underlying_type value_;
@@ -1702,6 +1316,8 @@ using arm64x_dynamic_relocation_copy_data = arm64x_dynamic_relocation_copy_data_
 using arm64x_dynamic_relocation_copy_data_details = arm64x_dynamic_relocation_copy_data_base<error_list>;
 using arm64x_dynamic_relocation_add_delta = arm64x_dynamic_relocation_add_delta_base<>;
 using arm64x_dynamic_relocation_add_delta_details = arm64x_dynamic_relocation_add_delta_base<error_list>;
+using function_override_dynamic_relocation = function_override_dynamic_relocation_base<>;
+using function_override_dynamic_relocation_details = function_override_dynamic_relocation_base<error_list>;
 
 using epilogue_dynamic_relocation_header = epilogue_dynamic_relocation_header_base<>;
 using epilogue_dynamic_relocation_header_details = epilogue_dynamic_relocation_header_base<error_list>;
@@ -1724,3 +1340,5 @@ using load_config_directory = load_config_directory_base<>;
 using load_config_directory_details = load_config_directory_base<error_list>;
 
 } //namespace pe_bliss::load_config
+
+#include "pe_bliss2/detail/load_config/load_config_directory-inl.h"

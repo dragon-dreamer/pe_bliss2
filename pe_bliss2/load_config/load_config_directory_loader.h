@@ -59,7 +59,10 @@ enum class load_config_directory_loader_errc
 	invalid_volatile_metadata_range_table,
 	invalid_ehcont_targets,
 	unsorted_ehcont_targets,
-	invalid_xfg_type_based_hash_rva
+	invalid_xfg_type_based_hash_rva,
+	invalid_func_override_size,
+	invalid_func_override_rvas_size,
+	invalid_bdd_info_size
 };
 
 std::error_code make_error_code(load_config_directory_loader_errc) noexcept;

@@ -4,9 +4,9 @@
 #include <exception>
 #include <functional>
 #include <iomanip>
-#include <list>
 #include <system_error>
 #include <variant>
+#include <vector>
 
 #include "formatter.h"
 
@@ -155,7 +155,9 @@ void dump_guard_flags(formatter& fmt,
 		{ retpoline_present, "RETPOLINE_PRESENT" },
 		{ eh_continuation_table_present_20h1, "EH_CONTINUATION_TABLE_PRESENT_20H1" },
 		{ eh_continuation_table_present, "eh_continuation_table_present" },
-		{ xfg_enabled, "XFG_ENABLED" }
+		{ xfg_enabled, "XFG_ENABLED" },
+		{ castguard_present, "CASTGUARD_PRESENT" },
+		{ memcpy_present, "MEMCPY_PRESENT" }
 	});
 
 	if (flags & cf_function_table_present)
@@ -493,6 +495,73 @@ void dump_dynamic_relocation_list(formatter& fmt, const pe_bliss::load_config::d
 	fmt.get_stream() << '\n';
 }
 
+void dump_dynamic_relocation_list(formatter& fmt,
+	const pe_bliss::load_config::dynamic_relocation_list_details<
+	pe_bliss::load_config::function_override_dynamic_relocation_details>& relocs)
+{
+	for (const auto& fixup : relocs.get_fixups())
+	{
+		fmt.print_structure("Function override header",
+			fixup.get_header(), std::array{
+			value_info{"func_override_size"}
+		});
+
+		fmt.print_errors(fixup);
+
+		for (const auto& reloc : fixup.get_relocations())
+		{
+			fmt.print_structure("Function override dynamic relocation descriptor",
+				reloc.get_descriptor(), std::array{
+				value_info{"original_rva"},
+				value_info{"bdd_offset"},
+				value_info{"rva_size"},
+				value_info{"base_reloc_size"}
+			});
+
+			fmt.print_errors(fixup);
+
+			if (!reloc.get_rvas().empty())
+			{
+				fmt.print_structure_name("Function override dynamic relocation RVAs");
+				for (const auto& rva_descriptor : reloc.get_rvas())
+				{
+					fmt.print_offsets_and_value(rva_descriptor, true);
+					fmt.get_stream() << '\n';
+				}
+			}
+			
+			for (const auto& base_reloc : reloc.get_relocations())
+			{
+				fmt.print_structure("Function override base relocation descriptor",
+					base_reloc, std::array{
+					value_info{"virtual_address"},
+					value_info{"size_of_block"}
+				});
+			}
+		}
+
+		fmt.print_structure("BDD info descriptor",
+			fixup.get_bdd_info().get_descriptor(), std::array{
+			value_info{"version"},
+			value_info{"bdd_size"}
+		});
+
+		for (const auto& bdd_node : fixup.get_bdd_info().get_relocations())
+		{
+			fmt.print_structure("Function override base relocation descriptor",
+				bdd_node, std::array{
+				value_info{"left"},
+				value_info{"right"},
+				value_info{"value"}
+			});
+		}
+
+		fmt.get_stream() << '\n';
+	}
+
+	fmt.get_stream() << '\n';
+}
+
 void dump_arm64x_fixups(formatter& fmt,
 	const pe_bliss::load_config::arm64x_dynamic_relocation_zero_fill& reloc)
 {
@@ -580,6 +649,7 @@ const char* dynamic_relocation_symbol_to_string(pe_bliss::load_config::dynamic_r
 	case guard_indir_control_transfer: return "GUARD_INDIR_CONTROL_TRANSFER";
 	case guard_switchtable_branch: return "GUARD_SWITCHTABLE_BRANCH";
 	case guard_arm64x: return "GUARD_ARM64X";
+	case function_override: return "FUNCTION_OVERRIDE";
 	default: return "Unknown";
 	}
 }
@@ -613,7 +683,7 @@ void dump_dynamic_relocation_list(formatter& fmt,
 }
 
 template<typename Pointer>
-void dump_dynamic_relocation_list(formatter& fmt, const std::list<
+void dump_dynamic_relocation_list(formatter& fmt, const std::vector<
 	pe_bliss::load_config::dynamic_relocation_table_v1_details<Pointer>>& list)
 {
 	fmt.print_structure_name("Dynamic relocation table v1 list");
@@ -741,7 +811,7 @@ void dump_v2_relocation_header(formatter& fmt,
 }
 
 template<typename Pointer>
-void dump_dynamic_relocation_list(formatter& fmt, const std::list<
+void dump_dynamic_relocation_list(formatter& fmt, const std::vector<
 	pe_bliss::load_config::dynamic_relocation_table_v2_details<Pointer>>& list)
 {
 	fmt.print_structure_name("Dynamic relocation table v2 list");

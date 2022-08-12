@@ -46,6 +46,7 @@
     <ClInclude Include="detail\imports\image_import_descriptor.h" />
     <ClInclude Include="detail\concepts.h" />
     <ClInclude Include="detail\load_config\image_load_config_directory.h" />
+    <ClInclude Include="detail\load_config\load_config_directory-inl.h" />
     <ClInclude Include="detail\packed_buffer_serialization.h" />
     <ClInclude Include="detail\packed_reflection.h" />
     <ClInclude Include="detail\packed_serialization.h" />

@@ -474,6 +474,9 @@
     <ClInclude Include="image\buffer_to_va.h">
       <Filter>Header Files\image</Filter>
     </ClInclude>
+    <ClInclude Include="detail\load_config\load_config_directory-inl.h">
+      <Filter>Header Files\detail\load_config</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">

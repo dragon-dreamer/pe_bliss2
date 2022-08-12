@@ -147,7 +147,8 @@ void load_config_directory_impl<Descriptor, Bases...>::set_version(version ver)
 }
 
 template<typename Descriptor, typename... Bases>
-std::uint8_t load_config_directory_impl<Descriptor, Bases...>::get_guard_cf_function_table_stride() const noexcept
+std::uint8_t load_config_directory_impl<Descriptor,
+	Bases...>::get_guard_cf_function_table_stride() const noexcept
 {
 	return static_cast<std::uint8_t>((descriptor_->cf_guard.guard_flags
 		& detail::load_config::guard_flags::cf_function_table_size_mask)
@@ -155,7 +156,8 @@ std::uint8_t load_config_directory_impl<Descriptor, Bases...>::get_guard_cf_func
 }
 
 template<typename Descriptor, typename... Bases>
-void load_config_directory_impl<Descriptor, Bases...>::set_guard_cf_function_table_stride(std::uint8_t stride)
+void load_config_directory_impl<Descriptor,
+	Bases...>::set_guard_cf_function_table_stride(std::uint8_t stride)
 {
 	if ((stride & detail::load_config::guard_flags::cf_function_table_size_mask) != stride)
 		throw pe_error(load_config_errc::invalid_stride_value);
@@ -242,7 +244,8 @@ arm64x_dynamic_relocation_add_delta_base<Bases...>::sign
 }
 
 template<typename... Bases>
-void arm64x_dynamic_relocation_add_delta_base<Bases...>::set_multiplier(multiplier value) noexcept
+void arm64x_dynamic_relocation_add_delta_base<Bases...>::set_multiplier(
+	multiplier value) noexcept
 {
 	if (value == multiplier::multiplier_4)
 		get_relocation()->metadata &= ~0x8000u;
@@ -251,7 +254,8 @@ void arm64x_dynamic_relocation_add_delta_base<Bases...>::set_multiplier(multipli
 }
 
 template<typename... Bases>
-void arm64x_dynamic_relocation_add_delta_base<Bases...>::set_sign(sign value) noexcept
+void arm64x_dynamic_relocation_add_delta_base<Bases...>::set_sign(
+	sign value) noexcept
 {
 	if (value == sign::plus)
 		get_relocation()->metadata &= ~0x4000u;

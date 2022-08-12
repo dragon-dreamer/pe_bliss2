@@ -374,6 +374,7 @@ constexpr std::uint32_t guard_import_control_transfer = 3u;
 constexpr std::uint32_t guard_indir_control_transfer = 4u;
 constexpr std::uint32_t guard_switchtable_branch = 5u;
 constexpr std::uint32_t guard_arm64x = 6u;
+constexpr std::uint32_t function_override = 7u;
 } //namespace dynamic_relocation_symbol
 
 //Symbol 1
@@ -463,6 +464,52 @@ struct image_arm64x_dynamic_relocation
 	
 	//std::uint8_t relocation_data[0];
 };
+
+//Symbol 7 - undocumented
+struct image_function_override_header
+{
+	std::uint32_t func_override_size;
+	//image_function_override_dynamic_relocation func_override_info[]; //func_override_size bytes in size
+	//image_bdd_info bdd_info; //BDD region, size in bytes:
+	//    DVRTEntrySize - sizeof(image_function_override_header) - func_override_size
+};
+
+struct image_function_override_dynamic_relocation
+{
+	std::uint32_t original_rva; //RVA of original function
+	std::uint32_t bdd_offset; //Offset into the BDD region
+	std::uint32_t rva_size; //Size in bytes taken by RVAs. Must be multiple of sizeof(DWORD)
+	std::uint32_t base_reloc_size; //Size in bytes taken by BaseRelocs
+
+	//std::uint32_t RVAs[rva_size / sizeof(DWORD)]; //Array containing overriding func RVAs
+
+	//image_base_relocation base_relocs[]; //Base relocations (RVA + Size + TO)
+	                                       //Padded with extra TOs for 4B alignment
+										   //base_reloc_size size in bytes
+};
+
+struct image_bdd_info
+{
+	std::uint32_t version; //decides the semantics of serialized BDD
+	std::uint32_t bdd_size;
+	//image_bdd_dynamic_relocation bdd_nodes[]; //bdd_size size in bytes
+};
+
+struct image_bdd_dynamic_relocation
+{
+	std::uint16_t left; //Index of FALSE edge in BDD array
+	std::uint16_t right; //Index of TRUE edge in BDD array
+	std::uint32_t value; //Either FeatureNumber or Index into RVAs array
+};
+
+//Function override relocation types in DVRT records
+namespace image_function_override_type
+{
+constexpr std::uint32_t invalid = 0u;
+constexpr std::uint32_t x64_rel32 = 1u; //32-bit relative address from byte following reloc
+constexpr std::uint32_t arm64_branch26 = 2u; //26 bit offset << 2 & sign ext. for B & BL
+constexpr std::uint32_t arm64_thunk = 3u;
+} //namespace image_function_override_type
 
 struct image_chpe_metadata_x86
 {
@@ -645,6 +692,10 @@ constexpr std::uint32_t eh_continuation_table_present_20h1 = 0x00200000;
 constexpr std::uint32_t eh_continuation_table_present = 0x00400000;
 //Module was built with xfg
 constexpr std::uint32_t xfg_enabled = 0x00800000;
+//Module has CastGuard instrumentation present
+constexpr std::uint32_t castguard_present = 0x01000000;
+//Module has Guarded Memcpy instrumentation present
+constexpr std::uint32_t memcpy_present = 0x02000000;
 
 //Stride of Guard CF function table encoded in these bits (additional count of bytes per element)
 constexpr std::uint32_t cf_function_table_size_mask = 0xf0000000;
