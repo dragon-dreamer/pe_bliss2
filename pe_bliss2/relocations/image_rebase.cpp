@@ -60,7 +60,8 @@ void process_relocation(image::image& instance, rva_type rva,
 			pe_error(rebase_errc::unable_to_rebase_inexistent_data));
 	}
 
-	value.get() = static_cast<T>(entry.apply_to(value.get(), base_diff));
+	auto machine = instance.get_file_header().get_machine_type();
+	value.get() = static_cast<T>(entry.apply_to(value.get(), base_diff, machine));
 	struct_to_rva(instance, rva, value, true, !ignore_virtual_data);
 }
 
@@ -73,13 +74,14 @@ void rebase_impl(image::image& instance, const RelocsList& relocs,
 	if (!base_diff)
 		return;
 
+	auto machine = instance.get_file_header().get_machine_type();
 	for (const auto& basereloc : relocs)
 	{
 		for (const auto& entry : basereloc.get_relocations())
 		{
 			// Make sure all relocation entries are supported
 			// before applying relocations
-			[[maybe_unused]] auto size = entry.get_affected_size_in_bytes();
+			[[maybe_unused]] auto size = entry.get_affected_size_in_bytes(machine);
 		}
 	}
 
@@ -88,7 +90,7 @@ void rebase_impl(image::image& instance, const RelocsList& relocs,
 		auto base_rva = basereloc.get_descriptor()->virtual_address;
 		for (const auto& entry : basereloc.get_relocations())
 		{
-			switch (entry.get_affected_size_in_bytes())
+			switch (entry.get_affected_size_in_bytes(machine))
 			{
 				case sizeof(std::uint16_t):
 					process_relocation<std::uint16_t>(instance,

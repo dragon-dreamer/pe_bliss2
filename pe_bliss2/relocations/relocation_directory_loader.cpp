@@ -30,7 +30,7 @@ struct relocation_directory_loader_error_category : std::error_category
 		case invalid_relocation_block_size:
 			return "Invalid base relocation block size";
 		case unaligned_relocation_entry:
-			"Unaligned base relocation entry";
+			return "Unaligned base relocation entry";
 		case invalid_directory_size:
 			return "Invalid relocation directory size";
 		case invalid_relocation_entry:
@@ -54,6 +54,7 @@ bool load_element(const image::image& instance, const loader_options& options,
 {
 	auto& elem = relocations.emplace_back();
 	auto& elem_descriptor = elem.get_descriptor();
+	auto machine = instance.get_file_header().get_machine_type();
 
 	if (!utilities::math::is_sum_safe<rva_type>(last_rva, elem_descriptor.packed_size)
 		|| current_rva + elem_descriptor.packed_size > last_rva)
@@ -79,7 +80,7 @@ bool load_element(const image::image& instance, const loader_options& options,
 	try
 	{
 		//Check relocation type is supported
-		[[maybe_unused]] auto size = elem.get_affected_size_in_bytes();
+		[[maybe_unused]] auto size = elem.get_affected_size_in_bytes(machine);
 	}
 	catch (const pe_error& e)
 	{

@@ -74,7 +74,8 @@ void relocation_entry::set_address(address_type address)
 }
 
 std::uint64_t relocation_entry::apply_to(std::uint64_t value,
-	std::uint64_t image_base_difference) const
+	std::uint64_t image_base_difference,
+	core::file_header::machine_type machine) const
 {
 	using enum relocation_type;
 	switch (get_type())
@@ -98,20 +99,46 @@ std::uint64_t relocation_entry::apply_to(std::uint64_t value,
 		return static_cast<std::uint16_t>(value + image_base_difference);
 
 	case highadj:
-	{
-		if (!param_)
-			throw pe_error(relocation_entry_errc::relocation_param_is_absent);
+		{
+			if (!param_)
+				throw pe_error(relocation_entry_errc::relocation_param_is_absent);
 
-		assert(value <= (std::numeric_limits<std::uint16_t>::max)());
-		std::uint32_t result = static_cast<std::uint32_t>(value) << 16u;
-		result += param_->get();
-		result += static_cast<std::uint32_t>(image_base_difference);
-		result += 0x8000u;
-		return static_cast<std::uint16_t>(result >> 16u);
-	}
+			assert(value <= (std::numeric_limits<std::uint16_t>::max)());
+			std::uint32_t result = static_cast<std::uint32_t>(value) << 16u;
+			result += param_->get();
+			result += static_cast<std::uint32_t>(image_base_difference);
+			result += 0x8000u;
+			return static_cast<std::uint16_t>(result >> 16u);
+		}
+
+	case thumb_mov32:
+		if (machine != core::file_header::machine_type::armnt)
+			break;
+
+		{
+			auto inst0 = static_cast<std::uint32_t>(value & 0xffffffffu);
+			auto inst1 = static_cast<std::uint32_t>((value >> 32u) & 0xffffffffu);
+
+			std::uint16_t lo = ((inst0 << 1u) & 0x0800u) + ((inst0 << 12u) & 0xf000u) +
+				((inst0 >> 20u) & 0x0700u) + ((inst0 >> 16u) & 0x00ffu);
+			std::uint16_t hi = ((inst1 << 1u) & 0x0800u) + ((inst1 << 12u) & 0xf000u) +
+				((inst1 >> 20u) & 0x0700u) + ((inst1 >> 16u) & 0x00ffu);
+
+			std::uint32_t adjusted = (static_cast<std::uint32_t>(lo) | (hi << 16u))
+				+ static_cast<std::uint32_t>(image_base_difference);
+			lo = static_cast<std::uint16_t>(adjusted & 0xffffu);
+			hi = static_cast<std::uint16_t>((adjusted >> 16u) & 0xffffu);
+
+			inst0 = (inst0 & 0x8f00fbf0u) + ((lo >> 1u) & 0x0400u) + ((lo >> 12u) & 0x000fu) +
+				((lo << 20u) & 0x70000000u) + ((lo << 16u) & 0xff0000u);
+			inst1 = (inst1 & 0x8f00fbf0u) + ((hi >> 1u) & 0x0400u) + ((hi >> 12u) & 0x000fu) +
+				((hi << 20u) & 0x70000000u) + ((hi << 16u) & 0xff0000u);
+
+			return static_cast<std::uint64_t>(inst0) | static_cast<std::uint64_t>(inst1) << 32ull;
+		}
+		break;
 
 	case mips_jmpaddr:
-	case thumb_mov32:
 	case riscv_low12s:
 	case high3adj:
 	case mips_jmpaddr16:
@@ -122,7 +149,8 @@ std::uint64_t relocation_entry::apply_to(std::uint64_t value,
 	throw pe_error(relocation_entry_errc::unsupported_relocation_type);
 }
 
-std::uint8_t relocation_entry::get_affected_size_in_bytes() const
+std::uint8_t relocation_entry::get_affected_size_in_bytes(
+	core::file_header::machine_type machine) const
 {
 	using enum relocation_type;
 	switch (get_type())
@@ -142,6 +170,10 @@ std::uint8_t relocation_entry::get_affected_size_in_bytes() const
 		return sizeof(std::uint16_t);
 
 	case thumb_mov32:
+		if (machine == core::file_header::machine_type::armnt)
+			return sizeof(std::uint64_t);
+		break;
+
 	case riscv_low12s:
 	case high3adj:
 	case mips_jmpaddr16:

@@ -7,6 +7,7 @@
 #include <type_traits>
 
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
+#include "pe_bliss2/core/file_header.h"
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/packed_struct.h"
 
@@ -89,10 +90,12 @@ public:
 	// (real image base) minus (image base from image headers)
 	[[nodiscard("Discarding relocated value")]]
 	std::uint64_t apply_to(std::uint64_t value,
-		std::uint64_t image_base_difference) const;
+		std::uint64_t image_base_difference,
+		core::file_header::machine_type machine) const;
 
 	[[nodiscard]]
-	std::uint8_t get_affected_size_in_bytes() const;
+	std::uint8_t get_affected_size_in_bytes(
+		core::file_header::machine_type machine) const;
 
 	[[nodiscard]]
 	bool requires_parameter() const noexcept

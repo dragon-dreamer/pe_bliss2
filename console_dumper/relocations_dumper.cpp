@@ -6,6 +6,7 @@
 
 #include "formatter.h"
 
+#include "pe_bliss2/core/file_header.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/relocations/relocation_entry.h"
 #include "pe_bliss2/relocations/relocation_directory_loader.h"
@@ -13,7 +14,8 @@
 
 namespace
 {
-const char* relocation_type_to_string(pe_bliss::relocations::relocation_type type)
+const char* relocation_type_to_string(pe_bliss::core::file_header::machine_type machine,
+	pe_bliss::relocations::relocation_type type)
 {
 	using enum pe_bliss::relocations::relocation_type;
 	switch (type)
@@ -24,7 +26,9 @@ const char* relocation_type_to_string(pe_bliss::relocations::relocation_type typ
 	case highlow: return "HIGHLOW";
 	case highadj: return "HIGHADJ";
 	case mips_jmpaddr: return "MIPS_JMPADDR/MIPS_JMPADDR/RISCV_HIGH20";
-	case thumb_mov32: return "THUMB_MOV32/RISCV_LOW12I";
+	case thumb_mov32:
+		return machine == pe_bliss::core::file_header::machine_type::armnt
+			? "THUMB_MOV32" : "RISCV_LOW12I";
 	case riscv_low12s: return "RISCV_LOW12S";
 	case mips_jmpaddr16: return "MIPS_JMPADDR16";
 	case dir64: return "DIR64";
@@ -45,6 +49,7 @@ void dump_relocations(formatter& fmt, const pe_bliss::image::image& image) try
 	fmt.get_stream() << " =====\n\n";
 	fmt.print_errors(relocations->errors);
 
+	auto machine = image.get_file_header().get_machine_type();
 	for (const auto& table : relocations->relocations)
 	{
 		fmt.print_structure("Relocation table descriptor", table.get_descriptor(), std::array{
@@ -69,10 +74,17 @@ void dump_relocations(formatter& fmt, const pe_bliss::image::image& image) try
 			fmt.get_stream() << ' ';
 			fmt.print_value(reloc.get_address() + table.get_descriptor()->virtual_address, true);
 
-			fmt.get_stream() << ' ';
-			fmt.print_field_name("Size");
-			fmt.get_stream() << ' ';
-			fmt.print_value(reloc.get_affected_size_in_bytes(), true);
+			try
+			{
+				auto size = reloc.get_affected_size_in_bytes(machine);
+				fmt.get_stream() << ' ';
+				fmt.print_field_name("Size");
+				fmt.get_stream() << ' ';
+				fmt.print_value(size, true);
+			}
+			catch (const std::system_error&)
+			{
+			}
 
 			if (reloc.get_param())
 			{
@@ -82,7 +94,7 @@ void dump_relocations(formatter& fmt, const pe_bliss::image::image& image) try
 			}
 
 			fmt.get_stream() << " (";
-			fmt.print_string(relocation_type_to_string(reloc.get_type()));
+			fmt.print_string(relocation_type_to_string(machine, reloc.get_type()));
 			fmt.get_stream() << ")\n";
 
 			fmt.print_errors(reloc);
