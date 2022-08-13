@@ -332,9 +332,11 @@ public:
 			return;
 
 		error_stream_ << "Errors:";
+		char sep = ' ';
 		for (auto error : *errors.get_errors())
 		{
-			error_stream_ << ' ';
+			error_stream_ << sep;
+			sep = '\n';
 
 			color_changer changer(stream_, color_provider_,
 				error_fg_color, error_bg_color);
