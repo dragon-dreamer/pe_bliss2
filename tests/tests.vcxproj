@@ -188,6 +188,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\export_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\imported_directory_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\import_loader_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\load_config_directory_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\rebase_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\relocation_entry_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\relocation_loader_tests.cpp" />
