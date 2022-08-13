@@ -1081,6 +1081,9 @@ template<typename Descriptor, typename... Bases>
 std::uint32_t load_config_directory_impl<Descriptor, Bases...>
 	::get_descriptor_size() const noexcept
 {
+	if (size_.get() < size_.packed_size)
+		return 0u;
+
 	return size_.get() - size_.packed_size;
 }
 
