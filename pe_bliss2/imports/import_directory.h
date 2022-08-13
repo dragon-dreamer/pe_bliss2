@@ -16,6 +16,7 @@ namespace pe_bliss::imports
 {
 
 //TODO: apisetschema.dll redirects parser
+//TODO: IMAGE_DELAYLOAD_DESCRIPTOR is different from loader imports
 
 template<typename ImportedAddressList>
 class [[nodiscard]] imported_library_base
