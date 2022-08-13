@@ -152,7 +152,3 @@ TEST(RelocationEntryTests, ApplyToArmNtTest)
 		std::byte{0xc0u}, std::byte{0xf2u}, std::byte{0x41u}, std::byte{0x0cu}
 	}));
 }
-
-//TODO
-	 //f2460002    movw    r0, 0x6002
-	 //f6c0405a    movt    r0, 0xc5a
