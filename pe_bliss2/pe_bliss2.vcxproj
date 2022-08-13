@@ -222,6 +222,8 @@
     <ClCompile Include="section\section_table.cpp" />
     <ClCompile Include="section\section_errc.cpp" />
     <ClCompile Include="section\section_table_validator.cpp" />
+    <ClInclude Include="tls\tls_directory-inl.h" />
+    <ClCompile Include="tls\tls_directory.cpp" />
     <ClCompile Include="tls\tls_directory_builder.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ExcludedFromBuild>

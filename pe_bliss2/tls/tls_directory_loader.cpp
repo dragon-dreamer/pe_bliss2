@@ -75,8 +75,7 @@ void load_impl(const image::image& instance, const loader_options& options,
 	try
 	{
 		(void)struct_from_va<va_type>(instance,
-			descriptor->address_of_index, options.include_headers,
-			options.allow_virtual_data);
+			descriptor->address_of_index, options.include_headers, true);
 	}
 	catch (const std::system_error&)
 	{

@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <utility>
 #include <variant>
 
 #include "formatter.h"
@@ -15,6 +16,21 @@ namespace
 {
 
 template<typename Directory>
+void dump_tls_characteristics(formatter& fmt, const Directory& dir,
+	std::size_t left_padding)
+{
+	fmt.get_stream() << '\n';
+	fmt.get_stream() << std::setw(left_padding) << std::setfill(' ') << "";
+
+	{
+		color_changer changer(fmt.get_stream(), fmt.get_color_provider(),
+			fmt.flags_bg_color, fmt.flags_fg_color);
+		fmt.get_stream() << "Alignment: " << std::dec
+			<< dir.get_max_type_alignment();
+	}
+}
+
+template<typename Directory>
 void dump_tls_impl(formatter& fmt, const Directory& directory)
 {
 	fmt.print_errors(directory);
@@ -25,7 +41,9 @@ void dump_tls_impl(formatter& fmt, const Directory& directory)
 		value_info{"address_of_index"},
 		value_info{"address_of_callbacks"},
 		value_info{"size_of_zero_fill"},
-		value_info{"characteristics"}
+		value_info{"characteristics", true, std::bind(
+			dump_tls_characteristics<Directory>,
+			std::ref(fmt), std::cref(directory), std::placeholders::_1)}
 	});
 
 	for (const auto& cb : directory.get_callbacks())

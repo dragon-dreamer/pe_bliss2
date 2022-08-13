@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <system_error>
+#include <type_traits>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -13,6 +15,14 @@
 
 namespace pe_bliss::tls
 {
+
+enum class tls_directory_errc
+{
+	too_big_alignment_value = 1,
+	invalid_alignment_value
+};
+
+std::error_code make_error_code(tls_directory_errc) noexcept;
 
 template<typename Va>
 using tls_callback = packed_struct<Va>;
@@ -37,46 +47,25 @@ public:
 
 public:
 	[[nodiscard]]
-	const packed_descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
+	const packed_descriptor_type& get_descriptor() const noexcept;
+	[[nodiscard]]
+	packed_descriptor_type& get_descriptor() noexcept;
 
 	[[nodiscard]]
-	packed_descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
+	const buffers::ref_buffer& get_raw_data() const noexcept;
+	[[nodiscard]]
+	buffers::ref_buffer& get_raw_data() noexcept;
 
 	[[nodiscard]]
-	const buffers::ref_buffer& get_raw_data() const noexcept
-	{
-		return raw_data_;
-	}
+	const callback_list_type& get_callbacks() const& noexcept;
+	[[nodiscard]]
+	callback_list_type& get_callbacks() & noexcept;
+	[[nodiscard]]
+	callback_list_type get_callbacks() && noexcept;
 
 	[[nodiscard]]
-	buffers::ref_buffer& get_raw_data() noexcept
-	{
-		return raw_data_;
-	}
-
-	[[nodiscard]]
-	const callback_list_type& get_callbacks() const & noexcept
-	{
-		return callbacks_;
-	}
-
-	[[nodiscard]]
-	callback_list_type& get_callbacks() & noexcept
-	{
-		return callbacks_;
-	}
-
-	[[nodiscard]]
-	callback_list_type get_callbacks() && noexcept
-	{
-		return std::move(callbacks_);
-	}
+	std::uint32_t get_max_type_alignment() const noexcept;
+	void set_max_type_alignment(std::uint32_t alignment);
 
 private:
 	packed_descriptor_type descriptor_;
@@ -104,3 +93,11 @@ using tls_directory = std::variant<tls_directory32, tls_directory64>;
 using tls_directory_details = std::variant<tls_directory_details32, tls_directory_details64>;
 
 } //namespace pe_bliss::tls
+
+namespace std
+{
+template<>
+struct is_error_code_enum<pe_bliss::tls::tls_directory_errc> : true_type {};
+} //namespace std
+
+#include "pe_bliss2/tls/tls_directory-inl.h"
