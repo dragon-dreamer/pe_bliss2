@@ -1284,13 +1284,14 @@ void load_volatile_metadata(const image::image& instance, const loader_options& 
 			for (std::uint32_t i = 0u, count = config_descriptor->volatile_access_table_size / 4u;
 				i != count; ++i)
 			{
-				table_rva += struct_from_va(instance, table_rva.value(),
+				table_rva += struct_from_rva(instance, table_rva.value(),
 					config.get_access_rva_table().emplace_back(),
 					options.include_headers, options.allow_virtual_data).packed_size;
 			}
 		}
 		catch (const std::system_error&)
 		{
+			config.get_access_rva_table().pop_back();
 			config.add_error(load_config_directory_loader_errc::invalid_volatile_metadata_access_rva_table);
 		}
 	}
@@ -1308,7 +1309,7 @@ void load_volatile_metadata(const image::image& instance, const loader_options& 
 			for (std::uint32_t i = 0u, count = config_descriptor->volatile_info_range_table_size
 				/ range_entry_type::packed_size; i != count; ++i)
 			{
-				table_rva += struct_from_va(instance, table_rva.value(),
+				table_rva += struct_from_rva(instance, table_rva.value(),
 					config.get_range_table().emplace_back(),
 					options.include_headers, options.allow_virtual_data).packed_size;
 			}

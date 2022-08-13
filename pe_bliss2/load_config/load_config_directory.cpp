@@ -225,7 +225,7 @@ void arm64x_dynamic_relocation_sized_base::set_size(std::uint8_t size)
 		throw pe_error(load_config_errc::invalid_size_value);
 
 	get_relocation()->metadata &= ~0xc000u;
-	get_relocation()->metadata |= std::bit_width(size) << 14u;
+	get_relocation()->metadata |= std::bit_width(size - 1u) << 14u;
 }
 
 template<typename... Bases>
@@ -327,7 +327,7 @@ void arm64x_dynamic_relocation_base::set_meta(std::uint8_t meta)
 		throw pe_error(load_config_errc::invalid_meta_value);
 
 	get_relocation()->metadata &= ~0xf000u;
-	get_relocation()->metadata |= (meta & 0xfu) << 12u;
+	get_relocation()->metadata |= meta << 12u;
 }
 
 void epilogue_branch_descriptor::set_instr_size(std::uint8_t instr_size)

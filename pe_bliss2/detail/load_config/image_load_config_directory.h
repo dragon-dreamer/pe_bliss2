@@ -368,6 +368,8 @@ using image_dynamic_relocation64_v2 = image_dynamic_relocation_v2<std::uint64_t>
 //Defined symbolic dynamic relocation entries
 namespace dynamic_relocation_symbol
 {
+//Used at runtime with some options. For example, the OS may use these relocations to
+//override calls when Retpoline is enabled.
 constexpr std::uint32_t guard_rf_prologue = 1u;
 constexpr std::uint32_t guard_rf_epilogue = 2u;
 constexpr std::uint32_t guard_import_control_transfer = 3u;
@@ -397,6 +399,11 @@ struct image_epilogue_dynamic_relocation_header //Unaligned
 };
 
 //Symbol 3
+/*
+ IAT function calling patch:
+	 call    cs:__imp_PshedFreeMemory
+	 nop     dword ptr [rax+rax+00h]
+*/
 struct image_import_control_transfer_dynamic_relocation //Unaligned
 {
 	/*
@@ -408,6 +415,11 @@ struct image_import_control_transfer_dynamic_relocation //Unaligned
 };
 
 //Symbol 4
+/*
+call reg patch:
+	call    rax
+	nop     dword ptr [rax]
+*/
 struct image_indir_control_transfer_dynamic_relocation //Unaligned
 {
 	/*
@@ -421,6 +433,13 @@ struct image_indir_control_transfer_dynamic_relocation //Unaligned
 };
 
 //Symbol 5
+/*
+call reg in switch patch:
+   mov     ecx, ds:rva off_14000DEBC[rdx+rdi*4]
+   add     rcx, rdx
+   jmp     rcx             ; switch jump
+   db 4 dup(0CCh)
+*/
 struct image_switchtable_branch_dynamic_relocation //Unaligned
 {
 	/*
@@ -431,6 +450,7 @@ struct image_switchtable_branch_dynamic_relocation //Unaligned
 };
 
 //Symbol 6
+//See https://ffri.github.io/ProjectChameleon/new_reloc_chpev2/ and https://github.com/FFRI/ProjectChameleon/
 struct image_arm64x_dynamic_relocation
 {
 	//element size of the array is at least 2 bytes
