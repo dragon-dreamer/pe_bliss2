@@ -62,12 +62,30 @@ enum class load_config_directory_loader_errc
 	invalid_xfg_type_based_hash_rva,
 	invalid_func_override_size,
 	invalid_func_override_rvas_size,
-	invalid_bdd_info_size
+	invalid_func_override_fixup,
+	invalid_func_override_dynamic_relocation,
+	invalid_func_override_rvas,
+	invalid_bdd_info_size,
+	invalid_bdd_info_entry,
+	invalid_bdd_dynamic_relocations,
+	invalid_load_config_directory,
+	invalid_guard_memcpy_function_pointer_va,
+	invalid_cast_guard_os_determined_failure_mode_va,
+	invalid_guard_xfg_check_function_pointer_va,
+	invalid_guard_xfg_dispatch_function_pointer_va,
+	invalid_guard_xfg_table_dispatch_function_pointer_va,
+	invalid_enclave_import_array,
+	invalid_dynamic_relocation_entry,
+	invalid_base_relocation,
+	invalid_dynamic_relocation_block,
+	invalid_arm64x_relocation_entry,
+	invalid_arm64x_dynamic_relocation_copy_data_data,
+	invalid_arm64x_dynamic_relocation_add_delta_entry
 };
 
 std::error_code make_error_code(load_config_directory_loader_errc) noexcept;
 
-struct loader_options
+struct [[nodiscard]] loader_options
 {
 	bool include_headers = true;
 	bool allow_virtual_data = false;
@@ -84,8 +102,9 @@ struct loader_options
 	bool load_xfg_type_based_hashes = true;
 };
 
+[[nodiscard]]
 std::optional<load_config_directory_details> load(const image::image& instance,
-	const loader_options& options);
+	const loader_options& options = {});
 
 } //namespace pe_bliss::load_config
 
