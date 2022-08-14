@@ -12,6 +12,7 @@ The library is aimed at being able to provide as much information about the PE f
   - Reading/modifying binaries, which are already loaded into memory by the Windows loader.
   - Supports copying the full binary sections memory or referencing the existing memory buffer (read-only mode).
   - Thread-safe when working with stateless buffers (i.e. an image does not reference a file) with the same image from different threads.
+  - Reading either physical only or physical and virtual data from PE files with bounds checking.
 - Rebuilding PE/PE+ binaries to a file or a memory buffer (unit-tested).
 - DOS, File, Optional header parsing (unit-tested).
 - Data directories parsing (unit-tested).
