@@ -80,7 +80,8 @@ enum class load_config_directory_loader_errc
 	invalid_dynamic_relocation_block,
 	invalid_arm64x_relocation_entry,
 	invalid_arm64x_dynamic_relocation_copy_data_data,
-	invalid_arm64x_dynamic_relocation_add_delta_entry
+	invalid_arm64x_dynamic_relocation_add_delta_entry,
+	invalid_security_cookie_va
 };
 
 std::error_code make_error_code(load_config_directory_loader_errc) noexcept;

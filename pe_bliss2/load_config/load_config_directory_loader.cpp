@@ -5,6 +5,7 @@
 #include <climits>
 #include <iterator>
 #include <limits>
+#include <optional>
 #include <system_error>
 #include <variant>
 
@@ -170,6 +171,8 @@ struct load_config_directory_loader_error_category : std::error_category
 			return "Invalid ARM64X dynamic relocation (copy data) data";
 		case invalid_arm64x_dynamic_relocation_add_delta_entry:
 			return "Invalid ARM64X dynamic relocation (add delta) entry";
+		case invalid_security_cookie_va:
+			return "Invalid security cookie virtual address";
 		default:
 			return {};
 		}
@@ -1739,6 +1742,15 @@ void validate_cast_guard_os_determined_failure_mode(const image::image& instance
 }
 
 template<typename Directory>
+void validate_security_cookie(const image::image& instance,
+	const loader_options& options, Directory& directory)
+{
+	auto va = directory.get_descriptor()->base.security_cookie;
+	validate_va(instance, va, options.include_headers, true, directory,
+		load_config_directory_loader_errc::invalid_security_cookie_va);
+}
+
+template<typename Directory>
 void validate_xf_guard_vas(const image::image& instance,
 	const loader_options& options, Directory& directory)
 {
@@ -1803,6 +1815,7 @@ void load_impl(const image::image& instance,
 		[[fallthrough]];
 	case base:
 		load_lock_prefix_table(instance, options, directory);
+		validate_security_cookie(instance, options, directory);
 		break;
 	default:
 		assert(false);
