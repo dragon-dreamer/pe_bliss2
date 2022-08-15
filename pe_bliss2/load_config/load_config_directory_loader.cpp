@@ -173,6 +173,20 @@ struct load_config_directory_loader_error_category : std::error_category
 			return "Invalid ARM64X dynamic relocation (add delta) entry";
 		case invalid_security_cookie_va:
 			return "Invalid security cookie virtual address";
+		case invalid_cf_guard_table_function_count:
+			return "Invalid CF guard table function count";
+		case invalid_guard_export_suppression_table_size:
+			return "Invalid CF guard export suppression table size";
+		case invalid_guard_export_suppression_table_function_count:
+			return "Invalid CF guard export suppression table function count";
+		case unsorted_guard_export_suppression_table:
+			return "Unsorted CF guard export suppression table";
+		case invalid_guard_longjump_table_size:
+			return "Invalid CF guard longjump table size";
+		case invalid_guard_longjump_table_function_count:
+			return "Invalid CF guard longjump table function count";
+		case unsorted_guard_longjump_table:
+			return "Unsorted CF guard longjump table";
 		default:
 			return {};
 		}
@@ -284,7 +298,11 @@ template<typename GuardFunction, typename Directory,
 	typename Va, typename Table>
 void read_cf_guard_rva_table(const image::image& instance,
 	const loader_options& options, Directory& directory,
-	Va table_va, Va function_count, Table& optional_table)
+	std::uint64_t max_functions,
+	Va table_va, Va function_count, Table& optional_table,
+	load_config_directory_loader_errc invalid_table_size_error,
+	load_config_directory_loader_errc invalid_function_count_error,
+	load_config_directory_loader_errc unsorted_table_error)
 {
 	if (!table_va)
 		return;
@@ -295,16 +313,20 @@ void read_cf_guard_rva_table(const image::image& instance,
 	auto handlers_size = static_cast<std::uint64_t>(function_count) * entry_size;
 	//Check multiplication overflow
 	if (function_count && handlers_size / function_count != entry_size) {
-		directory.add_error(
-			load_config_directory_loader_errc::invalid_cf_guard_table_size);
+		directory.add_error(invalid_table_size_error);
 		return;
 	}
 	if (handlers_size > (std::numeric_limits<Va>::max)()
 		|| !utilities::math::is_sum_safe(table_va, static_cast<Va>(handlers_size)))
 	{
-		directory.add_error(
-			load_config_directory_loader_errc::invalid_cf_guard_table_size);
+		directory.add_error(invalid_table_size_error);
 		return;
+	}
+
+	if (function_count > max_functions)
+	{
+		function_count = static_cast<Va>(max_functions);
+		directory.add_error(invalid_function_count_error);
 	}
 
 	auto& table = optional_table.emplace();
@@ -344,7 +366,7 @@ void read_cf_guard_rva_table(const image::image& instance,
 	}
 
 	if (!is_sorted)
-		directory.add_error(load_config_directory_loader_errc::unsorted_cf_guard_table);
+		directory.add_error(unsorted_table_error);
 }
 
 template<typename Directory>
@@ -366,9 +388,13 @@ void load_cf_guard(const image::image& instance,
 	try
 	{
 		read_cf_guard_rva_table<guard_function_details>(instance, options, directory,
+			options.max_cf_function_table_functions,
 			directory.get_descriptor()->cf_guard.guard_cf_function_table,
 			directory.get_descriptor()->cf_guard.guard_cf_function_count,
-			directory.get_guard_cf_function_table());
+			directory.get_guard_cf_function_table(),
+			load_config_directory_loader_errc::invalid_cf_guard_table_size,
+			load_config_directory_loader_errc::invalid_cf_guard_table_function_count,
+			load_config_directory_loader_errc::unsorted_cf_guard_table);
 	}
 	catch (const std::system_error&)
 	{
@@ -431,9 +457,13 @@ void load_cf_guard_export_suppression_table(const image::image& instance,
 	}
 
 	read_cf_guard_rva_table<guard_function_common>(instance, options, directory,
+		options.max_guard_export_suppression_table_functions,
 		directory.get_descriptor()->cf_guard_ex.guard_address_taken_iat_entry_table,
 		directory.get_descriptor()->cf_guard_ex.guard_address_taken_iat_entry_count,
-		directory.get_guard_address_taken_iat_entry_table());
+		directory.get_guard_address_taken_iat_entry_table(),
+		load_config_directory_loader_errc::invalid_guard_export_suppression_table_size,
+		load_config_directory_loader_errc::invalid_guard_export_suppression_table_function_count,
+		load_config_directory_loader_errc::unsorted_guard_export_suppression_table);
 }
 catch (const std::system_error&)
 {
@@ -458,9 +488,13 @@ void load_cf_guard_longjump_table(const image::image& instance,
 	}
 
 	read_cf_guard_rva_table<guard_function_common>(instance, options, directory,
+		options.max_guard_longjump_table_functions,
 		directory.get_descriptor()->cf_guard_ex.guard_long_jump_target_table,
 		directory.get_descriptor()->cf_guard_ex.guard_long_jump_target_count,
-		directory.get_guard_long_jump_target_table());
+		directory.get_guard_long_jump_target_table(),
+		load_config_directory_loader_errc::invalid_guard_longjump_table_size,
+		load_config_directory_loader_errc::invalid_guard_longjump_table_function_count,
+		load_config_directory_loader_errc::unsorted_guard_longjump_table);
 }
 catch (const std::system_error&)
 {

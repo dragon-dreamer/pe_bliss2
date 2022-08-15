@@ -81,7 +81,14 @@ enum class load_config_directory_loader_errc
 	invalid_arm64x_relocation_entry,
 	invalid_arm64x_dynamic_relocation_copy_data_data,
 	invalid_arm64x_dynamic_relocation_add_delta_entry,
-	invalid_security_cookie_va
+	invalid_security_cookie_va,
+	invalid_cf_guard_table_function_count,
+	invalid_guard_export_suppression_table_size,
+	invalid_guard_export_suppression_table_function_count,
+	unsorted_guard_export_suppression_table,
+	invalid_guard_longjump_table_size,
+	invalid_guard_longjump_table_function_count,
+	unsorted_guard_longjump_table
 };
 
 std::error_code make_error_code(load_config_directory_loader_errc) noexcept;
@@ -102,6 +109,9 @@ struct [[nodiscard]] loader_options
 	bool load_ehcont_targets = true;
 	bool load_xfg_type_based_hashes = true;
 	std::uint32_t max_safeseh_handler_count = 0xffffu;
+	std::uint64_t max_cf_function_table_functions = 0xfffffu;
+	std::uint64_t max_guard_export_suppression_table_functions = 0xfffffu;
+	std::uint64_t max_guard_longjump_table_functions = 0xfffffu;
 };
 
 [[nodiscard]]
