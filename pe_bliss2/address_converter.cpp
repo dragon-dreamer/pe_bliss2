@@ -59,7 +59,11 @@ rva_type va_to_rva_impl(Va va, std::uint64_t image_base)
 	if (va < image_base)
 		throw pe_error(address_converter_errc::address_conversion_overflow);
 
-	return static_cast<rva_type>(va - image_base);
+	auto rva = va - image_base;
+	if (rva > std::numeric_limits<rva_type>::max())
+		throw pe_error(address_converter_errc::address_conversion_overflow);
+
+	return static_cast<rva_type>(rva);
 }
 
 } //namespace

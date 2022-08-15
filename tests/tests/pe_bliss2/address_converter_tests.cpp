@@ -71,3 +71,11 @@ TEST(AddressConverterTests, VaToRvaTest)
 		(void)ac.va_to_rva(static_cast<std::uint64_t>(image_base - 1u));
 	}, address_converter_errc::address_conversion_overflow);
 }
+
+TEST(AddressConverterTests, VaToRvaTest2)
+{
+	address_converter ac(image_base);
+	expect_throw_pe_error([&] {
+		(void)ac.va_to_rva(0xff000000'00000000ull);
+	}, address_converter_errc::address_conversion_overflow);
+}
