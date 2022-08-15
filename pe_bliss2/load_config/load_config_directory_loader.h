@@ -101,6 +101,7 @@ struct [[nodiscard]] loader_options
 	bool load_volatile_metadata = true;
 	bool load_ehcont_targets = true;
 	bool load_xfg_type_based_hashes = true;
+	std::uint32_t max_safeseh_handler_count = 0xffffu;
 };
 
 [[nodiscard]]

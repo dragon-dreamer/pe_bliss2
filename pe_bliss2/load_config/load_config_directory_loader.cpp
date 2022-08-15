@@ -241,6 +241,13 @@ void load_safeseh_handler_table(const image::image& instance,
 		return;
 	}
 
+	if (count > options.max_safeseh_handler_count)
+	{
+		count = options.max_safeseh_handler_count;
+		directory.add_error(
+			load_config_directory_loader_errc::invalid_safeseh_handler_table);
+	}
+
 	auto& table = directory.get_safeseh_handler_table().emplace().get_handler_list();
 	while (count--)
 	{
