@@ -187,6 +187,10 @@ struct load_config_directory_loader_error_category : std::error_category
 			return "Invalid CF guard longjump table function count";
 		case unsorted_guard_longjump_table:
 			return "Unsorted CF guard longjump table";
+		case invalid_guard_cf_check_function_va:
+			return "Invalid CF guard check function virtual address";
+		case invalid_guard_cf_dispatch_function_va:
+			return "Invalid CF guard dispatch function virtual address";
 		default:
 			return {};
 		}
@@ -197,6 +201,25 @@ const load_config_directory_loader_error_category load_config_directory_loader_e
 
 using namespace pe_bliss;
 using namespace pe_bliss::load_config;
+
+template<typename Va, typename Directory>
+void validate_va(const image::image& instance, Va va,
+	bool include_headers, bool allow_virtual_data, Directory& directory,
+	load_config_directory_loader_errc errc)
+{
+	if (!va)
+		return;
+
+	try
+	{
+		[[maybe_unused]] auto first_byte = struct_from_va<std::uint8_t>(
+			instance, va, include_headers, allow_virtual_data);
+	}
+	catch (const std::system_error&)
+	{
+		directory.add_error(errc);
+	}
+}
 
 template<typename Directory>
 void load_lock_prefix_table(const image::image& instance,
@@ -379,11 +402,18 @@ void load_cf_guard(const image::image& instance,
 	if (!has_cf_guard(instance))
 		return;
 
-	if (!(directory.get_guard_flags() & (guard_flags::cf_instrumented
-		| guard_flags::cf_function_table_present)))
-	{
+	if (!(directory.get_guard_flags() & guard_flags::cf_instrumented))
 		return;
-	}
+
+	validate_va(instance, directory.get_descriptor()->cf_guard.guard_cf_check_function_pointer,
+		options.include_headers, options.allow_virtual_data, directory,
+		load_config_directory_loader_errc::invalid_guard_cf_check_function_va);
+	validate_va(instance, directory.get_descriptor()->cf_guard.guard_cf_dispatch_function_pointer,
+		options.include_headers, options.allow_virtual_data, directory,
+		load_config_directory_loader_errc::invalid_guard_cf_dispatch_function_va);
+
+	if (!(directory.get_guard_flags() & guard_flags::cf_function_table_present))
+		return;
 
 	try
 	{
@@ -450,11 +480,10 @@ void load_cf_guard_export_suppression_table(const image::image& instance,
 	if (!has_cf_guard(instance))
 		return;
 
-	if (!(directory.get_guard_flags() & (guard_flags::cf_instrumented
-		| guard_flags::cf_export_suppression_info_present)))
-	{
+	static constexpr auto flags = guard_flags::cf_instrumented
+		| guard_flags::cf_export_suppression_info_present;
+	if ((directory.get_guard_flags() & flags) != flags)
 		return;
-	}
 
 	read_cf_guard_rva_table<guard_function_common>(instance, options, directory,
 		options.max_guard_export_suppression_table_functions,
@@ -481,11 +510,10 @@ void load_cf_guard_longjump_table(const image::image& instance,
 	if (!has_cf_guard(instance))
 		return;
 
-	if (!(directory.get_guard_flags() & (guard_flags::cf_instrumented
-		| guard_flags::cf_longjump_table_present)))
-	{
+	static constexpr auto flags = guard_flags::cf_instrumented
+		| guard_flags::cf_longjump_table_present;
+	if ((directory.get_guard_flags() & flags) != flags)
 		return;
-	}
 
 	read_cf_guard_rva_table<guard_function_common>(instance, options, directory,
 		options.max_guard_longjump_table_functions,
@@ -1741,25 +1769,6 @@ bool load_size_and_descriptor(const image::image& instance,
 		return false;
 	}
 	return true;
-}
-
-template<typename Va, typename Directory>
-void validate_va(const image::image& instance, Va va,
-	bool include_headers, bool allow_virtual_data, Directory& directory,
-	load_config_directory_loader_errc errc)
-{
-	if (!va)
-		return;
-
-	try
-	{
-		[[maybe_unused]] auto first_byte = struct_from_va<std::uint8_t>(
-			instance, va, include_headers, allow_virtual_data);
-	}
-	catch (const std::system_error&)
-	{
-		directory.add_error(errc);
-	}
 }
 
 template<typename Directory>

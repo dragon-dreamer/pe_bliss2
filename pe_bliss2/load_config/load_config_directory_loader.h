@@ -88,7 +88,9 @@ enum class load_config_directory_loader_errc
 	unsorted_guard_export_suppression_table,
 	invalid_guard_longjump_table_size,
 	invalid_guard_longjump_table_function_count,
-	unsorted_guard_longjump_table
+	unsorted_guard_longjump_table,
+	invalid_guard_cf_check_function_va,
+	invalid_guard_cf_dispatch_function_va
 };
 
 std::error_code make_error_code(load_config_directory_loader_errc) noexcept;
