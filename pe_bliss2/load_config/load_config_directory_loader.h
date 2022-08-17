@@ -90,7 +90,9 @@ enum class load_config_directory_loader_errc
 	invalid_guard_longjump_table_function_count,
 	unsorted_guard_longjump_table,
 	invalid_guard_cf_check_function_va,
-	invalid_guard_cf_dispatch_function_va
+	invalid_guard_cf_dispatch_function_va,
+	invalid_chpe_range_entry_count,
+	invalid_chpe_entry_address_or_size
 };
 
 std::error_code make_error_code(load_config_directory_loader_errc) noexcept;
@@ -114,6 +116,7 @@ struct [[nodiscard]] loader_options
 	std::uint64_t max_cf_function_table_functions = 0xfffffu;
 	std::uint64_t max_guard_export_suppression_table_functions = 0xfffffu;
 	std::uint64_t max_guard_longjump_table_functions = 0xfffffu;
+	std::uint32_t max_cphe_code_address_range_count = 0xffu;
 };
 
 [[nodiscard]]

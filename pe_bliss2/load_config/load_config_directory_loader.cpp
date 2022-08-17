@@ -191,6 +191,10 @@ struct load_config_directory_loader_error_category : std::error_category
 			return "Invalid CF guard check function virtual address";
 		case invalid_guard_cf_dispatch_function_va:
 			return "Invalid CF guard dispatch function virtual address";
+		case invalid_chpe_range_entry_count:
+			return "Invalid CHPE range entry count";
+		case invalid_chpe_entry_address_or_size:
+			return "Invalid CHPE entry address or size";
 		default:
 			return {};
 		}
@@ -542,7 +546,7 @@ void load_chpe_range_entries(const image::image& instance,
 		* Metadata::range_entry_list_type::value_type::range_entry_type::packed_size;
 	if (entries_size > (std::numeric_limits<rva_type>::max)()
 		|| !utilities::math::is_sum_safe(entry_rva,
-			static_cast<std::uint32_t>(entries_size)))
+			static_cast<rva_type>(entries_size)))
 	{
 		metadata.add_error(
 			load_config_directory_loader_errc::invalid_chpe_range_entries);
@@ -550,13 +554,20 @@ void load_chpe_range_entries(const image::image& instance,
 	}
 
 	auto& entry_list = metadata.get_range_entries();
+	if (entry_count > options.max_cphe_code_address_range_count)
+	{
+		entry_count = options.max_cphe_code_address_range_count;
+		metadata.add_error(
+			load_config_directory_loader_errc::invalid_chpe_range_entry_count);
+	}
+
 	while (entry_count--)
 	{
+		auto& entry = entry_list.emplace_back();
 		try
 		{
 			entry_rva += static_cast<rva_type>(
-				struct_from_rva(instance, entry_rva,
-					entry_list.emplace_back().get_entry(),
+				struct_from_rva(instance, entry_rva, entry.get_entry(),
 					options.include_headers, options.allow_virtual_data).packed_size);
 		}
 		catch (const std::system_error&)
@@ -564,6 +575,20 @@ void load_chpe_range_entries(const image::image& instance,
 			entry_list.pop_back();
 			metadata.add_error(
 				load_config_directory_loader_errc::invalid_chpe_range_entries);
+			break;
+		}
+
+		try
+		{
+			auto buf = section_data_from_rva(instance, entry.get_rva(),
+				options.include_headers, options.allow_virtual_data);
+			if (buf->size() < entry.get_entry()->length)
+				throw pe_error(utilities::generic_errc::buffer_overrun);
+		}
+		catch (const std::system_error&)
+		{
+			entry.add_error(
+				load_config_directory_loader_errc::invalid_chpe_entry_address_or_size);
 		}
 	}
 }
@@ -588,28 +613,12 @@ void load_chpe_metadata(const image::image& instance,
 	metadata_va += struct_from_va(instance, metadata_va.value(), metadata.get_version(),
 		options.include_headers, options.allow_virtual_data).packed_size;
 
-	std::uint32_t metadata_size = 0;
-	switch (metadata.get_version().get())
-	{
-	case 0:
-	case 1:
-		metadata_size = detail::packed_reflection::get_field_offset<
-			&chpe_x86_metadata::metadata_type::value_type::compiler_iat_pointer>();
-		break;
-	case 2:
-		metadata_size = detail::packed_reflection::get_field_offset<
-			&chpe_x86_metadata::metadata_type::value_type::wow_a64_rdtsc_function_pointer>();
-		break;
-	default: // >= 3
-		metadata_size = chpe_x86_metadata::metadata_type::packed_size;
-		break;
-	}
-
 	auto buf = section_data_from_va(instance, metadata_va.value(),
 		options.include_headers, options.allow_virtual_data);
 	auto& metadata_descriptor = metadata.get_metadata();
 	buffers::input_buffer_stateful_wrapper_ref wrapper(*buf);
-	metadata_descriptor.deserialize_until(wrapper, metadata_size, options.allow_virtual_data);
+	metadata_descriptor.deserialize_until(wrapper,
+		metadata.get_metadata_size(), options.allow_virtual_data);
 
 	load_chpe_range_entries(instance, options, metadata);
 }
@@ -1447,8 +1456,8 @@ void load_dynamic_relocation_table(const image::image& instance,
 		return;
 	}
 
-	auto section = std::next(std::cbegin(section_headers), table_section_index);
-	if (table_offset >= section->get_virtual_size(
+	const auto& section = section_headers[table_section_index];
+	if (table_offset >= section.get_virtual_size(
 		instance.get_optional_header().get_raw_section_alignment()))
 	{
 		directory.add_error(load_config_directory_loader_errc
@@ -1457,7 +1466,7 @@ void load_dynamic_relocation_table(const image::image& instance,
 	}
 
 	//Does not overflow, section RVA and size are verified
-	utilities::safe_uint<rva_type> current_rva = section->get_rva();
+	utilities::safe_uint<rva_type> current_rva = section.get_rva();
 	auto& table = directory.get_dynamic_relocation_table().emplace();
 	using table_type = std::remove_cvref_t<decltype(table)>;
 

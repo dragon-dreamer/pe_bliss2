@@ -170,54 +170,6 @@ void load_config_directory_impl<Descriptor,
 		<< detail::load_config::guard_flags::cf_function_table_size_shift);
 }
 
-[[nodiscard]]
-chpe_arm64x_range_code_type chpe_arm64x_code_range_entry::get_code_type() const noexcept
-{
-	return static_cast<chpe_arm64x_range_code_type>(entry_->start_offset
-		& detail::load_config::chpe_arm64x_range_code_type_mask);
-}
-
-void chpe_arm64x_code_range_entry::set_code_type(chpe_arm64x_range_code_type code_type) noexcept
-{
-	entry_->start_offset &= ~detail::load_config::chpe_arm64x_range_code_type_mask;
-	entry_->start_offset |= static_cast<std::uint8_t>(code_type);
-}
-
-rva_type chpe_arm64x_code_range_entry::get_rva() const noexcept
-{
-	return entry_->start_offset & ~detail::load_config::chpe_arm64x_range_code_type_mask;
-}
-
-void chpe_arm64x_code_range_entry::set_rva(rva_type rva) noexcept
-{
-	entry_->start_offset = (rva & ~detail::load_config::chpe_arm64x_range_code_type_mask)
-		| static_cast<std::uint32_t>(get_code_type());
-}
-
-[[nodiscard]]
-chpe_x86_range_code_type chpe_x86_code_range_entry::get_code_type() const noexcept
-{
-	return static_cast<chpe_x86_range_code_type>(entry_->start_offset
-		& detail::load_config::chpe_x86_range_code_type_mask);
-}
-
-void chpe_x86_code_range_entry::set_code_type(chpe_x86_range_code_type code_type) noexcept
-{
-	entry_->start_offset &= ~detail::load_config::chpe_x86_range_code_type_mask;
-	entry_->start_offset |= static_cast<std::uint8_t>(code_type);
-}
-
-rva_type chpe_x86_code_range_entry::get_rva() const noexcept
-{
-	return entry_->start_offset & ~detail::load_config::chpe_x86_range_code_type_mask;
-}
-
-void chpe_x86_code_range_entry::set_rva(rva_type rva) noexcept
-{
-	entry_->start_offset = (rva & ~detail::load_config::chpe_x86_range_code_type_mask)
-		| static_cast<std::uint32_t>(get_code_type());
-}
-
 std::uint8_t arm64x_dynamic_relocation_sized_base::get_size() const noexcept
 {
 	return static_cast<std::uint8_t>(1u << (get_meta() >> 2u));

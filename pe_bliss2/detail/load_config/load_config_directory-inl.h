@@ -94,16 +94,76 @@ typename guard_function_base<Bases...>
 	return type_based_hash_;
 }
 
-inline chpe_arm64x_code_range_entry::range_entry_type&
-	chpe_arm64x_code_range_entry::get_entry() noexcept
+template<typename... Bases>
+typename chpe_arm64x_code_range_entry<Bases...>::range_entry_type&
+	chpe_arm64x_code_range_entry<Bases...>::get_entry() noexcept
 {
 	return entry_;
 }
 
-inline const chpe_arm64x_code_range_entry::range_entry_type&
-	chpe_arm64x_code_range_entry::get_entry() const noexcept
+template<typename... Bases>
+const typename chpe_arm64x_code_range_entry<Bases...>::range_entry_type&
+	chpe_arm64x_code_range_entry<Bases...>::get_entry() const noexcept
 {
 	return entry_;
+}
+
+template<typename... Bases>
+chpe_arm64x_range_code_type chpe_arm64x_code_range_entry<Bases...>
+::get_code_type() const noexcept
+{
+	return static_cast<chpe_arm64x_range_code_type>(entry_->start_offset
+		& detail::load_config::chpe_arm64x_range_code_type_mask);
+}
+
+template<typename... Bases>
+void chpe_arm64x_code_range_entry<Bases...>::set_code_type(
+	chpe_arm64x_range_code_type code_type) noexcept
+{
+	entry_->start_offset &= ~detail::load_config::chpe_arm64x_range_code_type_mask;
+	entry_->start_offset |= static_cast<std::uint8_t>(code_type);
+}
+
+template<typename... Bases>
+rva_type chpe_arm64x_code_range_entry<Bases...>::get_rva() const noexcept
+{
+	return entry_->start_offset & ~detail::load_config::chpe_arm64x_range_code_type_mask;
+}
+
+template<typename... Bases>
+void chpe_arm64x_code_range_entry<Bases...>::set_rva(rva_type rva) noexcept
+{
+	entry_->start_offset = (rva & ~detail::load_config::chpe_arm64x_range_code_type_mask)
+		| static_cast<std::uint32_t>(get_code_type());
+}
+
+template<typename... Bases>
+chpe_x86_range_code_type chpe_x86_code_range_entry<Bases...>
+	::get_code_type() const noexcept
+{
+	return static_cast<chpe_x86_range_code_type>(entry_->start_offset
+		& detail::load_config::chpe_x86_range_code_type_mask);
+}
+
+template<typename... Bases>
+void chpe_x86_code_range_entry<Bases...>::set_code_type(
+	chpe_x86_range_code_type code_type) noexcept
+{
+	entry_->start_offset &= ~detail::load_config::chpe_x86_range_code_type_mask;
+	entry_->start_offset |= static_cast<std::uint8_t>(code_type);
+}
+
+template<typename... Bases>
+rva_type chpe_x86_code_range_entry<Bases...>::get_rva() const noexcept
+{
+	return entry_->start_offset & ~detail::load_config::chpe_x86_range_code_type_mask;
+}
+
+template<typename... Bases>
+void chpe_x86_code_range_entry<Bases...>::set_rva(rva_type rva) noexcept
+{
+	entry_->start_offset = (rva & ~detail::load_config::chpe_x86_range_code_type_mask)
+		| static_cast<std::uint32_t>(get_code_type());
 }
 
 template<typename... Bases>
@@ -153,14 +213,16 @@ const typename chpe_arm64x_metadata_base<Bases...>::metadata_type&
 	return metadata_;
 }
 
-inline chpe_x86_code_range_entry::range_entry_type&
-	chpe_x86_code_range_entry::get_entry() noexcept
+template<typename... Bases>
+typename chpe_x86_code_range_entry<Bases...>::range_entry_type&
+	chpe_x86_code_range_entry<Bases...>::get_entry() noexcept
 {
 	return entry_;
 }
 
-inline const chpe_x86_code_range_entry::range_entry_type&
-	chpe_x86_code_range_entry::get_entry() const noexcept
+template<typename... Bases>
+const typename chpe_x86_code_range_entry<Bases...>::range_entry_type&
+	chpe_x86_code_range_entry<Bases...>::get_entry() const noexcept
 {
 	return entry_;
 }

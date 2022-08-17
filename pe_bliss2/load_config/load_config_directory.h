@@ -271,7 +271,8 @@ enum class chpe_arm64x_range_code_type : std::uint8_t
 	x64 = detail::load_config::chpe_arm64x_range_code_type_x64
 };
 
-class [[nodiscard]] chpe_arm64x_code_range_entry
+template<typename... Bases>
+class [[nodiscard]] chpe_arm64x_code_range_entry : public Bases...
 {
 public:
 	using range_entry_type = packed_struct<detail::load_config::image_chpe_arm64x_range_entry>;
@@ -298,7 +299,7 @@ template<typename... Bases>
 class [[nodiscard]] chpe_arm64x_metadata_base : public Bases...
 {
 public:
-	using range_entry_list_type = std::vector<chpe_arm64x_code_range_entry>;
+	using range_entry_list_type = std::vector<chpe_arm64x_code_range_entry<Bases...>>;
 	using metadata_type = packed_struct<detail::load_config::image_chpe_metadata_arm64x>;
 
 public:
@@ -331,7 +332,8 @@ enum class chpe_x86_range_code_type : std::uint8_t
 	x86 = detail::load_config::chpe_x86_range_code_type_x86
 };
 
-class [[nodiscard]] chpe_x86_code_range_entry
+template<typename... Bases>
+class [[nodiscard]] chpe_x86_code_range_entry : public Bases...
 {
 public:
 	using range_entry_type = packed_struct<detail::load_config::image_chpe_x86_range_entry>;
@@ -358,7 +360,7 @@ template<typename... Bases>
 class [[nodiscard]] chpe_x86_metadata_base : public Bases...
 {
 public:
-	using range_entry_list_type = std::vector<chpe_x86_code_range_entry>;
+	using range_entry_list_type = std::vector<chpe_x86_code_range_entry<Bases...>>;
 	using metadata_type = packed_struct<detail::load_config::image_chpe_metadata_x86>;
 
 public:
