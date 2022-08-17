@@ -154,7 +154,7 @@ void dump_guard_flags(formatter& fmt,
 		{ rf_strict, "RF_STRICT" },
 		{ retpoline_present, "RETPOLINE_PRESENT" },
 		{ eh_continuation_table_present_20h1, "EH_CONTINUATION_TABLE_PRESENT_20H1" },
-		{ eh_continuation_table_present, "eh_continuation_table_present" },
+		{ eh_continuation_table_present, "EH_CONTINUATION_TABLE_PRESENT" },
 		{ xfg_enabled, "XFG_ENABLED" },
 		{ castguard_present, "CASTGUARD_PRESENT" },
 		{ memcpy_present, "MEMCPY_PRESENT" }
