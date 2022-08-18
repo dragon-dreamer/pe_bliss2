@@ -1295,7 +1295,7 @@ bool load_relocations_header(const image::image& instance, const loader_options&
 	}
 
 	auto size = last_header_rva - current_rva;
-	if (min_required_size.value() > size)
+	if (min_required_size > size)
 	{
 		header.add_error(
 			load_config_directory_loader_errc::invalid_dynamic_relocation_epilogue_size);
@@ -1337,9 +1337,12 @@ bool load_relocations_header(const image::image& instance, const loader_options&
 	bit_map.set_bit_width(bit_width);
 	try
 	{
-		byte_vector_from_rva(instance, branch_descriptor_data_rva,
-			static_cast<std::uint32_t>(bytes_for_bit_map), bit_map.get_data(),
-			options.include_headers, options.allow_virtual_data);
+		if (bit_width)
+		{
+			byte_vector_from_rva(instance, branch_descriptor_data_rva,
+				static_cast<std::uint32_t>(bytes_for_bit_map), bit_map.get_data(),
+				options.include_headers, options.allow_virtual_data);
+		}
 	}
 	catch (const std::system_error&)
 	{
