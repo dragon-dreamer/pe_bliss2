@@ -749,6 +749,12 @@ bool load_base_relocation(const image::image& instance, const loader_options& op
 		return false;
 	}
 
+	if (current_rva % sizeof(rva_type))
+	{
+		fixups.add_error(
+			load_config_directory_loader_errc::unaligned_dynamic_relocation_block);
+	}
+
 	return true;
 }
 
@@ -759,11 +765,6 @@ void check_fixup_end_block_rva(rva_type current_rva, rva_type block_end_rva, Fix
 	{
 		fixups.add_error(
 			load_config_directory_loader_errc::invalid_dynamic_relocation_block_size);
-	}
-	else if (current_rva % sizeof(rva_type))
-	{
-		fixups.add_error(
-			load_config_directory_loader_errc::unaligned_dynamic_relocation_block);
 	}
 }
 
@@ -869,7 +870,9 @@ void load_arm64x_relocations(const image::image& instance, const loader_options&
 				break;
 			case copy_data:
 				{
-					arm64x_dynamic_relocation_copy_data_details element;
+					auto& element = std::get<arm64x_dynamic_relocation_copy_data_details>
+						(fixups.get_fixups().emplace_back(
+							std::in_place_type<arm64x_dynamic_relocation_copy_data_details>));
 					element.get_relocation() = relocation_base.get_relocation();
 					if (block_end_rva - current_rva < element.get_size())
 					{
@@ -891,12 +894,13 @@ void load_arm64x_relocations(const image::image& instance, const loader_options&
 						}
 						current_rva += element.get_size();
 					}
-					fixups.get_fixups().emplace_back(std::move(element));
 				}
 				break;
 			case add_delta:
 				{
-					arm64x_dynamic_relocation_add_delta_details element;
+					auto& element = std::get<arm64x_dynamic_relocation_add_delta_details>
+						(fixups.get_fixups().emplace_back(
+							std::in_place_type<arm64x_dynamic_relocation_add_delta_details>));
 					element.get_relocation() = relocation_base.get_relocation();
 					if (block_end_rva - current_rva
 						< std::remove_cvref_t<decltype(element.get_value())>::packed_size)
@@ -919,11 +923,11 @@ void load_arm64x_relocations(const image::image& instance, const loader_options&
 							break;
 						}
 					}
-					fixups.get_fixups().emplace_back(std::move(element));
 				}
 				break;
 			default:
 				fixups.add_error(load_config_directory_loader_errc::unknown_arm64x_relocation_type);
+				current_rva = block_end_rva;
 				break;
 			}
 		}
