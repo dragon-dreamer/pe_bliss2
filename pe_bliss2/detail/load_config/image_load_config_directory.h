@@ -616,7 +616,7 @@ constexpr std::uint8_t chpe_arm64x_range_code_type_arm64ec = 0b01u;
 constexpr std::uint8_t chpe_arm64x_range_code_type_x64 = 0b10u;
 constexpr std::uint32_t chpe_arm64x_range_code_type_mask = 0b11u;
 
-//XXX: this is not documented and not researched
+//TODO: this is not documented and not researched
 struct image_hot_patch_info
 {
 	std::uint32_t version;

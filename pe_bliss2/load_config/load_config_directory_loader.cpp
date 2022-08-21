@@ -1551,7 +1551,16 @@ void load_enclave_config(const image::image& instance, const loader_options& opt
 		= config_descriptor->import_entry_size > import_descriptor_type::packed_size
 		? config_descriptor->import_entry_size - import_descriptor_type::packed_size
 		: 0u;
-	for (std::uint32_t i = 0; i != config_descriptor->number_of_imports; ++i)
+
+	auto number_of_imports = config_descriptor->number_of_imports;
+	if (number_of_imports > options.max_enclave_number_of_imports)
+	{
+		number_of_imports = options.max_enclave_number_of_imports;
+		config.add_error(
+			load_config_directory_loader_errc::invalid_enclave_import_array);
+	}
+
+	for (std::uint32_t i = 0; i != number_of_imports; ++i)
 	{
 		auto& import = imports.emplace_back();
 		auto& import_descriptor = import.get_descriptor();
@@ -1574,7 +1583,7 @@ void load_enclave_config(const image::image& instance, const loader_options& opt
 			try
 			{
 				byte_vector_from_rva(instance, current_rva.value(), extra_import_size,
-					config.get_extra_data(), options.include_headers, options.allow_virtual_data);
+					import.get_extra_data(), options.include_headers, options.allow_virtual_data);
 			}
 			catch (const std::system_error&)
 			{
@@ -1650,7 +1659,7 @@ void load_volatile_metadata(const image::image& instance, const loader_options& 
 		{
 			utilities::safe_uint table_rva = config_descriptor->volatile_access_table;
 			for (std::uint32_t i = 0u,
-				count = config_descriptor->volatile_access_table_size / 4u;
+				count = config_descriptor->volatile_access_table_size / sizeof(rva_type);
 				i != count; ++i)
 			{
 				table_rva += struct_from_rva(instance, table_rva.value(),

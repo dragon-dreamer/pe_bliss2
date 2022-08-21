@@ -118,6 +118,7 @@ struct [[nodiscard]] loader_options
 	std::uint64_t max_guard_export_suppression_table_functions = 0xfffffu;
 	std::uint64_t max_guard_longjump_table_functions = 0xfffffu;
 	std::uint32_t max_cphe_code_address_range_count = 0xffu;
+	std::uint32_t max_enclave_number_of_imports = 0xffffu;
 };
 
 [[nodiscard]]
