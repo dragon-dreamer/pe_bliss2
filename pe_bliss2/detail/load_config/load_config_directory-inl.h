@@ -279,7 +279,7 @@ const typename chpe_x86_metadata_base<Bases...>::metadata_type&
 template<typename RelocationType>
 std::uint32_t dynamic_relocation_base<RelocationType>
 	::get_page_relative_offset() const noexcept
-	requires (!std::is_scalar_v<RelocationType>)
+	requires (!is_scalar)
 {
 	return get_relocation()->metadata & page_relative_offset_mask;
 }
@@ -287,7 +287,7 @@ std::uint32_t dynamic_relocation_base<RelocationType>
 template<typename RelocationType>
 std::uint32_t dynamic_relocation_base<RelocationType>
 	::get_page_relative_offset() const noexcept
-	requires (std::is_scalar_v<RelocationType>)
+	requires (is_scalar)
 {
 	return get_relocation().get() & page_relative_offset_mask;
 }
@@ -295,7 +295,7 @@ std::uint32_t dynamic_relocation_base<RelocationType>
 template<typename RelocationType>
 void dynamic_relocation_base<RelocationType>
 	::set_page_relative_offset(std::uint32_t offset)
-	requires (!std::is_scalar_v<RelocationType>)
+	requires (!is_scalar)
 {
 	if (offset > max_page_reative_offset)
 		throw pe_error(load_config_errc::invalid_page_relative_offset);
@@ -307,7 +307,7 @@ void dynamic_relocation_base<RelocationType>
 template<typename RelocationType>
 void dynamic_relocation_base<RelocationType>
 	::set_page_relative_offset(std::uint32_t offset)
-	requires (std::is_scalar_v<RelocationType>)
+	requires (is_scalar)
 {
 	if (offset > max_page_reative_offset)
 		throw pe_error(load_config_errc::invalid_page_relative_offset);
@@ -585,22 +585,36 @@ typename function_override_dynamic_relocation_base<Bases...>::item_list_type
 }
 
 template<typename... Bases>
-const typename function_override_dynamic_relocation_base<Bases...>::bdd_info_type&
-	function_override_dynamic_relocation_base<Bases...>::get_bdd_info() const& noexcept
+const typename function_override_dynamic_relocation_base<Bases...>::base_relocation_type&
+	function_override_dynamic_relocation_base<Bases...>::get_base_relocation() const noexcept
+{
+	return base_relocation_;
+}
+
+template<typename... Bases>
+typename function_override_dynamic_relocation_base<Bases...>::base_relocation_type&
+	function_override_dynamic_relocation_base<Bases...>::get_base_relocation() noexcept
+{
+	return base_relocation_;
+}
+
+template<typename... Bases>
+const typename function_override_dynamic_relocation_item<Bases...>::bdd_info_type&
+function_override_dynamic_relocation_item<Bases...>::get_bdd_info() const& noexcept
 {
 	return bdd_info_;
 }
 
 template<typename... Bases>
-typename function_override_dynamic_relocation_base<Bases...>::bdd_info_type&
-	function_override_dynamic_relocation_base<Bases...>::get_bdd_info() & noexcept
+typename function_override_dynamic_relocation_item<Bases...>::bdd_info_type&
+function_override_dynamic_relocation_item<Bases...>::get_bdd_info() & noexcept
 {
 	return bdd_info_;
 }
 
 template<typename... Bases>
-typename function_override_dynamic_relocation_base<Bases...>::bdd_info_type
-	function_override_dynamic_relocation_base<Bases...>::get_bdd_info() && noexcept
+typename function_override_dynamic_relocation_item<Bases...>::bdd_info_type
+function_override_dynamic_relocation_item<Bases...>::get_bdd_info() && noexcept
 {
 	return std::move(bdd_info_);
 }
@@ -1495,4 +1509,19 @@ typename load_config_directory_base<Bases...>::underlying_type
 		? underlying_type(std::in_place_type<underlying_type64>)
 		: underlying_type(std::in_place_type<underlying_type32>);
 }
+
+inline function_override_base_relocation::type function_override_base_relocation
+	::get_type() const noexcept
+{
+	return static_cast<function_override_base_relocation::type>(
+		(get_relocation().get() >> 12u) & 0xfu);
+}
+
+inline void function_override_base_relocation::set_type(
+	function_override_base_relocation::type type) noexcept
+{
+	get_relocation().get() &= ~0xf000u;
+	get_relocation().get() |= (static_cast<std::uint32_t>(type) & 0xfu) << 12u;
+}
+
 } //namespace pe_bliss::load_config

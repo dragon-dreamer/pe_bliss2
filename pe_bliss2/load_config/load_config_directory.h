@@ -399,20 +399,21 @@ public:
 public:
 	static constexpr std::uint32_t max_page_reative_offset = 0xfffu;
 	static constexpr std::uint32_t page_relative_offset_mask = 0xfffu;
+	static constexpr bool is_scalar = std::is_scalar_v<RelocationType>;
 
 public:
 	//Relative offset from image_base_relocation RVA
 	[[nodiscard]]
 	std::uint32_t get_page_relative_offset() const noexcept
-		requires (!std::is_scalar_v<RelocationType>);
+		requires (!is_scalar);
 	[[nodiscard]]
 	std::uint32_t get_page_relative_offset() const noexcept
-		requires (std::is_scalar_v<RelocationType>);
+		requires (is_scalar);
 
 	void set_page_relative_offset(std::uint32_t offset)
-		requires (!std::is_scalar_v<RelocationType>);
+		requires (!is_scalar);
 	void set_page_relative_offset(std::uint32_t offset)
-		requires (std::is_scalar_v<RelocationType>);
+		requires (is_scalar);
 
 public:
 	[[nodiscard]]
@@ -623,97 +624,23 @@ private:
 	dynamic_relocation_list_type relocations_;
 };
 
-template<typename... Bases>
-class [[nodiscard]] function_override_dynamic_relocation_item : public Bases...
+class [[nodiscard]] function_override_base_relocation
+	: public dynamic_relocation_base<std::uint16_t>
 {
 public:
-	using descriptor_type = packed_struct<
-		detail::load_config::image_function_override_dynamic_relocation>;
-	using rva_type = packed_struct<std::uint32_t>;
-	using rva_list_type = std::vector<rva_type>;
-	using base_relocation_type = packed_struct<detail::relocations::image_base_relocation>;
-	using base_relocation_list_type = std::vector<base_relocation_type>;
+	enum class type
+	{
+		invalid = detail::load_config::image_function_override_type::invalid,
+		x64_rel32 = detail::load_config::image_function_override_type::x64_rel32,
+		arm64_branch26 = detail::load_config::image_function_override_type::arm64_branch26,
+		arm64_thunk = detail::load_config::image_function_override_type::arm64_thunk
+	};
 
 public:
 	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept;
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept;
+	inline type get_type() const noexcept;
 
-	[[nodiscard]]
-	const rva_list_type& get_rvas() const& noexcept;
-	[[nodiscard]]
-	rva_list_type& get_rvas() & noexcept;
-	[[nodiscard]]
-	rva_list_type get_rvas() && noexcept;
-
-	[[nodiscard]]
-	const base_relocation_list_type& get_relocations() const& noexcept;
-	[[nodiscard]]
-	base_relocation_list_type& get_relocations() & noexcept;
-	[[nodiscard]]
-	base_relocation_list_type get_relocations() && noexcept;
-
-private:
-	descriptor_type descriptor_;
-	rva_list_type rvas_;
-	base_relocation_list_type base_relocations_;
-};
-
-template<typename... Bases>
-class [[nodiscard]] function_override_dynamic_relocation_base : public Bases...
-{
-public:
-	using relocation_header_type = packed_struct<
-		detail::load_config::image_function_override_header>;
-	using item_list_type = std::vector<
-		function_override_dynamic_relocation_item<Bases...>>;
-	using bdd_info_type = bdd_info<Bases...>;
-
-public:
-	[[nodiscard]]
-	const relocation_header_type& get_header() const noexcept;
-	[[nodiscard]]
-	relocation_header_type& get_header() noexcept;
-
-	[[nodiscard]]
-	const item_list_type& get_relocations() const& noexcept;
-	[[nodiscard]]
-	item_list_type& get_relocations() & noexcept;
-	[[nodiscard]]
-	item_list_type get_relocations() && noexcept;
-
-	[[nodiscard]]
-	const bdd_info_type& get_bdd_info() const& noexcept;
-	[[nodiscard]]
-	bdd_info_type& get_bdd_info() & noexcept;
-	[[nodiscard]]
-	bdd_info_type get_bdd_info() && noexcept;
-
-private:
-	relocation_header_type header_;
-	item_list_type relocations_;
-	bdd_info_type bdd_info_;
-};
-
-template<typename DynamicRelocation>
-class [[nodiscard]] dynamic_relocation_table_common
-{
-public:
-	using dynamic_relocation_type = packed_struct<DynamicRelocation>;
-
-public:
-	[[nodiscard]]
-	const dynamic_relocation_type& get_dynamic_relocation() const noexcept;
-	[[nodiscard]]
-	dynamic_relocation_type& get_dynamic_relocation() noexcept;
-
-public:
-	[[nodiscard]]
-	dynamic_relocation_symbol get_symbol() const noexcept;
-
-private:
-	dynamic_relocation_type dynamic_relocation_;
+	inline void set_type(type type) noexcept;
 };
 
 template<typename Symbol, typename... Bases>
@@ -742,6 +669,107 @@ private:
 	list_type fixups_;
 };
 
+template<typename... Bases>
+class [[nodiscard]] function_override_dynamic_relocation_item : public Bases...
+{
+public:
+	using descriptor_type = packed_struct<
+		detail::load_config::image_function_override_dynamic_relocation>;
+	using rva_type = packed_struct<std::uint32_t>;
+	using rva_list_type = std::vector<rva_type>;
+	using base_relocation_list_base = dynamic_relocation_list_base<
+		function_override_base_relocation, Bases...>;
+	using base_relocation_list_type = std::vector<base_relocation_list_base>;
+	using bdd_info_type = bdd_info<Bases...>;
+
+public:
+	[[nodiscard]]
+	const descriptor_type& get_descriptor() const noexcept;
+	[[nodiscard]]
+	descriptor_type& get_descriptor() noexcept;
+
+	[[nodiscard]]
+	const rva_list_type& get_rvas() const& noexcept;
+	[[nodiscard]]
+	rva_list_type& get_rvas() & noexcept;
+	[[nodiscard]]
+	rva_list_type get_rvas() && noexcept;
+
+	[[nodiscard]]
+	const base_relocation_list_type& get_relocations() const& noexcept;
+	[[nodiscard]]
+	base_relocation_list_type& get_relocations() & noexcept;
+	[[nodiscard]]
+	base_relocation_list_type get_relocations() && noexcept;
+
+	[[nodiscard]]
+	const bdd_info_type& get_bdd_info() const& noexcept;
+	[[nodiscard]]
+	bdd_info_type& get_bdd_info() & noexcept;
+	[[nodiscard]]
+	bdd_info_type get_bdd_info() && noexcept;
+
+private:
+	descriptor_type descriptor_;
+	rva_list_type rvas_;
+	base_relocation_list_type base_relocations_;
+	bdd_info_type bdd_info_;
+};
+
+template<typename... Bases>
+class [[nodiscard]] function_override_dynamic_relocation_base : public Bases...
+{
+public:
+	using relocation_header_type = packed_struct<
+		detail::load_config::image_function_override_header>;
+	using item_list_type = std::vector<
+		function_override_dynamic_relocation_item<Bases...>>;
+	using base_relocation_type = packed_struct<detail::relocations::image_base_relocation>;
+
+public:
+	[[nodiscard]]
+	const base_relocation_type& get_base_relocation() const noexcept;
+	[[nodiscard]]
+	base_relocation_type& get_base_relocation() noexcept;
+
+	[[nodiscard]]
+	const relocation_header_type& get_header() const noexcept;
+	[[nodiscard]]
+	relocation_header_type& get_header() noexcept;
+
+	[[nodiscard]]
+	const item_list_type& get_relocations() const& noexcept;
+	[[nodiscard]]
+	item_list_type& get_relocations() & noexcept;
+	[[nodiscard]]
+	item_list_type get_relocations() && noexcept;
+
+private:
+	relocation_header_type header_;
+	item_list_type relocations_;
+	base_relocation_type base_relocation_;
+};
+
+template<typename DynamicRelocation>
+class [[nodiscard]] dynamic_relocation_table_common
+{
+public:
+	using dynamic_relocation_type = packed_struct<DynamicRelocation>;
+
+public:
+	[[nodiscard]]
+	const dynamic_relocation_type& get_dynamic_relocation() const noexcept;
+	[[nodiscard]]
+	dynamic_relocation_type& get_dynamic_relocation() noexcept;
+
+public:
+	[[nodiscard]]
+	dynamic_relocation_symbol get_symbol() const noexcept;
+
+private:
+	dynamic_relocation_type dynamic_relocation_;
+};
+
 template<detail::executable_pointer Pointer, typename... Bases>
 class [[nodiscard]] dynamic_relocation_table_base_v1
 	: public dynamic_relocation_table_common<
@@ -760,9 +788,6 @@ public:
 		arm64x_dynamic_relocation_zero_fill,
 		arm64x_dynamic_relocation_copy_data_base<Bases...>,
 		arm64x_dynamic_relocation_add_delta_base<Bases...>>, Bases...>;
-	using function_override_dynamic_fixup_list_type
-		= dynamic_relocation_list_base<function_override_dynamic_relocation_base<Bases...>,
-		Bases...>;
 
 	using import_control_transfer_dynamic_relocation_list_type
 		= std::vector<import_control_transfer_dynamic_fixup_list_type>;
@@ -773,7 +798,7 @@ public:
 	using arm64x_dynamic_relocation_list_type
 		= std::vector<arm64x_dynamic_fixup_list_type>;
 	using function_override_dynamic_relocation_list_type
-		= std::vector<function_override_dynamic_fixup_list_type>;
+		= std::vector<function_override_dynamic_relocation_base<Bases...>>;
 
 	using fixup_list_type = std::variant<
 		import_control_transfer_dynamic_relocation_list_type,
@@ -958,7 +983,8 @@ public:
 	using table_type = packed_struct<detail::load_config::image_dynamic_relocation_table>;
 	using relocation_v1_list_type = std::vector<dynamic_relocation_table_base_v1<Pointer, Bases...>>;
 	using relocation_v2_list_type = std::vector<dynamic_relocation_table_base_v2<Pointer, Bases...>>;
-	using relocation_list_type = std::variant<relocation_v1_list_type, relocation_v2_list_type>;
+	using relocation_list_type = std::variant<std::monostate,
+		relocation_v1_list_type, relocation_v2_list_type>;
 
 public:
 	[[nodiscard]]

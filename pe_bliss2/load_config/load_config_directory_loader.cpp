@@ -195,6 +195,8 @@ struct load_config_directory_loader_error_category : std::error_category
 			return "Invalid CHPE range entry count";
 		case invalid_chpe_entry_address_or_size:
 			return "Invalid CHPE entry address or size";
+		case unknown_bdd_info_entry_version:
+			return "Unknown BDD info entry version";
 		default:
 			return {};
 		}
@@ -937,19 +939,73 @@ void load_arm64x_relocations(const image::image& instance, const loader_options&
 	}
 }
 
-void load_func_overrides(const image::image& instance,
+void load_bdd_info(const image::image& instance,
 	const loader_options& options,
-	rva_type current_rva, rva_type block_end_rva,
-	function_override_dynamic_relocation_details& fixup)
+	std::uint32_t bdd_offset, rva_type bdd_rva, rva_type block_end_rva,
+	bdd_info<error_list>& bdd)
 {
-	auto last_override_rva = fixup.get_header()->func_override_size;
-	if (!utilities::math::add_if_safe(last_override_rva, current_rva)
-		|| last_override_rva > block_end_rva)
+	rva_type descriptor_rva = bdd_rva;
+	if (!utilities::math::add_if_safe(descriptor_rva, bdd_offset))
 	{
-		fixup.add_error(load_config_directory_loader_errc::invalid_func_override_size);
+		bdd.add_error(load_config_directory_loader_errc::invalid_bdd_info_entry);
 		return;
 	}
 
+	rva_type descriptor_end_rva = bdd_info<error_list>::descriptor_type::packed_size;
+	if (!utilities::math::add_if_safe(descriptor_end_rva, descriptor_rva)
+		|| descriptor_end_rva > block_end_rva)
+	{
+		bdd.add_error(load_config_directory_loader_errc::invalid_bdd_info_entry);
+		return;
+	}
+
+	try
+	{
+		struct_from_rva(instance, descriptor_rva, bdd.get_descriptor(),
+			options.include_headers, options.allow_virtual_data);
+	}
+	catch (const std::system_error&)
+	{
+		bdd.add_error(load_config_directory_loader_errc::invalid_bdd_info_entry);
+		return;
+	}
+
+	if (bdd.get_descriptor()->version > 1u)
+	{
+		bdd.add_error(load_config_directory_loader_errc::unknown_bdd_info_entry_version);
+		return;
+	}
+
+	auto remaining_size = (std::min)(block_end_rva - descriptor_end_rva,
+		bdd.get_descriptor()->bdd_size);
+	while (remaining_size >= bdd_info<error_list>::dynamic_relocation_type::packed_size)
+	{
+		auto& reloc = bdd.get_relocations().emplace_back();
+		try
+		{
+			struct_from_rva(instance, descriptor_end_rva, reloc,
+				options.include_headers, options.allow_virtual_data);
+			descriptor_end_rva += bdd_info<error_list>::dynamic_relocation_type::packed_size;
+			remaining_size -= bdd_info<error_list>::dynamic_relocation_type::packed_size;
+		}
+		catch (const std::system_error&)
+		{
+			bdd.get_relocations().pop_back();
+			bdd.add_error(load_config_directory_loader_errc::invalid_bdd_dynamic_relocations);
+			break;
+		}
+	}
+
+	if (remaining_size)
+		bdd.add_error(load_config_directory_loader_errc::invalid_bdd_info_size);
+}
+
+void load_func_overrides(const image::image& instance,
+	const loader_options& options,
+	rva_type current_rva, rva_type block_end_rva,
+	rva_type last_override_rva, rva_type bdd_descriptors_rva,
+	function_override_dynamic_relocation_details& fixup)
+{
 	auto& funcs = fixup.get_relocations();
 	while (last_override_rva - current_rva >=
 		function_override_dynamic_relocation_item<>::descriptor_type::packed_size)
@@ -1005,13 +1061,6 @@ void load_func_overrides(const image::image& instance,
 		}
 
 		auto base_relocs_size = descriptor->base_reloc_size;
-		if (base_relocs_size
-			% function_override_dynamic_relocation_item<>::base_relocation_type::packed_size)
-		{
-			func.add_error(load_config_directory_loader_errc::invalid_base_relocation_size);
-			return;
-		}
-
 		auto last_base_relocs_rva = current_rva;
 		if (!utilities::math::add_if_safe(last_base_relocs_rva, base_relocs_size)
 			|| last_base_relocs_rva > last_override_rva)
@@ -1020,81 +1069,17 @@ void load_func_overrides(const image::image& instance,
 			return;
 		}
 
-		base_relocs_size
-			/= function_override_dynamic_relocation_item<>::base_relocation_type::packed_size;
+		load_relocations_no_extra_data(instance, options, current_rva,
+			last_base_relocs_rva, func.get_relocations());
 
-		auto& base_relocs = func.get_relocations();
-		while (base_relocs_size--)
-		{
-			try
-			{
-				current_rva += static_cast<rva_type>(
-					struct_from_rva(instance, current_rva, base_relocs.emplace_back(),
-						options.include_headers, options.allow_virtual_data).packed_size);
-			}
-			catch (const std::system_error&)
-			{
-				base_relocs.pop_back();
-				fixup.add_error(load_config_directory_loader_errc::invalid_base_relocation);
-				return;
-			}
-		}
+		load_bdd_info(instance, options, descriptor->bdd_offset,
+			bdd_descriptors_rva, block_end_rva, func.get_bdd_info());
+
+		current_rva = last_base_relocs_rva;
 	}
 
 	if (last_override_rva != current_rva)
 		fixup.add_error(load_config_directory_loader_errc::invalid_func_override_size);
-}
-
-bool load_bdd_info(const image::image& instance,
-	const loader_options& options,
-	rva_type current_rva, rva_type block_end_rva,
-	bdd_info<error_list>& bdd)
-{
-	rva_type last_bdd_descriptor_rva
-		= bdd_info<error_list>::descriptor_type::packed_size;
-	if (!utilities::math::add_if_safe(last_bdd_descriptor_rva, current_rva)
-		|| last_bdd_descriptor_rva > block_end_rva)
-	{
-		bdd.add_error(load_config_directory_loader_errc::invalid_bdd_info_size);
-		return false;
-	}
-
-	try
-	{
-		current_rva += static_cast<rva_type>(
-			struct_from_rva(instance, current_rva, bdd.get_descriptor(),
-				options.include_headers, options.allow_virtual_data).packed_size);
-	}
-	catch (const std::system_error&)
-	{
-		bdd.add_error(load_config_directory_loader_errc::invalid_bdd_info_entry);
-		return false;
-	}
-
-	auto remaining_size = block_end_rva - current_rva;
-	while (remaining_size >= bdd_info<error_list>::dynamic_relocation_type::packed_size)
-	{
-		auto& reloc = bdd.get_relocations().emplace_back();
-		try
-		{
-			remaining_size -= static_cast<rva_type>(
-				struct_from_rva(instance, current_rva, reloc,
-					options.include_headers, options.allow_virtual_data).packed_size);
-		}
-		catch (const std::system_error&)
-		{
-			bdd.add_error(load_config_directory_loader_errc::invalid_bdd_dynamic_relocations);
-			break;
-		}
-	}
-
-	if (remaining_size)
-	{
-		bdd.add_error(load_config_directory_loader_errc::invalid_bdd_info_size);
-		return false;
-	}
-
-	return true;
 }
 
 void load_function_override_relocations(const image::image& instance,
@@ -1111,39 +1096,46 @@ void load_function_override_relocations(const image::image& instance,
 		current_rva += 
 			std::remove_cvref_t<decltype(fixups.get_base_relocation())>::packed_size;
 
-		auto& fixup_list = fixups.get_fixups();
 		if (block_end_rva - current_rva
-			>= function_override_dynamic_relocation::relocation_header_type::packed_size)
+			< function_override_dynamic_relocation::relocation_header_type::packed_size)
 		{
-			auto& fixup = fixup_list.emplace_back();
-			try
-			{
-				current_rva += static_cast<rva_type>(
-					struct_from_rva(instance, current_rva, fixup.get_header(),
-						options.include_headers, options.allow_virtual_data).packed_size);
-			}
-			catch (const std::system_error&)
-			{
-				fixup_list.pop_back();
-				fixups.add_error(load_config_directory_loader_errc::invalid_func_override_fixup);
-				break;
-			}
-
-			load_func_overrides(instance, options, current_rva, block_end_rva, fixup);
-			if (!utilities::math::add_if_safe(current_rva,
-				fixup.get_header()->func_override_size) || current_rva > block_end_rva)
-			{
-				//Error is already added by load_func_overrides
-				break;
-			}
-
-			if (load_bdd_info(instance, options, current_rva,
-				block_end_rva, fixup.get_bdd_info()))
-			{
-				current_rva = block_end_rva;
-			}
+			fixups.add_error(load_config_directory_loader_errc::invalid_func_override_fixup);
+			break;
 		}
-		check_fixup_end_block_rva(current_rva, block_end_rva, fixups);
+
+		try
+		{
+			current_rva += static_cast<rva_type>(
+				struct_from_rva(instance, current_rva, fixups.get_header(),
+					options.include_headers, options.allow_virtual_data).packed_size);
+		}
+		catch (const std::system_error&)
+		{
+			fixups.add_error(load_config_directory_loader_errc::invalid_func_override_fixup);
+			break;
+		}
+
+		auto last_override_rva = current_rva;
+		if (!utilities::math::add_if_safe(last_override_rva,
+			fixups.get_header()->func_override_size) || last_override_rva > block_end_rva)
+		{
+			fixups.add_error(load_config_directory_loader_errc::invalid_func_override_size);
+			return;
+		}
+
+		rva_type bdd_descriptors_rva = current_rva;
+		if (!utilities::math::add_if_safe(bdd_descriptors_rva,
+			fixups.get_header()->func_override_size)
+			|| bdd_descriptors_rva > block_end_rva)
+		{
+			fixups.add_error(load_config_directory_loader_errc::invalid_bdd_info_size);
+		}
+
+		load_func_overrides(instance, options, current_rva, block_end_rva,
+			last_override_rva, bdd_descriptors_rva, fixups);
+
+		//No need to verify current_rva/block_end_rva,
+		//as all remaining data is BDD info region
 		current_rva = block_end_rva;
 	}
 }

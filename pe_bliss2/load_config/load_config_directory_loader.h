@@ -68,6 +68,7 @@ enum class load_config_directory_loader_errc
 	invalid_bdd_info_size,
 	invalid_bdd_info_entry,
 	invalid_bdd_dynamic_relocations,
+	unknown_bdd_info_entry_version,
 	invalid_load_config_directory,
 	invalid_guard_memcpy_function_pointer_va,
 	invalid_cast_guard_os_determined_failure_mode_va,

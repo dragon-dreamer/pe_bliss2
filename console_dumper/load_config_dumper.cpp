@@ -386,7 +386,10 @@ void dump_fixup_common(formatter& fmt, const Fixup& fixup, pe_bliss::rva_type va
 	fmt.get_stream() << ": ";
 	fmt.print_offsets(fixup.get_relocation());
 	fmt.get_stream() << '=';
-	fmt.print_value(fixup.get_relocation()->metadata, true);
+	if constexpr (!std::remove_cvref_t<decltype(fixup)>::is_scalar)
+		fmt.print_value(fixup.get_relocation()->metadata, true);
+	else
+		fmt.print_value(fixup.get_relocation().get(), true);
 
 	fmt.get_stream() << ' ';
 	fmt.print_field_name("Rel offset");
@@ -495,58 +498,95 @@ void dump_dynamic_relocation_list(formatter& fmt, const pe_bliss::load_config::d
 	fmt.get_stream() << '\n';
 }
 
-void dump_dynamic_relocation_list(formatter& fmt,
-	const pe_bliss::load_config::dynamic_relocation_list_details<
-	pe_bliss::load_config::function_override_dynamic_relocation_details>& relocs)
+
+const char* func_override_type_to_string(
+	pe_bliss::load_config::function_override_base_relocation::type type) noexcept
 {
+	using enum pe_bliss::load_config::function_override_base_relocation::type;
+	switch (type)
+	{
+	case x64_rel32: return "X64_REL32";
+	case arm64_branch26: return "ARM64_BRANCH26";
+	case arm64_thunk: return "ARM64_THUNK";
+	default: return "Invalid";
+	}
+}
+
+void dump_dynamic_relocation_list(formatter& fmt, const pe_bliss::load_config::dynamic_relocation_list_details<
+	pe_bliss::load_config::function_override_base_relocation>& relocs)
+{
+	auto rva = relocs.get_base_relocation()->virtual_address;
 	for (const auto& fixup : relocs.get_fixups())
 	{
-		fmt.print_structure("Function override header",
-			fixup.get_header(), std::array{
-			value_info{"func_override_size"}
+		dump_fixup_common(fmt, fixup, rva);
+
+		fmt.get_stream() << ' ';
+		fmt.print_field_name("Type");
+		fmt.get_stream() << ": ";
+		fmt.print_string(func_override_type_to_string(fixup.get_type()));
+
+		fmt.get_stream() << '\n';
+	}
+
+	fmt.get_stream() << '\n';
+}
+
+void dump_dynamic_relocation_list(formatter& fmt,
+	const pe_bliss::load_config::function_override_dynamic_relocation_details& fixup)
+{
+	fmt.print_structure("Base relocation descriptor",
+		fixup.get_base_relocation(), std::array{
+		value_info{"virtual_address"},
+		value_info{"size_of_block"}
+	});
+
+	fmt.print_structure("Function override header",
+		fixup.get_header(), std::array{
+		value_info{"func_override_size"}
+	});
+
+	fmt.print_errors(fixup);
+
+	for (const auto& reloc : fixup.get_relocations())
+	{
+		fmt.print_structure("Function override dynamic relocation descriptor",
+			reloc.get_descriptor(), std::array{
+			value_info{"original_rva"},
+			value_info{"bdd_offset"},
+			value_info{"rva_size"},
+			value_info{"base_reloc_size"}
 		});
 
 		fmt.print_errors(fixup);
 
-		for (const auto& reloc : fixup.get_relocations())
+		if (!reloc.get_rvas().empty())
 		{
-			fmt.print_structure("Function override dynamic relocation descriptor",
-				reloc.get_descriptor(), std::array{
-				value_info{"original_rva"},
-				value_info{"bdd_offset"},
-				value_info{"rva_size"},
-				value_info{"base_reloc_size"}
-			});
-
-			fmt.print_errors(fixup);
-
-			if (!reloc.get_rvas().empty())
+			fmt.print_structure_name("Function override dynamic relocation RVAs");
+			for (const auto& rva_descriptor : reloc.get_rvas())
 			{
-				fmt.print_structure_name("Function override dynamic relocation RVAs");
-				for (const auto& rva_descriptor : reloc.get_rvas())
-				{
-					fmt.print_offsets_and_value(rva_descriptor, true);
-					fmt.get_stream() << '\n';
-				}
-			}
-			
-			for (const auto& base_reloc : reloc.get_relocations())
-			{
-				fmt.print_structure("Function override base relocation descriptor",
-					base_reloc, std::array{
-					value_info{"virtual_address"},
-					value_info{"size_of_block"}
-				});
+				fmt.print_offsets_and_value(rva_descriptor, true);
+				fmt.get_stream() << '\n';
 			}
 		}
+		
+		for (const auto& base_reloc : reloc.get_relocations())
+		{
+			fmt.print_structure("Function override base relocation descriptor",
+				base_reloc.get_base_relocation(), std::array{
+				value_info{"virtual_address"},
+				value_info{"size_of_block"}
+			});
 
+			dump_dynamic_relocation_list(fmt, base_reloc);
+		}
+		
 		fmt.print_structure("BDD info descriptor",
-			fixup.get_bdd_info().get_descriptor(), std::array{
+			reloc.get_bdd_info().get_descriptor(), std::array{
 			value_info{"version"},
 			value_info{"bdd_size"}
 		});
 
-		for (const auto& bdd_node : fixup.get_bdd_info().get_relocations())
+		for (const auto& bdd_node : reloc.get_bdd_info().get_relocations())
 		{
 			fmt.print_structure("Function override base relocation descriptor",
 				bdd_node, std::array{
@@ -555,11 +595,9 @@ void dump_dynamic_relocation_list(formatter& fmt,
 				value_info{"value"}
 			});
 		}
-
-		fmt.get_stream() << '\n';
 	}
 
-	fmt.get_stream() << '\n';
+	fmt.get_stream() << '\n' << '\n';
 }
 
 void dump_arm64x_fixups(formatter& fmt,
@@ -708,8 +746,16 @@ void dump_dynamic_relocation_list(formatter& fmt, const std::vector<
 		std::visit([&fmt] (const auto& relocation_list) {
 			for (const auto& fixup_list : relocation_list)
 			{
-				if (dump_dynamic_relocation_list_base(fmt, fixup_list))
+				if constexpr (std::is_same_v<std::remove_cvref_t<decltype(fixup_list)>,
+					pe_bliss::load_config::function_override_dynamic_relocation_details>)
+				{
 					dump_dynamic_relocation_list(fmt, fixup_list);
+				}
+				else
+				{
+					if (dump_dynamic_relocation_list_base(fmt, fixup_list))
+						dump_dynamic_relocation_list(fmt, fixup_list);
+				}
 			}
 		}, fixup_table.get_fixup_lists());
 	}
@@ -847,6 +893,8 @@ void dump_dynamic_relocation_list(formatter& fmt, const std::vector<
 		}
 	}
 }
+
+constexpr void dump_dynamic_relocation_list(formatter&, std::monostate) {}
 
 template<typename RelocationTable>
 void dump_dynamic_relocation_table(formatter& fmt, const RelocationTable& table)

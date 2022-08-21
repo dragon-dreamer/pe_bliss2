@@ -352,3 +352,13 @@ TYPED_TEST(LoadConfigDirectoryTestsFixture,
 	EXPECT_EQ(dir.get_guard_cf_function_table_stride(), 0xau);
 	EXPECT_EQ(dir.get_descriptor()->cf_guard.guard_flags, 0xa0000000u);
 }
+
+TEST(LoadConfigDirectoryTests, FunctionOverrideDynamicRelocation)
+{
+	function_override_base_relocation reloc;
+	EXPECT_EQ(reloc.get_type(), function_override_base_relocation::type::invalid);
+	reloc.get_relocation().get() = 0x0abcu;
+	reloc.set_type(function_override_base_relocation::type::arm64_thunk);
+	EXPECT_EQ(reloc.get_type(), function_override_base_relocation::type::arm64_thunk);
+	EXPECT_EQ(reloc.get_relocation().get(), 0x3abcu);
+}

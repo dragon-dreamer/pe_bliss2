@@ -485,7 +485,7 @@ struct image_arm64x_dynamic_relocation
 	//std::uint8_t relocation_data[0];
 };
 
-//Symbol 7 - undocumented
+//Symbol 7 - undocumented, based on dumpbin and winnt.h
 struct image_function_override_header
 {
 	std::uint32_t func_override_size;
