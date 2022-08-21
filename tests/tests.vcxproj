@@ -205,6 +205,7 @@
     <ClCompile Include="tests\pe_bliss2\image_section_search_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_signature_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\load_config_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\optional_header_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\overlay_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\packed_byte_array_tests.cpp" />
