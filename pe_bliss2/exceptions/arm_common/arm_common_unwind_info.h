@@ -4,10 +4,12 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <list>
+#include <exception>
 #include <system_error>
 #include <type_traits>
+#include <utility>
 #include <variant>
+#include <vector>
 
 #include "boost/endian/conversion.hpp"
 
@@ -41,15 +43,18 @@ namespace pe_bliss::exceptions::arm_common
 std::error_code make_error_code(exception_directory_errc) noexcept;
 
 template<bool HasCondition>
-class epilog_info
+class [[nodiscard]] epilog_info
 {
 public:
 	using descriptor_type = packed_struct<std::uint32_t>;
-	using epilog_start_index_type = std::conditional_t<HasCondition, std::uint8_t, std::uint16_t>;
+	using epilog_start_index_type = std::conditional_t<
+		HasCondition, std::uint8_t, std::uint16_t>;
 
 public:
-	static constexpr std::uint32_t epilog_start_index_mask = HasCondition ? 0xff000000u : 0xffc00000u;
-	static constexpr std::uint32_t epilog_start_index_shift = HasCondition ? 24u : 22u;
+	static constexpr std::uint32_t epilog_start_index_mask
+		= HasCondition ? 0xff000000u : 0xffc00000u;
+	static constexpr std::uint32_t epilog_start_index_shift
+		= HasCondition ? 24u : 22u;
 	static constexpr std::uint8_t unconditional_epilog = 0x0eu;
 
 public:
@@ -66,7 +71,8 @@ public:
 	}
 
 public:
-	//The offset in bytes, divided by 2 (?), of the epilog relative to the start of the function.
+	//The offset in bytes, divided by 2 (?),
+	//of the epilog relative to the start of the function.
 	[[nodiscard]]
 	std::uint32_t get_epilog_start_offset() const noexcept
 	{
@@ -77,14 +83,16 @@ public:
 	[[nodiscard]]
 	epilog_start_index_type get_epilog_start_index() const noexcept
 	{
-		return static_cast<epilog_start_index_type>((descriptor_.get() & epilog_start_index_mask)
+		return static_cast<epilog_start_index_type>(
+			(descriptor_.get() & epilog_start_index_mask)
 			>> epilog_start_index_shift);
 	}
 
 	//The condition under which the epilogue is executed.
 	//For unconditional epilogues, it should be set to 0xE, which indicates "always".
 	//(An epilogue must be entirely conditional or entirely unconditional,
-	//and in Thumb-2 mode, the epilogue begins with the first instruction after the IT opcode.)
+	//and in Thumb-2 mode, the epilogue begins with
+	//the first instruction after the IT opcode.)
 	[[nodiscard]]
 	std::uint8_t get_epilog_condition() const noexcept
 		requires (HasCondition)
@@ -103,7 +111,7 @@ private:
 };
 
 template<std::size_t Length>
-class unwind_code_common
+class [[nodiscard]] unwind_code_common
 {
 public:
 	using descriptor_type = packed_byte_array<Length>;
@@ -126,16 +134,19 @@ public:
 
 protected:
 	template<std::size_t ByteCount>
-	using required_uint_type = typename std::conditional_t<ByteCount == sizeof(std::uint8_t),
+	using required_uint_type = typename std::conditional_t<
+		ByteCount == sizeof(std::uint8_t),
 		std::type_identity<std::uint8_t>,
-		std::conditional<ByteCount == sizeof(std::uint16_t), std::uint16_t, std::uint32_t>>::type;
+		std::conditional<ByteCount == sizeof(std::uint16_t),
+			std::uint16_t, std::uint32_t>>::type;
 
 	template<std::size_t FromBit, std::size_t ToBit>
 	[[nodiscard]]
 	auto get_value() const noexcept
 	{
 		static_assert(FromBit <= ToBit);
-		constexpr std::size_t byte_count = (ToBit - FromBit + CHAR_BIT) / CHAR_BIT;
+		constexpr std::size_t byte_count
+			= (ToBit - FromBit + CHAR_BIT) / CHAR_BIT;
 		static_assert(byte_count && byte_count <= sizeof(std::uint32_t));
 		using result_type = required_uint_type<byte_count>;
 		using source_type = required_uint_type<Length>;
@@ -154,7 +165,8 @@ protected:
 	void set_value(Value value)
 	{
 		static_assert(FromBit <= ToBit);
-		constexpr std::size_t byte_count = (ToBit - FromBit + CHAR_BIT) / CHAR_BIT;
+		constexpr std::size_t byte_count
+			= (ToBit - FromBit + CHAR_BIT) / CHAR_BIT;
 		static_assert(byte_count && byte_count <= sizeof(std::uint32_t));
 		using result_type = required_uint_type<byte_count>;
 		using source_type = required_uint_type<Length>;
@@ -191,7 +203,7 @@ protected:
 		}
 		catch (const pe_error&)
 		{
-			throw pe_error(ErrorCode);
+			std::throw_with_nested(pe_error(ErrorCode));
 		}
 	}
 
@@ -222,14 +234,16 @@ private:
 	descriptor_type descriptor_;
 };
 
-template<typename RuntimeFunctionEntry, typename PackedUnwindData, typename ExtendedUnwindRecord,
+template<typename RuntimeFunctionEntry,
+	typename PackedUnwindData, typename ExtendedUnwindRecord,
 	typename... Bases>
-class runtime_function_base
+class [[nodiscard]] runtime_function_base
 	: public Bases...
 {
 public:
 	using descriptor_type = packed_struct<RuntimeFunctionEntry>;
-	using unwind_info_type = std::variant<std::monostate, PackedUnwindData, ExtendedUnwindRecord>;
+	using unwind_info_type = std::variant<
+		std::monostate, PackedUnwindData, ExtendedUnwindRecord>;
 
 public:
 	[[nodiscard]]
@@ -268,31 +282,36 @@ private:
 };
 
 template<typename EpilogInfo, typename UnwindRecordOptions>
-class extended_unwind_record
+class [[nodiscard]] extended_unwind_record
 {
 public:
 	using main_header_type = packed_struct<std::uint32_t>;
 	//A list of information about epilog scopes, packed one to a word,
 	//comes after the header and optional extended header.
 	//They're stored in order of increasing starting offset.
-	using epilog_info_list_type = std::list<EpilogInfo>;
+	using epilog_info_list_type = std::vector<EpilogInfo>;
 
 	using unwind_code_type = typename UnwindRecordOptions::unwind_code_type;
-	using unwind_code_list_type = std::list<unwind_code_type>;
+	using unwind_code_list_type = std::vector<unwind_code_type>;
 
-	//XXX: there is some additional compiler-specific unwind data after the handler RVA.
+	//TODO: there is some additional compiler-specific unwind data after the handler RVA.
 	//dumpbin outputs it, but it is undocumented.
 	using exception_handler_rva_type = packed_struct<std::uint32_t>;
 
 public:
-	static constexpr auto function_length_multiplier = UnwindRecordOptions::function_length_multiplier;
+	static constexpr auto function_length_multiplier
+		= UnwindRecordOptions::function_length_multiplier;
 	static constexpr auto has_f_bit = UnwindRecordOptions::has_f_bit;
 
 private:
-	static constexpr std::uint32_t base_epilog_count_mask = has_f_bit ? 0xf800000u : 0x7c00000u;
-	static constexpr std::uint32_t base_epilog_count_shift = has_f_bit ? 23u : 22u;
-	static constexpr std::uint32_t base_code_words_mask = has_f_bit ? 0xf0000000u : 0xf8000000u;
-	static constexpr std::uint32_t base_code_words_shift = has_f_bit ? 28u : 27u;
+	static constexpr std::uint32_t base_epilog_count_mask
+		= has_f_bit ? 0xf800000u : 0x7c00000u;
+	static constexpr std::uint32_t base_epilog_count_shift
+		= has_f_bit ? 23u : 22u;
+	static constexpr std::uint32_t base_code_words_mask
+		= has_f_bit ? 0xf0000000u : 0xf8000000u;
+	static constexpr std::uint32_t base_code_words_shift
+		= has_f_bit ? 28u : 27u;
 
 public:
 	[[nodiscard]]
@@ -320,27 +339,39 @@ public:
 	}
 
 	[[nodiscard]]
-	epilog_info_list_type& get_epilog_info_list() noexcept
+	epilog_info_list_type& get_epilog_info_list() & noexcept
 	{
 		return epilog_info_list_;
 	}
 
 	[[nodiscard]]
-	const epilog_info_list_type& get_epilog_info_list() const noexcept
+	const epilog_info_list_type& get_epilog_info_list() const& noexcept
 	{
 		return epilog_info_list_;
 	}
 
 	[[nodiscard]]
-	unwind_code_list_type& get_unwind_code_list() noexcept
+	epilog_info_list_type get_epilog_info_list() && noexcept
+	{
+		return std::move(epilog_info_list_);
+	}
+
+	[[nodiscard]]
+	unwind_code_list_type& get_unwind_code_list() & noexcept
 	{
 		return unwind_code_list_;
 	}
 
 	[[nodiscard]]
-	const unwind_code_list_type& get_unwind_code_list() const noexcept
+	const unwind_code_list_type& get_unwind_code_list() const& noexcept
 	{
 		return unwind_code_list_;
+	}
+
+	[[nodiscard]]
+	unwind_code_list_type get_unwind_code_list() && noexcept
+	{
+		return std::move(unwind_code_list_);
 	}
 
 	[[nodiscard]]
@@ -386,8 +417,10 @@ public:
 		return (main_header_.get() & 0x200000u) != 0u;
 	}
 
-	//Indicates that this record describes a function fragment (1) or a full function (0).
-	//A fragment implies that there is no prologue and that all prologue processing should be ignored.
+	//Indicates that this record describes a function
+	//fragment (1) or a full function (0).
+	//A fragment implies that there is no prologue and
+	//that all prologue processing should be ignored.
 	[[nodiscard]]
 	bool is_function_fragment() const noexcept
 		requires (has_f_bit)
@@ -397,18 +430,21 @@ public:
 
 	//Has two meanings, depending on the state of E bit (single_epilog_info_packed):
 	//If E is 0, it specifies the count of the total number of epilog scopes.
-	//If E is 1, then this field specifies the index of the first unwind code that describes the one and only epilog.
+	//If E is 1, then this field specifies the index
+	//of the first unwind code that describes the one and only epilog.
 	[[nodiscard]]
 	std::uint16_t get_epilog_count() const noexcept
 	{
-		return has_extended_main_header() ? get_extended_epilog_count() : get_base_epilog_count();
+		return has_extended_main_header()
+			? get_extended_epilog_count() : get_base_epilog_count();
 	}
 
 	//The number of 32-bit words needed to contain all of the unwind codes.
 	[[nodiscard]]
 	std::uint8_t get_code_words() const noexcept
 	{
-		return has_extended_main_header() ? get_extended_code_words() : get_base_code_words();
+		return has_extended_main_header()
+			? get_extended_code_words() : get_base_code_words();
 	}
 
 	[[nodiscard]]
@@ -496,7 +532,8 @@ public:
 			auto epilog_count = get_epilog_count();
 
 			//Put code words to extended header
-			main_extended_header_.get() |= static_cast<std::uint32_t>(count) << 16u;
+			main_extended_header_.get()
+				|= static_cast<std::uint32_t>(count) << 16u;
 
 			//And move epilog count to extended header
 			main_header_.get() &= ~base_epilog_count_mask;
@@ -513,7 +550,8 @@ public:
 			}
 			else
 			{
-				main_extended_header_.get() |= static_cast<std::uint32_t>(count) << 16u;
+				main_extended_header_.get()
+					|= static_cast<std::uint32_t>(count) << 16u;
 			}
 		}
 	}
@@ -522,27 +560,31 @@ private:
 	[[nodiscard]]
 	std::uint8_t get_base_epilog_count() const noexcept
 	{
-		return static_cast<std::uint8_t>((main_header_.get() & base_epilog_count_mask)
+		return static_cast<std::uint8_t>(
+			(main_header_.get() & base_epilog_count_mask)
 			>> base_epilog_count_shift);
 	}
 
 	[[nodiscard]]
 	std::uint8_t get_base_code_words() const noexcept
 	{
-		return static_cast<std::uint8_t>((main_header_.get() & base_code_words_mask)
+		return static_cast<std::uint8_t>(
+			(main_header_.get() & base_code_words_mask)
 			>> base_code_words_shift);
 	}
 
 	[[nodiscard]]
 	std::uint16_t get_extended_epilog_count() const noexcept
 	{
-		return static_cast<std::uint16_t>(main_extended_header_.get() & 0xffffu);
+		return static_cast<std::uint16_t>(
+			main_extended_header_.get() & 0xffffu);
 	}
 
 	[[nodiscard]]
 	std::uint8_t get_extended_code_words() const noexcept
 	{
-		return static_cast<std::uint8_t>((main_extended_header_.get() & 0xff0000u) >> 16u);
+		return static_cast<std::uint8_t>(
+			(main_extended_header_.get() & 0xff0000u) >> 16u);
 	}
 
 private:
@@ -554,23 +596,29 @@ private:
 };
 
 template<template<typename...> typename RuntimeFunctionBase, typename... Bases>
-class exception_directory_base
+class [[nodiscard]] exception_directory_base
 	: public Bases...
 {
 public:
-	using runtime_function_list_type = std::list<RuntimeFunctionBase<Bases...>>;
+	using runtime_function_list_type = std::vector<RuntimeFunctionBase<Bases...>>;
 
 public:
 	[[nodiscard]]
-	runtime_function_list_type& get_runtime_function_list() noexcept
+	runtime_function_list_type& get_runtime_function_list() & noexcept
 	{
 		return runtime_function_list_;
 	}
 
 	[[nodiscard]]
-	const runtime_function_list_type& get_runtime_function_list() const noexcept
+	const runtime_function_list_type& get_runtime_function_list() const& noexcept
 	{
 		return runtime_function_list_;
+	}
+
+	[[nodiscard]]
+	runtime_function_list_type get_runtime_function_list() && noexcept
+	{
+		return std::move(runtime_function_list_);
 	}
 
 private:

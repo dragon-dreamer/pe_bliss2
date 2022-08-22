@@ -10,7 +10,7 @@ class image;
 namespace pe_bliss::exceptions::arm64
 {
 
-struct loader_options
+struct [[nodiscard]] loader_options
 {
 	bool include_headers = true;
 	bool allow_virtual_data = false;

@@ -1,7 +1,8 @@
 #pragma once
 
-#include <list>
+#include <utility>
 #include <variant>
+#include <vector>
 
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/exceptions/x64/x64_exception_directory.h"
@@ -12,7 +13,7 @@ namespace pe_bliss::exceptions
 {
 
 template<typename... Bases>
-class exception_directory_base
+class [[nodiscard]] exception_directory_base
 	: public Bases...
 {
 public:
@@ -21,19 +22,25 @@ public:
 		arm64::exception_directory_base<Bases...>,
 		arm::exception_directory_base<Bases...>
 	>;
-	using exception_directory_list_type = std::list<exception_directory_type>;
+	using exception_directory_list_type = std::vector<exception_directory_type>;
 
 public:
 	[[nodiscard]]
-	exception_directory_list_type& get_directories() noexcept
+	exception_directory_list_type& get_directories() & noexcept
 	{
 		return directories_;
 	}
 
 	[[nodiscard]]
-	const exception_directory_list_type& get_directories() const noexcept
+	const exception_directory_list_type& get_directories() const& noexcept
 	{
 		return directories_;
+	}
+
+	[[nodiscard]]
+	exception_directory_list_type get_directories() && noexcept
+	{
+		return std::move(directories_);
 	}
 
 private:

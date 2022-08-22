@@ -41,7 +41,7 @@ namespace pe_bliss::exceptions::arm_common
 
 std::error_code make_error_code(exception_directory_loader_errc) noexcept;
 
-struct exception_directory_info
+struct [[nodiscard]] exception_directory_info
 {
 	rva_type rva{};
 	rva_type size{};
@@ -49,7 +49,8 @@ struct exception_directory_info
 
 template<typename UwopControl, typename LoaderOptions,
 	typename RuntimeFunction, typename ExtendedUnwindRecord>
-void load_extended_unwind_record(const image::image& instance, const LoaderOptions& options,
+void load_extended_unwind_record(
+	const image::image& instance, const LoaderOptions& options,
 	utilities::safe_uint<rva_type> current_rva, RuntimeFunction& func,
 	ExtendedUnwindRecord& unwind_info) try
 {
@@ -155,7 +156,8 @@ void load_runtime_function(const image::image& instance, const LoaderOptions& op
 	}
 	else
 	{
-		func.get_unwind_info().emplace<PackedUnwindData>(func.get_descriptor()->unwind_data);
+		func.get_unwind_info().emplace<PackedUnwindData>(
+			func.get_descriptor()->unwind_data);
 	}
 }
 

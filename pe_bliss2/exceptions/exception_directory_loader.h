@@ -25,14 +25,16 @@ enum class exception_directory_loader_errc
 
 std::error_code make_error_code(exception_directory_loader_errc) noexcept;
 
-struct loader_options
+struct [[nodiscard]] loader_options
 {
 	x64::loader_options x64_loader_options;
 	arm64::loader_options arm64_loader_options;
 	arm::loader_options arm_loader_options;
 };
 
-exception_directory_details load(const image::image& instance, const loader_options& options);
+[[nodiscard]]
+exception_directory_details load(const image::image& instance,
+	const loader_options& options = {});
 
 } //namespace pe_bliss::exceptions
 

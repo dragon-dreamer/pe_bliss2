@@ -2,7 +2,6 @@
 
 #include <bit>
 #include <cstdint>
-#include <list>
 #include <optional>
 #include <system_error>
 #include <type_traits>
@@ -75,7 +74,7 @@ template<std::size_t Length>
 using unwind_code_common = arm_common::unwind_code_common<Length>;
 
 template<unwind_code Opcode, std::size_t Thumb2OpcodeBitSize>
-class unwind_code_id
+class [[nodiscard]] unwind_code_id
 {
 public:
 	static constexpr auto opcode = Opcode;
@@ -89,7 +88,7 @@ namespace opcode
 {
 
 //add sp,sp,#X
-class alloc_s
+class [[nodiscard]] alloc_s
 	: public unwind_code_common<1u>
 	, public unwind_code_id<unwind_code::alloc_s, 16u>
 {
@@ -165,7 +164,7 @@ enum fp_register : std::uint8_t
 };
 
 //pop {r0-r12, lr}
-class save_r0r12_lr
+class [[nodiscard]] save_r0r12_lr
 	: public unwind_code_common<2u>
 	, public unwind_code_id<unwind_code::save_r0r12_lr, 32u>
 {
@@ -177,7 +176,7 @@ public:
 };
 
 //mov sp,rX
-class mov_sprx
+class [[nodiscard]] mov_sprx
 	: public unwind_code_common<1u>
 	, public unwind_code_id<unwind_code::mov_sprx, 16u>
 {
@@ -188,8 +187,9 @@ public:
 	void set_delta(std::uint8_t delta);
 };
 
-template<std::uint32_t Delta, std::uint32_t ForbiddenMask, std::uint32_t RequiredMask>
-class save_r4rx_lr_base
+template<std::uint32_t Delta,
+	std::uint32_t ForbiddenMask, std::uint32_t RequiredMask>
+class [[nodiscard]] save_r4rx_lr_base
 	: public unwind_code_common<1u>
 {
 public:
@@ -226,21 +226,21 @@ public:
 };
 
 //pop {r4-rX,lr}
-class save_r4rx_lr
+class [[nodiscard]] save_r4rx_lr
 	: public save_r4rx_lr_base<4u, 0xdf0fu, 0x10u>
 	, public unwind_code_id<unwind_code::save_r4rx_lr, 16u>
 {
 };
 
 //pop {r4-rX,lr}
-class save_r4rx_lr_wide
+class [[nodiscard]] save_r4rx_lr_wide
 	: public save_r4rx_lr_base<8u, 0xd00fu, 0x1f0u>
 	, public unwind_code_id<unwind_code::save_r4rx_lr_wide, 32u>
 {
 };
 
 //add sp,sp,#X
-class save_d8dx
+class [[nodiscard]] save_d8dx
 	: public unwind_code_common<1u>
 	, public unwind_code_id<unwind_code::save_d8dx, 32u>
 {
@@ -252,7 +252,7 @@ public:
 };
 
 //add sp,sp,#X
-class alloc_s_wide
+class [[nodiscard]] alloc_s_wide
 	: public unwind_code_common<2u>
 	, public unwind_code_id<unwind_code::alloc_s_wide, 32u>
 {
@@ -264,7 +264,7 @@ public:
 };
 
 //pop {r0-r7,lr}
-class save_r0r7_lr
+class [[nodiscard]] save_r0r7_lr
 	: public unwind_code_common<2u>
 	, public unwind_code_id<unwind_code::save_r0r7_lr, 16u>
 {
@@ -275,7 +275,7 @@ public:
 	void set_saved_registers(int_registers::value value);
 };
 
-class ms_specific
+class [[nodiscard]] ms_specific
 	: public unwind_code_common<2u>
 	, public unwind_code_id<unwind_code::ms_specific, 16u>
 {
@@ -285,7 +285,7 @@ public:
 };
 
 //ldr lr,[sp],#X
-class ldr_lr_sp
+class [[nodiscard]] ldr_lr_sp
 	: public unwind_code_common<2u>
 	, public unwind_code_id<unwind_code::ldr_lr_sp, 32u>
 {
@@ -300,7 +300,7 @@ public:
 };
 
 template<std::uint8_t Delta>
-class save_dsde_base
+class [[nodiscard]] save_dsde_base
 	: public unwind_code_common<2u>
 {
 public:
@@ -329,20 +329,20 @@ public:
 };
 
 //vpop {dS-dE}
-class save_dsde
+class [[nodiscard]] save_dsde
 	: public save_dsde_base<0u>
 	, public unwind_code_id<unwind_code::save_dsde, 32u>
 {
 };
 
 //vpop {dS-dE}
-class save_dsde_16
+class [[nodiscard]] save_dsde_16
 	: public save_dsde_base<16u>
 	, public unwind_code_id<unwind_code::save_dsde_16, 32u>
 {
 };
 
-class alloc_m_base
+class [[nodiscard]] alloc_m_base
 	: public unwind_code_common<3u>
 {
 public:
@@ -352,7 +352,7 @@ public:
 	void set_allocation_size(std::uint32_t size);
 };
 
-class alloc_l_base
+class [[nodiscard]] alloc_l_base
 	: public unwind_code_common<4u>
 {
 public:
@@ -363,64 +363,64 @@ public:
 };
 
 //add sp,sp,#X
-class alloc_m
+class [[nodiscard]] alloc_m
 	: public alloc_m_base
 	, public unwind_code_id<unwind_code::alloc_m, 16u>
 {
 };
 
 //add sp,sp,#X
-class alloc_m_wide
+class [[nodiscard]] alloc_m_wide
 	: public alloc_m_base
 	, public unwind_code_id<unwind_code::alloc_m_wide, 32u>
 {
 };
 
 //add sp,sp,#X
-class alloc_l
+class [[nodiscard]] alloc_l
 	: public alloc_l_base
 	, public unwind_code_id<unwind_code::alloc_l, 16u>
 {
 };
 
 //add sp,sp,#X
-class alloc_l_wide
+class [[nodiscard]] alloc_l_wide
 	: public alloc_l_base
 	, public unwind_code_id<unwind_code::alloc_l_wide, 32u>
 {
 };
 
-class nop
+class [[nodiscard]] nop
 	: public unwind_code_common<1u>
 	, public unwind_code_id<unwind_code::nop, 16u>
 {
 };
 
-class nop_wide
+class [[nodiscard]] nop_wide
 	: public unwind_code_common<1u>
 	, public unwind_code_id<unwind_code::nop_wide, 32u>
 {
 };
 
-class end_nop
+class [[nodiscard]] end_nop
 	: public unwind_code_common<1u>
 	, public unwind_code_id<unwind_code::end_nop, 16u>
 {
 };
 
-class end_nop_wide
+class [[nodiscard]] end_nop_wide
 	: public unwind_code_common<1u>
 	, public unwind_code_id<unwind_code::end_nop_wide, 32u>
 {
 };
 
-class end
+class [[nodiscard]] end
 	: public unwind_code_common<1u>
 	, public unwind_code_id<unwind_code::end, 0u>
 {
 };
 
-class reserved
+class [[nodiscard]] reserved
 	: public unwind_code_common<1u>
 	, public unwind_code_id<unwind_code::reserved, 0u>
 {
@@ -428,7 +428,7 @@ class reserved
 
 } //namespace opcode
 
-struct unwind_record_options
+struct [[nodiscard]] unwind_record_options
 {
 	using unwind_code_type = std::variant<
 		opcode::alloc_s,
@@ -459,16 +459,17 @@ struct unwind_record_options
 	static constexpr bool has_f_bit = true;
 };
 
-using extended_unwind_record = arm_common::extended_unwind_record<epilog_info, unwind_record_options>;
+using extended_unwind_record = arm_common::extended_unwind_record<
+	epilog_info, unwind_record_options>;
 
-struct stack_adjust_flags
+struct [[nodiscard]] stack_adjust_flags
 {
 	std::uint8_t stack_adjustment_words_number{};
 	bool prologue_folding{};
 	bool epilogue_folding{};
 };
 
-class packed_unwind_data
+class [[nodiscard]] packed_unwind_data
 {
 public:
 	enum class flag : std::uint8_t
@@ -476,7 +477,8 @@ public:
 		//Packed unwind data.
 		packed_unwind_function = 0b01u,
 		//Pcked unwind data where the function is assumed to have no prologue.
-		//This is useful for describing function fragments that are discontiguous with the start of the function.
+		//This is useful for describing function fragments
+		//that are discontiguous with the start of the function.
 		packed_unwind_fragment = 0b10u
 	};
 
@@ -488,7 +490,9 @@ public:
 		branch_16bit = 0b01u,
 		//Return by using a 32-bit branch.
 		branch_32bit = 0b10u,
-		//No epilogue at all. This is useful for describing a discontiguous function fragment that may only contain a prologue, but whose epilogue is elsewhere.
+		//No epilogue at all. This is useful for describing a discontiguous
+		//function fragment that may only contain a prologue,
+		//but whose epilogue is elsewhere.
 		no_epilogue = 0b11u
 	};
 
