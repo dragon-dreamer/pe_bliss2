@@ -171,6 +171,25 @@ public:
 			dvrt_header_v0);
 	}
 
+	void add_enclave()
+	{
+		add_data(enclave_va, enclave_config_part1);
+		add_data(image_base + import_list_rva, enclave_imports);
+		add_data(image_base + import_name1_rva, enclave_import1_name);
+	}
+
+	void add_volatile_metadata()
+	{
+		add_data(volatile_metadata_va, volatile_metadata_descriptor);
+		add_data(image_base + volatile_access_table_rva, volatile_access_table);
+		add_data(image_base + volatile_info_range_table_rva, volatile_info_range_table);
+	}
+
+	void add_ehcont_targets()
+	{
+		add_data(guard_eh_continuation_table_va, ehcont_rvas);
+	}
+
 public:
 	template<typename Directory>
 	void validate_base(const Directory& dir, bool has_lock_prefixes = true)
@@ -774,6 +793,111 @@ public:
 		::dynamic_relocation_table_type& table_opt)
 	{
 		EXPECT_FALSE(table_opt);
+	}
+
+	template<typename Directory>
+	void validate_enclave(const Directory& dir,
+		std::uint32_t import_count = enclave_import_count)
+	{
+		ASSERT_TRUE(dir.get_enclave_config());
+		const auto& config = *dir.get_enclave_config();
+		EXPECT_TRUE(config.get_extra_data().value().empty());
+		const auto* image_id = reinterpret_cast<const std::byte*>(
+			config.get_descriptor()->image_id);
+		EXPECT_EQ(std::vector(image_id,
+			image_id + std::size(config.get_descriptor()->image_id)),
+			std::vector(enclave_image_id.begin(), enclave_image_id.end()));
+
+		const auto& imports = config.get_imports();
+		ASSERT_EQ(imports.size(), import_count);
+
+		EXPECT_TRUE(imports[0].get_name().value().empty());
+		EXPECT_EQ(imports[0].get_extra_data().value(),
+			std::vector(enclave_import0_extra.begin(), enclave_import0_extra.end()));
+		const auto* family_id0 = reinterpret_cast<const std::byte*>(
+			imports[0].get_descriptor()->family_id);
+		EXPECT_EQ(std::vector(family_id0,
+			family_id0 + std::size(imports[0].get_descriptor()->family_id)),
+			std::vector(enclave_family_id.begin(), enclave_family_id.end()));
+
+		if (import_count == enclave_import_count)
+		{
+			expect_contains_errors(config,
+				load_config::load_config_directory_loader_errc::invalid_enclave_config_extra_data);
+			EXPECT_EQ(imports[1].get_name().get_state().absolute_offset(),
+				(directory_rva - section_rva)
+				+ (import_name1_rva - section_rva) + absolute_offset);
+			EXPECT_EQ(imports[1].get_name().value(),
+				reinterpret_cast<const char*>(enclave_import1_name.data()));
+			EXPECT_EQ(imports[1].get_extra_data().value(),
+				std::vector(enclave_import1_extra.begin(), enclave_import1_extra.end()));
+			const auto* unique_or_author_id1 = reinterpret_cast<const std::byte*>(
+				imports[0].get_descriptor()->unique_or_author_id);
+			EXPECT_EQ(std::vector(unique_or_author_id1,
+				unique_or_author_id1 + std::size(imports[0].get_descriptor()->unique_or_author_id)),
+				std::vector(enclave_import1_uid.begin(), enclave_import1_uid.end()));
+		}
+		else
+		{
+			expect_contains_errors(config,
+				load_config::load_config_directory_loader_errc::invalid_enclave_config_extra_data,
+				load_config::load_config_directory_loader_errc::invalid_enclave_import_array);
+		}
+	}
+
+	template<typename Directory>
+	void validate_volatile_metadata(const Directory& dir)
+	{
+		ASSERT_TRUE(dir.get_volatile_metadata());
+
+		const auto& metadata = *dir.get_volatile_metadata();
+		expect_contains_errors(metadata,
+			load_config::load_config_directory_loader_errc::unaligned_volatile_metadata_range_table_size);
+
+		const auto& access_table = metadata.get_access_rva_table();
+		ASSERT_EQ(access_table.size(), volatile_metadata_access_table_size);
+		EXPECT_EQ(access_table[0].get(), volatile_access_table_rva0);
+		EXPECT_EQ(access_table[1].get(), volatile_access_table_rva1);
+
+		const auto& range_table = metadata.get_range_table();
+		ASSERT_EQ(range_table.size(), volatile_metadata_range_table_size);
+		EXPECT_EQ(range_table[0]->rva, volatile_access_table_rva2);
+	}
+
+	template<typename Directory>
+	void validate_volatile_metadata_limited(const Directory& dir)
+	{
+		ASSERT_TRUE(dir.get_volatile_metadata());
+
+		const auto& metadata = *dir.get_volatile_metadata();
+		expect_contains_errors(metadata,
+			load_config::load_config_directory_loader_errc::unaligned_volatile_metadata_range_table_size,
+			load_config::load_config_directory_loader_errc::invalid_volatile_metadata_access_rva_table_entry_count,
+			load_config::load_config_directory_loader_errc::invalid_volatile_metadata_range_table_entry_count);
+
+		EXPECT_EQ(metadata.get_access_rva_table().size(), 1u);
+		EXPECT_TRUE(metadata.get_range_table().empty());
+	}
+
+	template<typename Directory>
+	void validate_ehcont_targets(const Directory& dir)
+	{
+		ASSERT_TRUE(dir.get_eh_continuation_targets());
+
+		const auto& targets = *dir.get_eh_continuation_targets();
+		ASSERT_EQ(targets.size(), guard_eh_continuation_count);
+		EXPECT_EQ(targets[0].get(), ehcont_rva0);
+		EXPECT_EQ(targets[1].get(), ehcont_rva1);
+	}
+
+	template<typename Directory>
+	void validate_ehcont_targets_limited(const Directory& dir)
+	{
+		ASSERT_TRUE(dir.get_eh_continuation_targets());
+
+		const auto& targets = *dir.get_eh_continuation_targets();
+		ASSERT_EQ(targets.size(), 1u);
+		EXPECT_EQ(targets[0].get(), ehcont_rva0);
 	}
 
 public:
@@ -1526,6 +1650,365 @@ public:
 		detail::load_config::rf_guard32>();
 	static constexpr std::pair rf_guard{ std::array<std::byte,
 		rf_guard32_size>{std::byte{0xffu}}, rf_guard64 };
+
+	static constexpr std::array rf_guard_ex32{
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //guard_rf_verify_stack_pointer_function_pointer
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //hot_patch_table_offset
+	};
+	static constexpr std::array rf_guard_ex64{
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //guard_rf_verify_stack_pointer_function_pointer
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //hot_patch_table_offset
+	};
+	static constexpr std::pair rf_guard_ex{ rf_guard_ex32, rf_guard_ex64 };
+
+	static constexpr std::uint64_t enclave_va = section_rva + image_base + 0x700u;
+	static constexpr std::array enclave32{
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //reserved
+		//enclave_configuration_pointer
+		std::byte{enclave_va & 0xffu},
+		std::byte{(enclave_va >> 8u) & 0xffu},
+		std::byte{(enclave_va >> 16u) & 0xffu},
+		std::byte{(enclave_va >> 24u) & 0xffu},
+	};
+	static constexpr std::array enclave64{
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //reserved
+		//enclave_configuration_pointer
+		std::byte{enclave_va & 0xffu},
+		std::byte{(enclave_va >> 8u) & 0xffu},
+		std::byte{(enclave_va >> 16u) & 0xffu},
+		std::byte{(enclave_va >> 24u) & 0xffu},
+		std::byte{(enclave_va >> 32u) & 0xffu},
+		std::byte{(enclave_va >> 40u) & 0xffu},
+		std::byte{(enclave_va >> 48u) & 0xffu},
+		std::byte{(enclave_va >> 56u) & 0xffu},
+	};
+
+	static constexpr std::array enclave_family_id{
+		std::byte{'e'}, std::byte{'n'}, std::byte{'c'}, std::byte{'l'},
+		std::byte{'a'}, std::byte{'v'}, std::byte{'e'}, std::byte{' '},
+		std::byte{'f'}, std::byte{'a'}, std::byte{'m'}, std::byte{'i'},
+		std::byte{'l'}, std::byte{'y'}, std::byte{}, std::byte{},
+	};
+	static constexpr std::array enclave_image_id{
+		std::byte{'e'}, std::byte{'n'}, std::byte{'c'}, std::byte{'l'},
+		std::byte{'a'}, std::byte{'v'}, std::byte{'e'}, std::byte{' '},
+		std::byte{'i'}, std::byte{'m'}, std::byte{'a'}, std::byte{'g'},
+		std::byte{'e'}, std::byte{}, std::byte{}, std::byte{},
+	};
+	//There is no part2, as all part2 bytes are zero
+	//(enclave_size, number_of_threads, enclave_flags).
+	static constexpr std::size_t enclave_import_count = 2u;
+	static constexpr std::uint32_t import_list_rva = section_rva + 0x800u;
+	static constexpr std::uint32_t import_name1_rva = section_rva + 0xa00u;
+	static constexpr std::array enclave_config_part1{
+		std::byte{}, std::byte{}, std::byte{}, std::byte{1}, //size
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //minimum_required_config_size
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //policy_flags
+		std::byte{2}, std::byte{}, std::byte{}, std::byte{}, //number_of_imports
+		//import_list
+		std::byte{import_list_rva & 0xffu},
+		std::byte{(import_list_rva >> 8u) & 0xffu},
+		std::byte{(import_list_rva >> 16u) & 0xffu},
+		std::byte{(import_list_rva >> 24u) & 0xffu},
+		std::byte{82}, std::byte{}, std::byte{}, std::byte{}, //import_entry_size (2 extra bytes)
+		//family id
+		enclave_family_id[0], enclave_family_id[1],
+		enclave_family_id[2], enclave_family_id[3],
+		enclave_family_id[4], enclave_family_id[5],
+		enclave_family_id[6], enclave_family_id[7],
+		enclave_family_id[8], enclave_family_id[9],
+		enclave_family_id[10], enclave_family_id[11],
+		enclave_family_id[12], enclave_family_id[13],
+		enclave_family_id[14], enclave_family_id[15],
+		//image
+		enclave_image_id[0], enclave_image_id[1],
+		enclave_image_id[2], enclave_image_id[3],
+		enclave_image_id[4], enclave_image_id[5],
+		enclave_image_id[6], enclave_image_id[7],
+		enclave_image_id[8], enclave_image_id[9],
+		enclave_image_id[10], enclave_image_id[11],
+		enclave_image_id[12], enclave_image_id[13],
+		enclave_image_id[14], enclave_image_id[15],
+		std::byte{}, std::byte{}, std::byte{}, std::byte{1}, //image_version
+		std::byte{}, std::byte{}, std::byte{}, std::byte{1}, //security_version
+	};
+
+	static constexpr std::array enclave_import1_uid{
+		std::byte{'e'}, std::byte{'n'}, std::byte{'c'}, std::byte{'l'},
+		std::byte{'a'}, std::byte{'v'}, std::byte{'e'}, std::byte{' '},
+		std::byte{'i'}, std::byte{'m'}, std::byte{'p'}, std::byte{'o'},
+		std::byte{'r'}, std::byte{'t'}, std::byte{'1'}, std::byte{' '},
+		std::byte{'u'}, std::byte{'i'}, std::byte{'d'}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+	};
+	static constexpr std::array enclave_import2_uid{
+		std::byte{'e'}, std::byte{'n'}, std::byte{'c'}, std::byte{'l'},
+		std::byte{'a'}, std::byte{'v'}, std::byte{'e'}, std::byte{' '},
+		std::byte{'i'}, std::byte{'m'}, std::byte{'p'}, std::byte{'o'},
+		std::byte{'r'}, std::byte{'t'}, std::byte{'2'}, std::byte{' '},
+		std::byte{'u'}, std::byte{'i'}, std::byte{'d'}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+	};
+	static constexpr std::array enclave_import0_extra{
+		std::byte{1}, std::byte{2}
+	};
+	static constexpr std::array enclave_import1_extra{
+		std::byte{0xau}, std::byte{0xbu}
+	};
+	static constexpr std::array enclave_imports{
+		//import 0
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //match_type = none
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //minimum_security_version
+		//unique_or_author_id
+		enclave_import1_uid[0], enclave_import1_uid[1],
+		enclave_import1_uid[2], enclave_import1_uid[3],
+		enclave_import1_uid[4], enclave_import1_uid[5],
+		enclave_import1_uid[6], enclave_import1_uid[7],
+		enclave_import1_uid[8], enclave_import1_uid[9],
+		enclave_import1_uid[10], enclave_import1_uid[11],
+		enclave_import1_uid[12], enclave_import1_uid[13],
+		enclave_import1_uid[14], enclave_import1_uid[15],
+		enclave_import1_uid[16], enclave_import1_uid[17],
+		enclave_import1_uid[18], enclave_import1_uid[19],
+		enclave_import1_uid[20], enclave_import1_uid[21],
+		enclave_import1_uid[22], enclave_import1_uid[23],
+		enclave_import1_uid[24], enclave_import1_uid[25],
+		enclave_import1_uid[26], enclave_import1_uid[27],
+		enclave_import1_uid[28], enclave_import1_uid[29],
+		enclave_import1_uid[30], enclave_import1_uid[31],
+		//family id
+		enclave_family_id[0], enclave_family_id[1],
+		enclave_family_id[2], enclave_family_id[3],
+		enclave_family_id[4], enclave_family_id[5],
+		enclave_family_id[6], enclave_family_id[7],
+		enclave_family_id[8], enclave_family_id[9],
+		enclave_family_id[10], enclave_family_id[11],
+		enclave_family_id[12], enclave_family_id[13],
+		enclave_family_id[14], enclave_family_id[15],
+		//image
+		enclave_image_id[0], enclave_image_id[1],
+		enclave_image_id[2], enclave_image_id[3],
+		enclave_image_id[4], enclave_image_id[5],
+		enclave_image_id[6], enclave_image_id[7],
+		enclave_image_id[8], enclave_image_id[9],
+		enclave_image_id[10], enclave_image_id[11],
+		enclave_image_id[12], enclave_image_id[13],
+		enclave_image_id[14], enclave_image_id[15],
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //import_name
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //reserved
+		enclave_import0_extra[0], enclave_import0_extra[1], //extra data
+
+		//import 1
+		std::byte{1}, std::byte{}, std::byte{}, std::byte{}, //match_type = unique_id
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //minimum_security_version
+		//unique_or_author_id
+		enclave_import2_uid[0], enclave_import2_uid[1],
+		enclave_import2_uid[2], enclave_import2_uid[3],
+		enclave_import2_uid[4], enclave_import2_uid[5],
+		enclave_import2_uid[6], enclave_import2_uid[7],
+		enclave_import2_uid[8], enclave_import2_uid[9],
+		enclave_import2_uid[10], enclave_import2_uid[11],
+		enclave_import2_uid[12], enclave_import2_uid[13],
+		enclave_import2_uid[14], enclave_import2_uid[15],
+		enclave_import2_uid[16], enclave_import2_uid[17],
+		enclave_import2_uid[18], enclave_import2_uid[19],
+		enclave_import2_uid[20], enclave_import2_uid[21],
+		enclave_import2_uid[22], enclave_import2_uid[23],
+		enclave_import2_uid[24], enclave_import2_uid[25],
+		enclave_import2_uid[26], enclave_import2_uid[27],
+		enclave_import2_uid[28], enclave_import2_uid[29],
+		enclave_import2_uid[30], enclave_import2_uid[31],
+		//family id
+		enclave_family_id[0], enclave_family_id[1],
+		enclave_family_id[2], enclave_family_id[3],
+		enclave_family_id[4], enclave_family_id[5],
+		enclave_family_id[6], enclave_family_id[7],
+		enclave_family_id[8], enclave_family_id[9],
+		enclave_family_id[10], enclave_family_id[11],
+		enclave_family_id[12], enclave_family_id[13],
+		enclave_family_id[14], enclave_family_id[15],
+		//image
+		enclave_image_id[0], enclave_image_id[1],
+		enclave_image_id[2], enclave_image_id[3],
+		enclave_image_id[4], enclave_image_id[5],
+		enclave_image_id[6], enclave_image_id[7],
+		enclave_image_id[8], enclave_image_id[9],
+		enclave_image_id[10], enclave_image_id[11],
+		enclave_image_id[12], enclave_image_id[13],
+		enclave_image_id[14], enclave_image_id[15],
+		//import_name
+		std::byte{import_name1_rva & 0xffu},
+		std::byte{(import_name1_rva >> 8u) & 0xffu},
+		std::byte{(import_name1_rva >> 16u) & 0xffu},
+		std::byte{(import_name1_rva >> 24u) & 0xffu},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //reserved
+		enclave_import1_extra[0], enclave_import1_extra[1], //extra data
+	};
+
+	static constexpr std::array enclave_import1_name{
+		std::byte{'i'}, std::byte{'m'}, std::byte{'p'}, std::byte{'o'},
+		std::byte{'r'}, std::byte{'t'}, std::byte{}
+	};
+
+	static constexpr std::pair enclave{ enclave32, enclave64 };
+
+	static constexpr std::uint64_t volatile_metadata_va = section_rva + image_base + 0xc00u;
+	static constexpr std::array volatile_metadata32{
+		//volatile_metadata_pointer
+		std::byte{volatile_metadata_va & 0xffu},
+		std::byte{(volatile_metadata_va >> 8u) & 0xffu},
+		std::byte{(volatile_metadata_va >> 16u) & 0xffu},
+		std::byte{(volatile_metadata_va >> 24u) & 0xffu},
+	};
+	static constexpr std::array volatile_metadata64{
+		//volatile_metadata_pointer
+		std::byte{volatile_metadata_va & 0xffu},
+		std::byte{(volatile_metadata_va >> 8u) & 0xffu},
+		std::byte{(volatile_metadata_va >> 16u) & 0xffu},
+		std::byte{(volatile_metadata_va >> 24u) & 0xffu},
+		std::byte{(volatile_metadata_va >> 32u) & 0xffu},
+		std::byte{(volatile_metadata_va >> 40u) & 0xffu},
+		std::byte{(volatile_metadata_va >> 48u) & 0xffu},
+		std::byte{(volatile_metadata_va >> 56u) & 0xffu},
+	};
+
+	static constexpr std::uint64_t volatile_access_table_rva = section_rva + 0xc50u;
+	static constexpr std::uint64_t volatile_info_range_table_rva = section_rva + 0xca0u;
+	static constexpr std::array volatile_metadata_descriptor{
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //size
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //version
+		//volatile_access_table_rva
+		std::byte{volatile_access_table_rva & 0xffu},
+		std::byte{(volatile_access_table_rva >> 8u) & 0xffu},
+		std::byte{(volatile_access_table_rva >> 16u) & 0xffu},
+		std::byte{(volatile_access_table_rva >> 24u) & 0xffu},
+		std::byte{8}, std::byte{}, std::byte{}, std::byte{}, //volatile_access_table
+		//volatile_info_range_table
+		std::byte{volatile_info_range_table_rva & 0xffu},
+		std::byte{(volatile_info_range_table_rva >> 8u) & 0xffu},
+		std::byte{(volatile_info_range_table_rva >> 16u) & 0xffu},
+		std::byte{(volatile_info_range_table_rva >> 24u) & 0xffu},
+		std::byte{9}, std::byte{}, std::byte{}, std::byte{}, //volatile_info_range_table_size
+	};
+	static constexpr std::uint64_t volatile_access_table_rva0 = 0x12345678u;
+	static constexpr std::uint64_t volatile_access_table_rva1 = 0xcdef0192u;
+	static constexpr std::uint64_t volatile_access_table_rva2 = 0xffddeeaau;
+	static constexpr std::size_t volatile_metadata_access_table_size = 2u;
+	static constexpr std::size_t volatile_metadata_range_table_size = 1u;
+	static constexpr std::array volatile_access_table{
+		//rva 0
+		std::byte{volatile_access_table_rva0 & 0xffu},
+		std::byte{(volatile_access_table_rva0 >> 8u) & 0xffu},
+		std::byte{(volatile_access_table_rva0 >> 16u) & 0xffu},
+		std::byte{(volatile_access_table_rva0 >> 24u) & 0xffu},
+		//rva 1
+		std::byte{volatile_access_table_rva1 & 0xffu},
+		std::byte{(volatile_access_table_rva1 >> 8u) & 0xffu},
+		std::byte{(volatile_access_table_rva1 >> 16u) & 0xffu},
+		std::byte{(volatile_access_table_rva1 >> 24u) & 0xffu},
+	};
+	static constexpr std::array volatile_info_range_table{
+		//rva 2
+		std::byte{volatile_access_table_rva2 & 0xffu},
+		std::byte{(volatile_access_table_rva2 >> 8u) & 0xffu},
+		std::byte{(volatile_access_table_rva2 >> 16u) & 0xffu},
+		std::byte{(volatile_access_table_rva2 >> 24u) & 0xffu},
+		std::byte{1}, std::byte{2}, std::byte{3}, std::byte{4}, //size 2
+	};
+
+	static constexpr std::pair volatile_metadata{ volatile_metadata32, volatile_metadata64 };
+
+	static constexpr std::uint64_t guard_eh_continuation_table_va
+		= section_rva + image_base + 0xd00u;
+	static constexpr std::uint32_t guard_eh_continuation_count = 2u;
+	static constexpr std::array ehcont_targets32{
+		//guard_eh_continuation_table
+		std::byte{guard_eh_continuation_table_va & 0xffu},
+		std::byte{(guard_eh_continuation_table_va >> 8u) & 0xffu},
+		std::byte{(guard_eh_continuation_table_va >> 16u) & 0xffu},
+		std::byte{(guard_eh_continuation_table_va >> 24u) & 0xffu},
+		//guard_eh_continuation_count
+		std::byte{guard_eh_continuation_count}, std::byte{}, std::byte{}, std::byte{}
+	};
+	static constexpr std::array ehcont_targets64{
+		//guard_eh_continuation_table
+		std::byte{guard_eh_continuation_table_va & 0xffu},
+		std::byte{(guard_eh_continuation_table_va >> 8u) & 0xffu},
+		std::byte{(guard_eh_continuation_table_va >> 16u) & 0xffu},
+		std::byte{(guard_eh_continuation_table_va >> 24u) & 0xffu},
+		std::byte{(guard_eh_continuation_table_va >> 32u) & 0xffu},
+		std::byte{(guard_eh_continuation_table_va >> 40u) & 0xffu},
+		std::byte{(guard_eh_continuation_table_va >> 48u) & 0xffu},
+		std::byte{(guard_eh_continuation_table_va >> 56u) & 0xffu},
+		//guard_eh_continuation_count
+		std::byte{guard_eh_continuation_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{}
+	};
+
+	static constexpr std::uint32_t ehcont_rva0 = 0x48271837u;
+	static constexpr std::uint32_t ehcont_rva1 = 0xab83d0abu;
+	static constexpr std::array ehcont_rvas{
+		//rva 0
+		std::byte{ehcont_rva0 & 0xffu},
+		std::byte{(ehcont_rva0 >> 8u) & 0xffu},
+		std::byte{(ehcont_rva0 >> 16u) & 0xffu},
+		std::byte{(ehcont_rva0 >> 24u) & 0xffu},
+		//rva 1
+		std::byte{ehcont_rva1 & 0xffu},
+		std::byte{(ehcont_rva1 >> 8u) & 0xffu},
+		std::byte{(ehcont_rva1 >> 16u) & 0xffu},
+		std::byte{(ehcont_rva1 >> 24u) & 0xffu},
+	};
+
+	static constexpr std::pair ehcont_targets{ ehcont_targets32, ehcont_targets64 };
+
+	static constexpr std::array xf_guard64{
+		//guard_xfg_check_function_pointer
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{1},
+		//guard_xfg_dispatch_function_pointer
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{2},
+		//guard_xfg_table_dispatch_function_pointer
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{3},
+	};
+	static constexpr std::array xf_guard32{
+		//guard_xfg_check_function_pointer
+		std::byte{}, std::byte{}, std::byte{}, std::byte{1},
+		//guard_xfg_dispatch_function_pointer
+		std::byte{}, std::byte{}, std::byte{}, std::byte{2},
+		//guard_xfg_table_dispatch_function_pointer
+		std::byte{}, std::byte{}, std::byte{}, std::byte{3},
+	};
+	static constexpr std::pair xf_guard{ xf_guard32, xf_guard64 };
+
+	static constexpr std::array cast_guard64{
+		//cast_guard_os_determined_failure_mode
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{1},
+	};
+	static constexpr std::array cast_guard32{
+		//cast_guard_os_determined_failure_mode
+		std::byte{}, std::byte{}, std::byte{}, std::byte{1},
+	};
+	static constexpr std::pair cast_guard{ cast_guard32, cast_guard64 };
+
+	static constexpr std::array memcpy_guard64{
+		//guard_memcpy_function_pointer
+		std::byte{}, std::byte{}, std::byte{}, std::byte{},
+		std::byte{}, std::byte{}, std::byte{}, std::byte{1},
+	};
+	static constexpr std::array memcpy_guard32{
+		//guard_memcpy_function_pointer
+		std::byte{}, std::byte{}, std::byte{}, std::byte{1},
+	};
+	static constexpr std::pair memcpy_guard{ memcpy_guard32, memcpy_guard64 };
 };
 } //namespace
 
@@ -2027,6 +2510,231 @@ TEST_P(LoadConfigLoaderTestFixture, LoadDynRelocUnknownVerLoadConfigDirectory)
 		expect_contains_errors(dir,
 			load_config::load_config_directory_loader_errc::invalid_security_cookie_va);
 	}, { .load_chpe_metadata = false });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadEnclaveLoadConfigDirectory)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave);
+	add_lock_prefix_table();
+	add_enclave();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		validate_enclave(dir);
+		expect_contains_errors(dir,
+			load_config::load_config_directory_loader_errc::invalid_security_cookie_va);
+		validate_size_and_version(dir, load_config::version::enclave,
+			load_config_base, se_handler_table, cf_guard,
+			code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave);
+	}, { .load_chpe_metadata = false });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadEnclaveLoadConfigDirectoryLimit)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave);
+	add_lock_prefix_table();
+	add_enclave();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		validate_enclave(dir, 1u);
+	}, { .load_chpe_metadata = false, .max_enclave_number_of_imports = 1u });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadEnclaveLoadConfigDirectorySkip)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave);
+	add_lock_prefix_table();
+	add_enclave();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		EXPECT_FALSE(dir.get_enclave_config());
+	}, { .load_chpe_metadata = false, .load_enclave_config = false });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadVolatileMetadataLoadConfigDirectory)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+		volatile_metadata);
+	add_lock_prefix_table();
+	add_volatile_metadata();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		validate_volatile_metadata(dir);
+		expect_contains_errors(dir,
+			load_config::load_config_directory_loader_errc::invalid_security_cookie_va);
+		validate_size_and_version(dir, load_config::version::volatile_metadata,
+			load_config_base, se_handler_table, cf_guard,
+			code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+			volatile_metadata);
+	}, { .load_chpe_metadata = false });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadVolatileMetadataLoadConfigDirectorySkip)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+		volatile_metadata);
+	add_lock_prefix_table();
+	add_volatile_metadata();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		EXPECT_FALSE(dir.get_volatile_metadata());
+	}, { .load_chpe_metadata = false, .load_volatile_metadata = false });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadVolatileMetadataLoadConfigLimit)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+		volatile_metadata);
+	add_lock_prefix_table();
+	add_volatile_metadata();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		validate_volatile_metadata_limited(dir);
+		expect_contains_errors(dir,
+			load_config::load_config_directory_loader_errc::invalid_security_cookie_va);
+		validate_size_and_version(dir, load_config::version::volatile_metadata,
+			load_config_base, se_handler_table, cf_guard,
+			code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+			volatile_metadata);
+	}, { .load_chpe_metadata = false,
+		.max_volatile_metadata_access_entries = 1u,
+		.max_volatile_metadata_info_range_entries = 0u });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadEhContTargetsLoadConfigDirectory)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+		volatile_metadata, ehcont_targets);
+	add_lock_prefix_table();
+	add_ehcont_targets();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		validate_ehcont_targets(dir);
+		expect_contains_errors(dir,
+			load_config::load_config_directory_loader_errc::invalid_security_cookie_va,
+			load_config::load_config_directory_loader_errc::invalid_ehcont_target_rvas);
+		validate_size_and_version(dir, load_config::version::eh_guard,
+			load_config_base, se_handler_table, cf_guard,
+			code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+			volatile_metadata, ehcont_targets);
+	}, { .load_chpe_metadata = false });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadEhContTargetsLoadConfigDirectorySkip)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+		volatile_metadata, ehcont_targets);
+	add_lock_prefix_table();
+	add_ehcont_targets();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		EXPECT_FALSE(dir.get_eh_continuation_targets());
+		expect_contains_errors(dir,
+			load_config::load_config_directory_loader_errc::invalid_security_cookie_va);
+	}, { .load_chpe_metadata = false, .load_ehcont_targets = false });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadEhContTargetsLoadConfigDirectoryLimit)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+		volatile_metadata, ehcont_targets);
+	add_lock_prefix_table();
+	add_ehcont_targets();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		validate_ehcont_targets_limited(dir);
+		expect_contains_errors(dir,
+			load_config::load_config_directory_loader_errc::invalid_security_cookie_va,
+			load_config::load_config_directory_loader_errc::invalid_ehcont_target_rvas,
+			load_config::load_config_directory_loader_errc::invalid_ehcont_targets_count);
+		validate_size_and_version(dir, load_config::version::eh_guard,
+			load_config_base, se_handler_table, cf_guard,
+			code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+			volatile_metadata, ehcont_targets);
+	}, { .load_chpe_metadata = false, .max_ehcont_targets = 1u });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadXfGuardLoadConfigDirectory)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+		volatile_metadata, ehcont_targets, xf_guard);
+	add_lock_prefix_table();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		expect_contains_errors(dir,
+			load_config::load_config_directory_loader_errc::invalid_security_cookie_va,
+			load_config::load_config_directory_loader_errc::invalid_guard_xfg_check_function_pointer_va,
+			load_config::load_config_directory_loader_errc::invalid_guard_xfg_dispatch_function_pointer_va,
+			load_config::load_config_directory_loader_errc::invalid_guard_xfg_table_dispatch_function_pointer_va);
+		validate_size_and_version(dir, load_config::version::xf_guard,
+			load_config_base, se_handler_table, cf_guard,
+			code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+			volatile_metadata, ehcont_targets, xf_guard);
+	}, { .load_chpe_metadata = false, .load_ehcont_targets = false });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadCastGuardLoadConfigDirectory)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+		volatile_metadata, ehcont_targets, xf_guard, cast_guard);
+	add_lock_prefix_table();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		expect_contains_errors(dir,
+			load_config::load_config_directory_loader_errc::invalid_security_cookie_va,
+			load_config::load_config_directory_loader_errc::invalid_guard_xfg_check_function_pointer_va,
+			load_config::load_config_directory_loader_errc::invalid_guard_xfg_dispatch_function_pointer_va,
+			load_config::load_config_directory_loader_errc::invalid_guard_xfg_table_dispatch_function_pointer_va,
+			load_config::load_config_directory_loader_errc::invalid_cast_guard_os_determined_failure_mode_va);
+		validate_size_and_version(dir, load_config::version::cast_guard,
+			load_config_base, se_handler_table, cf_guard,
+			code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+			volatile_metadata, ehcont_targets, xf_guard, cast_guard);
+	}, { .load_chpe_metadata = false, .load_ehcont_targets = false });
+}
+
+TEST_P(LoadConfigLoaderTestFixture, LoadMemcpyGuardLoadConfigDirectory)
+{
+	add_load_config_directory();
+	add_directory_parts(load_config_base, se_handler_table, cf_guard,
+		code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+		volatile_metadata, ehcont_targets, xf_guard, cast_guard, memcpy_guard);
+	add_lock_prefix_table();
+	with_load_config([this](const auto& dir) {
+		validate_base(dir);
+		expect_contains_errors(dir,
+			load_config::load_config_directory_loader_errc::invalid_security_cookie_va,
+			load_config::load_config_directory_loader_errc::invalid_guard_xfg_check_function_pointer_va,
+			load_config::load_config_directory_loader_errc::invalid_guard_xfg_dispatch_function_pointer_va,
+			load_config::load_config_directory_loader_errc::invalid_guard_xfg_table_dispatch_function_pointer_va,
+			load_config::load_config_directory_loader_errc::invalid_cast_guard_os_determined_failure_mode_va,
+			load_config::load_config_directory_loader_errc::invalid_guard_memcpy_function_pointer_va);
+		validate_size_and_version(dir, load_config::version::memcpy_guard,
+			load_config_base, se_handler_table, cf_guard,
+			code_integrity, cf_guard_ex, hybrid_pe, rf_guard, rf_guard_ex, enclave,
+			volatile_metadata, ehcont_targets, xf_guard, cast_guard, memcpy_guard);
+	}, { .load_chpe_metadata = false, .load_ehcont_targets = false });
 }
 
 INSTANTIATE_TEST_SUITE_P(
