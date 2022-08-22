@@ -1854,10 +1854,10 @@ void load_impl(const image::image& instance,
 	using enum load_config::version;
 	switch (directory.get_version())
 	{
-	case guard_memcpy_function_pointer:
+	case memcpy_guard:
 		validate_guard_memcpy_function_pointer(instance, options, directory);
 		[[fallthrough]];
-	case cast_guard_os_determined_failure_mode:
+	case cast_guard:
 		validate_cast_guard_os_determined_failure_mode(
 			instance, options, directory);
 		[[fallthrough]];

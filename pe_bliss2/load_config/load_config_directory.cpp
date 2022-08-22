@@ -83,7 +83,7 @@ constexpr std::array versions{
 	version::volatile_metadata,
 	version::eh_guard,
 	version::xf_guard,
-	version::cast_guard_os_determined_failure_mode
+	version::cast_guard
 };
 
 static_assert(std::tuple_size_v<decltype(field_offsets<detail::load_config::image_load_config_directory32>)>
@@ -108,7 +108,7 @@ version load_config_directory_impl<Descriptor, Bases...>::get_version() const no
 		if (size <= field_offsets<Descriptor>[i])
 			return versions[i];
 	}
-	return version::guard_memcpy_function_pointer;
+	return version::memcpy_guard;
 }
 
 template<typename Descriptor, typename... Bases>
@@ -128,7 +128,7 @@ bool load_config_directory_impl<Descriptor, Bases...>::version_exactly_matches()
 template<typename Descriptor, typename... Bases>
 void load_config_directory_impl<Descriptor, Bases...>::set_version(version ver)
 {
-	if (ver == version::guard_memcpy_function_pointer)
+	if (ver == version::memcpy_guard)
 	{
 		size_ = packed_descriptor_type::packed_size + size_.packed_size;
 		return;
@@ -249,9 +249,9 @@ const char* version_to_min_required_windows_version(version value) noexcept
 	case volatile_metadata: return "Windows 10 Redstone 4 (1803)";
 	case eh_guard: return "Windows 10 Redstone 5 (1809)";
 	case xf_guard: return "Windows 10 Vibranium 3 (21H1)";
-	case cast_guard_os_determined_failure_mode:
+	case cast_guard:
 		return "Windows 10 Vibranium 4 (21H2)";
-	case guard_memcpy_function_pointer: [[fallthrough]];
+	case memcpy_guard: [[fallthrough]];
 	default: return "Windows 10 Vibranium 4 (21H2) or later";
 	}
 }

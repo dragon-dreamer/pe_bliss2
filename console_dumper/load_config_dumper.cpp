@@ -24,8 +24,8 @@ std::string get_features(pe_bliss::load_config::version version)
 	using enum pe_bliss::load_config::version;
 	switch (version)
 	{
-	case guard_memcpy_function_pointer: [[fallthrough]];
-	case cast_guard_os_determined_failure_mode: [[fallthrough]];
+	case memcpy_guard: [[fallthrough]];
+	case cast_guard: [[fallthrough]];
 	case xf_guard:  features += "XF Guard, CastGuard, "; [[fallthrough]];
 	case eh_guard: features += "EH Guard, "; [[fallthrough]];
 	case volatile_metadata: features += "Vilatile Metadata, "; [[fallthrough]];

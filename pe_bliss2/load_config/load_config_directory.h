@@ -65,8 +65,8 @@ enum class version
 	volatile_metadata,
 	eh_guard,
 	xf_guard,
-	cast_guard_os_determined_failure_mode,
-	guard_memcpy_function_pointer
+	cast_guard,
+	memcpy_guard
 };
 
 [[nodiscard]]
