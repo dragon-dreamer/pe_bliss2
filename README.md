@@ -33,7 +33,7 @@ The library is aimed at being able to provide as much information about the PE f
   - Imports (or same style delay imports):
     - Read (unit-tested)
     - Modify (untested)
-  - Load configuration (including recent versions up to Windows 10 22H1, read-only, partially unit-tested):
+  - Load configuration (including recent versions up to Windows 10 22H1, read-only, unit-tested):
     - Lock prefix table
     - Global flags
     - Process heap flags
@@ -54,6 +54,9 @@ The library is aimed at being able to provide as much information about the PE f
     - Enclave descriptors
     - Volatile metadata (descriptors, access RVA tables, range tables)
     - Exception handling (EH) continuation targets
+    - Extended flow guard
+    - CastGuard
+    - memcpy guard
   - Relocations:
     - Relocation types: ABSOLUTE, HIGHLOW, DIR64, HIGH, LOW, HIGHADJ, THUMB_MOV32.
     - Read (unit-tested)
