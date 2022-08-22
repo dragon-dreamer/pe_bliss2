@@ -95,7 +95,9 @@ enum class load_config_directory_loader_errc
 	invalid_chpe_range_entry_count,
 	invalid_chpe_entry_address_or_size,
 	invalid_volatile_metadata_access_rva_table_entry_count,
-	invalid_volatile_metadata_range_table_entry_count
+	invalid_volatile_metadata_range_table_entry_count,
+	invalid_ehcont_target_rvas,
+	invalid_ehcont_targets_count
 };
 
 std::error_code make_error_code(load_config_directory_loader_errc) noexcept;
@@ -123,6 +125,7 @@ struct [[nodiscard]] loader_options
 	std::uint32_t max_enclave_number_of_imports = 0xffffu;
 	std::uint32_t max_volatile_metadata_access_entries = 0xffffu;
 	std::uint32_t max_volatile_metadata_info_range_entries = 0xffffu;
+	std::uint64_t max_ehcont_targets = 0xfffffu;
 };
 
 [[nodiscard]]

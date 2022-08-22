@@ -201,6 +201,10 @@ struct load_config_directory_loader_error_category : std::error_category
 			return "Invalid volatile metadata access RVA table entry count";
 		case invalid_volatile_metadata_range_table_entry_count:
 			return "Invalid volatile metadata range table entry count";
+		case invalid_ehcont_target_rvas:
+			return "Invalid EH continuation targets RVAs";
+		case invalid_ehcont_targets_count:
+			return "Invalid EH continuation targets count";
 		default:
 			return {};
 		}
@@ -1722,7 +1726,14 @@ void load_ehcont_targets(const image::image& instance, const loader_options& opt
 		return;
 
 	auto& targets = directory.get_eh_continuation_targets().emplace();
-	auto count = directory.get_descriptor()->guard_exception_handling.guard_eh_continuation_count;
+	auto count = directory.get_descriptor()
+		->guard_exception_handling.guard_eh_continuation_count;
+	if (count > options.max_ehcont_targets)
+	{
+		count = static_cast<decltype(count)>(options.max_ehcont_targets);
+		directory.add_error(load_config_directory_loader_errc::invalid_ehcont_targets_count);
+	}
+
 	rva_type prev{};
 	bool is_sorted = true;
 	while (count--)
@@ -1731,8 +1742,7 @@ void load_ehcont_targets(const image::image& instance, const loader_options& opt
 		{
 			ehcont_targets_va += struct_from_va(instance, ehcont_targets_va.value(),
 				targets.emplace_back(), options.include_headers,
-				options.allow_virtual_data).packed_size
-				+ 1u /* unknown single-byte data */;
+				options.allow_virtual_data).packed_size;
 		}
 		catch (const std::system_error&)
 		{
@@ -1749,7 +1759,7 @@ void load_ehcont_targets(const image::image& instance, const loader_options& opt
 		}
 		catch (const std::system_error&)
 		{
-			directory.add_error(load_config_directory_loader_errc::invalid_ehcont_targets);
+			directory.add_error(load_config_directory_loader_errc::invalid_ehcont_target_rvas);
 		}
 
 		if (prev > targets.back().get())
