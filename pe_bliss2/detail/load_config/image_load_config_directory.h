@@ -387,7 +387,7 @@ struct image_prologue_dynamic_relocation_header //Unaligned
 };
 
 //Symbol 2
-//XXX: branch_descriptors, branch_descriptor_bit_map are not documented
+//TODO: branch_descriptors, branch_descriptor_bit_map are not documented
 struct image_epilogue_dynamic_relocation_header //Unaligned
 {
 	std::uint32_t epilogue_count;
@@ -568,7 +568,7 @@ constexpr std::uint8_t chpe_x86_range_code_type_arm64 = 0b0u;
 constexpr std::uint8_t chpe_x86_range_code_type_x86 = 0b1u;
 constexpr std::uint32_t chpe_x86_range_code_type_mask = 0b1u;
 
-//XXX: mostly undocumented
+//TODO: mostly undocumented
 struct image_chpe_metadata_arm64x
 {
 	/* std::uint32_t version; */
@@ -879,7 +879,7 @@ constexpr std::uint16_t load_library_search_system32 = 0x0800u;
 constexpr std::uint16_t load_library_search_user_dirs = 0x0400u;
 } //namespace dependent_load_flags
 
-//XXX: undocumented
+//TODO: undocumented
 struct image_volatile_metadata
 {
 	std::uint32_t size;

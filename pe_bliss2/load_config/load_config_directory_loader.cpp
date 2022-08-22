@@ -197,6 +197,10 @@ struct load_config_directory_loader_error_category : std::error_category
 			return "Invalid CHPE entry address or size";
 		case unknown_bdd_info_entry_version:
 			return "Unknown BDD info entry version";
+		case invalid_volatile_metadata_access_rva_table_entry_count:
+			return "Invalid volatile metadata access RVA table entry count";
+		case invalid_volatile_metadata_range_table_entry_count:
+			return "Invalid volatile metadata range table entry count";
 		default:
 			return {};
 		}
@@ -1618,6 +1622,46 @@ void load_enclave_config(const image::image& instance, const loader_options& opt
 	}
 }
 
+template<typename Table>
+void load_volatile_metadata_table(const image::image& instance, 
+	const loader_options& options,
+	rva_type rva, std::uint32_t size, std::uint32_t max_entry_count,
+	load_config_directory_loader_errc unaligned_error,
+	load_config_directory_loader_errc invalid_count_error,
+	load_config_directory_loader_errc invalid_table_error,
+	volatile_metadata_details& config,
+	Table& table)
+{
+	if (!rva || !size)
+		return;
+
+	static constexpr auto entry_size = Table::value_type::packed_size;
+	if (size % entry_size)
+		config.add_error(unaligned_error);
+
+	try
+	{
+		utilities::safe_uint table_rva = rva;
+		std::uint32_t count = size / entry_size;
+		if (count > max_entry_count)
+		{
+			count = max_entry_count;
+			config.add_error(invalid_count_error);
+		}
+		for (std::uint32_t i = 0u; i != count; ++i)
+		{
+			table_rva += struct_from_rva(instance, table_rva.value(),
+				table.emplace_back(),
+				options.include_headers, options.allow_virtual_data).packed_size;
+		}
+	}
+	catch (const std::system_error&)
+	{
+		table.pop_back();
+		config.add_error(invalid_table_error);
+	}
+}
+
 template<typename Directory>
 void load_volatile_metadata(const image::image& instance, const loader_options& options,
 	Directory& directory)
@@ -1646,66 +1690,23 @@ void load_volatile_metadata(const image::image& instance, const loader_options& 
 		return;
 	}
 
-	if (config_descriptor->volatile_access_table
-		&& config_descriptor->volatile_access_table_size)
-	{
-		if (config_descriptor->volatile_access_table_size % sizeof(rva_type))
-		{
-			config.add_error(
-				load_config_directory_loader_errc::unaligned_volatile_metadata_access_rva_table_size);
-		}
+	load_volatile_metadata_table(instance, options,
+		config_descriptor->volatile_access_table,
+		config_descriptor->volatile_access_table_size,
+		options.max_volatile_metadata_access_entries,
+		load_config_directory_loader_errc::unaligned_volatile_metadata_access_rva_table_size,
+		load_config_directory_loader_errc::invalid_volatile_metadata_access_rva_table_entry_count,
+		load_config_directory_loader_errc::invalid_volatile_metadata_access_rva_table,
+		config, config.get_access_rva_table());
 
-		try
-		{
-			utilities::safe_uint table_rva = config_descriptor->volatile_access_table;
-			for (std::uint32_t i = 0u,
-				count = config_descriptor->volatile_access_table_size / sizeof(rva_type);
-				i != count; ++i)
-			{
-				table_rva += struct_from_rva(instance, table_rva.value(),
-					config.get_access_rva_table().emplace_back(),
-					options.include_headers, options.allow_virtual_data).packed_size;
-			}
-		}
-		catch (const std::system_error&)
-		{
-			config.get_access_rva_table().pop_back();
-			config.add_error(
-				load_config_directory_loader_errc::invalid_volatile_metadata_access_rva_table);
-		}
-	}
-
-	if (config_descriptor->volatile_info_range_table
-		&& config_descriptor->volatile_info_range_table_size)
-	{
-		using range_entry_type = typename Directory
-			::volatile_metadata_type::value_type::range_entry_type;
-
-		if (config_descriptor->volatile_info_range_table_size
-			% range_entry_type::packed_size)
-		{
-			config.add_error(
-				load_config_directory_loader_errc::unaligned_volatile_metadata_range_table_size);
-		}
-
-		try
-		{
-			utilities::safe_uint table_rva = config_descriptor->volatile_info_range_table;
-			for (std::uint32_t i = 0u,
-				count = config_descriptor->volatile_info_range_table_size
-				/ range_entry_type::packed_size; i != count; ++i)
-			{
-				table_rva += struct_from_rva(instance, table_rva.value(),
-					config.get_range_table().emplace_back(),
-					options.include_headers, options.allow_virtual_data).packed_size;
-			}
-		}
-		catch (const std::system_error&)
-		{
-			config.get_range_table().pop_back();
-			config.add_error(load_config_directory_loader_errc::invalid_volatile_metadata_range_table);
-		}
-	}
+	load_volatile_metadata_table(instance, options,
+		config_descriptor->volatile_info_range_table,
+		config_descriptor->volatile_info_range_table_size,
+		options.max_volatile_metadata_info_range_entries,
+		load_config_directory_loader_errc::unaligned_volatile_metadata_range_table_size,
+		load_config_directory_loader_errc::invalid_volatile_metadata_range_table_entry_count,
+		load_config_directory_loader_errc::invalid_volatile_metadata_range_table,
+		config, config.get_range_table());
 }
 
 template<typename Directory>

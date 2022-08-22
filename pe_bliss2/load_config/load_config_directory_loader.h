@@ -93,7 +93,9 @@ enum class load_config_directory_loader_errc
 	invalid_guard_cf_check_function_va,
 	invalid_guard_cf_dispatch_function_va,
 	invalid_chpe_range_entry_count,
-	invalid_chpe_entry_address_or_size
+	invalid_chpe_entry_address_or_size,
+	invalid_volatile_metadata_access_rva_table_entry_count,
+	invalid_volatile_metadata_range_table_entry_count
 };
 
 std::error_code make_error_code(load_config_directory_loader_errc) noexcept;
@@ -119,6 +121,8 @@ struct [[nodiscard]] loader_options
 	std::uint64_t max_guard_longjump_table_functions = 0xfffffu;
 	std::uint32_t max_cphe_code_address_range_count = 0xffu;
 	std::uint32_t max_enclave_number_of_imports = 0xffffu;
+	std::uint32_t max_volatile_metadata_access_entries = 0xffffu;
+	std::uint32_t max_volatile_metadata_info_range_entries = 0xffffu;
 };
 
 [[nodiscard]]
