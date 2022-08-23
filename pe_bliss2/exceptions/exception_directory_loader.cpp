@@ -26,9 +26,9 @@ struct exception_directory_loader_error_category : std::error_category
 		case invalid_x64_exception_directory:
 			return "Invalid x64 exception directory";
 		case invalid_arm64_exception_directory:
-			return "Invalid arm64 exception directory";
+			return "Invalid ARM64 exception directory";
 		case invalid_arm_exception_directory:
-			return "Invalid arm exception directory";
+			return "Invalid ARM exception directory";
 		default:
 			return {};
 		}
