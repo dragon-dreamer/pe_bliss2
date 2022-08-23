@@ -480,6 +480,9 @@
     <ClInclude Include="tls\tls_directory-inl.h">
       <Filter>Header Files\tls</Filter>
     </ClInclude>
+    <ClInclude Include="exceptions\arm_common\arm_common_unwind_info-inl.h">
+      <Filter>Header Files\exceptions\arm_common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">

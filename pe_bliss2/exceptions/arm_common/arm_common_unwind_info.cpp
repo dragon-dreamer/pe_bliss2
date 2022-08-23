@@ -26,6 +26,8 @@ struct arm_common_exception_directory_error_category : std::error_category
 			return "Invalid epilog condition";
 		case invalid_function_length:
 			return "Invalid function length";
+		case invalid_version:
+			return "Invalid version";
 		default:
 			return {};
 		}
@@ -79,7 +81,93 @@ void epilog_info<HasCondition>::set_epilog_condition(std::uint8_t condition)
 	descriptor_.get() |= static_cast<std::uint32_t>(condition) << 20u;
 }
 
+template<bool HasCondition>
+std::uint32_t epilog_info<HasCondition>::get_epilog_start_offset() const noexcept
+{
+	return (descriptor_.get() & 0x3ffffu) * 2u;
+}
+
+template<bool HasCondition>
+typename epilog_info<HasCondition>::epilog_start_index_type
+epilog_info<HasCondition>::get_epilog_start_index() const noexcept
+{
+	return static_cast<epilog_start_index_type>(
+		(descriptor_.get() & epilog_start_index_mask)
+		>> epilog_start_index_shift);
+}
+
+template<bool HasCondition>
+std::uint8_t epilog_info<HasCondition>::get_epilog_condition() const noexcept
+	requires (HasCondition)
+{
+	return static_cast<std::uint8_t>((descriptor_.get() & 0xf00000u) >> 20u);
+}
+
 template class epilog_info<false>;
 template class epilog_info<true>;
+
+std::uint8_t extended_unwind_record_base::get_version() const noexcept
+{
+	return static_cast<std::uint8_t>((main_header_.get() & 0xc0000u) >> 18u);
+}
+
+bool extended_unwind_record_base::has_exception_data() const noexcept
+{
+	return (main_header_.get() & 0x100000u) != 0u;
+}
+
+bool extended_unwind_record_base::single_epilog_info_packed() const noexcept
+{
+	return (main_header_.get() & 0x200000u) != 0u;
+}
+
+void extended_unwind_record_base::set_function_length(std::uint32_t length)
+{
+	if (length % 4u)
+		throw pe_error(exception_directory_errc::invalid_function_length);
+
+	length /= 4u;
+	if (length > 0x3ffffu)
+		throw pe_error(exception_directory_errc::invalid_function_length);
+
+	main_header_.get() &= ~0x3ffffu;
+	main_header_.get() |= length;
+}
+
+void extended_unwind_record_base::set_version(std::uint8_t version)
+{
+	if (version != 0u)
+		throw pe_error(exception_directory_errc::invalid_version);
+
+	main_header_.get() &= ~0xc0000u;
+}
+
+void extended_unwind_record_base::set_has_exception_data(bool value) noexcept
+{
+	if (value)
+		main_header_.get() |= 0x100000u;
+	else
+		main_header_.get() &= ~0x100000u;
+}
+
+void extended_unwind_record_base::set_single_epilog_info_packed(bool value) noexcept
+{
+	if (value)
+		main_header_.get() |= 0x200000u;
+	else
+		main_header_.get() &= ~0x200000u;
+}
+
+std::uint16_t extended_unwind_record_base::get_extended_epilog_count() const noexcept
+{
+	return static_cast<std::uint16_t>(
+		main_extended_header_.get() & 0xffffu);
+}
+
+std::uint8_t extended_unwind_record_base::get_extended_code_words() const noexcept
+{
+	return static_cast<std::uint8_t>(
+		(main_extended_header_.get() & 0xff0000u) >> 16u);
+}
 
 } //namespace namespace pe_bliss::exceptions::arm_common
