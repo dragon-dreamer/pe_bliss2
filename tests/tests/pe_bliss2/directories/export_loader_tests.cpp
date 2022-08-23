@@ -455,7 +455,8 @@ TEST_F(ExportLoaderTestFixture, GetExportsDirectoryAddressesLimited)
 	ASSERT_TRUE(dir);
 	validate_library_name(*dir);
 	expect_contains_errors(*dir,
-		exports::export_directory_loader_errc::invalid_name_list);
+		exports::export_directory_loader_errc::invalid_name_list,
+		exports::export_directory_loader_errc::invalid_address_list_number_of_functions);
 
 	const auto& export_list = dir->get_export_list();
 	ASSERT_EQ(export_list.size(), 1u);
@@ -480,7 +481,8 @@ TEST_F(ExportLoaderTestFixture, GetExportsDirectoryNamesLimited)
 	ASSERT_TRUE(dir);
 	validate_library_name(*dir);
 	expect_contains_errors(*dir,
-		exports::export_directory_loader_errc::invalid_name_ordinal);
+		exports::export_directory_loader_errc::invalid_name_ordinal,
+		exports::export_directory_loader_errc::invalid_address_list_number_of_names);
 	ASSERT_EQ(dir->get_export_list().size(), 2u);
 	expect_contains_errors(dir->get_export_list()[0],
 		exports::export_directory_loader_errc::invalid_rva);

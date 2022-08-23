@@ -51,6 +51,10 @@ struct export_directory_loader_error_category : std::error_category
 			return "Invalid exported RVA";
 		case invalid_directory:
 			return "Invalid export directory";
+		case invalid_address_list_number_of_functions:
+			return "Invalid export address list number of functions";
+		case invalid_address_list_number_of_names:
+			return "Invalid export address list number of names";
 		default:
 			return {};
 		}
@@ -118,6 +122,11 @@ ordinal_to_exported_address_map load_addresses(
 	auto& descriptor = directory.get_descriptor();
 	auto number_of_functions = (std::min<std::uint32_t>)(descriptor->number_of_functions,
 		options.max_number_of_functions);
+	if (number_of_functions < descriptor->number_of_functions)
+	{
+		directory.add_error(
+			export_directory_loader_errc::invalid_address_list_number_of_functions);
+	}
 	utilities::safe_uint address_of_functions = descriptor->address_of_functions;
 	auto& export_list = directory.get_export_list();
 	export_list.reserve(number_of_functions);
@@ -152,6 +161,11 @@ auto load_names(const image::image& instance, const loader_options& options,
 	auto& descriptor = directory.get_descriptor();
 	auto number_of_names = (std::min<std::uint32_t>)(descriptor->number_of_names,
 		options.max_number_of_names);
+	if (number_of_names < descriptor->number_of_names)
+	{
+		directory.add_error(
+			export_directory_loader_errc::invalid_address_list_number_of_names);
+	}
 	utilities::safe_uint address_of_names = descriptor->address_of_names;
 	utilities::safe_uint address_of_name_ordinals = descriptor->address_of_name_ordinals;
 	const std::string empty;

@@ -26,7 +26,9 @@ enum class export_directory_loader_errc
 	empty_name,
 	unsorted_names,
 	invalid_rva,
-	invalid_directory
+	invalid_directory,
+	invalid_address_list_number_of_functions,
+	invalid_address_list_number_of_names
 };
 
 std::error_code make_error_code(export_directory_loader_errc) noexcept;
