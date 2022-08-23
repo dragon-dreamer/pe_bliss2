@@ -108,6 +108,7 @@ bool load_next_entry(rva_type start_rva, const image::image& instance,
 	}
 
 	auto& references = elem.get_references();
+	references.reserve(descriptor->number_of_module_forwarder_refs);
 	for (std::uint32_t i = 0; i != descriptor->number_of_module_forwarder_refs; ++i)
 	{
 		auto& ref = references.emplace_back();

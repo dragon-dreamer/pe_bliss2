@@ -300,6 +300,7 @@ void load_safeseh_handler_table(const image::image& instance,
 	}
 
 	auto& table = directory.get_safeseh_handler_table().emplace().get_handler_list();
+	table.reserve(count);
 	while (count--)
 	{
 		try
@@ -369,6 +370,7 @@ void read_cf_guard_rva_table(const image::image& instance,
 	auto& table = optional_table.emplace();
 	rva_type prev_rva{};
 	bool is_sorted = true;
+	table.reserve(function_count);
 	while (function_count--)
 	{
 		GuardFunction& func = table.emplace_back();
@@ -571,6 +573,7 @@ void load_chpe_range_entries(const image::image& instance,
 			load_config_directory_loader_errc::invalid_chpe_range_entry_count);
 	}
 
+	entry_list.reserve(entry_count);
 	while (entry_count--)
 	{
 		auto& entry = entry_list.emplace_back();
@@ -1052,6 +1055,7 @@ void load_func_overrides(const image::image& instance,
 		rva_size /= sizeof(rva_type);
 
 		auto& rvas = func.get_rvas();
+		rvas.reserve(rva_size);
 		while (rva_size--)
 		{
 			try
@@ -1568,6 +1572,7 @@ void load_enclave_config(const image::image& instance, const loader_options& opt
 			load_config_directory_loader_errc::invalid_enclave_import_array);
 	}
 
+	imports.reserve(number_of_imports);
 	for (std::uint32_t i = 0; i != number_of_imports; ++i)
 	{
 		auto& import = imports.emplace_back();
@@ -1652,6 +1657,7 @@ void load_volatile_metadata_table(const image::image& instance,
 			count = max_entry_count;
 			config.add_error(invalid_count_error);
 		}
+		table.reserve(count);
 		for (std::uint32_t i = 0u; i != count; ++i)
 		{
 			table_rva += struct_from_rva(instance, table_rva.value(),
@@ -1736,6 +1742,7 @@ void load_ehcont_targets(const image::image& instance, const loader_options& opt
 
 	rva_type prev{};
 	bool is_sorted = true;
+	targets.reserve(count);
 	while (count--)
 	{
 		try

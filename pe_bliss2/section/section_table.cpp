@@ -19,6 +19,7 @@ void section_table::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 	headers_.clear();
 
 	bool is_virtual = false;
+	headers_.reserve(number_of_sections);
 	for (std::uint16_t i = 0; i != number_of_sections; ++i)
 	{
 		auto& header = headers_.emplace_back();
