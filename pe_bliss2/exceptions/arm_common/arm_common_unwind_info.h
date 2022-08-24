@@ -218,20 +218,27 @@ public:
 	[[nodiscard]]
 	bool single_epilog_info_packed() const noexcept;
 
-public:
-	void set_function_length(std::uint32_t length);
+	//Extended Epilog Count and Extended Code Words are 16-bit and 8-bit fields, respectively.
+	//They provide more space for encoding an unusually large number of epilogs,
+	//or an unusually large number of unwind code words.
+	//The extension word that contains these fields is only present
+	//if both the Epilog Count and Code Words fields in the first header word are 0.
+	[[nodiscard]]
+	std::uint16_t get_extended_epilog_count() const noexcept;
 
+	[[nodiscard]]
+	std::uint8_t get_extended_code_words() const noexcept;
+
+public:
 	void set_version(std::uint8_t version);
 
 	void set_has_exception_data(bool value) noexcept;
 
 	void set_single_epilog_info_packed(bool value) noexcept;
 
-	[[nodiscard]]
-	std::uint16_t get_extended_epilog_count() const noexcept;
+	void set_extended_epilog_count(std::uint16_t count) noexcept;
 
-	[[nodiscard]]
-	std::uint8_t get_extended_code_words() const noexcept;
+	void set_extended_code_words(std::uint8_t count) noexcept;
 
 protected:
 	main_header_type main_header_;
@@ -313,6 +320,11 @@ public:
 	void set_epilog_count(std::uint16_t count) noexcept;
 
 	void set_code_words(std::uint8_t count) noexcept;
+
+	void set_function_length(std::uint32_t length);
+
+	void set_is_function_fragment(bool is_fragment) noexcept
+		requires (has_f_bit);
 
 private:
 	[[nodiscard]]

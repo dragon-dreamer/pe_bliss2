@@ -266,11 +266,37 @@ std::uint32_t extended_unwind_record<EpilogInfo,
 }
 
 template<typename EpilogInfo, typename UnwindRecordOptions>
+void extended_unwind_record<EpilogInfo,
+	UnwindRecordOptions>::set_function_length(std::uint32_t length)
+{
+	if (length % function_length_multiplier)
+		throw pe_error(exception_directory_errc::invalid_function_length);
+
+	length /= function_length_multiplier;
+	if (length > 0x3ffffu)
+		throw pe_error(exception_directory_errc::invalid_function_length);
+
+	main_header_.get() &= ~0x3ffffu;
+	main_header_.get() |= length;
+}
+
+template<typename EpilogInfo, typename UnwindRecordOptions>
 bool extended_unwind_record<EpilogInfo,
 	UnwindRecordOptions>::is_function_fragment() const noexcept
 	requires (has_f_bit)
 {
 	return (main_header_.get() & 0x400000u) != 0u;
+}
+
+template<typename EpilogInfo, typename UnwindRecordOptions>
+void extended_unwind_record<EpilogInfo,
+	UnwindRecordOptions>::set_is_function_fragment(bool is_fragment) noexcept
+	requires (has_f_bit)
+{
+	if (is_fragment)
+		main_header_.get() |= 0x400000u;
+	else
+		main_header_.get() &= ~0x400000u;
 }
 
 template<typename EpilogInfo, typename UnwindRecordOptions>
@@ -300,13 +326,13 @@ template<typename EpilogInfo, typename UnwindRecordOptions>
 void extended_unwind_record<EpilogInfo,
 	UnwindRecordOptions>::set_epilog_count(std::uint16_t count) noexcept
 {
+	auto code_words = get_code_words();
+
 	main_extended_header_.get() &= ~0xffffu;
 	main_header_.get() &= ~base_epilog_count_mask;
 
-	if (count > 0x1fu)
+	if (count > (base_epilog_count_mask >> base_epilog_count_shift))
 	{
-		auto code_words = get_code_words();
-
 		//Put epilog count to extended header
 		main_extended_header_.get() |= count;
 
@@ -317,10 +343,14 @@ void extended_unwind_record<EpilogInfo,
 	}
 	else
 	{
-		if (get_base_code_words())
+		if (code_words <= (base_code_words_mask >> base_code_words_shift))
 		{
 			//Both epilog count and code words can be put to base header
-			main_header_.get() |= count << base_epilog_count_shift;
+			main_header_.get() &= ~base_code_words_mask;
+			main_header_.get() |= static_cast<std::uint32_t>(code_words)
+				<< base_code_words_shift;
+			main_header_.get() |= static_cast<std::uint32_t>(count)
+				<< base_epilog_count_shift;
 		}
 		else
 		{
@@ -333,13 +363,13 @@ template<typename EpilogInfo, typename UnwindRecordOptions>
 void extended_unwind_record<EpilogInfo,
 	UnwindRecordOptions>::set_code_words(std::uint8_t count) noexcept
 {
+	auto epilog_count = get_epilog_count();
+
 	main_extended_header_.get() &= ~0xff0000u;
 	main_header_.get() &= ~base_code_words_mask;
 
-	if (count > 0x1fu)
+	if (count > (base_code_words_mask >> base_code_words_shift))
 	{
-		auto epilog_count = get_epilog_count();
-
 		//Put code words to extended header
 		main_extended_header_.get()
 			|= static_cast<std::uint32_t>(count) << 16u;
@@ -351,11 +381,14 @@ void extended_unwind_record<EpilogInfo,
 	}
 	else
 	{
-		if (get_base_epilog_count())
+		if (epilog_count <= (base_epilog_count_mask >> base_epilog_count_shift))
 		{
 			//Both epilog count and code words can be put to base header
+			main_header_.get() &= ~base_epilog_count_mask;
 			main_header_.get() |= static_cast<std::uint32_t>(count)
 				<< base_code_words_shift;
+			main_header_.get() |= static_cast<std::uint32_t>(epilog_count)
+				<< base_epilog_count_shift;
 		}
 		else
 		{

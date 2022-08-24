@@ -121,19 +121,6 @@ bool extended_unwind_record_base::single_epilog_info_packed() const noexcept
 	return (main_header_.get() & 0x200000u) != 0u;
 }
 
-void extended_unwind_record_base::set_function_length(std::uint32_t length)
-{
-	if (length % 4u)
-		throw pe_error(exception_directory_errc::invalid_function_length);
-
-	length /= 4u;
-	if (length > 0x3ffffu)
-		throw pe_error(exception_directory_errc::invalid_function_length);
-
-	main_header_.get() &= ~0x3ffffu;
-	main_header_.get() |= length;
-}
-
 void extended_unwind_record_base::set_version(std::uint8_t version)
 {
 	if (version != 0u)
@@ -168,6 +155,20 @@ std::uint8_t extended_unwind_record_base::get_extended_code_words() const noexce
 {
 	return static_cast<std::uint8_t>(
 		(main_extended_header_.get() & 0xff0000u) >> 16u);
+}
+
+void extended_unwind_record_base::set_extended_epilog_count(
+	std::uint16_t count) noexcept
+{
+	main_extended_header_.get() &= 0xffffu;
+	main_extended_header_.get() |= count;
+}
+
+void extended_unwind_record_base::set_extended_code_words(
+	std::uint8_t count) noexcept
+{
+	main_extended_header_.get() &= 0xff0000u;
+	main_extended_header_.get() |= static_cast<std::uint32_t>(count) << 16u;
 }
 
 } //namespace namespace pe_bliss::exceptions::arm_common
