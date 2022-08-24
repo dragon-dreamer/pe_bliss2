@@ -22,12 +22,16 @@ struct arm_common_exception_directory_loader_error_category : std::error_categor
 			return "Unaligned unwind info";
 		case unordered_epilog_scopes:
 			return "Unordered epilog scopes";
-		case invalid_unwind_info:
-			return "Invalid unwind info";
+		case invalid_extended_unwind_info:
+			return "Invalid extended unwind info";
 		case invalid_runtime_function_entry:
 			return "Invalid runtime function entry";
 		case excessive_data_in_directory:
 			return "Excessive data in directory";
+		case invalid_uwop_code:
+			return "Invalid unwind opcode";
+		case invalid_directory_size:
+			return "Invalid exception directory size";
 		default:
 			return {};
 		}
