@@ -23,10 +23,11 @@ The library is aimed at being able to provide as much information about the PE f
   - Bound import:
     - Read (unit-tested)
     - Modify (untested)
-  - Exception (read-only, untested)
+  - Exception (read-only, partially tested)
     - x64
     - ARM
     - ARM64
+    - ARM64 + x64 combined
   - Exports:
     - Read (unit-tested)
     - Modify (untested)
