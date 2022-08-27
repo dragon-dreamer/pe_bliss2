@@ -10,7 +10,6 @@
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/image/struct_from_va.h"
 #include "pe_bliss2/packed_struct.h"
-#include "pe_bliss2/exceptions/exception_directory.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 #include "utilities/generic_error.h"
@@ -22,13 +21,14 @@ namespace pe_bliss::exceptions::arm_common
 
 enum class exception_directory_loader_errc
 {
-	unaligned_unwind_info = 1,
-	unordered_epilog_scopes,
+	unordered_epilog_scopes = 1,
 	invalid_extended_unwind_info,
 	invalid_runtime_function_entry,
-	excessive_data_in_directory,
 	invalid_uwop_code,
-	invalid_directory_size
+	invalid_directory_size,
+	invalid_exception_handler,
+	invalid_exception_handler_rva,
+	unmatched_directory_size
 };
 
 } //namespace pe_bliss::exceptions::arm_common
@@ -54,12 +54,11 @@ template<typename UwopControl, typename LoaderOptions,
 	typename RuntimeFunction, typename ExtendedUnwindRecord>
 void load_extended_unwind_record(
 	const image::image& instance, const LoaderOptions& options,
-	utilities::safe_uint<rva_type> current_rva, RuntimeFunction& func,
-	ExtendedUnwindRecord& unwind_info) try
+	utilities::safe_uint<rva_type> current_rva,
+	RuntimeFunction& func, ExtendedUnwindRecord& unwind_info) try
 {
-	if (!utilities::math::is_aligned<rva_type>(current_rva.value()))
-		func.add_error(exception_directory_loader_errc::unaligned_unwind_info);
-
+	//No need to check if aligned or not. Always aligned, because
+	//two lower bits of RVA is zero (func.has_extended_unwind_record() == true).
 	current_rva += struct_from_rva(instance, current_rva.value(),
 		unwind_info.get_main_header(), options.include_headers,
 		options.allow_virtual_data).packed_size;
@@ -105,9 +104,9 @@ void load_extended_unwind_record(
 
 	auto& unwind_codes = unwind_info.get_unwind_code_list();
 	auto byte_count = unwind_info.get_code_words() * sizeof(std::uint32_t);
-	auto last_rva = current_rva + byte_count;
+	auto last_opcode_rva = current_rva + byte_count;
 	std::size_t opcode_index = 0;
-	while (current_rva < last_rva)
+	while (current_rva < last_opcode_rva)
 	{
 		packed_struct<std::byte> first_byte;
 		current_rva += struct_from_rva(instance, current_rva.value(),
@@ -115,7 +114,7 @@ void load_extended_unwind_record(
 
 		if (!std::to_integer<std::uint8_t>(first_byte.get()))
 		{
-			current_rva = last_rva;
+			current_rva = last_opcode_rva;
 			break;
 		}
 
@@ -123,14 +122,14 @@ void load_extended_unwind_record(
 			UwopControl::decode_unwind_code(first_byte.get()));
 
 		std::visit([&first_byte, &current_rva, &instance,
-			&options, &last_rva, &func, opcode_index] (auto& code) {
+			&options, &last_opcode_rva, &func, opcode_index] (auto& code) {
 			auto& descriptor = code.get_descriptor();
 			descriptor.copy_metadata_from(first_byte);
 			descriptor[0] = first_byte.get();
 
 			if constexpr (code.length > 1u)
 			{
-				if (current_rva + (code.length - 1u) > last_rva)
+				if (current_rva + (code.length - 1u) > last_opcode_rva)
 					throw pe_error(utilities::generic_errc::buffer_overrun);
 
 				std::size_t bytes_read{};
@@ -149,6 +148,7 @@ void load_extended_unwind_record(
 					throw;
 				}
 				descriptor.set_physical_size(descriptor.physical_size() + bytes_read);
+				descriptor.set_data_size(code.length);
 				current_rva += code.length - 1u;
 			}
 		}, unwind_codes.back());
@@ -157,9 +157,29 @@ void load_extended_unwind_record(
 
 	if (unwind_info.has_exception_data())
 	{
-		struct_from_rva(instance, current_rva.value(),
-			unwind_info.get_exception_handler_rva(), options.include_headers,
-			options.allow_virtual_data);
+		try
+		{
+			struct_from_rva(instance, current_rva.value(),
+				unwind_info.get_exception_handler_rva(), options.include_headers,
+				options.allow_virtual_data);
+		}
+		catch (const std::system_error&)
+		{
+			func.add_error(exception_directory_loader_errc::invalid_exception_handler);
+			return;
+		}
+
+		try
+		{
+			[[maybe_unused]] auto first_byte = struct_from_rva<std::uint8_t>(
+				instance, unwind_info.get_exception_handler_rva().get(),
+				options.include_headers, options.allow_virtual_data);
+		}
+		catch (const std::system_error&)
+		{
+			func.add_error(exception_directory_loader_errc::invalid_exception_handler_rva);
+			return;
+		}
 	}
 }
 catch (const std::system_error&)
@@ -189,9 +209,10 @@ void load_runtime_function(const image::image& instance, const LoaderOptions& op
 }
 
 template<typename ExceptionDirectoryControl, typename UwopControl, typename PackedUnwindData,
-	typename ExtendedUnwindRecord, typename ExceptionDirectory, typename LoaderOptions>
+	typename ExtendedUnwindRecord, typename ExceptionDirectory, typename LoaderOptions,
+	typename DirectoryContainer>
 void load(const image::image& instance, const LoaderOptions& options,
-	pe_bliss::exceptions::exception_directory_details& directory)
+	DirectoryContainer& directory_container)
 {
 	auto [current_rva, size] = ExceptionDirectoryControl
 		::get_exception_directory(instance, options);
@@ -199,7 +220,8 @@ void load(const image::image& instance, const LoaderOptions& options,
 		return;
 
 	auto& dir = std::get<ExceptionDirectory>(
-		directory.get_directories().emplace_back(std::in_place_type<ExceptionDirectory>));
+		directory_container.get_directories().emplace_back(
+			std::in_place_type<ExceptionDirectory>));
 
 	utilities::safe_uint last_rva = current_rva;
 	try
@@ -213,7 +235,9 @@ void load(const image::image& instance, const LoaderOptions& options,
 	}
 
 	auto& runtime_functions = dir.get_runtime_function_list();
-	while (current_rva < last_rva)
+	static constexpr std::uint32_t runtime_function_descriptor_size =
+		std::remove_cvref_t<decltype(runtime_functions.back().get_descriptor())>::packed_size;
+	while (current_rva + runtime_function_descriptor_size <= last_rva)
 	{
 		auto& func = runtime_functions.emplace_back();
 		try
@@ -226,11 +250,10 @@ void load(const image::image& instance, const LoaderOptions& options,
 			func.add_error(exception_directory_loader_errc::invalid_runtime_function_entry);
 		}
 		//Does not overflow, checked above
-		current_rva += std::remove_cvref_t<decltype(func.get_descriptor())>::packed_size;
+		current_rva += runtime_function_descriptor_size;
 	}
-
 	if (current_rva != last_rva)
-		dir.add_error(exception_directory_loader_errc::excessive_data_in_directory);
+		dir.add_error(exception_directory_loader_errc::unmatched_directory_size);
 }
 
 } //namespace namespace pe_bliss::exceptions::arm_common
