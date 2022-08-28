@@ -248,6 +248,7 @@ void load(const image::image& instance, const LoaderOptions& options,
 		catch (const std::system_error&)
 		{
 			func.add_error(exception_directory_loader_errc::invalid_runtime_function_entry);
+			break;
 		}
 		//Does not overflow, checked above
 		current_rva += runtime_function_descriptor_size;
