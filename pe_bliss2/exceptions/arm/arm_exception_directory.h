@@ -25,7 +25,6 @@ enum class exception_directory_errc
 	invalid_non_volatile_register_count,
 	invalid_stack_adjust_value,
 	invalid_stack_adjust_flags,
-	unknown_unwind_code,
 	invalid_allocation_size,
 	invalid_delta,
 	invalid_registers
@@ -42,55 +41,29 @@ struct is_error_code_enum<pe_bliss::exceptions::arm::exception_directory_errc> :
 namespace pe_bliss::exceptions::arm
 {
 
+std::error_code make_error_code(exception_directory_errc e) noexcept;
+
 using epilog_info = arm_common::epilog_info<true>;
 
-enum class unwind_code
-{
-	alloc_s,
-	save_r0r12_lr,
-	mov_sprx,
-	save_r4rx_lr,
-	save_r4rx_lr_wide,
-	save_d8dx,
-	alloc_s_wide,
-	save_r0r7_lr,
-	ms_specific,
-	ldr_lr_sp,
-	save_dsde,
-	save_dsde_16,
-	alloc_m,
-	alloc_m_wide,
-	alloc_l,
-	alloc_l_wide,
-	nop,
-	nop_wide,
-	end_nop,
-	end_nop_wide,
-	end,
-	reserved //F0-F4
-};
+template<std::size_t Length,
+	std::uint8_t Matcher, std::uint8_t MatcherMask>
+using unwind_code_common = arm_common::unwind_code_common<
+	Length, Matcher, MatcherMask>;
 
-template<std::size_t Length>
-using unwind_code_common = arm_common::unwind_code_common<Length>;
-
-template<unwind_code Opcode, std::size_t Thumb2OpcodeBitSize>
-class [[nodiscard]] unwind_code_id
+template<std::size_t Thumb2OpcodeBitSize>
+class [[nodiscard]] unwind_code_meta
 {
 public:
-	static constexpr auto opcode = Opcode;
 	static constexpr auto thumb2_opcode_bit_size = Thumb2OpcodeBitSize;
 };
-
-[[nodiscard]]
-unwind_code decode_unwind_code(std::byte value);
 
 namespace opcode
 {
 
 //add sp,sp,#X
 class [[nodiscard]] alloc_s
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::alloc_s, 16u>
+	: public unwind_code_common<1u, 0u, 0x80u>
+	, public unwind_code_meta<16u>
 {
 public:
 	[[nodiscard]]
@@ -165,8 +138,8 @@ enum fp_register : std::uint8_t
 
 //pop {r0-r12, lr}
 class [[nodiscard]] save_r0r12_lr
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::save_r0r12_lr, 32u>
+	: public unwind_code_common<2u, 0x80u, 0xc0u>
+	, public unwind_code_meta<32u>
 {
 public:
 	[[nodiscard]]
@@ -177,8 +150,8 @@ public:
 
 //mov sp,rX
 class [[nodiscard]] mov_sprx
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::mov_sprx, 16u>
+	: public unwind_code_common<1u, 0xc0u, 0xf0u>
+	, public unwind_code_meta<16u>
 {
 public:
 	[[nodiscard]]
@@ -188,17 +161,18 @@ public:
 };
 
 template<std::uint32_t Delta,
-	std::uint32_t ForbiddenMask, std::uint32_t RequiredMask>
+	std::uint32_t ForbiddenMask, std::uint32_t RequiredMask,
+	std::uint8_t Matcher, std::uint8_t MatcherMask>
 class [[nodiscard]] save_r4rx_lr_base
-	: public unwind_code_common<1u>
+	: public unwind_code_common<1u, Matcher, MatcherMask>
 {
 public:
 	[[nodiscard]]
 	int_registers::value get_saved_registers() const noexcept
 	{
-		std::uint32_t max_register = get_value<6, 7>() + Delta;
+		std::uint32_t max_register = this->get_value<6, 7>() + Delta;
 		auto register_mask = ((1u << (max_register + 1u)) - 1u) & 0x1ff0u;
-		if (get_value<5, 5>())
+		if (this->get_value<5, 5>())
 			register_mask |= int_registers::lr;
 		return static_cast<int_registers::value>(register_mask);
 	}
@@ -217,32 +191,35 @@ public:
 			register_mask &= ~static_cast<std::uint32_t>(int_registers::lr);
 		}
 
+		if (!std::has_single_bit((register_mask >> 4u) + 1))
+			throw pe_error(exception_directory_errc::invalid_registers);
+
 		auto max_register = std::bit_width(register_mask);
 		if (max_register)
 			opcode_value |= (max_register - Delta - 1u);
 
-		set_value<5, 7>(opcode_value);
+		this->set_value<5, 7>(opcode_value);
 	}
 };
 
 //pop {r4-rX,lr}
 class [[nodiscard]] save_r4rx_lr
-	: public save_r4rx_lr_base<4u, 0xdf0fu, 0x10u>
-	, public unwind_code_id<unwind_code::save_r4rx_lr, 16u>
+	: public save_r4rx_lr_base<4u, 0xdf0fu, 0x10u, 0xd0u, 0xf8u>
+	, public unwind_code_meta<16u>
 {
 };
 
 //pop {r4-rX,lr}
 class [[nodiscard]] save_r4rx_lr_wide
-	: public save_r4rx_lr_base<8u, 0xd00fu, 0x1f0u>
-	, public unwind_code_id<unwind_code::save_r4rx_lr_wide, 32u>
+	: public save_r4rx_lr_base<8u, 0xd00fu, 0x1f0u, 0xd8u, 0xf8u>
+	, public unwind_code_meta<32u>
 {
 };
 
-//add sp,sp,#X
+//vpop {d8-dX}
 class [[nodiscard]] save_d8dx
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::save_d8dx, 32u>
+	: public unwind_code_common<1u, 0xe0u, 0xf8u>
+	, public unwind_code_meta<32u>
 {
 public:
 	[[nodiscard]]
@@ -251,10 +228,10 @@ public:
 	void set_saved_registers(fp_registers::value value);
 };
 
-//add sp,sp,#X
+//addw sp,sp,#X
 class [[nodiscard]] alloc_s_wide
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::alloc_s_wide, 32u>
+	: public unwind_code_common<2u, 0xe8u, 0xfcu>
+	, public unwind_code_meta<32u>
 {
 public:
 	[[nodiscard]]
@@ -265,8 +242,8 @@ public:
 
 //pop {r0-r7,lr}
 class [[nodiscard]] save_r0r7_lr
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::save_r0r7_lr, 16u>
+	: public unwind_code_common<2u, 0xecu, 0xfeu>
+	, public unwind_code_meta<16u>
 {
 public:
 	[[nodiscard]]
@@ -276,8 +253,8 @@ public:
 };
 
 class [[nodiscard]] ms_specific
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::ms_specific, 16u>
+	: public unwind_code_common<2u, 0xeeu, 0xffu>
+	, public unwind_code_meta<16u>
 {
 public:
 	[[nodiscard]]
@@ -286,8 +263,8 @@ public:
 
 //ldr lr,[sp],#X
 class [[nodiscard]] ldr_lr_sp
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::ldr_lr_sp, 32u>
+	: public unwind_code_common<2u, 0xefu, 0xffu>
+	, public unwind_code_meta<32u>
 {
 public:
 	[[nodiscard]]
@@ -299,16 +276,16 @@ public:
 	void set_delta(std::uint8_t delta);
 };
 
-template<std::uint8_t Delta>
+template<std::uint8_t Delta, std::uint8_t Matcher>
 class [[nodiscard]] save_dsde_base
-	: public unwind_code_common<2u>
+	: public unwind_code_common<2u, Matcher, 0xffu>
 {
 public:
 	[[nodiscard]]
 	std::pair<fp_register, fp_register> get_saved_registers_range() const noexcept
 	{
-		return { static_cast<fp_register>(get_value<8, 11>() + Delta),
-			static_cast<fp_register>(get_value<12, 15>() + Delta) };
+		return { static_cast<fp_register>(this->get_value<8, 11>() + Delta),
+			static_cast<fp_register>(this->get_value<12, 15>() + Delta) };
 	}
 
 	void set_saved_registers_range(const std::pair<fp_register, fp_register>& value)
@@ -323,106 +300,123 @@ public:
 		if (s > e)
 			throw pe_error(exception_directory_errc::invalid_registers);
 
-		set_value<8, 11>(s);
-		set_value<12, 15>(e);
+		this->set_value<8, 11>(s);
+		this->set_value<12, 15>(e);
 	}
 };
 
 //vpop {dS-dE}
 class [[nodiscard]] save_dsde
-	: public save_dsde_base<0u>
-	, public unwind_code_id<unwind_code::save_dsde, 32u>
+	: public save_dsde_base<0u, 0xf5u>
+	, public unwind_code_meta<32u>
 {
 };
 
 //vpop {dS-dE}
 class [[nodiscard]] save_dsde_16
-	: public save_dsde_base<16u>
-	, public unwind_code_id<unwind_code::save_dsde_16, 32u>
+	: public save_dsde_base<16u, 0xf6u>
+	, public unwind_code_meta<32u>
 {
 };
 
+template<std::uint8_t Matcher>
 class [[nodiscard]] alloc_m_base
-	: public unwind_code_common<3u>
+	: public unwind_code_common<3u, Matcher, 0xffu>
 {
 public:
 	[[nodiscard]]
-	std::uint32_t get_allocation_size() const noexcept;
+	std::uint32_t get_allocation_size() const noexcept
+	{
+		return static_cast<std::uint32_t>(this->get_value<8, 23>()) * 4u;
+	}
 
-	void set_allocation_size(std::uint32_t size);
+	void set_allocation_size(std::uint32_t size)
+	{
+		this->set_scaled_value<4u, 8, 23,
+			exception_directory_errc::invalid_allocation_size>(size);
+	}
 };
 
+template<std::uint8_t Matcher>
 class [[nodiscard]] alloc_l_base
-	: public unwind_code_common<4u>
+	: public unwind_code_common<4u, Matcher, 0xffu>
 {
 public:
 	[[nodiscard]]
-	std::uint32_t get_allocation_size() const noexcept;
+	std::uint32_t get_allocation_size() const noexcept
+	{
+		return static_cast<std::uint32_t>(this->get_value<8, 31>()) * 4u;
+	}
 
-	void set_allocation_size(std::uint32_t size);
+	void set_allocation_size(std::uint32_t size)
+	{
+		this->set_scaled_value<4u, 8, 31,
+			exception_directory_errc::invalid_allocation_size>(size);
+	}
+
 };
 
 //add sp,sp,#X
 class [[nodiscard]] alloc_m
-	: public alloc_m_base
-	, public unwind_code_id<unwind_code::alloc_m, 16u>
+	: public alloc_m_base<0xf7u>
+	, public unwind_code_meta<16u>
 {
 };
 
 //add sp,sp,#X
 class [[nodiscard]] alloc_m_wide
-	: public alloc_m_base
-	, public unwind_code_id<unwind_code::alloc_m_wide, 32u>
+	: public alloc_m_base<0xf9u>
+	, public unwind_code_meta<32u>
 {
 };
 
 //add sp,sp,#X
 class [[nodiscard]] alloc_l
-	: public alloc_l_base
-	, public unwind_code_id<unwind_code::alloc_l, 16u>
+	: public alloc_l_base<0xf8u>
+	, public unwind_code_meta<16u>
 {
 };
 
 //add sp,sp,#X
 class [[nodiscard]] alloc_l_wide
-	: public alloc_l_base
-	, public unwind_code_id<unwind_code::alloc_l_wide, 32u>
+	: public alloc_l_base<0xfau>
+	, public unwind_code_meta<32u>
 {
 };
 
+//Unwind codes 0xFD and 0xFE are equivalent to the regular end code 0xFF,
+//but account for one extra nop opcode in the epilogue case, either 16-bit or 32-bit.
+//For prologues, codes 0xFD, 0xFE and 0xFF are exactly equivalent.
+//This accounts for the common epilogue endings bx lr or b <tailcall-target>,
+//which don't have an equivalent prologue instruction.
+//This increases the chance that unwind sequences can be shared between the prologue and the epilogues.
 class [[nodiscard]] nop
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::nop, 16u>
+	: public unwind_code_common<1u, 0xfbu, 0xffu>
+	, public unwind_code_meta<16u>
 {
 };
 
 class [[nodiscard]] nop_wide
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::nop_wide, 32u>
+	: public unwind_code_common<1u, 0xfcu, 0xffu>
+	, public unwind_code_meta<32u>
 {
 };
 
 class [[nodiscard]] end_nop
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::end_nop, 16u>
+	: public unwind_code_common<1u, 0xfdu, 0xffu>
+	, public unwind_code_meta<16u>
 {
 };
 
 class [[nodiscard]] end_nop_wide
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::end_nop_wide, 32u>
+	: public unwind_code_common<1u, 0xfeu, 0xffu>
+	, public unwind_code_meta<32u>
 {
 };
 
 class [[nodiscard]] end
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::end, 0u>
-{
-};
-
-class [[nodiscard]] reserved
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::reserved, 0u>
+	: public unwind_code_common<1u, 0xffu, 0xffu>
+	, public unwind_code_meta<0u>
 {
 };
 
@@ -451,8 +445,7 @@ struct [[nodiscard]] unwind_record_options
 		opcode::nop_wide,
 		opcode::end_nop,
 		opcode::end_nop_wide,
-		opcode::end,
-		opcode::reserved
+		opcode::end
 	>;
 
 	static constexpr std::uint32_t function_length_multiplier = 2u;
@@ -476,7 +469,7 @@ public:
 	{
 		//Packed unwind data.
 		packed_unwind_function = 0b01u,
-		//Pcked unwind data where the function is assumed to have no prologue.
+		//Packed unwind data where the function is assumed to have no prologue.
 		//This is useful for describing function fragments
 		//that are discontiguous with the start of the function.
 		packed_unwind_fragment = 0b10u

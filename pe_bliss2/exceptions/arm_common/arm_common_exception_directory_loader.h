@@ -50,7 +50,7 @@ struct [[nodiscard]] exception_directory_info
 	rva_type size{};
 };
 
-template<typename UwopControl, typename LoaderOptions,
+template<typename LoaderOptions,
 	typename RuntimeFunction, typename ExtendedUnwindRecord>
 void load_extended_unwind_record(
 	const image::image& instance, const LoaderOptions& options,
@@ -118,8 +118,14 @@ void load_extended_unwind_record(
 			break;
 		}
 
-		UwopControl::create_uwop_code(unwind_codes,
-			UwopControl::decode_unwind_code(first_byte.get()));
+		try
+		{
+			create_unwind_code(first_byte.get(), unwind_codes);
+		}
+		catch (const std::system_error&)
+		{
+			func.add_error(exception_directory_loader_errc::invalid_uwop_code, opcode_index);
+		}
 
 		std::visit([&first_byte, &current_rva, &instance,
 			&options, &last_opcode_rva, &func, opcode_index] (auto& code) {
@@ -129,12 +135,12 @@ void load_extended_unwind_record(
 
 			if constexpr (code.length > 1u)
 			{
-				if (current_rva + (code.length - 1u) > last_opcode_rva)
-					throw pe_error(utilities::generic_errc::buffer_overrun);
-
 				std::size_t bytes_read{};
 				try
 				{
+					if (current_rva + (code.length - 1u) > last_opcode_rva)
+						throw pe_error(utilities::generic_errc::buffer_overrun);
+
 					//Set allow_virtual_data=true, as the check is done on the next line
 					bytes_read = section_data_from_rva(instance, current_rva.value(),
 						options.include_headers, true)
@@ -187,7 +193,7 @@ catch (const std::system_error&)
 	func.add_error(exception_directory_loader_errc::invalid_extended_unwind_info);
 }
 
-template<typename UwopControl, typename PackedUnwindData, typename ExtendedUnwindRecord,
+template<typename PackedUnwindData, typename ExtendedUnwindRecord,
 	typename LoaderOptions, typename RuntimeFunction>
 void load_runtime_function(const image::image& instance, const LoaderOptions& options,
 	rva_type current_rva, RuntimeFunction& func)
@@ -197,7 +203,7 @@ void load_runtime_function(const image::image& instance, const LoaderOptions& op
 
 	if (func.has_extended_unwind_record())
 	{
-		load_extended_unwind_record<UwopControl>(
+		load_extended_unwind_record(
 			instance, options, func.get_descriptor()->unwind_data,
 			func, func.get_unwind_info().emplace<ExtendedUnwindRecord>());
 	}
@@ -208,7 +214,7 @@ void load_runtime_function(const image::image& instance, const LoaderOptions& op
 	}
 }
 
-template<typename ExceptionDirectoryControl, typename UwopControl, typename PackedUnwindData,
+template<typename ExceptionDirectoryControl, typename PackedUnwindData,
 	typename ExtendedUnwindRecord, typename ExceptionDirectory, typename LoaderOptions,
 	typename DirectoryContainer>
 void load(const image::image& instance, const LoaderOptions& options,
@@ -242,7 +248,7 @@ void load(const image::image& instance, const LoaderOptions& options,
 		auto& func = runtime_functions.emplace_back();
 		try
 		{
-			load_runtime_function<UwopControl, PackedUnwindData, ExtendedUnwindRecord>(
+			load_runtime_function<PackedUnwindData, ExtendedUnwindRecord>(
 				instance, options, current_rva, func);
 		}
 		catch (const std::system_error&)

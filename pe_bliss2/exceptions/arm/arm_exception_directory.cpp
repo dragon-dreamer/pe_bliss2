@@ -25,8 +25,6 @@ struct arm_exception_directory_error_category : std::error_category
 			return "Invalid stack adjust value";
 		case invalid_stack_adjust_flags:
 			return "Invalid stack adjust flags";
-		case unknown_unwind_code:
-			return "Unknown unwind code";
 		case invalid_allocation_size:
 			return "Invalid allocation size";
 		case invalid_delta:
@@ -119,7 +117,8 @@ std::uint16_t packed_unwind_data::get_stack_adjust() const noexcept
 		return value;
 }
 
-std::optional<stack_adjust_flags> packed_unwind_data::get_stack_adjust_flags() const noexcept
+std::optional<stack_adjust_flags> packed_unwind_data
+	::get_stack_adjust_flags() const noexcept
 {
 	auto value = get_stack_adjust_raw();
 	if (value < 0x3f4u)
@@ -165,7 +164,8 @@ void packed_unwind_data::set_homes_integer_parameter_registers(bool value) noexc
 		unwind_data_ |= 0x8000u;
 }
 
-void packed_unwind_data::set_saved_non_volatile_registers(saved_non_volatile_registers value) noexcept
+void packed_unwind_data::set_saved_non_volatile_registers(
+	saved_non_volatile_registers value) noexcept
 {
 	switch (value)
 	{
@@ -253,57 +253,6 @@ std::uint16_t packed_unwind_data::get_stack_adjust_raw() const noexcept
 	return static_cast<std::uint16_t>((unwind_data_ & 0xffc00000u) >> 22u);
 }
 
-unwind_code decode_unwind_code(std::byte value)
-{
-	auto int_value = std::to_integer<std::uint8_t>(value);
-	if (int_value <= 0x7fu)
-		return unwind_code::alloc_s;
-	if (int_value <= 0xbfu)
-		return unwind_code::save_r0r12_lr;
-	if (int_value <= 0xcfu)
-		return unwind_code::mov_sprx;
-	if (int_value <= 0xd7u)
-		return unwind_code::save_r4rx_lr;
-	if (int_value <= 0xdfu)
-		return unwind_code::save_r4rx_lr_wide;
-	if (int_value <= 0xe7u)
-		return unwind_code::save_d8dx;
-	if (int_value <= 0xebu)
-		return unwind_code::alloc_s_wide;
-	if (int_value <= 0xedu)
-		return unwind_code::save_r0r7_lr;
-	if (int_value == 0xeeu)
-		return unwind_code::ms_specific;
-	if (int_value == 0xefu)
-		return unwind_code::ldr_lr_sp;
-	if (int_value == 0xf5u)
-		return unwind_code::save_dsde;
-	if (int_value == 0xf6u)
-		return unwind_code::save_dsde_16;
-	if (int_value == 0xf7u)
-		return unwind_code::alloc_m;
-	if (int_value == 0xf8u)
-		return unwind_code::alloc_l;
-	if (int_value == 0xf9u)
-		return unwind_code::alloc_m_wide;
-	if (int_value == 0xfau)
-		return unwind_code::alloc_l_wide;
-	if (int_value == 0xfbu)
-		return unwind_code::nop;
-	if (int_value == 0xfcu)
-		return unwind_code::nop_wide;
-	if (int_value == 0xfdu)
-		return unwind_code::end_nop;
-	if (int_value == 0xfeu)
-		return unwind_code::end_nop_wide;
-	if (int_value == 0xffu)
-		return unwind_code::end;
-	if (int_value >= 0xf0u && int_value <= 0xf4u)
-		return unwind_code::reserved;
-
-	throw pe_error(exception_directory_errc::unknown_unwind_code);
-}
-
 namespace opcode
 {
 
@@ -350,6 +299,8 @@ void save_d8dx::set_saved_registers(fp_registers::value value)
 	if (register_mask & 0xffu)
 		throw pe_error(exception_directory_errc::invalid_registers);
 	if ((register_mask & 0x100u) != 0x100u)
+		throw pe_error(exception_directory_errc::invalid_registers);
+	if (!std::has_single_bit((register_mask >> 8u) + 1))
 		throw pe_error(exception_directory_errc::invalid_registers);
 
 	std::uint16_t opcode_value = 0u;
@@ -408,26 +359,6 @@ std::uint8_t ldr_lr_sp::get_delta() const noexcept
 void ldr_lr_sp::set_delta(std::uint8_t delta)
 {
 	set_scaled_value<4u, 12, 15, exception_directory_errc::invalid_delta>(delta);
-}
-
-std::uint32_t alloc_m_base::get_allocation_size() const noexcept
-{
-	return static_cast<std::uint32_t>(get_value<8, 23>()) * 4u;
-}
-
-void alloc_m_base::set_allocation_size(std::uint32_t size)
-{
-	set_scaled_value<4u, 8, 23, exception_directory_errc::invalid_allocation_size>(size);
-}
-
-std::uint32_t alloc_l_base::get_allocation_size() const noexcept
-{
-	return static_cast<std::uint32_t>(get_value<8, 31>()) * 4u;
-}
-
-void alloc_l_base::set_allocation_size(std::uint32_t size)
-{
-	set_scaled_value<4u, 8, 31, exception_directory_errc::invalid_allocation_size>(size);
 }
 
 } //namespace opcode

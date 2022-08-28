@@ -28,8 +28,6 @@ struct arm64_exception_directory_error_category : std::error_category
 			return "Invalid reg INT value";
 		case invalid_reg_fp_value:
 			return "Invalid reg FP value";
-		case unknown_unwind_code:
-			return "Unknown unwind code";
 		case invalid_allocation_size:
 			return "Invalid allocation size";
 		case invalid_offset:
@@ -123,53 +121,6 @@ void packed_unwind_data::set_reg_fp(std::uint8_t value)
 
 	unwind_data_ &= ~0xe000u;
 	unwind_data_ |= static_cast<std::uint32_t>(value) << 13u;
-}
-
-struct unwind_code_match
-{
-	std::uint8_t mask;
-	std::uint8_t match;
-	unwind_code code;
-};
-
-unwind_code decode_unwind_code(std::byte value)
-{
-	using enum unwind_code;
-	static constexpr std::array matches{
-		unwind_code_match{ 0b11100000, 0b00000000, alloc_s },
-		unwind_code_match{ 0b11100000, 0b00100000, save_r19r20_x },
-		unwind_code_match{ 0b11000000, 0b01000000, save_fplr },
-		unwind_code_match{ 0b11000000, 0b10000000, save_fplr_x },
-		unwind_code_match{ 0b11111000, 0b11000000, alloc_m },
-		unwind_code_match{ 0b11111100, 0b11001000, save_regp },
-		unwind_code_match{ 0b11111100, 0b11001100, save_regp_x },
-		unwind_code_match{ 0b11111100, 0b11010000, save_reg },
-		unwind_code_match{ 0b11111110, 0b11010100, save_reg_x },
-		unwind_code_match{ 0b11111110, 0b11010110, save_lrpair },
-		unwind_code_match{ 0b11111110, 0b11011000, save_fregp },
-		unwind_code_match{ 0b11111110, 0b11011010, save_fregp_x },
-		unwind_code_match{ 0b11111110, 0b11011100, save_freg },
-		unwind_code_match{ 0b11111111, 0b11011110, save_freg_x },
-		unwind_code_match{ 0b11111111, 0b11100000, alloc_l },
-		unwind_code_match{ 0b11111111, 0b11100001, set_fp },
-		unwind_code_match{ 0b11111111, 0b11100010, add_fp },
-		unwind_code_match{ 0b11111111, 0b11100011, nop },
-		unwind_code_match{ 0b11111111, 0b11100100, end },
-		unwind_code_match{ 0b11111111, 0b11100101, end_c },
-		unwind_code_match{ 0b11111111, 0b11100110, save_next },
-		unwind_code_match{ 0b11111111, 0b11100111, save_reg_any },
-		unwind_code_match{ 0b11111000, 0b11101000, reserved_custom_stack },
-		unwind_code_match{ 0b11110000, 0b11110000, reserved2 }
-	};
-
-	auto code_value = std::to_integer<std::uint8_t>(value);
-	for (const auto& match : matches)
-	{
-		if ((match.mask & code_value) == match.match)
-			return match.code;
-	}
-
-	throw pe_error(exception_directory_errc::unknown_unwind_code);
 }
 
 namespace opcode

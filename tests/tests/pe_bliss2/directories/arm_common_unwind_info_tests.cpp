@@ -90,10 +90,10 @@ TEST(ArmCommonUnwindInfoTests, EpilogInfoCondition)
 
 TEST(ArmCommonUnwindInfoTests, UnwindCodeCommonRequiredUintType)
 {
-	EXPECT_TRUE((std::is_same_v<unwind_code_common<1>::required_uint_type<1>, std::uint8_t>));
-	EXPECT_TRUE((std::is_same_v<unwind_code_common<1>::required_uint_type<2>, std::uint16_t>));
-	EXPECT_TRUE((std::is_same_v<unwind_code_common<1>::required_uint_type<3>, std::uint32_t>));
-	EXPECT_TRUE((std::is_same_v<unwind_code_common<1>::required_uint_type<4>, std::uint32_t>));
+	EXPECT_TRUE((std::is_same_v<unwind_code_common<1, 0, 0>::required_uint_type<1>, std::uint8_t>));
+	EXPECT_TRUE((std::is_same_v<unwind_code_common<1, 0, 0>::required_uint_type<2>, std::uint16_t>));
+	EXPECT_TRUE((std::is_same_v<unwind_code_common<1, 0, 0>::required_uint_type<3>, std::uint32_t>));
+	EXPECT_TRUE((std::is_same_v<unwind_code_common<1, 0, 0>::required_uint_type<4>, std::uint32_t>));
 }
 
 namespace
@@ -116,7 +116,7 @@ TYPED_TEST_SUITE(UnwindCodeCommonTests, unwind_code_common_tested_types);
 
 TYPED_TEST(UnwindCodeCommonTests, UnwindCodeCommonValue)
 {
-	unwind_code_common<TestFixture::width> code;
+	unwind_code_common<TestFixture::width, 0, 0> code;
 	code.get_descriptor().value()[0] = std::byte{ 0xaau };
 	EXPECT_EQ((code.get_value<0, 2>()), 0b101u);
 	EXPECT_EQ((code.get_value<3, 5>()), 0b010u);
@@ -392,4 +392,16 @@ TEST(ArmCommonUnwindInfoTests, ExtendedUnwindRecordExtendedMainHeaderFBit)
 	EXPECT_FALSE(record.has_extended_main_header());
 	EXPECT_EQ(record.get_epilog_count(), 0x1fu);
 	EXPECT_EQ(record.get_code_words(), 0xfu);
+}
+
+TEST(ArmCommonUnwindInfoTests, Init)
+{
+	unwind_code_common<1u, 0xa0u, 0xf0u> code;
+	EXPECT_EQ(code.get_descriptor()[0], std::byte{ 0u });
+	code.init();
+	EXPECT_EQ(code.get_descriptor()[0], std::byte{ 0xa0u });
+
+	code.get_descriptor()[0] = std::byte{ 0xabu };
+	code.init();
+	EXPECT_EQ(code.get_descriptor()[0], std::byte{ 0xabu });
 }

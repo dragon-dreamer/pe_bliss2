@@ -16,23 +16,44 @@ const typename epilog_info<HasCondition>::descriptor_type&
 	return descriptor_;
 }
 
-template<std::size_t Length>
-typename unwind_code_common<Length>::descriptor_type&
-	unwind_code_common<Length>::get_descriptor() noexcept
+template<std::size_t Length, std::uint8_t Matcher, std::uint8_t MatcherMask>
+void unwind_code_common<Length, Matcher, MatcherMask>::init() noexcept
+{
+	if (!descriptor_.physical_size())
+		descriptor_.set_physical_size(length);
+
+	auto value = static_cast<std::uint8_t>(descriptor_[0]);
+	value &= ~matcher_mask;
+	value |= matcher;
+	descriptor_[0] = static_cast<std::byte>(value);
+}
+
+template<std::size_t Length, std::uint8_t Matcher, std::uint8_t MatcherMask>
+constexpr bool unwind_code_common<Length, Matcher, MatcherMask>
+	::matches(std::byte first_byte) noexcept
+{
+	auto value = static_cast<std::uint8_t>(first_byte);
+	value &= matcher_mask;
+	return value == matcher;
+}
+
+template<std::size_t Length, std::uint8_t Matcher, std::uint8_t MatcherMask>
+typename unwind_code_common<Length, Matcher, MatcherMask>::descriptor_type&
+	unwind_code_common<Length, Matcher, MatcherMask>::get_descriptor() noexcept
 {
 	return descriptor_;
 }
 
-template<std::size_t Length>
-const typename unwind_code_common<Length>::descriptor_type&
-	unwind_code_common<Length>::get_descriptor() const noexcept
+template<std::size_t Length, std::uint8_t Matcher, std::uint8_t MatcherMask>
+const typename unwind_code_common<Length, Matcher, MatcherMask>::descriptor_type&
+	unwind_code_common<Length, Matcher, MatcherMask>::get_descriptor() const noexcept
 {
 	return descriptor_;
 }
 
-template<std::size_t Length>
+template<std::size_t Length, std::uint8_t Matcher, std::uint8_t MatcherMask>
 template<std::size_t FromBit, std::size_t ToBit>
-auto unwind_code_common<Length>::get_value() const noexcept
+auto unwind_code_common<Length, Matcher, MatcherMask>::get_value() const noexcept
 {
 	static_assert(FromBit <= ToBit);
 	constexpr std::size_t byte_count
@@ -50,9 +71,9 @@ auto unwind_code_common<Length>::get_value() const noexcept
 	return static_cast<result_type>(src);
 }
 
-template<std::size_t Length>
+template<std::size_t Length, std::uint8_t Matcher, std::uint8_t MatcherMask>
 template<std::size_t FromBit, std::size_t ToBit, typename Value>
-void unwind_code_common<Length>::set_value(Value value)
+void unwind_code_common<Length, Matcher, MatcherMask>::set_value(Value value)
 {
 	static_assert(FromBit <= ToBit);
 	constexpr std::size_t byte_count
@@ -75,10 +96,10 @@ void unwind_code_common<Length>::set_value(Value value)
 	std::memcpy(descriptor_.value().data(), &src, Length);
 }
 
-template<std::size_t Length>
+template<std::size_t Length, std::uint8_t Matcher, std::uint8_t MatcherMask>
 template<std::size_t Multiple, std::size_t StartBit,
 	std::size_t EndBit, auto ErrorCode, typename Value>
-void unwind_code_common<Length>::set_scaled_value(Value value)
+void unwind_code_common<Length, Matcher, MatcherMask>::set_scaled_value(Value value)
 {
 	if constexpr (Multiple > 1u)
 	{
@@ -98,23 +119,26 @@ void unwind_code_common<Length>::set_scaled_value(Value value)
 	}
 }
 
-template<std::size_t Length>
+template<std::size_t Length, std::uint8_t Matcher, std::uint8_t MatcherMask>
 template<std::size_t FirstBit, std::size_t ValueLength>
-consteval auto unwind_code_common<Length>::create_first_bit_mask() noexcept
+consteval auto unwind_code_common<Length, Matcher, MatcherMask>
+	::create_first_bit_mask() noexcept
 {
 	return (1ull << (ValueLength * CHAR_BIT - FirstBit)) - 1ull;
 }
 
-template<std::size_t Length>
+template<std::size_t Length, std::uint8_t Matcher, std::uint8_t MatcherMask>
 template<std::size_t LastBit, std::size_t ValueLength>
-consteval auto unwind_code_common<Length>::create_last_bit_mask() noexcept
+consteval auto unwind_code_common<Length,
+	Matcher, MatcherMask>::create_last_bit_mask() noexcept
 {
 	return ~create_first_bit_mask<LastBit + 1u, ValueLength>();
 }
 
-template<std::size_t Length>
+template<std::size_t Length, std::uint8_t Matcher, std::uint8_t MatcherMask>
 template<std::size_t FirstBit, std::size_t LastBit, std::size_t ValueLength>
-consteval auto unwind_code_common<Length>::create_bit_mask() noexcept
+consteval auto unwind_code_common<Length,
+	Matcher, MatcherMask>::create_bit_mask() noexcept
 {
 	return create_first_bit_mask<FirstBit, ValueLength>()
 		& create_last_bit_mask<LastBit, ValueLength>();
@@ -439,4 +463,38 @@ typename exception_directory_base<RuntimeFunctionBase,
 {
 	return std::move(runtime_function_list_);
 }
+
+namespace
+{
+template<typename UnwindCode, typename Vector>
+bool try_create_unwind_code(
+	std::byte first_byte, Vector& code_list)
+{
+	if (UnwindCode::matches(first_byte))
+	{
+		code_list.emplace_back(std::in_place_type<UnwindCode>);
+		return true;
+	}
+	return false;
+}
+} //namespace
+
+template<typename... UnwindCodes>
+template<typename Vector>
+void create_unwind_code_helper<std::variant<UnwindCodes...>>::create_unwind_code(
+	std::byte first_byte, Vector& code_list)
+{
+	bool found = (... || try_create_unwind_code<UnwindCodes>(first_byte, code_list));
+	if (!found)
+		throw pe_error(exception_directory_errc::unsupported_unwind_code);
+}
+
+template<typename Vector>
+void create_unwind_code(
+	std::byte first_byte, Vector& code_list)
+{
+	create_unwind_code_helper<typename Vector::value_type>
+		::create_unwind_code(first_byte, code_list);
+}
+
 } //namespace namespace pe_bliss::exceptions::arm_common

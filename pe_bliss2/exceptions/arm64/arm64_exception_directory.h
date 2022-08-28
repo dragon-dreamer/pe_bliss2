@@ -22,7 +22,6 @@ enum class exception_directory_errc
 	invalid_reg_int_value,
 	invalid_reg_fp_value,
 	invalid_version,
-	unknown_unwind_code,
 	invalid_allocation_size,
 	invalid_offset,
 	invalid_register,
@@ -152,54 +151,17 @@ private:
 
 using epilog_info = arm_common::epilog_info<false>;
 
-enum class unwind_code : std::uint8_t
-{
-	alloc_s,
-	save_r19r20_x,
-	save_fplr,
-	save_fplr_x,
-	alloc_m,
-	save_regp,
-	save_regp_x,
-	save_reg,
-	save_reg_x,
-	save_lrpair,
-	save_fregp,
-	save_fregp_x,
-	save_freg,
-	save_freg_x,
-	alloc_l,
-	set_fp,
-	add_fp,
-	nop,
-	end,
-	end_c,
-	save_next,
-	save_reg_any,
-	reserved_custom_stack,
-	reserved2
-};
-
-[[nodiscard]]
-unwind_code decode_unwind_code(std::byte value);
-
-template<std::size_t Length>
-using unwind_code_common = arm_common::unwind_code_common<Length>;
-
-template<unwind_code Opcode>
-class [[nodiscard]] unwind_code_id
-{
-public:
-	static constexpr auto opcode = Opcode;
-};
+template<std::size_t Length,
+	std::uint8_t MatcherMask, std::uint8_t Matcher>
+using unwind_code_common = arm_common::unwind_code_common<
+	Length, Matcher, MatcherMask>;
 
 namespace opcode
 {
 
 //000xxxxx: allocate small stack with size < 512 (2^5 * 16).
 class [[nodiscard]] alloc_s
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::alloc_s>
+	: public unwind_code_common<1u, 0b11100000u, 0b00000000u>
 {
 public:
 	[[nodiscard]]
@@ -209,8 +171,7 @@ public:
 
 //001zzzzz: save <x19,x20> pair at [sp-#Z*8]!, pre-indexed offset >= -248
 class [[nodiscard]] save_r19r20_x
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::save_r19r20_x>
+	: public unwind_code_common<1u, 0b11100000u, 0b00100000u>
 {
 public:
 	[[nodiscard]]
@@ -220,8 +181,7 @@ public:
 
 //01zzzzzz: save <x29,lr> pair at [sp+#Z*8], offset <= 504.
 class [[nodiscard]] save_fplr
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::save_fplr>
+	: public unwind_code_common<1u, 0b11000000u, 0b01000000u>
 {
 public:
 	[[nodiscard]]
@@ -231,8 +191,7 @@ public:
 
 //10zzzzzz: save <x29,lr> pair at [sp-(#Z+1)*8]!, pre-indexed offset >= -512
 class [[nodiscard]] save_fplr_x
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::save_fplr_x>
+	: public unwind_code_common<1u, 0b11000000u, 0b10000000u>
 {
 public:
 	[[nodiscard]]
@@ -242,8 +201,7 @@ public:
 
 //11000xxx'xxxxxxxx: allocate large stack with size < 16k (2^11 * 16).
 class [[nodiscard]] alloc_m
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::alloc_m>
+	: public unwind_code_common<2u, 0b11111000u, 0b11000000u>
 {
 public:
 	[[nodiscard]]
@@ -253,8 +211,7 @@ public:
 
 //110010xx'xxzzzzzz: save x(19+#X) pair at [sp+#Z*8], offset <= 504
 class [[nodiscard]] save_regp
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::save_regp>
+	: public unwind_code_common<2u, 0b11111100u, 0b11001000u>
 {
 public:
 	[[nodiscard]]
@@ -268,8 +225,7 @@ public:
 
 //110011xx'xxzzzzzz: save pair x(19+#X) at [sp-(#Z+1)*8]!, pre-indexed offset >= -512
 class [[nodiscard]] save_regp_x
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::save_regp_x>
+	: public unwind_code_common<2u, 0b11111100u, 0b11001100u>
 {
 public:
 	[[nodiscard]]
@@ -283,8 +239,7 @@ public:
 
 //110100xx'xxzzzzzz: save reg x(19+#X) at [sp+#Z*8], offset <= 504
 class [[nodiscard]] save_reg
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::save_reg>
+	: public unwind_code_common<2u, 0b11111100u, 0b11010000u>
 {
 public:
 	[[nodiscard]]
@@ -298,8 +253,7 @@ public:
 
 //1101010x'xxxzzzzz: save reg x(19+#X) at [sp-(#Z+1)*8]!, pre-indexed offset >= -256
 class [[nodiscard]] save_reg_x
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::save_reg_x>
+	: public unwind_code_common<2u, 0b11111110u, 0b11010100u>
 {
 public:
 	[[nodiscard]]
@@ -313,8 +267,7 @@ public:
 
 //1101011x'xxzzzzzz: save pair <x(19+2*#X),lr> at [sp+#Z*8], offset <= 504
 class [[nodiscard]] save_lrpair
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::save_lrpair>
+	: public unwind_code_common<2u, 0b11111110u, 0b11010110u>
 {
 public:
 	[[nodiscard]]
@@ -328,8 +281,7 @@ public:
 
 //1101100x'xxzzzzzz: save pair d(8+#X) at [sp+#Z*8], offset <= 504
 class [[nodiscard]] save_fregp
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::save_fregp>
+	: public unwind_code_common<2u, 0b11111110u, 0b11011000u>
 {
 public:
 	[[nodiscard]]
@@ -343,8 +295,7 @@ public:
 
 //1101101x'xxzzzzzz: save pair d(8+#X), at [sp-(#Z+1)*8]!, pre-indexed offset >= -512
 class [[nodiscard]] save_fregp_x
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::save_fregp_x>
+	: public unwind_code_common<2u, 0b11111110u, 0b11011010u>
 {
 public:
 	[[nodiscard]]
@@ -358,8 +309,7 @@ public:
 
 //1101110x'xxzzzzzz: save reg d(8+#X) at [sp+#Z*8], offset <= 504
 class [[nodiscard]] save_freg
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::save_freg>
+	: public unwind_code_common<2u, 0b11111110u, 0b11011100u>
 {
 public:
 	[[nodiscard]]
@@ -373,8 +323,7 @@ public:
 
 //11011110'xxxzzzzz: save reg d(8+#X) at [sp-(#Z+1)*8]!, pre-indexed offset >= -256
 class [[nodiscard]] save_freg_x
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::save_freg_x>
+	: public unwind_code_common<2u, 0b11111111u, 0b11011110u>
 {
 public:
 	[[nodiscard]]
@@ -388,8 +337,7 @@ public:
 
 //11100000'xxxxxxxx'xxxxxxxx'xxxxxxxx: allocate large stack with size < 256M (2^24 *16)
 class [[nodiscard]] alloc_l
-	: public unwind_code_common<4u>
-	, public unwind_code_id<unwind_code::alloc_l>
+	: public unwind_code_common<4u, 0b11111111u, 0b11100000u>
 {
 public:
 	[[nodiscard]]
@@ -399,15 +347,13 @@ public:
 
 //11100001: set up x29: with: mov x29,sp
 class [[nodiscard]] set_fp
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::set_fp>
+	: public unwind_code_common<1u, 0b11111111u, 0b11100001u>
 {
 };
 
 //11100010'xxxxxxxx: set up x29 with: add x29,sp,#x*8
 class [[nodiscard]] add_fp
-	: public unwind_code_common<2u>
-	, public unwind_code_id<unwind_code::add_fp>
+	: public unwind_code_common<2u, 0b11111111u, 0b11100010u>
 {
 public:
 	[[nodiscard]]
@@ -417,29 +363,31 @@ public:
 
 //11100011: no unwind operation is required
 class [[nodiscard]] nop
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::nop>
+	: public unwind_code_common<1u, 0b11111111u, 0b11100011u>
 {
 };
 
 //11100100: end of unwind code. Implies ret in epilog
 class [[nodiscard]] end
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::end>
+	: public unwind_code_common<1u, 0b11111111u, 0b11100100u>
 {
 };
 
 //11100101: end of unwind code in current chained scope
 class [[nodiscard]] end_c
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::end_c>
+	: public unwind_code_common<1u, 0b11111111u, 0b11100101u>
 {
 };
 
 //11100110: save next non-volatile Int or FP register pair
 class [[nodiscard]] save_next
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::save_next>
+	: public unwind_code_common<1u, 0b11111111u, 0b11100110u>
+{
+};
+
+//0xfc: pacibsp
+class [[nodiscard]] pacibsp
+	: public unwind_code_common<1u, 0b11111111u, 0xfcu>
 {
 };
 
@@ -454,8 +402,7 @@ enum class register_character : std::uint8_t
 };
 
 class [[nodiscard]] save_reg_any
-	: public unwind_code_common<3u>
-	, public unwind_code_id<unwind_code::save_reg_any>
+	: public unwind_code_common<3u, 0b11111111u, 0b11100111u>
 {
 public:
 	[[nodiscard]]
@@ -493,20 +440,12 @@ enum class custom_stack_case : std::uint8_t
 //11101010: Custom stack for MSFT_OP_CONTEXT
 //11101100: Custom stack for MSFT_OP_CLEAR_UNWOUND_TO_CALL
 class [[nodiscard]] reserved_custom_stack
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::reserved_custom_stack>
+	: public unwind_code_common<1u, 0b11111000u, 0b11101000u>
 {
 public:
 	[[nodiscard]]
 	custom_stack_case get_custom_stack_case() const noexcept;
 	void set_custom_stack_case(custom_stack_case value);
-};
-
-//1111xxxx: reserved
-class [[nodiscard]] reserved2
-	: public unwind_code_common<1u>
-	, public unwind_code_id<unwind_code::reserved2>
-{
 };
 
 } //namespace opcode
@@ -537,7 +476,7 @@ struct [[nodiscard]] unwind_record_options
 		opcode::save_next,
 		opcode::save_reg_any,
 		opcode::reserved_custom_stack,
-		opcode::reserved2
+		opcode::pacibsp
 	>;
 
 	static constexpr std::uint32_t function_length_multiplier = 4u;

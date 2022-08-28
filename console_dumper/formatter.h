@@ -11,6 +11,7 @@
 #include <map>
 #include <ostream>
 #include <string>
+#include <string_view>
 #include <system_error>
 #include <type_traits>
 
@@ -217,6 +218,13 @@ public:
 	}
 
 	void print_string(const char* str)
+	{
+		color_changer changer(stream_, color_provider_,
+			string_fg_color, string_bg_color);
+		stream_ << str;
+	}
+
+	void print_string(std::string_view str)
 	{
 		color_changer changer(stream_, color_provider_,
 			string_fg_color, string_bg_color);

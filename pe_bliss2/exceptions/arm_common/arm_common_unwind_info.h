@@ -27,7 +27,8 @@ enum class exception_directory_errc
 	invalid_epilog_start_index,
 	invalid_epilog_condition,
 	invalid_function_length,
-	invalid_version
+	invalid_version,
+	unsupported_unwind_code
 };
 
 } //namespace pe_bliss::exceptions::arm_common
@@ -93,7 +94,8 @@ private:
 	descriptor_type descriptor_;
 };
 
-template<std::size_t Length>
+template<std::size_t Length,
+	std::uint8_t Matcher, std::uint8_t MatcherMask>
 class [[nodiscard]] unwind_code_common
 {
 public:
@@ -101,8 +103,15 @@ public:
 
 public:
 	static constexpr auto length = Length;
+	static constexpr auto matcher = Matcher;
+	static constexpr auto matcher_mask = MatcherMask;
 	static_assert(length > 0 && length <= sizeof(std::uint32_t),
 		"Invalid unwind code length");
+
+public:
+	void init() noexcept;
+	[[nodiscard]]
+	static constexpr bool matches(std::byte first_byte) noexcept;
 
 public:
 	[[nodiscard]]
@@ -147,6 +156,19 @@ private:
 private:
 	descriptor_type descriptor_;
 };
+
+template<typename UnwindCodes>
+struct create_unwind_code_helper {};
+template<typename... UnwindCodes>
+struct create_unwind_code_helper<std::variant<UnwindCodes...>>
+{
+	template<typename Vector>
+	static void create_unwind_code(
+		std::byte first_byte, Vector& code_list);
+};
+
+template<typename Vector>
+void create_unwind_code(std::byte first_byte, Vector& code_list);
 
 template<typename RuntimeFunctionEntry,
 	typename PackedUnwindData, typename ExtendedUnwindRecord,

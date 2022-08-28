@@ -32,10 +32,10 @@ struct packed_unwind_data
 struct unwind_record_options
 {
 	using unwind_code_type = std::variant<
-		unwind_code_common<1>,
-		unwind_code_common<2>,
-		unwind_code_common<3>,
-		unwind_code_common<4>
+		unwind_code_common<1, 0x1u, 0xffu>,
+		unwind_code_common<2, 0x2u, 0xffu>,
+		unwind_code_common<3, 0x3u, 0xffu>,
+		unwind_code_common<4, 0x4u, 0xffu>
 	>;
 
 	static constexpr std::uint32_t function_length_multiplier = 1u;
@@ -94,10 +94,6 @@ private:
 class ArmCommonExceptionsLoaderTestFixture : public ::testing::Test
 {
 public:
-	using unwind_code_type = std::variant<unwind_code_common<1>,
-		unwind_code_common<2>, unwind_code_common<3>, unwind_code_common<4>>;
-
-public:
 	ArmCommonExceptionsLoaderTestFixture()
 		: instance(create_test_image({ .start_section_rva = section_rva,
 			.sections = { { section_virtual_size, section_raw_size } } }))
@@ -112,27 +108,10 @@ public:
 		return { .rva = options.directory_rva, .size = options.directory_size };
 	}
 
-	static std::byte decode_unwind_code(std::byte code) noexcept
-	{
-		return code;
-	}
-
-	static void create_uwop_code(std::vector<unwind_code_type>& codes, std::byte code)
-	{
-		if (code == std::byte{ 1 })
-			codes.emplace_back(std::in_place_type<unwind_code_common<1>>);
-		else if (code == std::byte{ 2 })
-			codes.emplace_back(std::in_place_type<unwind_code_common<2>>);
-		else if (code == std::byte{ 3 })
-			codes.emplace_back(std::in_place_type<unwind_code_common<3>>);
-		else
-			codes.emplace_back(std::in_place_type<unwind_code_common<4>>);
-	}
-
 	void load_dir()
 	{
 		EXPECT_NO_THROW((load<ArmCommonExceptionsLoaderTestFixture,
-			ArmCommonExceptionsLoaderTestFixture, packed_unwind_data,
+			packed_unwind_data,
 			extended_unwind_record_type, exception_directory_details>(
 				instance, *this, container)));
 	}
@@ -193,13 +172,13 @@ public:
 		EXPECT_EQ(epilogs0[1].get_descriptor().get(), epilog1);
 		const auto& codes0 = unwind0.get_unwind_code_list();
 		ASSERT_EQ(codes0.size(), extended_code_words_count);
-		const auto* code0 = std::get_if<unwind_code_common<1>>(&codes0[0]);
+		const auto* code0 = std::get_if<unwind_code_common<1, 0x1u, 0xffu>>(&codes0[0]);
 		ASSERT_NE(code0, nullptr);
 		EXPECT_EQ(code0->get_descriptor()[0], std::byte{ 1 });
 		EXPECT_EQ(code0->get_descriptor().data_size(), 1u);
 		EXPECT_EQ(code0->get_descriptor().physical_size(), 1u);
 		EXPECT_EQ(code0->get_descriptor().get_state().relative_offset(), code0_offset);
-		const auto* code1 = std::get_if<unwind_code_common<4>>(&codes0[1]);
+		const auto* code1 = std::get_if<unwind_code_common<4, 0x4u, 0xffu>>(&codes0[1]);
 		ASSERT_NE(code1, nullptr);
 		EXPECT_EQ(code1->get_descriptor()[0], std::byte{ 4 });
 		EXPECT_EQ(code1->get_descriptor()[1], std::byte{ 5 });

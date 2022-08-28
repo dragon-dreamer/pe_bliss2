@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <functional>
 #include <iomanip>
+#include <string_view>
 #include <variant>
 
 #include "formatter.h"
@@ -59,26 +60,71 @@ const char* register_id_to_string(pe_bliss::exceptions::x64::register_id reg_id)
 	}
 }
 
-const char* opcode_id_to_string(pe_bliss::exceptions::x64::opcode_id opcode_id) noexcept
-{
-	using enum pe_bliss::exceptions::x64::opcode_id;
-	switch (opcode_id)
-	{
-	case push_nonvol: return "PUSH_NONVOL";
-	case alloc_large: return "ALLOC_LARGE";
-	case alloc_small: return "ALLOC_SMALL";
-	case set_fpreg: return "SET_FPREG";
-	case save_nonvol: return "SAVE_NONVOL";
-	case save_nonvol_far: return "SAVE_NONVOL_FAR";
-	case epilog: return "EPILOG";
-	case spare: return "SPARE";
-	case save_xmm128: return "SAVE_XMM128";
-	case save_xmm128_far: return "SAVE_XMM128_FAR";
-	case push_machframe: return "PUSH_MACHFRAME";
-	case set_fpreg_large: return "SET_FPREG_LARGE";
-	default: return "Unknown";
-	}
-}
+template<typename Opcode>
+constexpr std::string_view opcode_id_to_string{ "Unknown" };
+
+namespace arm64_opcode = pe_bliss::exceptions::arm64::opcode;
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::alloc_s>{ "alloc_s" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_r19r20_x>{ "save_r19r20_x" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_fplr>{ "save_fplr" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_fplr_x>{ "save_fplr_x" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::alloc_m>{ "alloc_m" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_regp>{ "save_regp" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_regp_x>{ "save_regp_x" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_reg>{ "save_reg" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_reg_x>{ "save_reg_x" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_lrpair>{ "save_lrpair" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_fregp>{ "save_fregp" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_fregp_x>{ "save_fregp_x" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_freg>{ "save_freg" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_freg_x>{ "save_freg_x" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::alloc_l>{ "alloc_l" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::set_fp>{ "set_fp" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::add_fp>{ "add_fp" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::nop>{ "nop" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::end>{ "end" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::end_c>{ "end_c" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_next>{ "save_next" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::save_reg_any>{ "save_reg_any" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::reserved_custom_stack>{ "reserved_custom_stack" };
+template<> constexpr std::string_view opcode_id_to_string<arm64_opcode::pacibsp>{ "pacibsp" };
+
+namespace arm_opcode = pe_bliss::exceptions::arm::opcode;
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::alloc_s>{ "alloc_s" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::save_r0r12_lr>{ "save_r0r12_lr" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::mov_sprx>{ "mov_sprx" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::save_r4rx_lr>{ "save_r4rx_lr" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::save_r4rx_lr_wide>{ "save_r4rx_lr_wide" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::save_d8dx>{ "save_d8dx" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::alloc_s_wide>{ "alloc_s_wide" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::save_r0r7_lr>{ "save_r0r7_lr" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::ms_specific>{ "ms_specific" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::ldr_lr_sp>{ "ldr_lr_sp" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::save_dsde>{ "save_dsde" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::save_dsde_16>{ "save_dsde_16" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::alloc_m>{ "alloc_m" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::alloc_m_wide>{ "alloc_m_wide" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::alloc_l>{ "alloc_l" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::alloc_l_wide>{ "alloc_l_wide" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::nop>{ "nop" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::nop_wide>{ "nop_wide" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::end_nop>{ "end_nop" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::end_nop_wide>{ "end_nop_wide" };
+template<> constexpr std::string_view opcode_id_to_string<arm_opcode::end>{ "end" };
+
+namespace x64_opcode = pe_bliss::exceptions::x64;
+template<> constexpr std::string_view opcode_id_to_string<x64_opcode::push_nonvol>{ "PUSH_NONVOL" };
+template<std::size_t Nodes> constexpr std::string_view opcode_id_to_string<x64_opcode::alloc_large<Nodes>>{ "ALLOC_LARGE" };
+template<> constexpr std::string_view opcode_id_to_string<x64_opcode::alloc_small>{ "ALLOC_SMALL" };
+template<> constexpr std::string_view opcode_id_to_string<x64_opcode::set_fpreg>{ "SET_FPREG" };
+template<> constexpr std::string_view opcode_id_to_string<x64_opcode::save_nonvol>{ "SAVE_NONVOL" };
+template<> constexpr std::string_view opcode_id_to_string<x64_opcode::save_nonvol_far>{ "SAVE_NONVOL_FAR" };
+template<> constexpr std::string_view opcode_id_to_string<x64_opcode::epilog>{ "EPILOG" };
+template<> constexpr std::string_view opcode_id_to_string<x64_opcode::spare>{ "SPARE" };
+template<> constexpr std::string_view opcode_id_to_string<x64_opcode::save_xmm128>{ "SAVE_XMM128" };
+template<> constexpr std::string_view opcode_id_to_string<x64_opcode::save_xmm128_far>{ "SAVE_XMM128_FAR" };
+template<> constexpr std::string_view opcode_id_to_string<x64_opcode::push_machframe>{ "PUSH_MACHFRAME" };
+template<> constexpr std::string_view opcode_id_to_string<x64_opcode::set_fpreg_large>{ "SET_FPREG_LARGE" };
 
 void dump_frame_register_and_offset(formatter& fmt, const pe_bliss::exceptions::x64::unwind_info& info,
 	std::size_t left_padding)
@@ -143,7 +189,7 @@ template<typename Opcode>
 void dump_opcode_id_and_register(formatter& fmt, const Opcode& opcode)
 {
 	fmt.get_stream() << " (";
-	fmt.print_string(opcode_id_to_string(Opcode::opcode));
+	fmt.print_string(opcode_id_to_string<Opcode>);
 	fmt.get_stream() << ')';
 
 	if constexpr (opcode_with_register<Opcode>)
@@ -411,70 +457,6 @@ void dump_unwind_info(formatter& fmt, const pe_bliss::exceptions::arm64::packed_
 	fmt.get_stream() << ": ";
 	fmt.print_value(data.get_reg_fp(), true);
 	fmt.get_stream() << "\n\n";
-}
-
-const char* opcode_id_to_string(pe_bliss::exceptions::arm64::unwind_code opcode_id) noexcept
-{
-	using enum pe_bliss::exceptions::arm64::unwind_code;
-	switch (opcode_id)
-	{
-	case alloc_s: return "alloc_s";
-	case save_r19r20_x: return "save_r19r20_x";
-	case save_fplr: return "save_fplr";
-	case save_fplr_x: return "save_fplr_x";
-	case alloc_m: return "alloc_m";
-	case save_regp: return "save_regp";
-	case save_regp_x: return "save_regp_x";
-	case save_reg: return "save_reg";
-	case save_reg_x: return "save_reg_x";
-	case save_lrpair: return "save_lrpair";
-	case save_fregp: return "save_fregp";
-	case save_fregp_x: return "save_fregp_x";
-	case save_freg: return "save_freg";
-	case save_freg_x: return "save_freg_x";
-	case alloc_l: return "alloc_l";
-	case set_fp: return "set_fp";
-	case add_fp: return "add_fp";
-	case nop: return "nop";
-	case end: return "end";
-	case end_c: return "end_c";
-	case save_next: return "save_next";
-	case save_reg_any: return "save_reg_any";
-	case reserved_custom_stack: return "reserved_custom_stack";
-	case reserved2: return "reserved2";
-	default: return "Unknown";
-	}
-}
-
-const char* opcode_id_to_string(pe_bliss::exceptions::arm::unwind_code opcode_id) noexcept
-{
-	using enum pe_bliss::exceptions::arm::unwind_code;
-	switch (opcode_id)
-	{
-	case alloc_s: return "alloc_s"; break;
-	case save_r0r12_lr: return "save_r0r12_lr"; break;
-	case mov_sprx: return "mov_sprx"; break;
-	case save_r4rx_lr: return "save_r4rx_lr"; break;
-	case save_r4rx_lr_wide: return "save_r4rx_lr_wide"; break;
-	case save_d8dx: return "save_d8dx"; break;
-	case alloc_s_wide: return "alloc_s_wide"; break;
-	case save_r0r7_lr: return "save_r0r7_lr"; break;
-	case ms_specific: return "ms_specific"; break;
-	case ldr_lr_sp: return "ldr_lr_sp"; break;
-	case save_dsde: return "save_dsde"; break;
-	case save_dsde_16: return "save_dsde_16"; break;
-	case alloc_m: return "alloc_m"; break;
-	case alloc_m_wide: return "alloc_m_wide"; break;
-	case alloc_l: return "alloc_l"; break;
-	case alloc_l_wide: return "alloc_l_wide"; break;
-	case nop: return "nop"; break;
-	case nop_wide: return "nop_wide"; break;
-	case end_nop: return "end_nop"; break;
-	case end_nop_wide: return "end_nop_wide"; break;
-	case end: return "end"; break;
-	case reserved: return "reserved"; break;
-	default: return "Unknown";
-	}
 }
 
 template<typename Opcode>
@@ -811,7 +793,7 @@ void dump_unwind_info(formatter& fmt,
 			std::visit([&fmt] (const auto& code) {
 				fmt.print_field_name("Code");
 				fmt.get_stream() << ": ";
-				fmt.print_string(opcode_id_to_string(code.opcode));
+				fmt.print_string(opcode_id_to_string<std::remove_cvref_t<decltype(code)>>);
 				fmt.get_stream() << '\n';
 
 				fmt.print_field_name("Descriptor");

@@ -28,6 +28,8 @@ struct arm_common_exception_directory_error_category : std::error_category
 			return "Invalid function length";
 		case invalid_version:
 			return "Invalid version";
+		case unsupported_unwind_code:
+			return "Unsupported unwind code";
 		default:
 			return {};
 		}
