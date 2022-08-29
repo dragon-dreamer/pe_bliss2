@@ -27,8 +27,10 @@ class LoadConfigLoaderTestFixture
 	: public ::testing::TestWithParam<core::optional_header::magic>
 {
 public:
-	LoadConfigLoaderTestFixture()
-		: instance(create_test_image({
+	LoadConfigLoaderTestFixture(std::optional<core::optional_header::magic> magic = {})
+		: is_x64_(magic == core::optional_header::magic::pe64
+			|| GetParam() == core::optional_header::magic::pe64)
+		, instance(create_test_image({
 			.is_x64 = is_x64(),
 			.image_base = image_base,
 			.start_section_rva = section_rva,
@@ -40,7 +42,7 @@ public:
 
 	bool is_x64() const
 	{
-		return GetParam() == core::optional_header::magic::pe64;
+		return is_x64_;
 	}
 
 	std::uint32_t va_size() const
@@ -540,6 +542,12 @@ public:
 					detail::packed_reflection::get_field_offset<
 					&detail::load_config::image_chpe_metadata_x86::wow_a64_rdtsc_function_pointer>());
 			}
+			else if constexpr (std::is_same_v<type,
+				load_config::chpe_arm64x_metadata_details>)
+			{
+				EXPECT_EQ(chpe.get_metadata()->extra_rfe_table, extra_rfe_table);
+				EXPECT_EQ(chpe.get_metadata()->extra_rfe_table_size, extra_rfe_table_size);
+			}
 		}, dir.get_chpe_metadata());
 	}
 
@@ -901,6 +909,7 @@ public:
 	}
 
 public:
+	bool is_x64_{};
 	image::image instance;
 
 public:
@@ -1208,7 +1217,9 @@ public:
 	};
 
 	static constexpr std::uint32_t cphe_code_address_range_count = 3u;
-	static constexpr std::uint32_t cphe_code_address_range_rva = section_rva + 0x360u;
+	static constexpr std::uint32_t cphe_code_address_range_rva = section_rva + 0x380u;
+	static constexpr std::uint32_t extra_rfe_table = 1u;
+	static constexpr std::uint32_t extra_rfe_table_size = 2u;
 	static constexpr std::array chpe_descriptor_arm64{
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //version
 		//cphe_code_address_range_offset
@@ -1231,8 +1242,8 @@ public:
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //arm64x_redirection_metadata_table_entry_count
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //unknown_rva2
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //unknown_rva3
-		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //extra_rfe_table
-		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //extra_rfe_table_size
+		std::byte{extra_rfe_table}, std::byte{}, std::byte{}, std::byte{}, //extra_rfe_table
+		std::byte{extra_rfe_table_size}, std::byte{}, std::byte{}, std::byte{}, //extra_rfe_table_size
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //dispatch_function_pointer
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //copy_of_auxiliary_import_address_table
 	};
@@ -2744,3 +2755,24 @@ INSTANTIATE_TEST_SUITE_P(
 		core::optional_header::magic::pe32,
 		core::optional_header::magic::pe64
 	));
+
+namespace
+{
+struct LoadConfigLoaderTestFixtureImpl final : LoadConfigLoaderTestFixture
+{
+	using LoadConfigLoaderTestFixture::LoadConfigLoaderTestFixture;
+	void TestBody() override {}
+};
+} //namespace
+
+pe_bliss::image::image create_hybrid_exception_load_config_image()
+{
+	LoadConfigLoaderTestFixtureImpl fixture(core::optional_header::magic::pe64);
+	fixture.add_load_config_directory();
+	fixture.add_directory_parts(fixture.load_config_base,
+		fixture.se_handler_table, fixture.cf_guard,
+		fixture.code_integrity, fixture.cf_guard_ex,
+		fixture.hybrid_pe);
+	fixture.add_chpe_tables();
+	return std::move(fixture.instance);
+}

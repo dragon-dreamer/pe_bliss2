@@ -8,6 +8,7 @@
 #include "gtest/gtest.h"
 
 #include "pe_bliss2/exceptions/arm_common/arm_common_unwind_info.h"
+#include "pe_bliss2/image/image.h"
 
 template<typename Codes, typename Expected>
 void test_created_unwind_code(std::uint8_t first_byte)
@@ -18,3 +19,5 @@ void test_created_unwind_code(std::uint8_t first_byte)
 	ASSERT_EQ(vec.size(), 1u);
 	ASSERT_TRUE(std::get_if<Expected>(&vec.back()));
 }
+
+pe_bliss::image::image create_hybrid_exception_load_config_image();
