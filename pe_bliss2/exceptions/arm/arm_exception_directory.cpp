@@ -112,9 +112,9 @@ std::uint16_t packed_unwind_data::get_stack_adjust() const noexcept
 {
 	auto value = get_stack_adjust_raw();
 	if (value >= 0x3f4u)
-		return 0x3f0u;
+		return 0x3f0u * 4u;
 	else
-		return value;
+		return value * 4u;
 }
 
 std::optional<stack_adjust_flags> packed_unwind_data
@@ -159,23 +159,28 @@ void packed_unwind_data::set_ret(ret value) noexcept
 void packed_unwind_data::set_homes_integer_parameter_registers(bool value) noexcept
 {
 	if (value)
-		unwind_data_ &= ~0x8000u;
-	else
 		unwind_data_ |= 0x8000u;
+	else
+		unwind_data_ &= ~0x8000u;
 }
 
 void packed_unwind_data::set_saved_non_volatile_registers(
-	saved_non_volatile_registers value) noexcept
+	saved_non_volatile_registers value)
 {
+	if (get_saved_non_volatile_registers() == saved_non_volatile_registers::none)
+		unwind_data_ = ~0x70000u;
+
 	switch (value)
 	{
 	case saved_non_volatile_registers::integer:
 		unwind_data_ &= ~0x80000u;
 		break;
 	case saved_non_volatile_registers::none:
-		unwind_data_ |= 0x70000u;
-		[[fallthrough]];
+		unwind_data_ |= 0x70000u | 0x80000u;
+		break;
 	default: //floating_point
+		if ((unwind_data_ & 0x70000u) == 0x70000u)
+			throw pe_error(exception_directory_errc::invalid_non_volatile_register_count);
 		unwind_data_ |= 0x80000u;
 		break;
 	}
@@ -186,21 +191,18 @@ void packed_unwind_data::set_last_saved_non_volatile_register_index(std::uint8_t
 	switch (get_saved_non_volatile_registers())
 	{
 	case saved_non_volatile_registers::integer:
-		if (index < 4u)
+		if (index < 4u || index > 11u)
 			throw pe_error(exception_directory_errc::invalid_non_volatile_register_count);
 		index -= 4u;
 		break;
 	case saved_non_volatile_registers::floating_point:
-		if (index < 8u)
+		if (index < 8u || index > 14u)
 			throw pe_error(exception_directory_errc::invalid_non_volatile_register_count);
 		index -= 8u;
 		break;
 	default:
 		throw pe_error(exception_directory_errc::invalid_non_volatile_register_count);
 	}
-
-	if (index > 6u)
-		throw pe_error(exception_directory_errc::invalid_non_volatile_register_count);
 
 	unwind_data_ &= ~0x70000u;
 	unwind_data_ |= (index << 16u);
@@ -209,21 +211,25 @@ void packed_unwind_data::set_last_saved_non_volatile_register_index(std::uint8_t
 void packed_unwind_data::set_save_restore_lr(bool value) noexcept
 {
 	if (value)
-		unwind_data_ &= ~0x100000u;
-	else
 		unwind_data_ |= 0x100000u;
+	else
+		unwind_data_ &= ~0x100000u;
 }
 
 void packed_unwind_data::set_includes_extra_instructions(bool value) noexcept
 {
 	if (value)
-		unwind_data_ &= ~0x200000u;
-	else
 		unwind_data_ |= 0x200000u;
+	else
+		unwind_data_ &= ~0x200000u;
 }
 
 void packed_unwind_data::set_stack_adjust(std::uint16_t value)
 {
+	if (value % 4u)
+		throw pe_error(exception_directory_errc::invalid_stack_adjust_value);
+
+	value /= 4u;
 	if (value > 0x3f3u)
 		throw pe_error(exception_directory_errc::invalid_stack_adjust_value);
 
@@ -233,11 +239,12 @@ void packed_unwind_data::set_stack_adjust(std::uint16_t value)
 
 void packed_unwind_data::set_stack_adjust_flags(const stack_adjust_flags& flags)
 {
-	auto value = get_stack_adjust_raw();
-	if (value != 0x3f0u && value < 0x3f4u)
-		throw pe_error(exception_directory_errc::invalid_stack_adjust_flags);
+	if (get_stack_adjust() != 0x3f0u * 4u)
+		throw pe_error(exception_directory_errc::invalid_stack_adjust_value);
 
 	if (flags.stack_adjustment_words_number < 1u || flags.stack_adjustment_words_number > 4u)
+		throw pe_error(exception_directory_errc::invalid_stack_adjust_flags);
+	if (!flags.prologue_folding && !flags.epilogue_folding)
 		throw pe_error(exception_directory_errc::invalid_stack_adjust_flags);
 
 	unwind_data_ &= ~0x3c00000u;
@@ -333,12 +340,14 @@ int_registers::value save_r0r7_lr::get_saved_registers() const noexcept
 void save_r0r7_lr::set_saved_registers(int_registers::value value)
 {
 	std::uint16_t int_value = static_cast<std::uint16_t>(value);
+	if ((value & ~static_cast<std::uint16_t>(int_registers::lr)) >= int_registers::r8)
+		throw pe_error(exception_directory_errc::invalid_registers);
 	if (int_value & static_cast<std::uint16_t>(int_registers::lr))
 	{
 		int_value &= ~static_cast<std::uint16_t>(int_registers::lr);
 		int_value |= 0x100u;
 	}
-	set_value<7, 15>(int_value);
+	set_scaled_value<0u, 7, 15, exception_directory_errc::invalid_registers>(int_value);
 }
 
 bool ms_specific::is_available_opcode() const noexcept

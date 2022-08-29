@@ -133,7 +133,23 @@ enum fp_register : std::uint8_t
 	d12,
 	d13,
 	d14,
-	d15
+	d15,
+	d16,
+	d17,
+	d18,
+	d19,
+	d20,
+	d21,
+	d22,
+	d23,
+	d24,
+	d25,
+	d26,
+	d27,
+	d28,
+	d29,
+	d30,
+	d31
 };
 
 //pop {r0-r12, lr}
@@ -292,16 +308,18 @@ public:
 	{
 		auto s = static_cast<std::uint8_t>(value.first);
 		auto e = static_cast<std::uint8_t>(value.second);
-		if constexpr (Delta)
+		if constexpr (Delta != 0u)
 		{
 			if (s < Delta || e < Delta)
 				throw pe_error(exception_directory_errc::invalid_registers);
+			s -= Delta;
+			e -= Delta;
 		}
-		if (s > e)
+		if (s > e || s > 0b1111u || e > 0b1111u)
 			throw pe_error(exception_directory_errc::invalid_registers);
 
-		this->set_value<8, 11>(s);
-		this->set_value<12, 15>(e);
+		this->set_scaled_value<0u, 8, 11, exception_directory_errc::invalid_registers>(s);
+		this->set_scaled_value<0u, 12, 15, exception_directory_errc::invalid_registers>(e);
 	}
 };
 
@@ -353,7 +371,6 @@ public:
 		this->set_scaled_value<4u, 8, 31,
 			exception_directory_errc::invalid_allocation_size>(size);
 	}
-
 };
 
 //add sp,sp,#X
@@ -460,6 +477,10 @@ struct [[nodiscard]] stack_adjust_flags
 	std::uint8_t stack_adjustment_words_number{};
 	bool prologue_folding{};
 	bool epilogue_folding{};
+
+	[[nodiscard]]
+	friend constexpr bool operator==(const stack_adjust_flags&,
+		const stack_adjust_flags&) = default;
 };
 
 class [[nodiscard]] packed_unwind_data
@@ -507,6 +528,15 @@ public:
 	{
 		return unwind_data_;
 	}
+	
+	void set_packed_value(std::uint32_t value) noexcept
+	{
+		unwind_data_ = value;
+	}
+
+	[[nodiscard]]
+	friend constexpr bool operator==(const packed_unwind_data&,
+		const packed_unwind_data&) = default;
 
 public:
 	[[nodiscard]]
@@ -567,7 +597,7 @@ public:
 	void set_function_length(std::uint16_t value);
 	void set_ret(ret value) noexcept;
 	void set_homes_integer_parameter_registers(bool value) noexcept;
-	void set_saved_non_volatile_registers(saved_non_volatile_registers value) noexcept;
+	void set_saved_non_volatile_registers(saved_non_volatile_registers value);
 	void set_last_saved_non_volatile_register_index(std::uint8_t index);
 	void set_save_restore_lr(bool value) noexcept;
 	void set_includes_extra_instructions(bool value) noexcept;
