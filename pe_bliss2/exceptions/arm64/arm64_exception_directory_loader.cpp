@@ -16,15 +16,17 @@ namespace
 using namespace pe_bliss;
 using namespace pe_bliss::exceptions::arm64;
 
-struct exception_directory_control
+struct exception_directory_control final
 {
-	static pe_bliss::exceptions::arm_common::exception_directory_info get_exception_directory(
-		const image::image& instance, const loader_options& options)
+	static pe_bliss::exceptions::arm_common::exception_directory_info
+		get_exception_directory(const image::image& instance,
+			const loader_options& options)
 	{
 		if (!instance.is_64bit())
 			return {};
 
-		if (instance.get_file_header().get_machine_type() == core::file_header::machine_type::arm64)
+		if (instance.get_file_header().get_machine_type()
+			== core::file_header::machine_type::arm64)
 		{
 			if (instance.get_data_directories().has_exception_directory())
 			{
@@ -35,7 +37,8 @@ struct exception_directory_control
 			}
 		}
 
-		if (instance.get_file_header().get_machine_type() == core::file_header::machine_type::amd64
+		if (instance.get_file_header().get_machine_type()
+			== core::file_header::machine_type::amd64
 			&& options.load_hybrid_pe_directory)
 		{
 			try
@@ -59,14 +62,17 @@ struct exception_directory_control
 				if (load_config_dir)
 				{
 					if (const auto* load_config_dir64 = std::get_if<
-						load_config::load_config_directory_details::underlying_type64>(&load_config_dir->get_value());
+						load_config::load_config_directory_details::underlying_type64>(
+							&load_config_dir->get_value());
 						load_config_dir64)
 					{
-						if (const auto* metadata = std::get_if<load_config::chpe_arm64x_metadata_details>(
-							&load_config_dir64->get_chpe_metadata()); metadata)
+						if (const auto* metadata = std::get_if<
+							load_config::chpe_arm64x_metadata_details>(
+								&load_config_dir64->get_chpe_metadata()); metadata)
 						{
 							const auto& descriptor = metadata->get_metadata();
-							return { descriptor->extra_rfe_table, descriptor->extra_rfe_table_size };
+							return { descriptor->extra_rfe_table,
+								descriptor->extra_rfe_table_size };
 						}
 					}
 				}
