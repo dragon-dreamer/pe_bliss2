@@ -182,6 +182,7 @@
     <ClCompile Include="tests\pe_bliss2\byte_vector_from_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\compid_database_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\data_directories_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\arm64_exception_directory_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\arm_common_exceptions_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\arm_common_unwind_info_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\arm_exception_directory_tests.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="tests\buffers\output_buffer_helpers.h" />
     <ClInclude Include="tests\pe_bliss2\bytes_to_va_fixture_base.h" />
     <ClInclude Include="tests\pe_bliss2\byte_container_fixture_base.h" />
+    <ClInclude Include="tests\pe_bliss2\directories\arm_common_exception_helpers.h" />
     <ClInclude Include="tests\pe_bliss2\image_helper.h" />
     <ClInclude Include="tests\pe_bliss2\input_buffer_mock.h" />
     <ClInclude Include="tests\pe_bliss2\output_buffer_mock.h" />

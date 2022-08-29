@@ -6,47 +6,34 @@
 #include <vector>
 
 #include "pe_bliss2/exceptions/arm/arm_exception_directory.h"
-
+#include "tests/tests/pe_bliss2/directories/arm_common_exception_helpers.h"
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss::exceptions;
 using namespace pe_bliss::exceptions::arm;
 
-namespace
-{
-template<typename Expected>
-void test_created_unwind_code(std::uint8_t first_byte)
-{
-	using codes = unwind_record_options::unwind_code_type;
-	std::vector<codes> vec;
-	ASSERT_NO_THROW(arm_common::create_unwind_code(
-		std::byte{ first_byte }, vec));
-	ASSERT_EQ(vec.size(), 1u);
-	ASSERT_TRUE(std::get_if<Expected>(&vec.back()));
-}
-} //namespace
 
 TEST(ArmExceptionDirectoryTests, Decode)
 {
 	using codes = unwind_record_options::unwind_code_type;
-	test_created_unwind_code<opcode::alloc_s>(0u);
-	test_created_unwind_code<opcode::alloc_s>(0x7fu);
-	test_created_unwind_code<opcode::save_r0r12_lr>(0x80u);
-	test_created_unwind_code<opcode::save_r0r12_lr>(0xbfu);
-	test_created_unwind_code<opcode::mov_sprx>(0xc0u);
-	test_created_unwind_code<opcode::mov_sprx>(0xcfu);
-	test_created_unwind_code<opcode::save_r4rx_lr>(0xd0u);
-	test_created_unwind_code<opcode::save_r4rx_lr>(0xd7u);
-	test_created_unwind_code<opcode::save_r4rx_lr_wide>(0xd8u);
-	test_created_unwind_code<opcode::save_r4rx_lr_wide>(0xdfu);
-	test_created_unwind_code<opcode::save_d8dx>(0xe0u);
-	test_created_unwind_code<opcode::save_d8dx>(0xe7u);
-	test_created_unwind_code<opcode::alloc_s_wide>(0xe8u);
-	test_created_unwind_code<opcode::alloc_s_wide>(0xebu);
-	test_created_unwind_code<opcode::save_r0r7_lr>(0xecu);
-	test_created_unwind_code<opcode::save_r0r7_lr>(0xedu);
-	test_created_unwind_code<opcode::ms_specific>(0xeeu);
-	test_created_unwind_code<opcode::ldr_lr_sp>(0xefu);
+	test_created_unwind_code<codes, opcode::alloc_s>(0u);
+	test_created_unwind_code<codes, opcode::alloc_s>(0x7fu);
+	test_created_unwind_code<codes, opcode::save_r0r12_lr>(0x80u);
+	test_created_unwind_code<codes, opcode::save_r0r12_lr>(0xbfu);
+	test_created_unwind_code<codes, opcode::mov_sprx>(0xc0u);
+	test_created_unwind_code<codes, opcode::mov_sprx>(0xcfu);
+	test_created_unwind_code<codes, opcode::save_r4rx_lr>(0xd0u);
+	test_created_unwind_code<codes, opcode::save_r4rx_lr>(0xd7u);
+	test_created_unwind_code<codes, opcode::save_r4rx_lr_wide>(0xd8u);
+	test_created_unwind_code<codes, opcode::save_r4rx_lr_wide>(0xdfu);
+	test_created_unwind_code<codes, opcode::save_d8dx>(0xe0u);
+	test_created_unwind_code<codes, opcode::save_d8dx>(0xe7u);
+	test_created_unwind_code<codes, opcode::alloc_s_wide>(0xe8u);
+	test_created_unwind_code<codes, opcode::alloc_s_wide>(0xebu);
+	test_created_unwind_code<codes, opcode::save_r0r7_lr>(0xecu);
+	test_created_unwind_code<codes, opcode::save_r0r7_lr>(0xedu);
+	test_created_unwind_code<codes, opcode::ms_specific>(0xeeu);
+	test_created_unwind_code<codes, opcode::ldr_lr_sp>(0xefu);
 	expect_throw_pe_error([] {
 		std::vector<codes> vec;
 		arm_common::create_unwind_code(std::byte{ 0xf0u }, vec);
@@ -55,17 +42,17 @@ TEST(ArmExceptionDirectoryTests, Decode)
 		std::vector<codes> vec;
 		arm_common::create_unwind_code(std::byte{ 0xf4u }, vec);
 	}, arm_common::exception_directory_errc::unsupported_unwind_code);
-	test_created_unwind_code<opcode::save_dsde>(0xf5u);
-	test_created_unwind_code<opcode::save_dsde_16>(0xf6u);
-	test_created_unwind_code<opcode::alloc_m>(0xf7u);
-	test_created_unwind_code<opcode::alloc_l>(0xf8u);
-	test_created_unwind_code<opcode::alloc_m_wide>(0xf9u);
-	test_created_unwind_code<opcode::alloc_l_wide>(0xfau);
-	test_created_unwind_code<opcode::nop>(0xfbu);
-	test_created_unwind_code<opcode::nop_wide>(0xfcu);
-	test_created_unwind_code<opcode::end_nop>(0xfdu);
-	test_created_unwind_code<opcode::end_nop_wide>(0xfeu);
-	test_created_unwind_code<opcode::end>(0xffu);
+	test_created_unwind_code<codes, opcode::save_dsde>(0xf5u);
+	test_created_unwind_code<codes, opcode::save_dsde_16>(0xf6u);
+	test_created_unwind_code<codes, opcode::alloc_m>(0xf7u);
+	test_created_unwind_code<codes, opcode::alloc_l>(0xf8u);
+	test_created_unwind_code<codes, opcode::alloc_m_wide>(0xf9u);
+	test_created_unwind_code<codes, opcode::alloc_l_wide>(0xfau);
+	test_created_unwind_code<codes, opcode::nop>(0xfbu);
+	test_created_unwind_code<codes, opcode::nop_wide>(0xfcu);
+	test_created_unwind_code<codes, opcode::end_nop>(0xfdu);
+	test_created_unwind_code<codes, opcode::end_nop_wide>(0xfeu);
+	test_created_unwind_code<codes, opcode::end>(0xffu);
 }
 
 TEST(ArmExceptionDirectoryTests, AllocS)
