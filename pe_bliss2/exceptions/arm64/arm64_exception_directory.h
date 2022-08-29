@@ -6,8 +6,6 @@
 #include <type_traits>
 #include <variant>
 
-#include <boost/endian/conversion.hpp>
-
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/detail/exceptions/image_runtime_function_entry.h"
 #include "pe_bliss2/exceptions/arm_common/arm_common_unwind_info.h"
@@ -85,56 +83,43 @@ public:
 		return unwind_data_;
 	}
 
+	void set_packed_value(std::uint32_t value) noexcept
+	{
+		unwind_data_ = value;
+	}
+
+	[[nodiscard]]
+	friend constexpr bool operator==(const packed_unwind_data&,
+		const packed_unwind_data&) = default;
+
 public:
 	[[nodiscard]]
-	flag get_flag() const noexcept
-	{
-		return static_cast<flag>(unwind_data_ & 0b11u);
-	}
+	flag get_flag() const noexcept;
 	
 	//The length of the entire function in bytes, divided by 4
 	[[nodiscard]]
-	std::uint16_t get_function_length() const noexcept
-	{
-		return static_cast<std::uint16_t>(((unwind_data_ & 0x1ffcu) >> 2u) * 4u);
-	}
+	std::uint16_t get_function_length() const noexcept;
 
 	//The number of bytes of stack that is allocated for this function, divided by 16.
 	[[nodiscard]]
-	std::uint16_t get_frame_size() const noexcept
-	{
-		return static_cast<std::uint16_t>(((unwind_data_ & 0xff800000u) >> 23u) * 16u);
-	}
+	std::uint16_t get_frame_size() const noexcept;
 
 	[[nodiscard]]
-	cr get_cr() const noexcept
-	{
-		return static_cast<cr>((unwind_data_ & 0x600000u) >> 21u);
-	}
+	cr get_cr() const noexcept;
 
 	//Whether the function homes the integer parameter registers (x0-x7)
 	//by storing them at the very start of the function.
 	[[nodiscard]]
-	bool homes_integer_parameter_registers() const noexcept
-	{
-		return (unwind_data_ & 0x100000u) != 0u;
-	}
+	bool homes_integer_parameter_registers() const noexcept;
 
 	//The number of non-volatile INT registers (x19-x28) saved in the canonical stack location.
 	[[nodiscard]]
-	std::uint8_t get_reg_int() const noexcept
-	{
-		return static_cast<std::uint8_t>((unwind_data_ & 0xf0000u) >> 16u);
-	}
+	std::uint8_t get_reg_int() const noexcept;
 	
 	//The number of non-volatile FP registers (d8-d15) saved in the canonical stack location.
 	//(RegF=0: no FP register is saved; RegF>0: RegF+1 FP registers are saved).
 	[[nodiscard]]
-	std::uint8_t get_reg_fp() const noexcept
-	{
-		auto result = static_cast<std::uint8_t>((unwind_data_ & 0xe000u) >> 13u);
-		return result ? result + 1u : 0u;
-	}
+	std::uint8_t get_reg_fp() const noexcept;
 
 public:
 	void set_flag(flag value) noexcept;
@@ -318,7 +303,7 @@ public:
 
 	[[nodiscard]]
 	std::uint8_t get_register() const noexcept;
-	void set_register_pair(std::uint8_t reg);
+	void set_register(std::uint8_t reg);
 };
 
 //11011110'xxxzzzzz: save reg d(8+#X) at [sp-(#Z+1)*8]!, pre-indexed offset >= -256
@@ -332,7 +317,7 @@ public:
 
 	[[nodiscard]]
 	std::uint8_t get_register() const noexcept;
-	void set_register_pair(std::uint8_t reg);
+	void set_register(std::uint8_t reg);
 };
 
 //11100000'xxxxxxxx'xxxxxxxx'xxxxxxxx: allocate large stack with size < 256M (2^24 *16)
@@ -391,7 +376,7 @@ class [[nodiscard]] pacibsp
 {
 };
 
-//TODO: undocumented, reverse engineered.
+//TODO: below opcodes are undocumented, reverse engineered.
 //MSDN marks this code as "reserved".
 enum class register_character : std::uint8_t
 {
@@ -407,11 +392,11 @@ class [[nodiscard]] save_reg_any
 public:
 	[[nodiscard]]
 	bool is_reg_pair() const noexcept;
-	void set_reg_pair(bool is_reg_pair);
+	void set_reg_pair(bool is_reg_pair) noexcept;
 
 	[[nodiscard]]
 	bool is_negative_offset() const noexcept;
-	void set_negative_offset(bool is_negative_offset);
+	void set_negative_offset(bool is_negative_offset) noexcept;
 
 	[[nodiscard]]
 	std::uint16_t get_register_or_register_pair() const noexcept;

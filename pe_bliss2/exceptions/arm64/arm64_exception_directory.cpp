@@ -56,6 +56,42 @@ std::error_code make_error_code(exception_directory_errc e) noexcept
 	return { static_cast<int>(e), arm64_exception_directory_error_category_instance };
 }
 
+packed_unwind_data::flag packed_unwind_data::get_flag() const noexcept
+{
+	return static_cast<flag>(unwind_data_ & 0b11u);
+}
+
+std::uint16_t packed_unwind_data::get_function_length() const noexcept
+{
+	return static_cast<std::uint16_t>(((unwind_data_ & 0x1ffcu) >> 2u) * 4u);
+}
+
+std::uint16_t packed_unwind_data::get_frame_size() const noexcept
+{
+	return static_cast<std::uint16_t>(((unwind_data_ & 0xff800000u) >> 23u) * 16u);
+}
+
+packed_unwind_data::cr packed_unwind_data::get_cr() const noexcept
+{
+	return static_cast<cr>((unwind_data_ & 0x600000u) >> 21u);
+}
+
+bool packed_unwind_data::homes_integer_parameter_registers() const noexcept
+{
+	return (unwind_data_ & 0x100000u) != 0u;
+}
+
+std::uint8_t packed_unwind_data::get_reg_int() const noexcept
+{
+	return static_cast<std::uint8_t>((unwind_data_ & 0xf0000u) >> 16u);
+}
+
+std::uint8_t packed_unwind_data::get_reg_fp() const noexcept
+{
+	auto result = static_cast<std::uint8_t>((unwind_data_ & 0xe000u) >> 13u);
+	return result ? result + 1u : 0u;
+}
+
 void packed_unwind_data::set_flag(flag value) noexcept
 {
 	unwind_data_ &= ~0b11u;
@@ -113,7 +149,7 @@ void packed_unwind_data::set_reg_int(std::uint8_t value)
 
 void packed_unwind_data::set_reg_fp(std::uint8_t value)
 {
-	if (value > 0x7u || value == 1u)
+	if (value > 0x8u || value == 1u)
 		throw pe_error(exception_directory_errc::invalid_reg_fp_value);
 
 	if (value)
@@ -376,7 +412,7 @@ std::uint8_t save_freg::get_register() const noexcept
 	return get_value<7, 9>() + 8u;
 }
 
-void save_freg::set_register_pair(std::uint8_t reg)
+void save_freg::set_register(std::uint8_t reg)
 {
 	//d31 is the last valid register
 	if (reg > 31u || reg < 8u)
@@ -404,7 +440,7 @@ std::uint8_t save_freg_x::get_register() const noexcept
 	return get_value<8, 10>() + 8u;
 }
 
-void save_freg_x::set_register_pair(std::uint8_t reg)
+void save_freg_x::set_register(std::uint8_t reg)
 {
 	//d31 is the last valid register
 	if (reg > 31u || reg < 8u)
@@ -415,7 +451,7 @@ void save_freg_x::set_register_pair(std::uint8_t reg)
 
 std::uint32_t alloc_l::get_allocation_size() const noexcept
 {
-	return static_cast<std::uint16_t>(get_value<8, 31>()) * 16u;
+	return static_cast<std::uint32_t>(get_value<8, 31>()) * 16u;
 }
 
 void alloc_l::set_allocation_size(std::uint32_t size)
@@ -449,7 +485,7 @@ bool save_reg_any::is_reg_pair() const noexcept
 	return get_value<9, 9>() != 0u;
 }
 
-void save_reg_any::set_reg_pair(bool is_reg_pair)
+void save_reg_any::set_reg_pair(bool is_reg_pair) noexcept
 {
 	set_value<9, 9>(is_reg_pair ? 1u : 0u);
 }
@@ -459,7 +495,7 @@ bool save_reg_any::is_negative_offset() const noexcept
 	return get_value<10, 10>() != 0u;
 }
 
-void save_reg_any::set_negative_offset(bool is_negative_offset)
+void save_reg_any::set_negative_offset(bool is_negative_offset) noexcept
 {
 	set_value<10, 10>(is_negative_offset ? 1u : 0u);
 }
