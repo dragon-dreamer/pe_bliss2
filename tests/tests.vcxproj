@@ -185,6 +185,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\arm_common_exceptions_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\arm_common_unwind_info_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\arm_exception_directory_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\arm_exception_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\bound_import_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\exported_address_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\export_directory_tests.cpp" />
