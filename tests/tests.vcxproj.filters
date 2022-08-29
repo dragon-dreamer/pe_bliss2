@@ -255,6 +255,12 @@
     <ClCompile Include="tests\pe_bliss2\directories\arm_exception_loader_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2\directories</Filter>
     </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\arm64_exception_directory_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\arm64_exception_loader_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">
@@ -286,6 +292,9 @@
     </ClInclude>
     <ClInclude Include="tests\pe_bliss2\bytes_to_va_fixture_base.h">
       <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClInclude>
+    <ClInclude Include="tests\pe_bliss2\directories\arm_common_exception_helpers.h">
+      <Filter>Source Files\tests\pe_bliss2\directories</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

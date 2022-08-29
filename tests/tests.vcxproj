@@ -183,6 +183,7 @@
     <ClCompile Include="tests\pe_bliss2\compid_database_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\data_directories_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\arm64_exception_directory_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\arm64_exception_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\arm_common_exceptions_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\arm_common_unwind_info_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\arm_exception_directory_tests.cpp" />
