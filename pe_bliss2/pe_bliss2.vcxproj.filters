@@ -483,6 +483,9 @@
     <ClInclude Include="exceptions\arm_common\arm_common_unwind_info-inl.h">
       <Filter>Header Files\exceptions\arm_common</Filter>
     </ClInclude>
+    <ClInclude Include="exceptions\x64\x64_exception_directory-inl.h">
+      <Filter>Header Files\exceptions\x64</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">

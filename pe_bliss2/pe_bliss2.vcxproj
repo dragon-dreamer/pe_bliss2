@@ -69,6 +69,7 @@
     <ClInclude Include="exceptions\arm_common\arm_common_unwind_info.h" />
     <ClInclude Include="exceptions\exception_directory.h" />
     <ClInclude Include="exceptions\exception_directory_loader.h" />
+    <ClInclude Include="exceptions\x64\x64_exception_directory-inl.h" />
     <ClInclude Include="exceptions\x64\x64_exception_directory.h" />
     <ClInclude Include="exceptions\x64\x64_exception_directory_loader.h" />
     <ClInclude Include="exports\exported_address.h" />
