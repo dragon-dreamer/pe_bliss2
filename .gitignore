@@ -3,5 +3,5 @@ Release
 Debug
 .vs
 documents
-x64
+/x64
 oldtests
