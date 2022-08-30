@@ -29,7 +29,7 @@ void ensure_directory_loaded(const pe_bliss::exceptions::exception_directory_det
 	const auto* arm_dir = std::get_if<exception_directory_details>(&dir.get_directories()[0]);
 	ASSERT_NE(arm_dir, nullptr);
 	expect_contains_errors(*arm_dir,
-		exceptions::arm_common::exception_directory_loader_errc::unmatched_directory_size);
+		exceptions::arm_common::exception_directory_loader_errc::invalid_directory_size);
 }
 } //namespace
 

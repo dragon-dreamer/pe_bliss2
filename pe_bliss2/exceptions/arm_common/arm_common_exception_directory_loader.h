@@ -229,10 +229,16 @@ void load(const image::image& instance, const LoaderOptions& options,
 		directory_container.get_directories().emplace_back(
 			std::in_place_type<ExceptionDirectory>));
 
+	auto& runtime_functions = dir.get_runtime_function_list();
+	static constexpr std::uint32_t runtime_function_descriptor_size =
+		std::remove_cvref_t<decltype(runtime_functions.back().get_descriptor())>::packed_size;
+
 	utilities::safe_uint last_rva = current_rva;
+	rva_type last_valid_rva{};
 	try
 	{
 		last_rva += size;
+		last_valid_rva = (last_rva - runtime_function_descriptor_size).value();
 	}
 	catch (const std::system_error&)
 	{
@@ -240,10 +246,7 @@ void load(const image::image& instance, const LoaderOptions& options,
 		return;
 	}
 
-	auto& runtime_functions = dir.get_runtime_function_list();
-	static constexpr std::uint32_t runtime_function_descriptor_size =
-		std::remove_cvref_t<decltype(runtime_functions.back().get_descriptor())>::packed_size;
-	while (current_rva + runtime_function_descriptor_size <= last_rva)
+	while (current_rva <= last_valid_rva)
 	{
 		auto& func = runtime_functions.emplace_back();
 		try

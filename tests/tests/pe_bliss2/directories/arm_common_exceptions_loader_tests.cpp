@@ -277,7 +277,7 @@ TEST_F(ArmCommonExceptionsLoaderTestFixture, AbsentDirectory)
 
 TEST_F(ArmCommonExceptionsLoaderTestFixture, InvalidDirectorySize)
 {
-	directory_rva = 1u;
+	directory_rva = 100u;
 	directory_size = (std::numeric_limits<std::uint32_t>::max)();
 	load_dir();
 	expect_contains_errors(container);
@@ -289,7 +289,7 @@ TEST_F(ArmCommonExceptionsLoaderTestFixture, InvalidDirectorySize)
 
 TEST_F(ArmCommonExceptionsLoaderTestFixture, UnmatchedDirectorySize)
 {
-	directory_rva = 1u;
+	directory_rva = 100u;
 	directory_size = 1u;
 	load_dir();
 	expect_contains_errors(container);

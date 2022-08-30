@@ -29,7 +29,7 @@ TEST(ArmExceptionsLoaderTests, PresentDirectory)
 	instance.get_data_directories().set_size(16);
 	instance.get_data_directories().get_directory(
 		core::data_directories::directory_type::exception).get()
-		= { .virtual_address = 1u, .size = 1u };
+		= { .virtual_address = 100u, .size = 1u };
 	EXPECT_NO_THROW(load(instance, {}, dir));
 	ASSERT_EQ(dir.get_directories().size(), 1u);
 	const auto* arm_dir = std::get_if<exception_directory_details>(&dir.get_directories()[0]);
