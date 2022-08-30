@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <system_error>
+#include <utility>
 
 #include "buffers/input_buffer_stateful_wrapper.h"
 #include "pe_bliss2/core/data_directories.h"
@@ -55,13 +56,16 @@ struct x64_exception_directory_loader_error_category : std::error_category
 			return "Invalid chained runtime function entry";
 		case both_set_fpreg_types_used:
 			"Both SET_FPREG and SET_FPREG_LARGE are used";
+		case invalid_directory_size:
+			return "Invalid exception directory size";
 		default:
 			return {};
 		}
 	}
 };
 
-const x64_exception_directory_loader_error_category x64_exception_directory_loader_error_category_instance;
+const x64_exception_directory_loader_error_category
+	x64_exception_directory_loader_error_category_instance;
 
 using namespace pe_bliss;
 using namespace pe_bliss::exceptions::x64;
@@ -163,7 +167,14 @@ void load_unwind_codes(RuntimeFunction& func, Buffer& unwind_codes_data, bool al
 		}
 
 		std::visit([&unwind_code_count, &base_code_descriptor,
-			&unwind_codes_data, allow_virtual_data] (auto& code) {
+			&func, &unwind_codes_data, allow_virtual_data] (auto& code) {
+			if (unwind_code_count < code.node_count + 1u)
+			{
+				unwind_code_count = 0u;
+				func.add_error(exception_directory_loader_errc::invalid_unwind_slot_count);
+				return;
+			}
+
 			unwind_code_count -= code.node_count + 1u;
 			load_uwop_code(allow_virtual_data,
 				base_code_descriptor, code, unwind_codes_data);
@@ -193,7 +204,7 @@ bool load_runtime_function(const image::image& instance, const loader_options& o
 		return false;
 	}
 
-	utilities::safe_uint unwind_info_rva = func.get_descriptor()->unwind_info_address;
+	utilities::safe_uint unwind_info_rva = underlying_struct.unwind_info_address;
 	if (!utilities::math::is_aligned<rva_type>(unwind_info_rva.value()))
 		func.add_error(exception_directory_loader_errc::unaligned_unwind_info);
 
@@ -215,7 +226,8 @@ bool load_runtime_function(const image::image& instance, const loader_options& o
 	{
 		try
 		{
-			unwind_code_size = utilities::math::align_up(unwind_code_size, 2u) * sizeof(std::uint16_t);
+			unwind_code_size = utilities::math::align_up(unwind_code_size, 2u)
+				* sizeof(std::uint16_t);
 			auto unwind_codes_data = section_data_from_rva(instance, unwind_info_rva.value(),
 				options.include_headers, options.allow_virtual_data);
 			buffers::input_buffer_stateful_wrapper_ref wrapper(*unwind_codes_data);
@@ -251,7 +263,8 @@ bool load_runtime_function(const image::image& instance, const loader_options& o
 		}
 		catch (const std::system_error&)
 		{
-			func.add_error(exception_directory_loader_errc::invalid_chained_runtime_function_entry);
+			func.add_error(
+				exception_directory_loader_errc::invalid_chained_runtime_function_entry);
 		}
 		func.get_additional_info() = std::move(chained_func);
 	}
@@ -260,7 +273,8 @@ bool load_runtime_function(const image::image& instance, const loader_options& o
 		try
 		{
 			struct_from_rva(instance, unwind_info_rva.value(),
-				func.get_additional_info().emplace<runtime_function_details::exception_handler_rva_type>(),
+				func.get_additional_info()
+					.emplace<runtime_function_details::exception_handler_rva_type>(),
 				options.include_headers, options.allow_virtual_data);
 		}
 		catch (const std::system_error&)
@@ -286,7 +300,8 @@ void load(const image::image& instance, const loader_options& options,
 	pe_bliss::exceptions::exception_directory_details& directory)
 {
 	if (!instance.is_64bit()
-		|| instance.get_file_header().get_machine_type() != core::file_header::machine_type::amd64
+		|| instance.get_file_header().get_machine_type()
+			!= core::file_header::machine_type::amd64
 		|| !instance.get_data_directories().has_exception_directory())
 	{
 		return;
@@ -300,26 +315,37 @@ void load(const image::image& instance, const loader_options& options,
 
 	auto current_rva = data_dir->virtual_address;
 	utilities::safe_uint last_rva = current_rva;
-	last_rva += data_dir->size;
+	rva_type last_valid_rva{};
+	try
+	{
+		last_rva += data_dir->size;
+		last_valid_rva = (last_rva
+			- runtime_function_details::descriptor_type::packed_size).value();
+	}
+	catch (const std::system_error&)
+	{
+		x64_dir.add_error(exception_directory_loader_errc::invalid_directory_size);
+		return;
+	}
 	
 	auto& runtime_functions = x64_dir.get_runtime_function_list();
-	while (current_rva < last_rva.value())
+	while (current_rva <= last_valid_rva)
 	{
-		runtime_function_details func;
+		runtime_function_details& func = runtime_functions.emplace_back();
 		try
 		{
-			if (load_runtime_function(instance, options, current_rva, func))
-				runtime_functions.emplace_back(std::move(func));
+			if (!load_runtime_function(instance, options, current_rva, func))
+				runtime_functions.pop_back();
 		}
 		catch (const std::system_error&)
 		{
 			func.add_error(exception_directory_loader_errc::invalid_runtime_function_entry);
 		}
 		//Does not overflow, checked above
-		current_rva += static_cast<rva_type>(func.get_descriptor().packed_size);
+		current_rva += runtime_function_details::descriptor_type::packed_size;
 	}
 
-	if (current_rva != last_rva.value())
+	if (current_rva != last_rva)
 		x64_dir.add_error(exception_directory_loader_errc::excessive_data_in_directory);
 }
 

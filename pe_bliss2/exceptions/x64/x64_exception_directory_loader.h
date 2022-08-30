@@ -26,7 +26,8 @@ enum class exception_directory_loader_errc
 	invalid_unwind_info,
 	invalid_exception_handler_rva,
 	invalid_chained_runtime_function_entry,
-	both_set_fpreg_types_used
+	both_set_fpreg_types_used,
+	invalid_directory_size
 };
 
 std::error_code make_error_code(exception_directory_loader_errc) noexcept;
