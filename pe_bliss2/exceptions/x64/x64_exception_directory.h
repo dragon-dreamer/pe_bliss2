@@ -99,6 +99,7 @@ public:
 
 public:
 	using descriptor_type = packed_struct<detail::exceptions::unwind_code<Nodes>>;
+	static_assert(Nodes <= 2u);
 
 public:
 	[[nodiscard]]
@@ -322,7 +323,7 @@ public:
 	[[nodiscard]]
 	inline std::uint8_t get_rsp_decrement() const noexcept;
 
-	inline void set_push_error_code(bool value);
+	inline void set_push_error_code(bool value) noexcept;
 };
 
 //CLR Unix-only extension. When used, frame_register must be set to
@@ -339,9 +340,9 @@ class [[nodiscard]] set_fpreg_large
 {
 public:
 	[[nodiscard]]
-	inline std::uint32_t get_offset() const noexcept;
+	inline std::uint64_t get_offset() const noexcept;
 
-	void set_offset(std::uint32_t size);
+	void set_offset(std::uint64_t offset);
 };
 
 class [[nodiscard]] unwind_info

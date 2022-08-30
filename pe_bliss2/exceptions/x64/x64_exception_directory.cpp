@@ -1,6 +1,9 @@
 #include "pe_bliss2/exceptions/x64/x64_exception_directory.h"
 
+#include <limits>
 #include <system_error>
+
+#include "pe_bliss2/pe_error.h"
 
 namespace
 {
@@ -54,7 +57,11 @@ void alloc_large<1u>::set_allocation_size(std::uint32_t size)
 	if (size % 8u)
 		throw pe_error(exception_directory_errc::invalid_allocation_size);
 
-	get_descriptor()->node = static_cast<std::uint16_t>(size / 8u);
+	size /= 8u;
+	if (size > (std::numeric_limits<std::uint16_t>::max)())
+		throw pe_error(exception_directory_errc::invalid_allocation_size);
+
+	get_descriptor()->node = static_cast<std::uint16_t>(size);
 }
 
 void alloc_small::set_allocation_size(std::uint8_t size)
@@ -70,7 +77,11 @@ void save_nonvol::set_stack_offset(std::uint32_t offset)
 	if (offset % 8u)
 		throw pe_error(exception_directory_errc::invalid_stack_offset);
 
-	get_descriptor()->node = static_cast<std::uint16_t>(offset / 8u);
+	offset /= 8u;
+	if (offset > (std::numeric_limits<std::uint16_t>::max)())
+		throw pe_error(exception_directory_errc::invalid_stack_offset);
+
+	get_descriptor()->node = static_cast<std::uint16_t>(offset);
 }
 
 void save_xmm128::set_stack_offset(std::uint32_t offset)
@@ -78,15 +89,23 @@ void save_xmm128::set_stack_offset(std::uint32_t offset)
 	if (offset % 16u)
 		throw pe_error(exception_directory_errc::invalid_stack_offset);
 
-	get_descriptor()->node = static_cast<std::uint16_t>(offset / 16u);
+	offset /= 16u;
+	if (offset > (std::numeric_limits<std::uint16_t>::max)())
+		throw pe_error(exception_directory_errc::invalid_stack_offset);
+
+	get_descriptor()->node = static_cast<std::uint16_t>(offset);
 }
 
-void set_fpreg_large::set_offset(std::uint32_t offset)
+void set_fpreg_large::set_offset(std::uint64_t offset)
 {
-	if (offset & 0xfu)
+	if (offset % 16u)
 		throw pe_error(exception_directory_errc::invalid_scaled_frame_register_offset);
 
-	get_descriptor()->node = offset / 16u;
+	offset /= 16u;
+	if (offset > (std::numeric_limits<std::uint32_t>::max)())
+		throw pe_error(exception_directory_errc::invalid_scaled_frame_register_offset);
+
+	get_descriptor()->node = static_cast<std::uint32_t>(offset);
 }
 
 std::optional<register_id> unwind_info::get_frame_register() const noexcept
@@ -117,7 +136,7 @@ void unwind_info::set_version(std::uint8_t version)
 		throw pe_error(exception_directory_errc::invalid_unwind_info_version);
 
 	descriptor_->flags_and_version &= ~0x7u;
-	descriptor_->flags_and_version |= (version & 0x7u);
+	descriptor_->flags_and_version |= version;
 }
 
 void unwind_info::set_frame_register(register_id fr)

@@ -129,14 +129,14 @@ inline std::uint8_t push_machframe::get_rsp_decrement() const noexcept
 	return push_error_code() ? 48u : 40u;
 }
 
-inline void push_machframe::set_push_error_code(bool value)
+inline void push_machframe::set_push_error_code(bool value) noexcept
 {
-	set_operation_info(value ? 1 : 0);
+	set_operation_info(value ? 1u : 0u);
 }
 
-inline std::uint32_t set_fpreg_large::get_offset() const noexcept
+inline std::uint64_t set_fpreg_large::get_offset() const noexcept
 {
-	return get_descriptor()->node * 16u;
+	return get_descriptor()->node * 16ull;
 }
 
 inline unwind_info::descriptor_type& unwind_info::get_descriptor() noexcept

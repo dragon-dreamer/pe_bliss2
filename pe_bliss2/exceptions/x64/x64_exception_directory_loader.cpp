@@ -124,12 +124,6 @@ void load_unwind_codes(RuntimeFunction& func, Buffer& unwind_codes_data, bool al
 		case opcode_id::save_nonvol_far:
 			unwind_code_list.emplace_back(std::in_place_type<save_nonvol_far>);
 			break;
-		case opcode_id::epilog:
-			unwind_code_list.emplace_back(std::in_place_type<epilog>);
-			break;
-		case opcode_id::spare:
-			unwind_code_list.emplace_back(std::in_place_type<spare>);
-			break;
 		case opcode_id::save_xmm128:
 			unwind_code_list.emplace_back(std::in_place_type<save_xmm128>);
 			break;
@@ -143,6 +137,20 @@ void load_unwind_codes(RuntimeFunction& func, Buffer& unwind_codes_data, bool al
 			unwind_code_list.emplace_back(std::in_place_type<set_fpreg_large>);
 			set_fpreg_large_used = true;
 			break;
+		case opcode_id::spare:
+			if (unwind_info.get_version() >= 2u)
+			{
+				unwind_code_list.emplace_back(std::in_place_type<spare>);
+				break;
+			}
+			[[fallthrough]];
+		case opcode_id::epilog:
+			if (unwind_info.get_version() >= 2u)
+			{
+				unwind_code_list.emplace_back(std::in_place_type<epilog>);
+				break;
+			}
+			[[fallthrough]];
 		default:
 			func.add_error(exception_directory_loader_errc::unknown_unwind_code);
 			return;
