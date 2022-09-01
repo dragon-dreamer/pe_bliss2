@@ -9,6 +9,7 @@
 #include "pe_bliss2/core/file_header.h"
 #include "pe_bliss2/exceptions/x64/x64_exception_directory.h"
 #include "pe_bliss2/exceptions/x64/x64_exception_directory_loader.h"
+#include "pe_bliss2/exceptions/exception_directory_loader.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/pe_types.h"
 #include "tests/tests/pe_bliss2/image_helper.h"
@@ -74,10 +75,8 @@ public:
 		return dir;
 	}
 
-	const exception_directory_details* load_and_get_x64_dir(
-		const loader_options& options = {})
+	const exception_directory_details* get_x64_dir()
 	{
-		dir = load_dir(options);
 		expect_contains_errors(dir);
 		EXPECT_EQ(dir.get_directories().size(), 1u);
 		if (dir.get_directories().size() != 1u)
@@ -86,6 +85,13 @@ public:
 			&dir.get_directories()[0]);
 		EXPECT_NE(x64dir, nullptr);
 		return x64dir;
+	}
+
+	const exception_directory_details* load_and_get_x64_dir(
+		const loader_options& options = {})
+	{
+		dir = load_dir(options);
+		return get_x64_dir();
 	}
 
 public:
@@ -285,4 +291,12 @@ TEST_F(X64ExceptionLoaderTestFixture, HeaderDirectory)
 		exception_directory_loader_errc::unmatched_directory_size);
 	
 	ASSERT_TRUE(dir->get_runtime_function_list().empty());
+}
+
+TEST_F(X64ExceptionLoaderTestFixture, ExceptionLoaderValidDirectory)
+{
+	add_exception_dir();
+	add_exception_dir_descriptors();
+	dir = exceptions::load(instance, {});
+	validate_dir(get_x64_dir());
 }
