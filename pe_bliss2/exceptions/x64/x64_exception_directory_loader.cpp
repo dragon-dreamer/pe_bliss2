@@ -36,8 +36,8 @@ struct x64_exception_directory_loader_error_category : std::error_category
 			return "Unaligned runtime function entry";
 		case invalid_unwind_info_flags:
 			return "Invalid unwind info flags";
-		case excessive_data_in_directory:
-			return "Excessive data in directory";
+		case unmatched_directory_size:
+			return "Unmatched directory size";
 		case unaligned_unwind_info:
 			return "Unaligned unwind information";
 		case invalid_unwind_slot_count:
@@ -226,13 +226,13 @@ bool load_runtime_function(const image::image& instance, const loader_options& o
 	{
 		try
 		{
-			unwind_code_size = utilities::math::align_up(unwind_code_size, 2u)
-				* sizeof(std::uint16_t);
 			auto unwind_codes_data = section_data_from_rva(instance, unwind_info_rva.value(),
+				unwind_code_size * sizeof(std::uint16_t),
 				options.include_headers, options.allow_virtual_data);
 			buffers::input_buffer_stateful_wrapper_ref wrapper(*unwind_codes_data);
 			load_unwind_codes(func, wrapper, options.allow_virtual_data);
-			unwind_info_rva += unwind_code_size;
+			unwind_info_rva += utilities::math::align_up(unwind_code_size, 2u)
+				* sizeof(std::uint16_t);
 		}
 		catch (const std::system_error&)
 		{
@@ -270,12 +270,25 @@ bool load_runtime_function(const image::image& instance, const loader_options& o
 	}
 	else if (flags & (unwind_flags::ehandler | unwind_flags::uhandler))
 	{
+		auto& rva = func.get_additional_info()
+			.emplace<runtime_function_details::exception_handler_rva_type>();
+
 		try
 		{
-			struct_from_rva(instance, unwind_info_rva.value(),
-				func.get_additional_info()
-					.emplace<runtime_function_details::exception_handler_rva_type>(),
+			struct_from_rva(instance, unwind_info_rva.value(), rva,
 				options.include_headers, options.allow_virtual_data);
+		}
+		catch (const std::system_error&)
+		{
+			func.add_error(exception_directory_loader_errc::invalid_exception_handler_rva);
+			func.get_additional_info().emplace<std::monostate>();
+			return true;
+		}
+
+		try
+		{
+			[[maybe_unused]] auto first_byte = struct_from_rva<std::uint8_t>(
+				instance, rva.get(), options.include_headers, options.allow_virtual_data);
 		}
 		catch (const std::system_error&)
 		{
@@ -340,13 +353,14 @@ void load(const image::image& instance, const loader_options& options,
 		catch (const std::system_error&)
 		{
 			func.add_error(exception_directory_loader_errc::invalid_runtime_function_entry);
+			break;
 		}
 		//Does not overflow, checked above
 		current_rva += runtime_function_details::descriptor_type::packed_size;
 	}
 
 	if (current_rva != last_rva)
-		x64_dir.add_error(exception_directory_loader_errc::excessive_data_in_directory);
+		x64_dir.add_error(exception_directory_loader_errc::unmatched_directory_size);
 }
 
 } //namespace pe_bliss::exceptions::x64

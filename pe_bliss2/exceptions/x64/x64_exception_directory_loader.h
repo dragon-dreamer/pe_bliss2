@@ -17,7 +17,7 @@ enum class exception_directory_loader_errc
 {
 	unaligned_runtime_function_entry = 1,
 	invalid_unwind_info_flags,
-	excessive_data_in_directory,
+	unmatched_directory_size,
 	unaligned_unwind_info,
 	invalid_unwind_slot_count,
 	unknown_unwind_code,
