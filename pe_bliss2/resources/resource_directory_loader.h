@@ -26,7 +26,7 @@ enum class resource_directory_loader_errc
 	invalid_resource_data_entry_raw_data
 };
 
-struct loader_options
+struct [[nodiscard]] loader_options
 {
 	bool include_headers = true;
 	bool allow_virtual_data = false;
@@ -35,6 +35,7 @@ struct loader_options
 
 std::error_code make_error_code(resource_directory_loader_errc) noexcept;
 
+[[nodiscard]]
 std::optional<resource_directory_details> load(const image::image& instance,
 	const loader_options& options);
 

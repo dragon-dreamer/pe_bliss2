@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <limits>
 #include <system_error>
 #include <unordered_set>
 
@@ -48,7 +49,7 @@ struct resource_directory_loader_error_category : std::error_category
 		switch (static_cast<pe_bliss::resources::resource_directory_loader_errc>(ev))
 		{
 		case invalid_directory_size:
-			return "Invalid base relocation block size";
+			return "Invalid resource directory size";
 		case invalid_resource_directory:
 			return "Invalid resource directory";
 		case invalid_resource_directory_number_of_entries:
@@ -75,40 +76,29 @@ using namespace pe_bliss;
 using namespace pe_bliss::resources;
 
 using safe_rva_type = utilities::safe_uint<rva_type>;
-using visited_directories_map = std::unordered_set<rva_type>;
+using visited_entries_map = std::unordered_set<rva_type>;
 
 void load_resource_data_entry(const image::image& instance, const loader_options& options,
-	safe_rva_type current_rva, rva_type& max_rva, resource_data_entry_details& entry)
+	safe_rva_type current_rva, std::uint64_t& max_rva, resource_data_entry_details& entry)
 {
 	auto& entry_descriptor = entry.get_descriptor();
 
-	try
-	{
-		struct_from_rva(instance,
-			current_rva.value(), entry_descriptor, options.include_headers,
-			options.allow_virtual_data);
-	}
-	catch (const pe_error&)
-	{
-		entry.add_error(
-			resource_directory_loader_errc::invalid_resource_data_entry);
-		return;
-	}
+	struct_from_rva(instance,
+		current_rva.value(), entry_descriptor, options.include_headers,
+		options.allow_virtual_data);
 
-	try
-	{
-		max_rva = (std::max)(max_rva,
-			(current_rva + entry_descriptor.packed_size).value());
-	}
-	catch (const pe_error&)
-	{
-	}
+	max_rva = (std::max)(max_rva,
+		static_cast<std::uint64_t>(current_rva.value())
+		+ entry_descriptor.packed_size);
 
 	try
 	{
 		auto data_rva = entry_descriptor->offset_to_data;
 		auto data_size = entry_descriptor->size;
-		auto raw_length = section_data_length_from_rva(instance, data_rva, options.include_headers, false);
+		max_rva = (std::max)(max_rva,
+			static_cast<std::uint64_t>(data_rva) + data_size);
+		auto raw_length = section_data_length_from_rva(
+			instance, data_rva, options.include_headers, false);
 		raw_length = (std::min)(raw_length, data_size);
 		if (raw_length)
 		{
@@ -125,13 +115,23 @@ void load_resource_data_entry(const image::image& instance, const loader_options
 }
 
 void load_resource_directory(const image::image& instance, const loader_options& options,
-	safe_rva_type resource_dir_rva, safe_rva_type current_rva, rva_type& max_rva,
-	resource_directory_details& directory, visited_directories_map& visited_directories);
+	safe_rva_type resource_dir_rva, safe_rva_type current_rva, std::uint64_t& max_rva,
+	resource_directory_details& directory, visited_entries_map& visited_entries);
 
 bool load_resource_directory_entry(const image::image& instance, const loader_options& options,
-	safe_rva_type resource_dir_rva, safe_rva_type current_rva, rva_type& max_rva,
-	resource_directory_entry_details& entry, visited_directories_map& visited_directories)
+	safe_rva_type resource_dir_rva, safe_rva_type current_rva, std::uint64_t& max_rva,
+	resource_directory_entry_details& entry, visited_entries_map& visited_entries)
 {
+	if (!visited_entries.emplace(current_rva.value()).second)
+	{
+		entry.get_data_or_directory().emplace<rva_type>(current_rva.value());
+		return true;
+	}
+
+	utilities::scoped_guard guard([&visited_entries, current_rva] {
+		visited_entries.erase(current_rva.value());
+	});
+
 	auto& entry_descriptor = entry.get_descriptor();
 
 	try
@@ -162,26 +162,22 @@ bool load_resource_directory_entry(const image::image& instance, const loader_op
 		}
 		catch (const pe_error&)
 		{
+			entry.get_name_or_id().emplace<std::monostate>();
 			entry.add_error(
 				resource_directory_loader_errc::invalid_resource_directory_entry_name);
 			return true;
 		}
-
-		try
-		{
-			max_rva = (std::max)(max_rva,
-				(name_rva + name.data_size()).value());
-		}
-		catch (const pe_error&)
-		{
-		}
+		
+		max_rva = (std::max)(max_rva,
+			static_cast<std::uint64_t>(name_rva.value()) + name.data_size());
 	}
 	else
 	{
 		entry.get_name_or_id().emplace<resource_id_type>(entry_descriptor->name_or_id);
 	}
 
-	if (entry_descriptor->offset_to_data_or_directory & detail::resources::data_is_directory_flag)
+	if (entry_descriptor->offset_to_data_or_directory
+		& detail::resources::data_is_directory_flag)
 	{
 		safe_rva_type dir_rva;
 
@@ -200,25 +196,21 @@ bool load_resource_directory_entry(const image::image& instance, const loader_op
 			return true;
 		}
 
-		if (!visited_directories.emplace(dir_rva.value()).second)
-		{
-			entry.get_data_or_directory().emplace<rva_type>() = dir_rva.value();
-			return true;
-		}
-
 		load_resource_directory(instance, options,
 			resource_dir_rva, dir_rva, max_rva,
 			entry.get_data_or_directory().emplace<resource_directory_details>(),
-			visited_directories);
+			visited_entries);
 	}
 	else
 	{
-		auto& data_entry = entry.get_data_or_directory().emplace<resource_data_entry_details>();
+		auto& data_entry = entry.get_data_or_directory()
+			.emplace<resource_data_entry_details>();
 		try
 		{
 			auto data_entry_rva = resource_dir_rva
 				+ entry_descriptor->offset_to_data_or_directory;
-			load_resource_data_entry(instance, options, data_entry_rva, max_rva, data_entry);
+			load_resource_data_entry(instance, options,
+				data_entry_rva, max_rva, data_entry);
 		}
 		catch (const pe_error&)
 		{
@@ -231,13 +223,9 @@ bool load_resource_directory_entry(const image::image& instance, const loader_op
 }
 
 void load_resource_directory(const image::image& instance, const loader_options& options,
-	safe_rva_type resource_dir_rva, safe_rva_type current_rva, rva_type& max_rva,
-	resource_directory_details& directory, visited_directories_map& visited_directories)
+	safe_rva_type resource_dir_rva, safe_rva_type current_rva, std::uint64_t& max_rva,
+	resource_directory_details& directory, visited_entries_map& visited_entries)
 {
-	utilities::scoped_guard guard([&visited_directories, current_rva] {
-		visited_directories.erase(current_rva.value());
-	});
-
 	auto& descriptor = directory.get_descriptor();
 	try
 	{
@@ -252,7 +240,7 @@ void load_resource_directory(const image::image& instance, const loader_options&
 		return;
 	}
 
-	max_rva = (std::max)(max_rva, current_rva.value());
+	max_rva = (std::max<std::uint64_t>)(max_rva, current_rva.value());
 
 	std::uint32_t entry_count = descriptor->number_of_named_entries;
 	if (!utilities::math::add_if_safe<std::uint32_t>(entry_count,
@@ -268,7 +256,7 @@ void load_resource_directory(const image::image& instance, const loader_options&
 	{
 		auto& entry = directory.get_entries().emplace_back();
 		if (!load_resource_directory_entry(instance, options, resource_dir_rva,
-			current_rva, max_rva, entry, visited_directories))
+			current_rva, max_rva, entry, visited_entries))
 		{
 			break;
 		}
@@ -277,7 +265,8 @@ void load_resource_directory(const image::image& instance, const loader_options&
 
 		try
 		{
-			current_rva += entry.get_descriptor().packed_size;
+			current_rva
+				+= resources::resource_directory_entry_details::packed_descriptor_type::packed_size;
 		}
 		catch (const pe_error&)
 		{
@@ -293,7 +282,7 @@ void load_resource_directory(const image::image& instance, const loader_options&
 			resource_directory_loader_errc::invalid_number_of_named_and_id_entries);
 	}
 
-	max_rva = (std::max)(max_rva, current_rva.value());
+	max_rva = (std::max<std::uint64_t>)(max_rva, current_rva.value());
 }
 
 } //namespace
@@ -316,20 +305,19 @@ std::optional<resource_directory_details> load(const image::image& instance,
 	const auto& resource_dir_info = instance.get_data_directories().get_directory(
 		core::data_directories::directory_type::resource);
 
-	result.emplace();
+	auto& directory = result.emplace();
 
 	auto last_rva = resource_dir_info->virtual_address;
 	if (!utilities::math::add_if_safe(last_rva, resource_dir_info->size))
-		result->add_error(resource_directory_loader_errc::invalid_directory_size);
+		directory.add_error(resource_directory_loader_errc::invalid_directory_size);
 
-	visited_directories_map visited_directories;
-	rva_type max_rva = resource_dir_info->virtual_address;
-	visited_directories.emplace(resource_dir_info->virtual_address);
+	visited_entries_map visited_entries;
+	std::uint64_t max_rva = resource_dir_info->virtual_address;
 	load_resource_directory(instance, options, resource_dir_info->virtual_address,
-		resource_dir_info->virtual_address, max_rva, *result, visited_directories);
+		resource_dir_info->virtual_address, max_rva, directory, visited_entries);
 
-	if (max_rva != last_rva)
-		result->add_error(resource_directory_loader_errc::invalid_directory_size);
+	if (max_rva > last_rva)
+		directory.add_error(resource_directory_loader_errc::invalid_directory_size);
 
 	return result;
 }

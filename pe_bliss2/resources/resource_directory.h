@@ -1,7 +1,8 @@
 #pragma once
 
-#include <list>
+#include <utility>
 #include <variant>
+#include <vector>
 
 #include "buffers/ref_buffer.h"
 #include "pe_bliss2/error_list.h"
@@ -17,11 +18,13 @@ template<typename... Bases>
 class resource_directory_entry_base;
 
 template<typename... Bases>
-class resource_directory_base : public Bases...
+class [[nodiscard]] resource_directory_base : public Bases...
 {
 public:
-	using packed_descriptor_type = packed_struct<detail::resources::image_resource_directory>;
-	using entry_list_type = std::list<resource_directory_entry_base<Bases...>>;
+	using packed_descriptor_type = packed_struct<
+		detail::resources::image_resource_directory>;
+	using entry_list_type = std::vector<
+		resource_directory_entry_base<Bases...>>;
 
 public:
 	[[nodiscard]]
@@ -37,15 +40,21 @@ public:
 	}
 
 	[[nodiscard]]
-	const entry_list_type& get_entries() const noexcept
+	const entry_list_type& get_entries() const& noexcept
 	{
 		return entries_;
 	}
 
 	[[nodiscard]]
-	entry_list_type& get_entries() noexcept
+	entry_list_type& get_entries() & noexcept
 	{
 		return entries_;
+	}
+
+	[[nodiscard]]
+	entry_list_type get_entries() && noexcept
+	{
+		return std::move(entries_);
 	}
 
 private:
@@ -54,10 +63,11 @@ private:
 };
 
 template<typename... Bases>
-class resource_data_entry_base : public Bases...
+class [[nodiscard]] resource_data_entry_base : public Bases...
 {
 public:
-	using packed_descriptor_type = packed_struct<detail::resources::image_resource_data_entry>;
+	using packed_descriptor_type = packed_struct<
+		detail::resources::image_resource_data_entry>;
 
 public:
 	[[nodiscard]]
@@ -92,10 +102,11 @@ private:
 using resource_id_type = std::uint32_t;
 
 template<typename... Bases>
-class resource_directory_entry_base : public Bases...
+class [[nodiscard]] resource_directory_entry_base : public Bases...
 {
 public:
-	using packed_descriptor_type = packed_struct<detail::resources::image_resource_directory_entry>;
+	using packed_descriptor_type = packed_struct<
+		detail::resources::image_resource_directory_entry>;
 	using name_or_id_type = std::variant<std::monostate,
 		resource_id_type, packed_utf16_string>;
 	using data_or_directory_type = std::variant<std::monostate,
@@ -116,15 +127,21 @@ public:
 	}
 
 	[[nodiscard]]
-	const name_or_id_type& get_name_or_id() const noexcept
+	const name_or_id_type& get_name_or_id() const& noexcept
 	{
 		return name_or_id_;
 	}
 
 	[[nodiscard]]
-	name_or_id_type& get_name_or_id() noexcept
+	name_or_id_type& get_name_or_id() & noexcept
 	{
 		return name_or_id_;
+	}
+
+	[[nodiscard]]
+	name_or_id_type get_name_or_id() && noexcept
+	{
+		return std::move(name_or_id_);
 	}
 
 	[[nodiscard]]
@@ -135,15 +152,21 @@ public:
 	}
 
 	[[nodiscard]]
-	const data_or_directory_type& get_data_or_directory() const noexcept
+	const data_or_directory_type& get_data_or_directory() const& noexcept
 	{
 		return data_or_directory_;
 	}
 
 	[[nodiscard]]
-	data_or_directory_type& get_data_or_directory() noexcept
+	data_or_directory_type& get_data_or_directory() & noexcept
 	{
 		return data_or_directory_;
+	}
+
+	[[nodiscard]]
+	data_or_directory_type& get_data_or_directory() && noexcept
+	{
+		return std::move(data_or_directory_);
 	}
 
 private:
