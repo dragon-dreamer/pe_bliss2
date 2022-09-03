@@ -15,6 +15,7 @@
 #include "load_config_dumper.h"
 #include "optional_header_dumper.h"
 #include "relocations_dumper.h"
+#include "resources_dumper.h"
 #include "rich_data_dumper.h"
 #include "section_table_dumper.h"
 #include "tls_dumper.h"
@@ -42,6 +43,7 @@ void dump_pe(const pe_bliss::image::image& image)
 	dump_relocations(fmt, image);
 	dump_load_config(fmt, image);
 	dump_exceptions(fmt, image);
+	dump_resources(fmt, image);
 }
 
 int main(int argc, char* argv[]) try

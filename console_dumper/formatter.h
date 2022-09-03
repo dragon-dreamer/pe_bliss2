@@ -5,9 +5,11 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
+#include <codecvt>
 #include <exception>
 #include <functional>
 #include <iomanip>
+#include <locale>
 #include <map>
 #include <ostream>
 #include <string>
@@ -206,14 +208,15 @@ public:
 		}
 	}
 
-	void print_packed_string(const pe_bliss::packed_c_string& str)
+	template<typename PackedString>
+	void print_packed_string(const PackedString& str)
 	{
 		if (str.value().empty() && !str.get_state().absolute_offset())
 			return;
 
 		print_offsets(str);
 		stream_ << " (";
-		print_string(str.value().c_str());
+		print_string(str.value());
 		stream_ << ')';
 	}
 
@@ -229,6 +232,11 @@ public:
 		color_changer changer(stream_, color_provider_,
 			string_fg_color, string_bg_color);
 		stream_ << str;
+	}
+
+	void print_string(std::u16string_view str)
+	{
+		print_string(utf16_to_utf8(str));
 	}
 
 	void print_error(const char* prefix, const std::system_error& e)
@@ -417,6 +425,12 @@ public:
 
 		if (buf_length > max_length)
 			stream_ << "...\n";
+	}
+
+	std::string utf16_to_utf8(std::u16string_view str)
+	{
+		std::wstring_convert<std::codecvt_utf8<char16_t>, char16_t> converter;
+		return converter.to_bytes(str.data(), str.data() + str.size());
 	}
 
 public:

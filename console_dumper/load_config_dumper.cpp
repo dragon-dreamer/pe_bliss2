@@ -1034,7 +1034,8 @@ void dump_enclave_config(formatter& fmt, const Config& config)
 				std::ref(fmt), std::cref(import.get_descriptor()->family_id), std::placeholders::_1), false},
 			value_info{"image_id", true, std::bind(dump_enclave_id{},
 				std::ref(fmt), std::cref(import.get_descriptor()->image_id), std::placeholders::_1), false},
-			value_info{"import_name", true, std::bind(&formatter::print_packed_string, std::ref(fmt),
+			value_info{"import_name", true, std::bind(
+				&formatter::print_packed_string<pe_bliss::packed_c_string>, std::ref(fmt),
 				std::cref(import.get_name()))},
 			value_info{"reserved"}
 		});

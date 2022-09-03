@@ -28,7 +28,8 @@ void dump_exports(formatter& fmt, const pe_bliss::image::image& image) try
 		value_info{"time_date_stamp"},
 		value_info{"major_version"},
 		value_info{"minor_version"},
-		value_info{"name", true, std::bind(&formatter::print_packed_string, std::ref(fmt),
+		value_info{"name", true, std::bind(
+			&formatter::print_packed_string<pe_bliss::packed_c_string>, std::ref(fmt),
 			std::cref(exports->get_library_name()))},
 		value_info{"base"},
 		value_info{"number_of_functions"},

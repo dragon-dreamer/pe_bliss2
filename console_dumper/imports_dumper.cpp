@@ -78,7 +78,8 @@ void dump_imports(formatter& fmt,
 			value_info{"time_date_stamp", true,
 				std::bind(dump_is_library_bound, std::ref(fmt), lib.is_bound())},
 			value_info{"forwarder_chain"},
-			value_info{"name", true, std::bind(&formatter::print_packed_string, std::ref(fmt),
+			value_info{"name", true, std::bind(
+				&formatter::print_packed_string<pe_bliss::packed_c_string>, std::ref(fmt),
 				std::cref(lib.get_library_name()))},
 			value_info{"address_table"}
 		});

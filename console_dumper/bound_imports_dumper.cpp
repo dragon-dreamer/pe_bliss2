@@ -21,7 +21,8 @@ void dump_descriptor(const char* name, const Library& library, formatter& fmt)
 	fmt.print_errors(library);
 	fmt.print_structure(name, library.get_descriptor(), std::array{
 		value_info{"time_date_stamp"},
-		value_info{"offset_module_name", true, std::bind(&formatter::print_packed_string, std::ref(fmt),
+		value_info{"offset_module_name", true, std::bind(
+			&formatter::print_packed_string<pe_bliss::packed_c_string>, std::ref(fmt),
 			std::cref(library.get_library_name()))},
 		value_info{"number_of_module_forwarder_refs"}
 	});
