@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <compare>
 #include <concepts>
 #include <string>
 #include <utility>
@@ -89,6 +90,12 @@ public:
 	void set_virtual_nullbyte(bool virtual_nullbyte) noexcept
 	{
 		virtual_nullbyte_ = virtual_nullbyte;
+	}
+
+	[[nodiscard]]
+	friend auto operator<=>(const packed_c_string& l, const packed_c_string& r)
+	{
+		return l.value() <=> r.value();
 	}
 
 private:

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <compare>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -90,6 +91,12 @@ public:
 	void set_physical_size(std::size_t size) noexcept;
 
 	void sync_physical_size() noexcept;
+
+	[[nodiscard]]
+	friend auto operator<=>(const packed_utf16_string& l, const packed_utf16_string& r)
+	{
+		return l.value() <=> r.value();
+	}
 
 private:
 	template<typename WriteChar, typename WriteRemaining>
