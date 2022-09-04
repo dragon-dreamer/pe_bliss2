@@ -67,7 +67,7 @@ The library is aimed at being able to provide as much information about the PE f
     - Read (unit-tested)
     - Modify (untested)
   - Resources:
-    - Read (no resource types support, untested)
+    - Read (no resource types support, unit-tested)
 - Address conversions (RVA/VA/file offsets, unit-tested).
 - Overlay at the end of file parsing (unit-tested).
 - Simple console dumper of PE/PE+ files (no extended configuration yet).
