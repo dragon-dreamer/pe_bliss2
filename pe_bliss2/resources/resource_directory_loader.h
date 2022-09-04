@@ -23,7 +23,8 @@ enum class resource_directory_loader_errc
 	invalid_resource_directory_entry_name,
 	invalid_number_of_named_and_id_entries,
 	invalid_resource_data_entry,
-	invalid_resource_data_entry_raw_data
+	invalid_resource_data_entry_raw_data,
+	unsorted_entries
 };
 
 struct [[nodiscard]] loader_options
@@ -37,7 +38,7 @@ std::error_code make_error_code(resource_directory_loader_errc) noexcept;
 
 [[nodiscard]]
 std::optional<resource_directory_details> load(const image::image& instance,
-	const loader_options& options);
+	const loader_options& options = {});
 
 } //namespace pe_bliss::resources
 
