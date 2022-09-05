@@ -47,7 +47,12 @@ public:
 		buffer_pos_ = pos;
 	}
 
+	[[nodiscard]]
 	friend constexpr auto operator<=>(const input_buffer_state&,
+		const input_buffer_state&) noexcept = default;
+
+	[[nodiscard]]
+	friend constexpr bool operator==(const input_buffer_state&,
 		const input_buffer_state&) noexcept = default;
 	
 protected:

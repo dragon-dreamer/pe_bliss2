@@ -37,6 +37,8 @@ public:
 
 		[[nodiscard]]
 		friend auto operator<=>(const error_context&, const error_context&) = default;
+		[[nodiscard]]
+		friend bool operator==(const error_context&, const error_context&) = default;
 	};
 
 	struct error_context_hash final

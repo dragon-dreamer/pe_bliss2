@@ -38,6 +38,8 @@ public:
 
 	[[nodiscard]]
 	auto operator<=>(const safe_uint&) const noexcept = default;
+	[[nodiscard]]
+	bool operator==(const safe_uint&) const noexcept = default;
 
 	[[nodiscard]]
 	explicit operator bool() const noexcept

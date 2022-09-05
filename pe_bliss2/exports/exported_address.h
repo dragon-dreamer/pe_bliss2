@@ -179,6 +179,9 @@ struct [[nodiscard]] forwarded_name_info
 	[[nodiscard]]
 	friend auto operator<=>(const forwarded_name_info&,
 		const forwarded_name_info&) = default;
+	[[nodiscard]]
+	friend bool operator==(const forwarded_name_info&,
+		const forwarded_name_info&) = default;
 };
 
 [[nodiscard]]

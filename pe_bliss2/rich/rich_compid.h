@@ -16,6 +16,10 @@ public:
 	[[nodiscard]]
 	friend auto operator<=>(const rich_compid&,
 		const rich_compid&) noexcept = default;
+
+	[[nodiscard]]
+	friend bool operator==(const rich_compid&,
+		const rich_compid&) noexcept = default;
 };
 
 [[nodiscard]]
