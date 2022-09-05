@@ -25,10 +25,11 @@ class [[nodiscard]] packed_c_string
 public:
 	packed_c_string() = default;
 
-	template<convertible_to_string String>
-	packed_c_string(String&& str)
-		noexcept(noexcept(std::string(std::forward<String>(str))))
-		: value_(std::forward<String>(str))
+	template<typename... Args>
+		requires(std::constructible_from<std::string, Args...>)
+	explicit packed_c_string(Args&&... args)
+		noexcept(noexcept(std::string(std::forward<Args>(args)...)))
+		: value_(std::forward<Args>(args)...)
 	{
 	}
 
@@ -93,9 +94,15 @@ public:
 	}
 
 	[[nodiscard]]
-	friend auto operator<=>(const packed_c_string& l, const packed_c_string& r)
+	friend auto operator<=>(const packed_c_string& l, const packed_c_string& r) noexcept
 	{
 		return l.value() <=> r.value();
+	}
+
+	[[nodiscard]]
+	friend bool operator==(const packed_c_string& l, const packed_c_string& r) noexcept
+	{
+		return l.value() == r.value();
 	}
 
 private:

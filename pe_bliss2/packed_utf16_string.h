@@ -1,6 +1,7 @@
 #pragma once
 
 #include <compare>
+#include <concepts>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -23,6 +24,28 @@ public:
 	using string_type = std::u16string;
 
 public:
+	template<typename... Args>
+		requires(std::constructible_from<string_type, Args...>)
+	explicit packed_utf16_string(Args&&... args)
+		noexcept(noexcept(string_type(std::forward<Args>(args)...)))
+		: value_(std::forward<Args>(args)...)
+	{
+	}
+
+	packed_utf16_string() = default;
+
+	template<typename String>
+		requires(std::convertible_to<String, string_type> )
+	packed_utf16_string& operator=(String&& str)
+		noexcept(noexcept(value_ = std::forward<String>(str)))
+	{
+		value_ = std::forward<String>(str);
+		state_ = {};
+		physical_size_ = value_.size() + sizeof(std::uint16_t);
+		virtual_size_ = physical_size_;
+		return *this;
+	}
+
 	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 		bool allow_virtual_memory);
 	std::size_t serialize(buffers::output_buffer_interface& buf,
@@ -93,9 +116,15 @@ public:
 	void sync_physical_size() noexcept;
 
 	[[nodiscard]]
-	friend auto operator<=>(const packed_utf16_string& l, const packed_utf16_string& r)
+	friend auto operator<=>(const packed_utf16_string& l, const packed_utf16_string& r) noexcept
 	{
 		return l.value() <=> r.value();
+	}
+
+	[[nodiscard]]
+	friend bool operator==(const packed_utf16_string& l, const packed_utf16_string& r) noexcept
+	{
+		return l.value() == r.value();
 	}
 
 private:
