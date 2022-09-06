@@ -486,6 +486,12 @@
     <ClInclude Include="exceptions\x64\x64_exception_directory-inl.h">
       <Filter>Header Files\exceptions\x64</Filter>
     </ClInclude>
+    <ClInclude Include="resources\resource_reader.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\resource_types.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -700,6 +706,12 @@
     </ClCompile>
     <ClCompile Include="tls\tls_directory.cpp">
       <Filter>Source Files\tls</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\resource_reader.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\resource_directory.cpp">
+      <Filter>Source Files\resources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

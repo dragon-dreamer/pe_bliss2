@@ -1,5 +1,8 @@
 #pragma once
 
+#include <string_view>
+#include <system_error>
+#include <type_traits>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -7,12 +10,23 @@
 #include "buffers/ref_buffer.h"
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/packed_struct.h"
-#include "pe_bliss2/packed_utf16_string.h"
 #include "pe_bliss2/detail/resources/image_resource_directory.h"
 #include "pe_bliss2/pe_types.h"
+#include "pe_bliss2/resources/resource_types.h"
 
 namespace pe_bliss::resources
 {
+
+enum class resource_directory_errc
+{
+	entry_does_not_exist = 1,
+	entry_does_not_contain_directory,
+	entry_does_not_contain_data,
+	entry_does_not_have_name,
+	entry_does_not_have_id
+};
+
+std::error_code make_error_code(resource_directory_errc) noexcept;
 
 template<typename... Bases>
 class resource_directory_entry_base;
@@ -23,8 +37,8 @@ class [[nodiscard]] resource_directory_base : public Bases...
 public:
 	using packed_descriptor_type = packed_struct<
 		detail::resources::image_resource_directory>;
-	using entry_list_type = std::vector<
-		resource_directory_entry_base<Bases...>>;
+	using entry_type = resource_directory_entry_base<Bases...>;
+	using entry_list_type = std::vector<entry_type>;
 
 public:
 	[[nodiscard]]
@@ -56,6 +70,32 @@ public:
 	{
 		return std::move(entries_);
 	}
+
+	[[nodiscard]]
+	const entry_type& entry_by_id(resource_id_type id) const;
+	[[nodiscard]]
+	entry_type& entry_by_id(resource_id_type id);
+	[[nodiscard]]
+	const entry_type* try_entry_by_id(resource_id_type id) const noexcept;
+	[[nodiscard]]
+	entry_type* try_entry_by_id(resource_id_type id) noexcept;
+	[[nodiscard]]
+	const entry_type& entry_by_name(std::u16string_view name) const;
+	[[nodiscard]]
+	entry_type& entry_by_name(std::u16string_view name);
+	[[nodiscard]]
+	const entry_type* try_entry_by_name(std::u16string_view name) const noexcept;
+	[[nodiscard]]
+	entry_type* try_entry_by_name(std::u16string_view name) noexcept;
+
+	[[nodiscard]]
+	entry_list_type::const_iterator entry_iterator_by_id(resource_id_type id) const noexcept;
+	[[nodiscard]]
+	entry_list_type::iterator entry_iterator_by_id(resource_id_type id) noexcept;
+	[[nodiscard]]
+	entry_list_type::const_iterator entry_iterator_by_name(std::u16string_view name) const noexcept;
+	[[nodiscard]]
+	entry_list_type::iterator entry_iterator_by_name(std::u16string_view name) noexcept;
 
 private:
 	packed_descriptor_type descriptor_;
@@ -99,8 +139,6 @@ private:
 	buffers::ref_buffer raw_data_;
 };
 
-using resource_id_type = std::uint32_t;
-
 template<typename... Bases>
 class [[nodiscard]] resource_directory_entry_base : public Bases...
 {
@@ -108,7 +146,7 @@ public:
 	using packed_descriptor_type = packed_struct<
 		detail::resources::image_resource_directory_entry>;
 	using name_or_id_type = std::variant<std::monostate,
-		resource_id_type, packed_utf16_string>;
+		resource_id_type, resource_name_type>;
 	using data_or_directory_type = std::variant<std::monostate,
 		resource_directory_base<Bases...>, resource_data_entry_base<Bases...>,
 		rva_type /* RVA of looped resource_directory_base */>;
@@ -152,6 +190,23 @@ public:
 	}
 
 	[[nodiscard]]
+	bool has_id() const noexcept
+	{
+		static constexpr std::size_t id_index = 1u;
+		return name_or_id_.index() == id_index;
+	}
+
+	[[nodiscard]]
+	resource_name_type& get_name();
+	[[nodiscard]]
+	resource_id_type& get_id();
+
+	[[nodiscard]]
+	const resource_name_type& get_name() const;
+	[[nodiscard]]
+	const resource_id_type& get_id() const;
+
+	[[nodiscard]]
 	const data_or_directory_type& get_data_or_directory() const& noexcept
 	{
 		return data_or_directory_;
@@ -164,10 +219,34 @@ public:
 	}
 
 	[[nodiscard]]
-	data_or_directory_type& get_data_or_directory() && noexcept
+	data_or_directory_type get_data_or_directory() && noexcept
 	{
 		return std::move(data_or_directory_);
 	}
+
+	[[nodiscard]]
+	bool has_data() const noexcept
+	{
+		static constexpr std::size_t data_index = 2u;
+		return data_or_directory_.index() == data_index;
+	}
+
+	[[nodiscard]]
+	bool has_directory() const noexcept
+	{
+		static constexpr std::size_t data_index = 1u;
+		return data_or_directory_.index() == data_index;
+	}
+
+	[[nodiscard]]
+	resource_directory_base<Bases...>& get_directory();
+	[[nodiscard]]
+	resource_data_entry_base<Bases...>& get_data();
+
+	[[nodiscard]]
+	const resource_directory_base<Bases...>& get_directory() const;
+	[[nodiscard]]
+	const resource_data_entry_base<Bases...>& get_data() const;
 
 private:
 	packed_descriptor_type descriptor_;
@@ -183,3 +262,9 @@ using resource_directory = resource_directory_base<>;
 using resource_directory_details = resource_directory_base<error_list>;
 
 } //namespace pe_bliss::resources
+
+namespace std
+{
+template<>
+struct is_error_code_enum<pe_bliss::resources::resource_directory_errc> : true_type {};
+} //namespace std

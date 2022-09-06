@@ -113,6 +113,8 @@
     <ClInclude Include="relocations\relocation_directory_loader.h" />
     <ClInclude Include="resources\resource_directory.h" />
     <ClInclude Include="resources\resource_directory_loader.h" />
+    <ClInclude Include="resources\resource_reader.h" />
+    <ClInclude Include="resources\resource_types.h" />
     <ClInclude Include="rich\compid_database.h" />
     <ClInclude Include="rich\rich_compid.h" />
     <ClInclude Include="rich\rich_header.h" />
@@ -211,7 +213,9 @@
     <ClCompile Include="relocations\relocation_entry.cpp" />
     <ClCompile Include="relocations\relocation_directory_builder.cpp" />
     <ClCompile Include="relocations\relocation_directory_loader.cpp" />
+    <ClCompile Include="resources\resource_directory.cpp" />
     <ClCompile Include="resources\resource_directory_loader.cpp" />
+    <ClCompile Include="resources\resource_reader.cpp" />
     <ClCompile Include="rich\compid_database.cpp" />
     <ClCompile Include="rich\rich_compid.cpp" />
     <ClCompile Include="rich\rich_header.cpp" />
