@@ -24,7 +24,8 @@ enum class resource_directory_loader_errc
 	invalid_number_of_named_and_id_entries,
 	invalid_resource_data_entry,
 	invalid_resource_data_entry_raw_data,
-	unsorted_entries
+	unsorted_entries,
+	duplicate_entries
 };
 
 struct [[nodiscard]] loader_options

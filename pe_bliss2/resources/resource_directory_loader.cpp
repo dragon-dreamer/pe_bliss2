@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <limits>
+#include <string>
 #include <system_error>
 #include <unordered_set>
 
@@ -53,6 +54,8 @@ struct resource_directory_loader_error_category : std::error_category
 			return "Invalid resource data entry raw data";
 		case unsorted_entries:
 			return "Unsorted directory entries";
+		case duplicate_entries:
+			return "Duplicate directory entries";
 		default:
 			return {};
 		}
@@ -77,6 +80,15 @@ bool is_sorted(const std::vector<resource_directory_entry_details>& entries)
 		else
 			return l.is_named();
 	});
+}
+
+bool has_duplicates(const std::vector<resource_directory_entry_details>& entries)
+{
+	return std::adjacent_find(entries.cbegin(), entries.cend(),
+		[](const auto& l, const auto& r)
+	{
+		return l.get_name_or_id() == r.get_name_or_id();
+	}) != entries.cend();
 }
 
 void load_resource_data_entry(const image::image& instance, const loader_options& options,
@@ -282,6 +294,11 @@ void load_resource_directory(const image::image& instance, const loader_options&
 	{
 		directory.add_error(
 			resource_directory_loader_errc::unsorted_entries);
+	}
+	else if (has_duplicates(directory.get_entries()))
+	{
+		directory.add_error(
+			resource_directory_loader_errc::duplicate_entries);
 	}
 
 	if (number_of_named_entries != descriptor->number_of_named_entries)
