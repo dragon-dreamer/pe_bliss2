@@ -200,6 +200,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\relocation_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\resources_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\resource_directory_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\resource_reader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\tls_directory_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\tls_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\x64_exceptions_loader_tests.cpp" />
