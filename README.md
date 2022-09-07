@@ -67,7 +67,9 @@ The library is aimed at being able to provide as much information about the PE f
     - Read (unit-tested)
     - Modify (untested)
   - Resources:
-    - Read (no resource types support, unit-tested)
+    - Read (unit-tested)
+    - Supported resource types:
+      - Bitmap (read-only, unit-tested)
 - Address conversions (RVA/VA/file offsets, unit-tested).
 - Overlay at the end of file parsing (unit-tested).
 - Simple console dumper of PE/PE+ files (no extended configuration yet).
@@ -84,7 +86,6 @@ The following features are planned:
     - Icons, Cursors
     - Manifests
     - Version info 
-    - Bitmaps
     - Message lists
     - String tables
   - Debug
