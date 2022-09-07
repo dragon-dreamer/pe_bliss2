@@ -52,6 +52,7 @@
     <ClInclude Include="detail\packed_serialization.h" />
     <ClInclude Include="detail\relocations\image_base_relocation.h" />
     <ClInclude Include="detail\packed_struct_base.h" />
+    <ClInclude Include="detail\resources\bitmap.h" />
     <ClInclude Include="detail\resources\image_resource_directory.h" />
     <ClInclude Include="detail\rich\rich_header_utils.h" />
     <ClInclude Include="detail\tls\image_tls_directory.h" />
@@ -111,6 +112,7 @@
     <ClInclude Include="relocations\relocation_entry.h" />
     <ClInclude Include="relocations\relocation_directory_builder.h" />
     <ClInclude Include="relocations\relocation_directory_loader.h" />
+    <ClInclude Include="resources\bitmap_reader.h" />
     <ClInclude Include="resources\resource_directory.h" />
     <ClInclude Include="resources\resource_directory_loader.h" />
     <ClInclude Include="resources\resource_reader.h" />
@@ -213,6 +215,7 @@
     <ClCompile Include="relocations\relocation_entry.cpp" />
     <ClCompile Include="relocations\relocation_directory_builder.cpp" />
     <ClCompile Include="relocations\relocation_directory_loader.cpp" />
+    <ClCompile Include="resources\bitmap_reader.cpp" />
     <ClCompile Include="resources\resource_directory.cpp" />
     <ClCompile Include="resources\resource_directory_loader.cpp" />
     <ClCompile Include="resources\resource_reader.cpp" />

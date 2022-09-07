@@ -492,6 +492,12 @@
     <ClInclude Include="resources\resource_types.h">
       <Filter>Header Files\resources</Filter>
     </ClInclude>
+    <ClInclude Include="resources\bitmap_reader.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\resources\bitmap.h">
+      <Filter>Header Files\detail\resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -711,6 +717,9 @@
       <Filter>Source Files\resources</Filter>
     </ClCompile>
     <ClCompile Include="resources\resource_directory.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\bitmap_reader.cpp">
       <Filter>Source Files\resources</Filter>
     </ClCompile>
   </ItemGroup>
