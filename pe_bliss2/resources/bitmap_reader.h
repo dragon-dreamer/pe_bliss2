@@ -1,17 +1,14 @@
 #pragma once
 
-#include <cstddef>
 #include <system_error>
 #include <type_traits>
-#include <vector>
 
-namespace buffers
-{
-class input_buffer_interface;
-} //namespace buffers
+#include "buffers/input_buffer_interface.h"
 
 namespace pe_bliss::resources
 {
+
+class bitmap;
 
 enum class bitmap_reader_errc
 {
@@ -23,7 +20,7 @@ enum class bitmap_reader_errc
 std::error_code make_error_code(bitmap_reader_errc) noexcept;
 
 [[nodiscard]]
-std::vector<std::byte> bitmap_from_resource(buffers::input_buffer_interface& buf,
+bitmap bitmap_from_resource(buffers::input_buffer_ptr buf,
 	bool allow_virtual_memory);
 
 } //namespace pe_bliss::resources

@@ -112,6 +112,7 @@
     <ClInclude Include="relocations\relocation_entry.h" />
     <ClInclude Include="relocations\relocation_directory_builder.h" />
     <ClInclude Include="relocations\relocation_directory_loader.h" />
+    <ClInclude Include="resources\bitmap.h" />
     <ClInclude Include="resources\bitmap_reader.h" />
     <ClInclude Include="resources\resource_directory.h" />
     <ClInclude Include="resources\resource_directory_loader.h" />
@@ -215,6 +216,7 @@
     <ClCompile Include="relocations\relocation_entry.cpp" />
     <ClCompile Include="relocations\relocation_directory_builder.cpp" />
     <ClCompile Include="relocations\relocation_directory_loader.cpp" />
+    <ClCompile Include="resources\bitmap.cpp" />
     <ClCompile Include="resources\bitmap_reader.cpp" />
     <ClCompile Include="resources\resource_directory.cpp" />
     <ClCompile Include="resources\resource_directory_loader.cpp" />

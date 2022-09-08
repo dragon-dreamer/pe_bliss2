@@ -1,5 +1,6 @@
 #include "pe_bliss2/resources/bitmap_reader.h"
 
+#include <cassert>
 #include <cstdint>
 #include <exception>
 #include <string>
@@ -8,10 +9,12 @@
 #include <boost/endian/conversion.hpp>
 
 #include "buffers/input_buffer_interface.h"
+#include "buffers/input_buffer_section.h"
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/detail/resources/bitmap.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
+#include "pe_bliss2/resources/bitmap.h"
 #include "utilities/generic_error.h"
 #include "utilities/safe_uint.h"
 
@@ -53,18 +56,18 @@ std::error_code make_error_code(bitmap_reader_errc e) noexcept
 	return { static_cast<int>(e), bitmap_reader_error_category_instance };
 }
 
-std::vector<std::byte> bitmap_from_resource(buffers::input_buffer_interface& buf,
+bitmap bitmap_from_resource(buffers::input_buffer_ptr buf,
 	bool allow_virtual_memory)
 {
-	packed_struct<detail::resources::bitmap_info_header> info_header;
-	packed_struct<detail::resources::bitmap_file_header> file_header;
+	assert(!!buf);
 
-	auto buffer_size = allow_virtual_memory ? buf.size() : buf.physical_size();
+	auto buffer_size = allow_virtual_memory ? buf->size() : buf->physical_size();
 
-	if (buffer_size < info_header.packed_size)
+	if (buffer_size < bitmap::info_header_type::packed_size)
 		throw pe_error(bitmap_reader_errc::invalid_buffer_size);
 
-	utilities::safe_uint<std::uint32_t> bitmap_size = file_header.packed_size;
+	utilities::safe_uint<std::uint32_t> bitmap_size
+		= bitmap::file_header_type::packed_size;
 	try
 	{
 		bitmap_size += buffer_size;
@@ -74,10 +77,11 @@ std::vector<std::byte> bitmap_from_resource(buffers::input_buffer_interface& buf
 		std::throw_with_nested(pe_error(bitmap_reader_errc::invalid_buffer_size));
 	}
 
+	bitmap result;
 	try
 	{
-		buffers::input_buffer_stateful_wrapper_ref ref(buf);
-		info_header.deserialize(ref, allow_virtual_memory);
+		buffers::input_buffer_stateful_wrapper_ref ref(*buf);
+		result.get_info_header().deserialize(ref, allow_virtual_memory);
 	}
 	catch (const std::system_error&)
 	{
@@ -85,40 +89,34 @@ std::vector<std::byte> bitmap_from_resource(buffers::input_buffer_interface& buf
 	}
 
 	utilities::safe_uint<std::uint32_t> off_bits
-		= info_header.packed_size + file_header.packed_size;
+		= bitmap::info_header_type::packed_size
+		+ bitmap::file_header_type::packed_size;
 	try
 	{
-		if (((info_header->clr_used << 2u) >> 2u) != info_header->clr_used)
+		if (((result.get_info_header()->clr_used << 2u) >> 2u)
+			!= result.get_info_header()->clr_used)
+		{
 			throw std::system_error(utilities::generic_errc::integer_overflow);
+		}
 
 		//If color table is present, skip it
-		if (info_header->clr_used)
-			off_bits += info_header->clr_used << 2u;
-		else if (info_header->bit_count <= 8u)
-			off_bits += (1u << info_header->bit_count) << 2u;
+		if (result.get_info_header()->clr_used)
+			off_bits += result.get_info_header()->clr_used << 2u;
+		else if (result.get_info_header()->bit_count <= 8u)
+			off_bits += (1u << result.get_info_header()->bit_count) << 2u;
 	}
 	catch (const std::system_error&)
 	{
 		std::throw_with_nested(pe_error(bitmap_reader_errc::invalid_bitmap_header));
 	}
 
-	file_header->type = detail::resources::bm_signature;
+	result.get_file_header()->type = detail::resources::bm_signature;
 	//Offset to bitmap bits
-	file_header->off_bits = off_bits.value();
+	result.get_file_header()->off_bits = off_bits.value();
 	//Size of bitmap
-	file_header->size = bitmap_size.value();
+	result.get_file_header()->size = bitmap_size.value();
 
-	std::vector<std::byte> result;
-	result.resize(bitmap_size.value());
-	file_header.serialize(result.data(), result.size(), true);
-	try
-	{
-		buf.read(0u, buffer_size, result.data() + file_header.packed_size);
-	}
-	catch (const std::system_error&)
-	{
-		std::throw_with_nested(pe_error(bitmap_reader_errc::buffer_read_error));
-	}
+	result.get_buffer() = buffers::reduce(buf, bitmap::info_header_type::packed_size);
 	return result;
 }
 
