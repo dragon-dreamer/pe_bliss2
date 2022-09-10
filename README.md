@@ -69,25 +69,28 @@ The library is aimed at being able to provide as much information about the PE f
   - Resources:
     - Read (unit-tested)
     - Supported resource types:
-      - Bitmap (read-only, unit-tested)
+      - Bitmap (read-write, unit-tested)
+      - String tables (read-write, unit-tested)
 - Address conversions (RVA/VA/file offsets, unit-tested).
 - Overlay at the end of file parsing (unit-tested).
 - Simple console dumper of PE/PE+ files (no extended configuration yet).
 
 The following features are planned:
 - Cross-platform compilation with CMake.
-- Unit-tests/integration tests.
 - Documentation.
 - Examples.
 - Porting of missing old functionality from the PE Bliss library.
 - Directory support:
   - Resources
+    - Accelerators
     - Dialogs
     - Icons, Cursors
     - Manifests
-    - Version info 
+    - Version info
     - Message lists
-    - String tables
+    - Menu
+    - Toolbar
+    - Ribbon
   - Debug
   - Digital signature (Security)
 - Image signature verification/calculation.
