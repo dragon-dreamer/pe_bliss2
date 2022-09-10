@@ -117,7 +117,10 @@
     <ClInclude Include="resources\resource_directory.h" />
     <ClInclude Include="resources\resource_directory_loader.h" />
     <ClInclude Include="resources\resource_reader.h" />
+    <ClInclude Include="resources\resource_reader_errc.h" />
     <ClInclude Include="resources\resource_types.h" />
+    <ClInclude Include="resources\string_table.h" />
+    <ClInclude Include="resources\string_table_reader.h" />
     <ClInclude Include="rich\compid_database.h" />
     <ClInclude Include="rich\rich_compid.h" />
     <ClInclude Include="rich\rich_header.h" />
@@ -221,6 +224,8 @@
     <ClCompile Include="resources\resource_directory.cpp" />
     <ClCompile Include="resources\resource_directory_loader.cpp" />
     <ClCompile Include="resources\resource_reader.cpp" />
+    <ClCompile Include="resources\resource_reader_errc.cpp" />
+    <ClCompile Include="resources\string_table_reader.cpp" />
     <ClCompile Include="rich\compid_database.cpp" />
     <ClCompile Include="rich\rich_compid.cpp" />
     <ClCompile Include="rich\rich_header.cpp" />

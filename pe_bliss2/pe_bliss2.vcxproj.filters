@@ -501,6 +501,15 @@
     <ClInclude Include="resources\bitmap.h">
       <Filter>Header Files\resources</Filter>
     </ClInclude>
+    <ClInclude Include="resources\string_table_reader.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\string_table.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\resource_reader_errc.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -726,6 +735,12 @@
       <Filter>Source Files\resources</Filter>
     </ClCompile>
     <ClCompile Include="resources\bitmap.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\string_table_reader.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\resource_reader_errc.cpp">
       <Filter>Source Files\resources</Filter>
     </ClCompile>
   </ItemGroup>

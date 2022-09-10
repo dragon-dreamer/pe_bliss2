@@ -1,6 +1,6 @@
 #pragma once
 
-#include "buffers/input_buffer_interface.h"
+#include "buffers/ref_buffer.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/resources/bitmap.h"
 
@@ -44,13 +44,13 @@ public:
 	}
 
 	[[nodiscard]]
-	buffers::input_buffer_ptr& get_buffer() noexcept
+	buffers::ref_buffer& get_buffer() noexcept
 	{
 		return buf_;
 	}
 
 	[[nodiscard]]
-	const buffers::input_buffer_ptr& get_buffer() const noexcept
+	const buffers::ref_buffer& get_buffer() const noexcept
 	{
 		return buf_;
 	}
@@ -61,7 +61,7 @@ public:
 private:
 	file_header_type fh_;
 	info_header_type ih_;
-	buffers::input_buffer_ptr buf_;
+	buffers::ref_buffer buf_;
 };
 
 } //namespace pe_bliss::resources

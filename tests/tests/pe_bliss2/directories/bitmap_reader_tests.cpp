@@ -10,6 +10,7 @@
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/resources/bitmap.h"
 #include "pe_bliss2/resources/bitmap_reader.h"
+#include "pe_bliss2/resources/resource_reader_errc.h"
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss::resources;
@@ -18,8 +19,8 @@ TEST(BitmapReaderTests, ReadEmpty)
 {
 	auto buf = std::make_shared<buffers::input_container_buffer>();
 	expect_throw_pe_error([&buf] {
-		(void)bitmap_from_resource(buf, true);
-	}, bitmap_reader_errc::invalid_buffer_size);
+		(void)bitmap_from_resource(buf);
+	}, resource_reader_errc::invalid_buffer_size);
 }
 
 TEST(BitmapReaderTests, ReadInvalidHeader)
@@ -31,7 +32,7 @@ TEST(BitmapReaderTests, ReadInvalidHeader)
 	header.serialize(buf->get_container().data(), header.packed_size, true);
 
 	expect_throw_pe_error([&buf] {
-		(void)bitmap_from_resource(buf, true);
+		(void)bitmap_from_resource(buf);
 	}, bitmap_reader_errc::invalid_bitmap_header);
 }
 
@@ -47,12 +48,13 @@ void read_test(
 	header.serialize(buf->get_container().data(), header.packed_size, true);
 
 	bitmap bmp;
-	EXPECT_NO_THROW(bmp = bitmap_from_resource(buf, true));
+	EXPECT_NO_THROW(bmp = bitmap_from_resource(buf));
 
 	EXPECT_EQ(bmp.get_file_header()->off_bits,
 		header.packed_size + bitmap::file_header_type::packed_size + off_bits_delta);
 	EXPECT_EQ(bmp.get_file_header()->type, pe_bliss::detail::resources::bm_signature);
 	EXPECT_EQ(bmp.get_info_header()->clr_used, header->clr_used);
+	EXPECT_FALSE(bmp.get_buffer().is_copied());
 
 	buffers::output_memory_buffer::buffer_type vec;
 	buffers::output_memory_buffer out(vec);

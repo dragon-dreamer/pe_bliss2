@@ -15,12 +15,12 @@
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/resources/bitmap.h"
+#include "pe_bliss2/resources/resource_reader_errc.h"
 #include "utilities/generic_error.h"
 #include "utilities/safe_uint.h"
 
 namespace
 {
-
 struct bitmap_reader_error_category : std::error_category
 {
 	const char* name() const noexcept override
@@ -35,10 +35,6 @@ struct bitmap_reader_error_category : std::error_category
 		{
 		case invalid_bitmap_header:
 			return "Invalid bitmap header";
-		case invalid_buffer_size:
-			return "Invalid buffer size";
-		case buffer_read_error:
-			return "Buffer read error";
 		default:
 			return {};
 		}
@@ -46,7 +42,7 @@ struct bitmap_reader_error_category : std::error_category
 };
 
 const bitmap_reader_error_category bitmap_reader_error_category_instance;
-}
+} // namespace
 
 namespace pe_bliss::resources
 {
@@ -57,14 +53,15 @@ std::error_code make_error_code(bitmap_reader_errc e) noexcept
 }
 
 bitmap bitmap_from_resource(buffers::input_buffer_ptr buf,
-	bool allow_virtual_memory)
+	const bitmap_read_options& options)
 {
 	assert(!!buf);
 
-	auto buffer_size = allow_virtual_memory ? buf->size() : buf->physical_size();
+	auto buffer_size = options.allow_virtual_memory
+		? buf->size() : buf->physical_size();
 
 	if (buffer_size < bitmap::info_header_type::packed_size)
-		throw pe_error(bitmap_reader_errc::invalid_buffer_size);
+		throw pe_error(resource_reader_errc::invalid_buffer_size);
 
 	utilities::safe_uint<std::uint32_t> bitmap_size
 		= bitmap::file_header_type::packed_size;
@@ -74,18 +71,18 @@ bitmap bitmap_from_resource(buffers::input_buffer_ptr buf,
 	}
 	catch (const std::system_error&)
 	{
-		std::throw_with_nested(pe_error(bitmap_reader_errc::invalid_buffer_size));
+		std::throw_with_nested(pe_error(resource_reader_errc::invalid_buffer_size));
 	}
 
 	bitmap result;
 	try
 	{
 		buffers::input_buffer_stateful_wrapper_ref ref(*buf);
-		result.get_info_header().deserialize(ref, allow_virtual_memory);
+		result.get_info_header().deserialize(ref, options.allow_virtual_memory);
 	}
 	catch (const std::system_error&)
 	{
-		std::throw_with_nested(pe_error(bitmap_reader_errc::buffer_read_error));
+		std::throw_with_nested(pe_error(resource_reader_errc::buffer_read_error));
 	}
 
 	utilities::safe_uint<std::uint32_t> off_bits
@@ -116,7 +113,8 @@ bitmap bitmap_from_resource(buffers::input_buffer_ptr buf,
 	//Size of bitmap
 	result.get_file_header()->size = bitmap_size.value();
 
-	result.get_buffer() = buffers::reduce(buf, bitmap::info_header_type::packed_size);
+	result.get_buffer().deserialize(buffers::reduce(buf,
+		bitmap::info_header_type::packed_size), options.copy_memory);
 	return result;
 }
 
