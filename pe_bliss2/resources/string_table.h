@@ -18,17 +18,11 @@ public:
 
 public:
 	[[nodiscard]]
-	static id_type string_to_table_id(id_type string_id) noexcept
-	{
-		return (string_id >> 4u) + 1u;
-	}
+	static id_type string_to_table_id(id_type string_id) noexcept;
 
 	[[nodiscard]]
 	static id_type table_to_string_id(id_type table_id,
-		std::uint8_t index) noexcept
-	{
-		return ((table_id - 1u) << 4u) + index;
-	}
+		std::uint8_t index) noexcept;
 
 public:
 	[[nodiscard]] id_type get_id() const noexcept
@@ -39,6 +33,11 @@ public:
 	void set_id(id_type id) noexcept
 	{
 		table_id_ = id;
+	}
+
+	[[nodiscard]] bool is_valid_id() const noexcept
+	{
+		return table_id_ != 0u;
 	}
 
 	[[nodiscard]] string_list_type& get_list() & noexcept
@@ -57,7 +56,7 @@ public:
 	}
 
 private:
-	id_type table_id_{};
+	id_type table_id_{1u};
 	string_list_type list_{};
 };
 

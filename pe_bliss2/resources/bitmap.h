@@ -4,11 +4,6 @@
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/resources/bitmap.h"
 
-namespace buffers
-{
-class output_buffer_interface;
-} //namespace buffers
-
 namespace pe_bliss::resources
 {
 
@@ -54,9 +49,6 @@ public:
 	{
 		return buf_;
 	}
-
-	void serialize(buffers::output_buffer_interface& output,
-		bool write_virtual_part);
 
 private:
 	file_header_type fh_;

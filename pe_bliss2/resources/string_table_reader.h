@@ -1,8 +1,11 @@
 #pragma once
 
-#include "buffers/input_buffer_interface.h"
-
 #include "pe_bliss2/resources/string_table.h"
+
+namespace buffers
+{
+class input_buffer_stateful_wrapper_ref;
+} //namespace buffers
 
 namespace pe_bliss::resources
 {
@@ -14,7 +17,8 @@ struct [[nodiscard]] string_table_read_options
 };
 
 [[nodiscard]]
-string_table string_table_from_resource(buffers::input_buffer_ptr buf,
+string_table string_table_from_resource(
+	buffers::input_buffer_stateful_wrapper_ref& buf,
 	const string_table_read_options& options = {});
 
 } //namespace pe_bliss::resources
