@@ -24,7 +24,7 @@ struct [[nodiscard]] bitmap_read_options
 std::error_code make_error_code(bitmap_reader_errc) noexcept;
 
 [[nodiscard]]
-bitmap bitmap_from_resource(buffers::input_buffer_ptr buf,
+bitmap bitmap_from_resource(const buffers::input_buffer_ptr& buf,
 	const bitmap_read_options& options = {});
 
 } //namespace pe_bliss::resources

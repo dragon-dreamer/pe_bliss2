@@ -6,11 +6,8 @@
 #include <string>
 #include <system_error>
 
-#include <boost/endian/conversion.hpp>
-
 #include "buffers/input_buffer_interface.h"
 #include "buffers/input_buffer_section.h"
-#include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/detail/resources/bitmap.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
@@ -52,7 +49,7 @@ std::error_code make_error_code(bitmap_reader_errc e) noexcept
 	return { static_cast<int>(e), bitmap_reader_error_category_instance };
 }
 
-bitmap bitmap_from_resource(buffers::input_buffer_ptr buf,
+bitmap bitmap_from_resource(const buffers::input_buffer_ptr& buf,
 	const bitmap_read_options& options)
 {
 	assert(!!buf);
