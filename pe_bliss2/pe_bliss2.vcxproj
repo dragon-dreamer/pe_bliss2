@@ -54,6 +54,7 @@
     <ClInclude Include="detail\packed_struct_base.h" />
     <ClInclude Include="detail\resources\bitmap.h" />
     <ClInclude Include="detail\resources\image_resource_directory.h" />
+    <ClInclude Include="detail\resources\message_table.h" />
     <ClInclude Include="detail\rich\rich_header_utils.h" />
     <ClInclude Include="detail\tls\image_tls_directory.h" />
     <ClInclude Include="dos\dos_header.h" />
@@ -115,6 +116,8 @@
     <ClInclude Include="resources\bitmap.h" />
     <ClInclude Include="resources\bitmap_reader.h" />
     <ClInclude Include="resources\bitmap_writer.h" />
+    <ClInclude Include="resources\message_table.h" />
+    <ClInclude Include="resources\message_table_reader.h" />
     <ClInclude Include="resources\resource_directory.h" />
     <ClInclude Include="resources\resource_directory_loader.h" />
     <ClInclude Include="resources\resource_reader.h" />
@@ -223,6 +226,8 @@
     <ClCompile Include="relocations\relocation_directory_loader.cpp" />
     <ClCompile Include="resources\bitmap_writer.cpp" />
     <ClCompile Include="resources\bitmap_reader.cpp" />
+    <ClCompile Include="resources\message_table.cpp" />
+    <ClCompile Include="resources\message_table_reader.cpp" />
     <ClCompile Include="resources\resource_directory.cpp" />
     <ClCompile Include="resources\resource_directory_loader.cpp" />
     <ClCompile Include="resources\resource_reader.cpp" />

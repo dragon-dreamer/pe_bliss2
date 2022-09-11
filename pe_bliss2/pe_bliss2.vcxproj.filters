@@ -516,6 +516,15 @@
     <ClInclude Include="resources\string_table_writer.h">
       <Filter>Header Files\resources</Filter>
     </ClInclude>
+    <ClInclude Include="resources\message_table.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\resources\message_table.h">
+      <Filter>Header Files\detail\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\message_table_reader.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -753,6 +762,12 @@
       <Filter>Source Files\resources</Filter>
     </ClCompile>
     <ClCompile Include="resources\string_table_writer.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\message_table_reader.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\message_table.cpp">
       <Filter>Source Files\resources</Filter>
     </ClCompile>
   </ItemGroup>
