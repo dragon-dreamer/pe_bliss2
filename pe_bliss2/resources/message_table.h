@@ -21,6 +21,45 @@ enum class message_encoding
 	utf8 = detail::resources::message_resource_utf8
 };
 
+enum class message_severity : std::uint32_t
+{
+	success = detail::resources::error_severity_success,
+	informational = detail::resources::error_severity_informational,
+	warning = detail::resources::error_severity_warning,
+	error = detail::resources::error_severity_error
+};
+
+[[nodiscard]] constexpr message_severity get_message_severity(
+	std::uint32_t message_id) noexcept
+{
+	return static_cast<message_severity>(
+		message_id & detail::resources::severity_mask);
+}
+
+[[nodiscard]] constexpr std::uint32_t set_message_severity(
+	std::uint32_t message_id, message_severity severity) noexcept
+{
+	message_id &= ~detail::resources::severity_mask;
+	message_id |= static_cast<std::uint32_t>(severity);
+	return message_id;
+}
+
+[[nodiscard]] constexpr std::uint16_t get_message_facility(
+	std::uint32_t message_id) noexcept
+{
+	return static_cast<std::uint16_t>(
+		(message_id & detail::resources::facility_mask) >> 16u);
+}
+
+[[nodiscard]] constexpr std::uint32_t set_message_facility(
+	std::uint32_t message_id, std::uint16_t facility) noexcept
+{
+	message_id &= ~detail::resources::facility_mask;
+	message_id |= (static_cast<std::uint32_t>(facility) << 16u)
+		& detail::resources::facility_mask;
+	return message_id;
+}
+
 template<message_encoding Encoding>
 class [[nodiscard]] message_string
 {
