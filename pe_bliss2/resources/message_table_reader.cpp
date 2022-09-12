@@ -115,10 +115,14 @@ void load_message(buffers::input_buffer_stateful_wrapper_ref& entry_buf,
 		value[index++] = ch;
 	}
 
+	// read nullbyte
+	total_physical_bytes_read += entry_buf.read(char_size,
+		reinterpret_cast<std::byte*>(&ch));
+
 	if (!allow_virtual_memory
-		&& total_physical_bytes_read != message.value().size() * char_size)
+		&& total_physical_bytes_read != (message.value().size() + 1u) * char_size)
 	{
-		message.value().resize(physical_bytes_read / char_size);
+		message.value().resize(total_physical_bytes_read / char_size);
 		entry.add_error(message_table_reader_errc::virtual_message_memory);
 	}
 
@@ -177,6 +181,12 @@ void load_entries(const message_table_read_options& options,
 				break;
 			default:
 				entry.add_error(message_table_reader_errc::invalid_message_block_encoding);
+				if (entry.get_descriptor()->length >
+					message_entry_details::descriptor_type::packed_size)
+				{
+					entry_buf.advance_rpos(entry.get_descriptor()->length -
+						message_entry_details::descriptor_type::packed_size);
+				}
 				break;
 			}
 		}
@@ -223,7 +233,7 @@ void load_blocks(buffers::input_buffer_stateful_wrapper_ref& buf,
 		{
 			total_entries = remaining_entries;
 			remaining_entries = 0;
-			block.add_error(message_table_reader_errc::too_many_messages);
+			table.add_error(message_table_reader_errc::too_many_messages);
 		}
 		else
 		{
