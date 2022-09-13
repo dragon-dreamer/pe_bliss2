@@ -69,6 +69,7 @@ The library is aimed at being able to provide as much information about the PE f
   - Resources:
     - Read (unit-tested)
     - Supported resource types:
+      - Accelerators (read-only, unit-tested)
       - Bitmap (read-write, unit-tested)
       - String tables (read-write, unit-tested)
       - Message tables (read-only, unit-tested)
@@ -83,7 +84,6 @@ The following features are planned:
 - Porting of missing old functionality from the PE Bliss library.
 - Directory support:
   - Resources
-    - Accelerators
     - Dialogs
     - Icons, Cursors
     - Manifests
