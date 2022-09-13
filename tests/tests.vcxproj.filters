@@ -288,6 +288,12 @@
     <ClCompile Include="tests\pe_bliss2\directories\message_table_reader_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2\directories</Filter>
     </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\accelerator_table_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\accelerator_table_loader_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">
