@@ -525,6 +525,15 @@
     <ClInclude Include="resources\message_table_reader.h">
       <Filter>Header Files\resources</Filter>
     </ClInclude>
+    <ClInclude Include="resources\accelerator_table.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\resources\accelerator.h">
+      <Filter>Header Files\detail\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\accelerator_table_reader.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -768,6 +777,12 @@
       <Filter>Source Files\resources</Filter>
     </ClCompile>
     <ClCompile Include="resources\message_table.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\accelerator_table_reader.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\accelerator_table.cpp">
       <Filter>Source Files\resources</Filter>
     </ClCompile>
   </ItemGroup>
