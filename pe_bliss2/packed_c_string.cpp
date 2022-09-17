@@ -3,6 +3,8 @@
 #include <cstddef>
 #include <string>
 
+#include <boost/endian/conversion.hpp>
+
 #include "buffers/input_buffer_stateful_wrapper.h"
 #include "buffers/output_buffer_interface.h"
 #include "pe_bliss2/pe_error.h"
@@ -11,16 +13,21 @@
 namespace pe_bliss
 {
 
-void packed_c_string::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
+template<typename String>
+void packed_c_string_base<String>::deserialize(
+	buffers::input_buffer_stateful_wrapper_ref& buf,
 	bool allow_virtual_memory)
 {
 	buffers::serialized_data_state state(buf);
-
-	std::byte ch{};
-	static constexpr std::byte nullbyte{};
-	std::string value;
-	while (buf.read(sizeof(ch), &ch))
+	
+	typename string_type::value_type ch{};
+	static constexpr typename string_type::value_type nullbyte{};
+	string_type value;
+	std::size_t read_bytes{};
+	while ((read_bytes = buf.read(sizeof(ch),
+		reinterpret_cast<std::byte*>(&ch))) == sizeof(ch))
 	{
+		boost::endian::little_to_native_inplace(ch);
 		if (ch == nullbyte)
 		{
 			value_ = std::move(value);
@@ -28,7 +35,13 @@ void packed_c_string::deserialize(buffers::input_buffer_stateful_wrapper_ref& bu
 			virtual_nullbyte_ = false;
 			return;
 		}
-		value.push_back(std::to_integer<char>(ch));
+		value.push_back(ch);
+	}
+
+	if (read_bytes)
+	{
+		boost::endian::little_to_native_inplace(ch);
+		value.push_back(ch);
 	}
 
 	if (!allow_virtual_memory)
@@ -39,25 +52,32 @@ void packed_c_string::deserialize(buffers::input_buffer_stateful_wrapper_ref& bu
 	state_ = state;
 }
 
-std::size_t packed_c_string::serialize(buffers::output_buffer_interface& buf,
+template<typename String>
+std::size_t packed_c_string_base<String>::serialize(
+	buffers::output_buffer_interface& buf,
 	bool write_virtual_part) const
 {
 	bool write_nullbyte = !virtual_nullbyte_ || write_virtual_part;
-	std::size_t size = value_.size() + write_nullbyte;
+	std::size_t size = (value_.size() + write_nullbyte)
+		* sizeof(typename string_type::value_type);
 	buf.write(size, reinterpret_cast<const std::byte*>(value_.data()));
 	return size;
 }
 
-std::size_t packed_c_string::serialize(std::byte* buf,
+template<typename String>
+std::size_t packed_c_string_base<String>::serialize(std::byte* buf,
 	std::size_t max_size, bool write_virtual_part) const
 {
-	auto size = value_.size();
+	std::size_t size = value_.size() * sizeof(typename string_type::value_type);
 	if (!virtual_nullbyte_ || write_virtual_part)
-		++size;
+		size += sizeof(typename string_type::value_type);
 	if (size > max_size)
 		throw pe_error(utilities::generic_errc::buffer_overrun);
 	std::memcpy(buf, value_.data(), size);
 	return size;
 }
+
+template packed_c_string_base<std::string>;
+template packed_c_string_base<std::u16string>;
 
 } //namespace pe_bliss

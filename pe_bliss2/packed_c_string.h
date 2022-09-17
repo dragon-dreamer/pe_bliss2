@@ -17,24 +17,25 @@ class output_buffer_interface;
 namespace pe_bliss
 {
 
-template<typename T>
-concept convertible_to_string = std::convertible_to<T, std::string>;
-
-class [[nodiscard]] packed_c_string
+template<typename String>
+class [[nodiscard]] packed_c_string_base
 {
 public:
-	packed_c_string() = default;
+	using string_type = String;
+
+public:
+	packed_c_string_base() = default;
 
 	template<typename... Args>
-		requires(std::constructible_from<std::string, Args...>)
-	explicit packed_c_string(Args&&... args)
-		noexcept(noexcept(std::string(std::forward<Args>(args)...)))
+		requires(std::constructible_from<string_type, Args...>)
+	explicit packed_c_string_base(Args&&... args)
+		noexcept(noexcept(string_type(std::forward<Args>(args)...)))
 		: value_(std::forward<Args>(args)...)
 	{
 	}
 
-	template<convertible_to_string String>
-	packed_c_string& operator=(String&& str)
+	template<std::convertible_to<string_type> String>
+	packed_c_string_base& operator=(String&& str)
 		noexcept(noexcept(value_ = std::forward<String>(str)))
 	{
 		value_ = std::forward<String>(str);
@@ -53,7 +54,8 @@ public:
 
 	[[nodiscard]] std::size_t physical_size() const noexcept
 	{
-		return value_.size() + !virtual_nullbyte_;
+		return (value_.size() + !virtual_nullbyte_)
+			* sizeof(typename string_type::value_type);
 	}
 
 	[[nodiscard]]
@@ -73,17 +75,17 @@ public:
 		return virtual_nullbyte_;
 	}
 
-	[[nodiscard]] const std::string& value() const & noexcept
+	[[nodiscard]] const string_type& value() const & noexcept
 	{
 		return value_;
 	}
 
-	[[nodiscard]] std::string& value() & noexcept
+	[[nodiscard]] string_type& value() & noexcept
 	{
 		return value_;
 	}
 
-	[[nodiscard]] std::string value() && noexcept
+	[[nodiscard]] string_type value() && noexcept
 	{
 		return std::move(value_);
 	}
@@ -94,21 +96,24 @@ public:
 	}
 
 	[[nodiscard]]
-	friend auto operator<=>(const packed_c_string& l, const packed_c_string& r) noexcept
+	friend auto operator<=>(const packed_c_string_base& l, const packed_c_string_base& r) noexcept
 	{
 		return l.value() <=> r.value();
 	}
 
 	[[nodiscard]]
-	friend bool operator==(const packed_c_string& l, const packed_c_string& r) noexcept
+	friend bool operator==(const packed_c_string_base& l, const packed_c_string_base& r) noexcept
 	{
 		return l.value() == r.value();
 	}
 
 private:
-	std::string value_;
+	string_type value_;
 	buffers::serialized_data_state state_;
 	bool virtual_nullbyte_ = false;
 };
+
+using packed_c_string = packed_c_string_base<std::string>;
+using packed_utf16_c_string = packed_c_string_base<std::string>;
 
 } //namespace pe_bliss
