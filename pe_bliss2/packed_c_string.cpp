@@ -16,7 +16,8 @@ namespace pe_bliss
 template<typename String>
 void packed_c_string_base<String>::deserialize(
 	buffers::input_buffer_stateful_wrapper_ref& buf,
-	bool allow_virtual_memory)
+	bool allow_virtual_memory,
+	std::size_t max_physical_size)
 {
 	buffers::serialized_data_state state(buf);
 	
@@ -27,6 +28,10 @@ void packed_c_string_base<String>::deserialize(
 	while ((read_bytes = buf.read(sizeof(ch),
 		reinterpret_cast<std::byte*>(&ch))) == sizeof(ch))
 	{
+		if (max_physical_size < sizeof(ch))
+			throw pe_error(utilities::generic_errc::buffer_overrun);
+		max_physical_size -= sizeof(ch);
+
 		boost::endian::little_to_native_inplace(ch);
 		if (ch == nullbyte)
 		{
@@ -40,6 +45,8 @@ void packed_c_string_base<String>::deserialize(
 
 	if (read_bytes)
 	{
+		if (max_physical_size < read_bytes)
+			throw pe_error(utilities::generic_errc::buffer_overrun);
 		boost::endian::little_to_native_inplace(ch);
 		value.push_back(ch);
 	}

@@ -201,3 +201,18 @@ TEST(PackedCStringTests, DeserializeTest)
 		EXPECT_EQ(str.value(), test_string);
 	}
 }
+
+TEST(PackedCStringTests, DeserializeLimitTest)
+{
+	buffers::input_memory_buffer buffer(
+		reinterpret_cast<const std::byte*>(test_string),
+		test_string_length + 1u);
+	
+	buffers::input_buffer_stateful_wrapper_ref ref(buffer);
+	pe_bliss::packed_c_string str;
+	EXPECT_NO_THROW(str.deserialize(ref, true, test_string_length + 1u));
+	EXPECT_EQ(str.value(), test_string);
+
+	EXPECT_THROW(str.deserialize(ref, true, test_string_length), std::system_error);
+	EXPECT_EQ(str.value(), test_string);
+}
