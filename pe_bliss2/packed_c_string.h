@@ -60,6 +60,11 @@ public:
 			* sizeof(typename string_type::value_type);
 	}
 
+	[[nodiscard]] std::size_t data_size() const noexcept
+	{
+		return (value_.size() + 1u) * sizeof(typename string_type::value_type);
+	}
+
 	[[nodiscard]]
 	constexpr buffers::serialized_data_state& get_state() noexcept
 	{
@@ -116,6 +121,6 @@ private:
 };
 
 using packed_c_string = packed_c_string_base<std::string>;
-using packed_utf16_c_string = packed_c_string_base<std::string>;
+using packed_utf16_c_string = packed_c_string_base<std::u16string>;
 
 } //namespace pe_bliss

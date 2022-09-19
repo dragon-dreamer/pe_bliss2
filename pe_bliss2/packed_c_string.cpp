@@ -43,10 +43,11 @@ void packed_c_string_base<String>::deserialize(
 		value.push_back(ch);
 	}
 
+	if (max_physical_size < sizeof(ch)) // virtual nullbyte
+		throw pe_error(utilities::generic_errc::buffer_overrun);
+
 	if (read_bytes)
 	{
-		if (max_physical_size < read_bytes)
-			throw pe_error(utilities::generic_errc::buffer_overrun);
 		boost::endian::little_to_native_inplace(ch);
 		value.push_back(ch);
 	}
