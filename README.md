@@ -73,6 +73,7 @@ The library is aimed at being able to provide as much information about the PE f
       - Bitmap (read-write, unit-tested)
       - String tables (read-write, unit-tested)
       - Message tables (read-only, unit-tested)
+      - Version info (read-only, untested)
 - Address conversions (RVA/VA/file offsets, unit-tested).
 - Overlay at the end of file parsing (unit-tested).
 - Simple console dumper of PE/PE+ files (no extended configuration yet).
@@ -87,7 +88,6 @@ The following features are planned:
     - Dialogs
     - Icons, Cursors
     - Manifests
-    - Version info
     - Menu
     - Toolbar
     - Ribbon
