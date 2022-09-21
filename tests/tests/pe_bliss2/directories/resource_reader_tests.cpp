@@ -7,6 +7,7 @@
 
 #include "buffers/ref_buffer.h"
 #include "pe_bliss2/packed_utf16_string.h"
+#include "pe_bliss2/resources/lcid.h"
 #include "pe_bliss2/resources/resource_reader.h"
 #include "tests/tests/pe_bliss2/pe_error_helper.h"
 
@@ -93,7 +94,7 @@ const std::vector resource_data{
 
 template<typename NameOrId>
 resource_directory create_resources(resource_type Type,
-	NameOrId&& name_or_id, resource_language_type lang)
+	NameOrId&& name_or_id, lcid_type lang)
 {
 	resource_directory dir;
 
@@ -278,8 +279,7 @@ TEST(ResourceReaderTests, ForEachResource)
 
 	{
 		MockFunction<bool(resource_directory_entry::name_or_id_type&,
-			resource_language_type,
-			buffers::ref_buffer&)> mockCallback;
+			lcid_type, buffers::ref_buffer&)> mockCallback;
 
 		InSequence seq;
 		EXPECT_CALL(mockCallback, Call(VariantWith<
@@ -298,8 +298,7 @@ TEST(ResourceReaderTests, ForEachResource)
 
 	{
 		MockFunction<bool(const resource_directory_entry::name_or_id_type&,
-			resource_language_type,
-			const buffers::ref_buffer&)> mockCallback;
+			lcid_type, const buffers::ref_buffer&)> mockCallback;
 
 		InSequence seq;
 		EXPECT_CALL(mockCallback, Call(VariantWith<

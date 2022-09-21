@@ -56,6 +56,7 @@
     <ClInclude Include="detail\resources\bitmap.h" />
     <ClInclude Include="detail\resources\image_resource_directory.h" />
     <ClInclude Include="detail\resources\message_table.h" />
+    <ClInclude Include="detail\resources\version_info.h" />
     <ClInclude Include="detail\rich\rich_header_utils.h" />
     <ClInclude Include="detail\tls\image_tls_directory.h" />
     <ClInclude Include="dos\dos_header.h" />
@@ -119,6 +120,8 @@
     <ClInclude Include="resources\bitmap.h" />
     <ClInclude Include="resources\bitmap_reader.h" />
     <ClInclude Include="resources\bitmap_writer.h" />
+    <ClInclude Include="resources\cpid.h" />
+    <ClInclude Include="resources\lcid.h" />
     <ClInclude Include="resources\message_table.h" />
     <ClInclude Include="resources\message_table_reader.h" />
     <ClInclude Include="resources\resource_directory.h" />
@@ -129,6 +132,9 @@
     <ClInclude Include="resources\string_table.h" />
     <ClInclude Include="resources\string_table_reader.h" />
     <ClInclude Include="resources\string_table_writer.h" />
+    <ClInclude Include="resources\version_info.h" />
+    <ClInclude Include="resources\version_info_block.h" />
+    <ClInclude Include="resources\version_info_reader.h" />
     <ClInclude Include="rich\compid_database.h" />
     <ClInclude Include="rich\rich_compid.h" />
     <ClInclude Include="rich\rich_header.h" />
@@ -231,6 +237,8 @@
     <ClCompile Include="resources\accelerator_table_reader.cpp" />
     <ClCompile Include="resources\bitmap_writer.cpp" />
     <ClCompile Include="resources\bitmap_reader.cpp" />
+    <ClCompile Include="resources\cpid.cpp" />
+    <ClCompile Include="resources\lcid.cpp" />
     <ClCompile Include="resources\message_table.cpp" />
     <ClCompile Include="resources\message_table_reader.cpp" />
     <ClCompile Include="resources\resource_directory.cpp" />
@@ -240,6 +248,8 @@
     <ClCompile Include="resources\string_table.cpp" />
     <ClCompile Include="resources\string_table_reader.cpp" />
     <ClCompile Include="resources\string_table_writer.cpp" />
+    <ClCompile Include="resources\version_info.cpp" />
+    <ClCompile Include="resources\version_info_reader.cpp" />
     <ClCompile Include="rich\compid_database.cpp" />
     <ClCompile Include="rich\rich_compid.cpp" />
     <ClCompile Include="rich\rich_header.cpp" />

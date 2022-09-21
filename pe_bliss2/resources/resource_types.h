@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "pe_bliss2/packed_utf16_string.h"
+#include "pe_bliss2/resources/lcid.h"
 
 namespace pe_bliss::resources
 {
@@ -44,10 +45,9 @@ enum class manifest_resource_id : std::uint32_t
 
 using resource_type_list_type = std::vector<resource_type>;
 using resource_id_type = std::uint32_t;
-using resource_language_type = std::uint32_t;
 using resource_id_list_type = std::vector<resource_id_type>;
 using resource_name_type = packed_utf16_string;
 using resource_name_list_type = std::vector<resource_name_type>;
-using resource_language_list_type = std::vector<std::uint32_t>;
+using resource_language_list_type = std::vector<lcid_type>;
 
 } //namespace pe_bliss::resources

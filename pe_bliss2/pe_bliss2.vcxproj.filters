@@ -534,6 +534,24 @@
     <ClInclude Include="resources\accelerator_table_reader.h">
       <Filter>Header Files\resources</Filter>
     </ClInclude>
+    <ClInclude Include="detail\resources\version_info.h">
+      <Filter>Header Files\detail\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\version_info.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\lcid.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\cpid.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\version_info_reader.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\version_info_block.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -783,6 +801,18 @@
       <Filter>Source Files\resources</Filter>
     </ClCompile>
     <ClCompile Include="resources\accelerator_table.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\lcid.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\cpid.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\version_info_reader.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\version_info.cpp">
       <Filter>Source Files\resources</Filter>
     </ClCompile>
   </ItemGroup>
