@@ -105,10 +105,12 @@ std::optional<translation> parse_translation(std::u16string_view text)
 	translation result{};
 	if (std::from_chars(translation_str.data(),
 		translation_str.data() + lcid_length,
-		result.lcid, lcid_cpid_base).ec != std::errc{}
+		result.lcid, lcid_cpid_base)
+		!= std::from_chars_result{ translation_str.data() + lcid_length }
 		|| std::from_chars(translation_str.data() + lcid_length,
 			translation_str.data() + lcid_length + cpid_length,
-			result.cpid, lcid_cpid_base).ec != std::errc{})
+			result.cpid, lcid_cpid_base)
+			!= std::from_chars_result{ translation_str.data() + lcid_length + cpid_length })
 	{
 		return {};
 	}

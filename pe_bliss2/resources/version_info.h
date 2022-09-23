@@ -21,7 +21,7 @@
 namespace pe_bliss::resources
 {
 
-struct [[nodiscard]] translation
+struct [[nodiscard]] translation final
 {
 	std::uint16_t lcid{};
 	std::uint16_t cpid{};
@@ -103,18 +103,18 @@ enum class file_type
 enum class driver_file_subtype
 {
 	unknown = detail::resources::vft2_unknown,
-	drv_printer = detail::resources::vft2_drv_printer,
-	drv_keyboard = detail::resources::vft2_drv_keyboard,
-	drv_language = detail::resources::vft2_drv_language,
-	drv_display = detail::resources::vft2_drv_display,
-	drv_mouse = detail::resources::vft2_drv_mouse,
-	drv_network = detail::resources::vft2_drv_network,
-	drv_system = detail::resources::vft2_drv_system,
-	drv_installable = detail::resources::vft2_drv_installable,
-	drv_sound = detail::resources::vft2_drv_sound,
-	drv_comm = detail::resources::vft2_drv_comm,
-	drv_inputmethod = detail::resources::vft2_drv_inputmethod,
-	drv_versioned_printer = detail::resources::vft2_drv_versioned_printer
+	printer = detail::resources::vft2_drv_printer,
+	keyboard = detail::resources::vft2_drv_keyboard,
+	language = detail::resources::vft2_drv_language,
+	display = detail::resources::vft2_drv_display,
+	mouse = detail::resources::vft2_drv_mouse,
+	network = detail::resources::vft2_drv_network,
+	system = detail::resources::vft2_drv_system,
+	installable = detail::resources::vft2_drv_installable,
+	sound = detail::resources::vft2_drv_sound,
+	comm = detail::resources::vft2_drv_comm,
+	inputmethod = detail::resources::vft2_drv_inputmethod,
+	versioned_printer = detail::resources::vft2_drv_versioned_printer
 };
 
 enum class font_file_subtype
@@ -137,7 +137,7 @@ struct file_flags final
 	};
 };
 
-class file_version_info
+class [[nodiscard]] file_version_info
 {
 public:
 	using descriptor_type = packed_struct<detail::resources::vs_fixedfileinfo>;
