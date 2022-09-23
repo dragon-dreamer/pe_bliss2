@@ -209,6 +209,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\string_table_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\tls_directory_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\tls_loader_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\version_info_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\x64_exceptions_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\x64_exception_directory_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\dos_header_tests.cpp" />
