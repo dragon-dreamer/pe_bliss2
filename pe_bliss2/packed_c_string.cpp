@@ -43,17 +43,22 @@ void packed_c_string_base<String>::deserialize(
 		value.push_back(ch);
 	}
 
+	if (!allow_virtual_memory)
+		throw pe_error(utilities::generic_errc::buffer_overrun);
+
 	if (max_physical_size < sizeof(ch)) // virtual nullbyte
 		throw pe_error(utilities::generic_errc::buffer_overrun);
 
-	if (read_bytes)
+	if (read_bytes && ch)
 	{
+		//ch has a non-zero value, this was not a nullbyte
 		boost::endian::little_to_native_inplace(ch);
 		value.push_back(ch);
+		buf.advance_rpos(sizeof(ch));
+		max_physical_size -= sizeof(ch);
+		if (max_physical_size < sizeof(ch)) // virtual nullbyte
+			throw pe_error(utilities::generic_errc::buffer_overrun);
 	}
-
-	if (!allow_virtual_memory)
-		throw pe_error(utilities::generic_errc::buffer_overrun);
 
 	value_ = std::move(value);
 	virtual_nullbyte_ = true;
