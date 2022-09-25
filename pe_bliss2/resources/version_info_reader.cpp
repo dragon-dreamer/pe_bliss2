@@ -1,5 +1,6 @@
 #include "pe_bliss2/resources/version_info_reader.h"
 
+#include <cstdint>
 #include <string>
 #include <system_error>
 
@@ -41,6 +42,8 @@ struct version_info_reader_error_category : std::error_category
 			return "Unknown version info block value type";
 		case invalid_string_value_length:
 			return "Actual string value length is smaller than version info block value length";
+		case block_tree_is_too_deep:
+			return "Version block tree is too deep";
 		default:
 			return {};
 		}
@@ -92,7 +95,8 @@ bool align_buffer(
 bool version_info_from_resource_impl(
 	version_info_block_details& block,
 	buffers::input_buffer_stateful_wrapper& buf,
-	const version_info_read_options& options)
+	const version_info_read_options& options,
+	std::uint32_t depth_left)
 {
 	{
 		const auto file_offset = buf.get_buffer()->absolute_offset() + buf.rpos();
@@ -197,19 +201,35 @@ bool version_info_from_resource_impl(
 	if (!remaining_block_length)
 		return true;
 
+	if (!depth_left)
+	{
+		block.add_error(version_info_reader_errc::block_tree_is_too_deep);
+
+		try
+		{
+			buf.advance_rpos(remaining_block_length);
+		}
+		catch (const std::system_error&)
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	try
 	{
 		auto child_section = buffers::reduce(buf.get_buffer(),
 			buf.rpos(), remaining_block_length);
 		buffers::input_buffer_stateful_wrapper child_buf(child_section);
-
 		while (child_buf.rpos() != child_buf.size())
 		{
 			if (!align_buffer(block, child_buf, &remaining_block_length))
 				return false;
 			auto start_rpos = child_buf.rpos();
 			if (!version_info_from_resource_impl(
-				block.get_children().emplace_back(), child_buf, options))
+				block.get_children().emplace_back(), child_buf, options,
+				depth_left - 1u))
 			{
 				return false;
 			}
@@ -243,7 +263,7 @@ version_info_block_details version_info_from_resource(
 	const version_info_read_options& options)
 {
 	version_info_block_details result;
-	version_info_from_resource_impl(result, buf, options);
+	version_info_from_resource_impl(result, buf, options, options.max_depth);
 	if (buf.rpos() != buf.size())
 		result.add_error(version_info_reader_errc::excessive_data_in_buffer);
 	return result;

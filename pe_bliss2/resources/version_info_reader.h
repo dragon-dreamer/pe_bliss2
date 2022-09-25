@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+#include <limits>
 #include <system_error>
 #include <type_traits>
 
@@ -23,7 +25,8 @@ enum class version_info_reader_errc
 	excessive_data_in_buffer,
 	child_read_error,
 	unknown_value_type,
-	invalid_string_value_length
+	invalid_string_value_length,
+	block_tree_is_too_deep
 };
 
 std::error_code make_error_code(version_info_reader_errc) noexcept;
@@ -32,6 +35,7 @@ struct [[nodiscard]] version_info_read_options
 {
 	bool allow_virtual_memory = false;
 	bool copy_value_memory = false;
+	std::uint32_t max_depth = 0xffu;
 };
 
 version_info_block_details version_info_from_resource(
