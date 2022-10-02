@@ -198,7 +198,7 @@ enum class lcid_language
 [[nodiscard]]
 std::optional<std::string_view> lcid_language_to_string(lcid_language lang) noexcept;
 
-struct lcid_info
+struct [[nodiscard]] lcid_info
 {
 	lcid_type lcid;
 	lcid_language language;
@@ -209,5 +209,8 @@ struct lcid_info
 
 [[nodiscard]]
 std::optional<lcid_info> get_lcid_info(lcid_type lcid) noexcept;
+
+[[nodiscard]]
+std::optional<lcid_info> get_lcid_info(std::string_view lang_code) noexcept;
 
 } //namespace pe_bliss::resources
