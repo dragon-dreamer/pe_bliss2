@@ -89,6 +89,7 @@ The following features are planned:
     - Icons, Cursors
     - Manifests
     - Menu
+    - MUI
     - Toolbar
     - Ribbon
   - Debug
