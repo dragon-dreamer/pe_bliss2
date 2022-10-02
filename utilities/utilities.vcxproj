@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="generic_error.h" />
+    <ClInclude Include="hash.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="safe_uint.h" />
     <ClInclude Include="scoped_guard.h" />
