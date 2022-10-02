@@ -38,6 +38,7 @@ struct [[nodiscard]] version_info_read_options
 	std::uint32_t max_depth = 0xffu;
 };
 
+[[nodiscard]]
 version_info_block_details version_info_from_resource(
 	buffers::input_buffer_stateful_wrapper& buf,
 	const version_info_read_options& options = {});
