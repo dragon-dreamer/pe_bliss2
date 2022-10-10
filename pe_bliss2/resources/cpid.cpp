@@ -133,9 +133,10 @@ std::string_view get_cpid_name_impl(code_page cpid) noexcept
 	case iso_8859_15: return "iso-8859-15";
 	case x_europa: return "x-Europa";
 	case iso_8859_8_i: return "iso-8859-8-i";
-	case iso_2022_jp_no_halfwidth: return "iso-2022-jp";
+	case iso_2022_jp_no_halfwidth: [[fallthrough]];
+	case iso_2022_jp_jis_x_0201_1989:
+		return "iso-2022-jp";
 	case csiso2022jp: return "csISO2022JP";
-	case iso_2022_jp_jis_x_0201_1989: return "iso-2022-jp";
 	case iso_2022_kr: return "iso-2022-kr";
 	case x_cp50227: return "x-cp50227";
 	case iso_2022_traditional_chinese: return "ISO 2022 Traditional Chinese";
