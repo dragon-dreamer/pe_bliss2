@@ -121,6 +121,7 @@
     <ClInclude Include="resources\bitmap_reader.h" />
     <ClInclude Include="resources\bitmap_writer.h" />
     <ClInclude Include="resources\cpid.h" />
+    <ClInclude Include="resources\guid.h" />
     <ClInclude Include="resources\lcid.h" />
     <ClInclude Include="resources\message_table.h" />
     <ClInclude Include="resources\message_table_reader.h" />
@@ -238,6 +239,7 @@
     <ClCompile Include="resources\bitmap_writer.cpp" />
     <ClCompile Include="resources\bitmap_reader.cpp" />
     <ClCompile Include="resources\cpid.cpp" />
+    <ClCompile Include="resources\guid.cpp" />
     <ClCompile Include="resources\lcid.cpp" />
     <ClCompile Include="resources\message_table.cpp" />
     <ClCompile Include="resources\message_table_reader.cpp" />

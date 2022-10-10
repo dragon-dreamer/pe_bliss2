@@ -552,6 +552,9 @@
     <ClInclude Include="resources\version_info_block.h">
       <Filter>Header Files\resources</Filter>
     </ClInclude>
+    <ClInclude Include="resources\guid.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -813,6 +816,9 @@
       <Filter>Source Files\resources</Filter>
     </ClCompile>
     <ClCompile Include="resources\version_info.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\guid.cpp">
       <Filter>Source Files\resources</Filter>
     </ClCompile>
   </ItemGroup>
