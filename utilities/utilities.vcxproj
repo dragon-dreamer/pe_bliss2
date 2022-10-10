@@ -161,6 +161,7 @@
     <ClInclude Include="safe_uint.h" />
     <ClInclude Include="scoped_guard.h" />
     <ClInclude Include="static_class.h" />
+    <ClInclude Include="string.h" />
     <ClInclude Include="variant_helpers.h" />
   </ItemGroup>
   <ItemGroup>
