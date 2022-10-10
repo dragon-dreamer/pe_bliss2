@@ -618,7 +618,7 @@ std::optional<lcid_info> get_lcid_info(lcid_type lcid) noexcept
 	return {};
 }
 
-std::optional<lcid_info> get_lcid_info_impl(std::string_view lang_code) noexcept
+std::optional<lcid_info> get_lcid_info(std::string_view lang_code) noexcept
 {
 	static const std::unordered_map<std::string_view, lcid_type> lang_to_lcid{
 		{ "af", 0x0036u },
