@@ -251,6 +251,7 @@
     <ClCompile Include="tests\utilities\safe_uint_tests.cpp" />
     <ClCompile Include="tests\utilities\scoped_guard_tests.cpp" />
     <ClCompile Include="tests\utilities\static_class_tests.cpp" />
+    <ClCompile Include="tests\utilities\string_tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\buffers\buffers.vcxproj">

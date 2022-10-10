@@ -303,6 +303,9 @@
     <ClCompile Include="tests\pe_bliss2\directories\guid_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2\directories</Filter>
     </ClCompile>
+    <ClCompile Include="tests\utilities\string_tests.cpp">
+      <Filter>Source Files\tests\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">
