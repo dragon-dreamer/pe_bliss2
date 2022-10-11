@@ -42,4 +42,11 @@ constexpr void trim(std::string_view& str) noexcept
 		str.remove_suffix(1);
 }
 
+[[nodiscard]]
+constexpr std::string_view trim_copy(std::string_view str) noexcept
+{
+	trim(str);
+	return str;
+}
+
 } //namespace utilities
