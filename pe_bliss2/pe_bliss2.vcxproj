@@ -123,8 +123,12 @@
     <ClInclude Include="resources\cpid.h" />
     <ClInclude Include="resources\guid.h" />
     <ClInclude Include="resources\lcid.h" />
+    <ClInclude Include="resources\manifest-inl.h" />
+    <ClInclude Include="resources\manifest.h" />
+    <ClInclude Include="resources\manifest_accessor_interface.h" />
     <ClInclude Include="resources\message_table.h" />
     <ClInclude Include="resources\message_table_reader.h" />
+    <ClInclude Include="resources\pugixml_manifest_accessor.h" />
     <ClInclude Include="resources\resource_directory.h" />
     <ClInclude Include="resources\resource_directory_loader.h" />
     <ClInclude Include="resources\resource_reader.h" />
@@ -241,8 +245,11 @@
     <ClCompile Include="resources\cpid.cpp" />
     <ClCompile Include="resources\guid.cpp" />
     <ClCompile Include="resources\lcid.cpp" />
+    <ClCompile Include="resources\manifest.cpp" />
+    <ClCompile Include="resources\manifest_accessor_interface.cpp" />
     <ClCompile Include="resources\message_table.cpp" />
     <ClCompile Include="resources\message_table_reader.cpp" />
+    <ClCompile Include="resources\pugixml_manifest_accessor.cpp" />
     <ClCompile Include="resources\resource_directory.cpp" />
     <ClCompile Include="resources\resource_directory_loader.cpp" />
     <ClCompile Include="resources\resource_reader.cpp" />

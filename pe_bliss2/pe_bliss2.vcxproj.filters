@@ -552,6 +552,18 @@
     <ClInclude Include="resources\version_info_block.h">
       <Filter>Header Files\resources</Filter>
     </ClInclude>
+    <ClInclude Include="resources\manifest_accessor_interface.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\pugixml_manifest_accessor.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\manifest.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\manifest-inl.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
     <ClInclude Include="resources\guid.h">
       <Filter>Header Files\resources</Filter>
     </ClInclude>
@@ -816,6 +828,15 @@
       <Filter>Source Files\resources</Filter>
     </ClCompile>
     <ClCompile Include="resources\version_info.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\pugixml_manifest_accessor.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\manifest_accessor_interface.cpp">
+      <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="resources\manifest.cpp">
       <Filter>Source Files\resources</Filter>
     </ClCompile>
     <ClCompile Include="resources\guid.cpp">
