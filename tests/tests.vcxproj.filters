@@ -303,8 +303,14 @@
     <ClCompile Include="tests\pe_bliss2\directories\guid_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2\directories</Filter>
     </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\manifest_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories</Filter>
+    </ClCompile>
     <ClCompile Include="tests\utilities\string_tests.cpp">
       <Filter>Source Files\tests\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\pugixml_manifest_accessor_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
