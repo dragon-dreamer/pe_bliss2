@@ -72,6 +72,16 @@ The library is aimed at being able to provide as much information about the PE f
       - Accelerators (read-only, unit-tested)
       - Bitmap (read-write, unit-tested)
       - String tables (read-write, unit-tested)
+      - Manifests (read-only, unit-tested)
+        - Assembly and Application
+          - Assembly identity
+          - noInherit/noInheritable
+          - Supported OS list
+          - Dependencies
+          - Windows settings
+          - MSIX identity
+          - Requested execution level
+          - Files, COM classes, typelibs, COM interface proxy stubs, window classes
       - Message tables (read-only, unit-tested)
       - Version info (read-only, unit-tested)
 - Address conversions (RVA/VA/file offsets, unit-tested).
@@ -87,7 +97,6 @@ The following features are planned:
   - Resources
     - Dialogs
     - Icons, Cursors
-    - Manifests
     - Menu
     - MUI
     - Toolbar
