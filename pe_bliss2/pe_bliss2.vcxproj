@@ -34,6 +34,7 @@
     <ClInclude Include="core\optional_header_validator.h" />
     <ClInclude Include="core\overlay.h" />
     <ClInclude Include="detail\bound_import\image_bound_import_descriptor.h" />
+    <ClInclude Include="detail\debug\image_debug_directory.h" />
     <ClInclude Include="detail\endian_convert.h" />
     <ClInclude Include="detail\exceptions\image_runtime_function_entry.h" />
     <ClInclude Include="detail\exports\image_export_directory.h" />

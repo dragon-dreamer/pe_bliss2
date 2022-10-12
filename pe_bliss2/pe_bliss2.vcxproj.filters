@@ -154,6 +154,9 @@
     <Filter Include="Header Files\detail\image">
       <UniqueIdentifier>{8d7ceb44-66f2-491c-b723-bea3507dcb49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\detail\debug">
+      <UniqueIdentifier>{9bbc014b-5198-498f-be89-0d7995a79c23}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detail\packed_serialization.h">
@@ -566,6 +569,9 @@
     </ClInclude>
     <ClInclude Include="resources\guid.h">
       <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\debug\image_debug_directory.h">
+      <Filter>Header Files\detail\debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
