@@ -150,6 +150,7 @@ public:
 		visual_studio_2022_17_3_4,
 		visual_studio_2022_17_4_0_preview1_0,
 		visual_studio_2022_17_4_0_preview2_0,
+		visual_studio_2022_17_4_0_preview3_0,
 		unmarked_object,
 		unknown
 	};
