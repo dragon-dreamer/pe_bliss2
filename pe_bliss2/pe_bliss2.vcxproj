@@ -33,6 +33,7 @@
     <ClInclude Include="core\optional_header_errc.h" />
     <ClInclude Include="core\optional_header_validator.h" />
     <ClInclude Include="core\overlay.h" />
+    <ClInclude Include="debug\debug_directory.h" />
     <ClInclude Include="detail\bound_import\image_bound_import_descriptor.h" />
     <ClInclude Include="detail\debug\image_debug_directory.h" />
     <ClInclude Include="detail\endian_convert.h" />
@@ -170,6 +171,7 @@
     <ClCompile Include="core\optional_header_errc.cpp" />
     <ClCompile Include="core\optional_header_validator.cpp" />
     <ClCompile Include="core\overlay.cpp" />
+    <ClCompile Include="debug\debug_directory.cpp" />
     <ClCompile Include="detail\rich\rich_header_utils.cpp" />
     <ClCompile Include="dos\dos_header.cpp" />
     <ClCompile Include="dos\dos_header_errc.cpp" />
@@ -348,15 +350,19 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IntDir>build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IntDir>build\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IntDir>build\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

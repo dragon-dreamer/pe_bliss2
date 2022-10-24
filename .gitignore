@@ -7,9 +7,7 @@
 /console_dumper/Debug
 /console_dumper/Release
 /console_dumper/x64
-/pe_bliss2/Debug
-/pe_bliss2/Release
-/pe_bliss2/x64
+/pe_bliss2/build
 /tests/Debug
 /tests/Release
 /tests/x64

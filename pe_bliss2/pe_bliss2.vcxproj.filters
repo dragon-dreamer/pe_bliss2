@@ -157,6 +157,12 @@
     <Filter Include="Header Files\detail\debug">
       <UniqueIdentifier>{9bbc014b-5198-498f-be89-0d7995a79c23}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\debug">
+      <UniqueIdentifier>{1a1b8186-7517-471f-9c6c-dcd71133fe2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\debug">
+      <UniqueIdentifier>{d8ffc7db-3008-436d-a493-cdb22bd11cfa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detail\packed_serialization.h">
@@ -573,6 +579,9 @@
     <ClInclude Include="detail\debug\image_debug_directory.h">
       <Filter>Header Files\detail\debug</Filter>
     </ClInclude>
+    <ClInclude Include="debug\debug_directory.h">
+      <Filter>Header Files\debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -847,6 +856,9 @@
     </ClCompile>
     <ClCompile Include="resources\guid.cpp">
       <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\debug_directory.cpp">
+      <Filter>Source Files\debug</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

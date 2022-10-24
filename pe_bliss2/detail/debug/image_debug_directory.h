@@ -119,10 +119,83 @@ struct image_coff_symbols_header
 	std::uint32_t rva_to_last_byte_of_data;
 };
 
-constexpr std::uint32_t frame_fpo = 0u;
-constexpr std::uint32_t frame_trap = 1u;
-constexpr std::uint32_t frame_tss = 2u;
-constexpr std::uint32_t frame_nonfpo = 3u;
+struct coff_symbol
+{
+	std::uint8_t name[8u];
+	//or union with:
+	//unsigned long e_zeroes;
+	//unsigned long e_offset;
+
+	std::uint32_t value;
+	std::int16_t section_number;
+	std::uint16_t type;
+	std::uint8_t storage_class;
+	std::uint8_t aux_symbol_number;
+};
+
+constexpr std::int16_t coff_section_number_undef = 0;
+constexpr std::int16_t coff_section_number_absolute = -1;
+constexpr std::int16_t coff_section_number_debug = -2;
+
+constexpr std::uint8_t coff_type_null = 0;
+constexpr std::uint8_t coff_type_void = 1;
+constexpr std::uint8_t coff_type_char = 2;
+constexpr std::uint8_t coff_type_short = 3;
+constexpr std::uint8_t coff_type_int = 4;
+constexpr std::uint8_t coff_type_long = 5;
+constexpr std::uint8_t coff_type_float = 6;
+constexpr std::uint8_t coff_type_double = 7;
+constexpr std::uint8_t coff_type_struct = 8;
+constexpr std::uint8_t coff_type_union = 9;
+constexpr std::uint8_t coff_type_enum = 10;
+constexpr std::uint8_t coff_type_member_of_enum = 11;
+constexpr std::uint8_t coff_type_uchar = 12;
+constexpr std::uint8_t coff_type_ushort = 13;
+constexpr std::uint8_t coff_type_uint = 14;
+constexpr std::uint8_t coff_type_ulong = 15;
+constexpr std::uint8_t coff_type_mask = 0xffu;
+constexpr std::uint8_t coff_type_long_double = 16;
+
+constexpr std::uint16_t coff_type_attr_mask = 0x300u;
+constexpr std::uint16_t coff_type_no_derived = 0u;
+constexpr std::uint16_t coff_type_pointer = 0x100u;
+constexpr std::uint16_t coff_type_function_return_value = 0x200u;
+constexpr std::uint16_t coff_type_array = 0x300u;
+
+constexpr std::uint8_t coff_storage_class_null = 0u;
+constexpr std::uint8_t coff_storage_class_automatic = 1u;
+constexpr std::uint8_t coff_storage_class_external = 2u;
+constexpr std::uint8_t coff_storage_class_static = 3u;
+constexpr std::uint8_t coff_storage_class_register = 4u;
+constexpr std::uint8_t coff_storage_class_external_definition = 5u;
+constexpr std::uint8_t coff_storage_class_label = 6u;
+constexpr std::uint8_t coff_storage_class_undefined_label = 7u;
+constexpr std::uint8_t coff_storage_class_member_of_structure = 8u;
+constexpr std::uint8_t coff_storage_class_function_argument = 9u;
+constexpr std::uint8_t coff_storage_class_structure_tag = 10u;
+constexpr std::uint8_t coff_storage_class_member_of_union = 11u;
+constexpr std::uint8_t coff_storage_class_union_tag = 12u;
+constexpr std::uint8_t coff_storage_class_type_definition = 13u;
+constexpr std::uint8_t coff_storage_class_undefined_static = 14u;
+constexpr std::uint8_t coff_storage_class_enumeration_tag = 15u;
+constexpr std::uint8_t coff_storage_class_member_of_enumeration = 16u;
+constexpr std::uint8_t coff_storage_class_register_param = 17u;
+constexpr std::uint8_t coff_storage_class_bit_field = 18u;
+constexpr std::uint8_t coff_storage_class_automatic_argument = 19u;
+constexpr std::uint8_t coff_storage_class_dummy_entry = 20u;
+constexpr std::uint8_t coff_storage_class_begin_or_end_of_block = 100u;
+constexpr std::uint8_t coff_storage_class_begin_or_end_of_function = 101u;
+constexpr std::uint8_t coff_storage_class_end_of_structure = 102u;
+constexpr std::uint8_t coff_storage_class_file_name = 103u;
+constexpr std::uint8_t coff_storage_class_line_number = 104u;
+constexpr std::uint8_t coff_storage_class_duplicate_tag = 105u;
+constexpr std::uint8_t coff_storage_class_hidden = 106u;
+constexpr std::uint8_t coff_storage_class_physical_end_of_function = 255u;
+
+constexpr std::uint32_t frame_type_fpo = 0u;
+constexpr std::uint32_t frame_type_trap = 1u;
+constexpr std::uint32_t frame_type_tss = 2u;
+constexpr std::uint32_t frame_type_nonfpo = 3u;
 
 struct fpo_data
 {
@@ -158,6 +231,24 @@ struct image_debug_dllcharacteristics_ex
 	std::uint32_t flags; //image_dllcharacteristics_ex flags
 };
 
+constexpr std::uint32_t debug_signature_pdb7 = 0x53445352u; //RSDS
+//VC++ 2.0+
+constexpr std::uint32_t debug_signature_pdb2 = 0x3031424eu; //NB10
+//link 5.20 or earlier linker
+constexpr std::uint32_t debug_signature_nb02 = 0x3230424eu;
+//link 5.30 and not cvpacked
+constexpr std::uint32_t debug_signature_nb05 = 0x3530424eu;
+//ilink 1.30 and not cvpacked
+constexpr std::uint32_t debug_signature_nb06 = 0x3630424eu;
+//cvpacked by QCWIN 1.0
+constexpr std::uint32_t debug_signature_nb07 = 0x3730424eu;
+//cvpacked for C7.0
+constexpr std::uint32_t debug_signature_nb08 = 0x3830424eu;
+//cvpacked for C8.0
+constexpr std::uint32_t debug_signature_nb09 = 0x3930424eu;
+//cvpacked for C11.0
+constexpr std::uint32_t debug_signature_nb11 = 0x3131424eu;
+
 struct omf_signature
 {
 	std::uint8_t signature[4]; //"NBxx"
@@ -168,7 +259,7 @@ struct cv_info_pdb20
 {
 	std::uint32_t cv_signature;
 	std::uint32_t offset;
-	std::uint32_t signature;
+	std::uint32_t signature; //unix timestamp
 	std::uint32_t age;
 	//std::uint8_t pdb_file_name[1];
 };
@@ -218,7 +309,7 @@ constexpr std::uint32_t pgo = 0x50474f00u; //Profile-guided optimization - optim
 struct pogo_header
 {
 	std::uint32_t signature; //pogo_type
-	//pogo_item items[1];
+	//pogo_entry items[1];
 };
 
 struct pogo_entry
