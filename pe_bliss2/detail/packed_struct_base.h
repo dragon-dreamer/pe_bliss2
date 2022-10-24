@@ -13,7 +13,7 @@ class packed_struct_base
 {
 public:
 	using underlying_struct_type = Struct;
-	using packed_struct_type = typename packed_struct<Struct>;
+	using packed_struct_type = typename packed_struct<Struct, Endianness>;
 
 public:
 	[[nodiscard]]
