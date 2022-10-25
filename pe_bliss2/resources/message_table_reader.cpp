@@ -80,7 +80,7 @@ template<message_encoding Encoding>
 void load_message(buffers::input_buffer_stateful_wrapper_ref& entry_buf,
 	message_entry_details& entry,
 	std::uint16_t length, message_string<Encoding>& message,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	using char_type = typename message_string<Encoding>::string_type::value_type;
 	static constexpr auto char_size = sizeof(char_type);
@@ -119,7 +119,7 @@ void load_message(buffers::input_buffer_stateful_wrapper_ref& entry_buf,
 	total_physical_bytes_read += entry_buf.read(char_size,
 		reinterpret_cast<std::byte*>(&ch));
 
-	if (!allow_virtual_memory
+	if (!allow_virtual_data
 		&& total_physical_bytes_read != (message.value().size() + 1u) * char_size)
 	{
 		message.value().resize(total_physical_bytes_read / char_size);
@@ -151,7 +151,7 @@ void load_entries(const message_table_read_options& options,
 		auto& entry = block.get_entries().emplace_back();
 		try
 		{
-			entry.get_descriptor().deserialize(entry_buf, options.allow_virtual_memory);
+			entry.get_descriptor().deserialize(entry_buf, options.allow_virtual_data);
 		}
 		catch (const std::system_error&)
 		{
@@ -167,17 +167,17 @@ void load_entries(const message_table_read_options& options,
 			case detail::resources::message_resource_ansi:
 				load_message(entry_buf, entry, length,
 					entry.get_message().emplace<ansi_message>(),
-					options.allow_virtual_memory);
+					options.allow_virtual_data);
 				break;
 			case detail::resources::message_resource_unicode:
 				load_message(entry_buf, entry, length,
 					entry.get_message().emplace<unicode_message>(),
-					options.allow_virtual_memory);
+					options.allow_virtual_data);
 				break;
 			case detail::resources::message_resource_utf8:
 				load_message(entry_buf, entry, length,
 					entry.get_message().emplace<utf8_message>(),
-					options.allow_virtual_memory);
+					options.allow_virtual_data);
 				break;
 			default:
 				entry.add_error(message_table_reader_errc::invalid_message_block_encoding);
@@ -211,7 +211,7 @@ void load_blocks(buffers::input_buffer_stateful_wrapper_ref& buf,
 		auto& block = table.get_message_blocks().emplace_back();
 		try
 		{
-			block.get_descriptor().deserialize(buf, options.allow_virtual_memory);
+			block.get_descriptor().deserialize(buf, options.allow_virtual_data);
 		}
 		catch (const std::system_error&)
 		{
@@ -259,7 +259,7 @@ message_table_details message_table_from_resource(
 	const auto start_rpos = buf.rpos();
 	try
 	{
-		table.get_descriptor().deserialize(buf, options.allow_virtual_memory);
+		table.get_descriptor().deserialize(buf, options.allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{

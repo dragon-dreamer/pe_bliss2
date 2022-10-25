@@ -14,7 +14,7 @@ namespace pe_bliss::section
 {
 
 void section_table::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
-	std::uint16_t number_of_sections, bool allow_virtual_memory)
+	std::uint16_t number_of_sections, bool allow_virtual_data)
 {
 	headers_.clear();
 
@@ -25,7 +25,7 @@ void section_table::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 		auto& header = headers_.emplace_back();
 		if (!is_virtual)
 		{
-			header.deserialize(buf, allow_virtual_memory);
+			header.deserialize(buf, allow_virtual_data);
 			is_virtual = header.get_descriptor().is_virtual();
 		}
 		else

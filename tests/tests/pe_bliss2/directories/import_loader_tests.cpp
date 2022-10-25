@@ -712,13 +712,13 @@ TEST_P(ImportLoaderTestFixture, VirtualPart)
 		+ sizeof(std::uint16_t) //size of hint
 		+ sizeof(imported_name) - 1u); //nullbyte is virtual
 
-	for (bool allow_virtual_memory : {false, true})
+	for (bool allow_virtual_data : {false, true})
 	{
 		auto result = imports::load(instance,
-			{ .allow_virtual_data = allow_virtual_memory });
+			{ .allow_virtual_data = allow_virtual_data });
 		ASSERT_TRUE(result);
 		expect_contains_errors(*result);
-		with_imports(*result, [this, allow_virtual_memory](const auto& list)
+		with_imports(*result, [this, allow_virtual_data](const auto& list)
 		{
 			ASSERT_EQ(list.size(), library_count);
 			expect_contains_errors(list[1]);
@@ -726,15 +726,15 @@ TEST_P(ImportLoaderTestFixture, VirtualPart)
 			expect_contains_errors(list[3]);
 			expect_contains_errors(list[4]);
 			validate_ilt13(list[1], { .with_iat = true,
-				.with_name = true, .virtual_name_error = !allow_virtual_memory });
+				.with_name = true, .virtual_name_error = !allow_virtual_data });
 			validate_ilt13(list[3], { .is_bound = true,
 				.with_iat = true, .with_name = true,
-				.virtual_name_error = !allow_virtual_memory });
+				.virtual_name_error = !allow_virtual_data });
 			validate_iat24(list[2], { .with_name = true,
-				.has_ilt = false, .virtual_name_error = !allow_virtual_memory });
+				.has_ilt = false, .virtual_name_error = !allow_virtual_data });
 			validate_iat24(list[4], { .is_bound = true,
 				.with_name = true, .has_ilt = false,
-				.virtual_name_error = !allow_virtual_memory });
+				.virtual_name_error = !allow_virtual_data });
 		});
 	}
 }

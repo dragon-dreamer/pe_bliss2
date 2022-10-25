@@ -54,7 +54,7 @@ bitmap bitmap_from_resource(const buffers::input_buffer_ptr& buf,
 {
 	assert(!!buf);
 
-	auto buffer_size = options.allow_virtual_memory
+	auto buffer_size = options.allow_virtual_data
 		? buf->size() : buf->physical_size();
 
 	if (buffer_size < bitmap::info_header_type::packed_size)
@@ -75,7 +75,7 @@ bitmap bitmap_from_resource(const buffers::input_buffer_ptr& buf,
 	try
 	{
 		buffers::input_buffer_stateful_wrapper_ref ref(*buf);
-		result.get_info_header().deserialize(ref, options.allow_virtual_memory);
+		result.get_info_header().deserialize(ref, options.allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{

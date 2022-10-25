@@ -106,7 +106,7 @@ bool version_info_from_resource_impl(
 
 	try
 	{
-		block.get_descriptor().deserialize(buf, options.allow_virtual_memory);
+		block.get_descriptor().deserialize(buf, options.allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{
@@ -125,7 +125,7 @@ bool version_info_from_resource_impl(
 	auto& key = block.get_key().emplace();
 	try
 	{
-		key.deserialize(buf, options.allow_virtual_memory, remaining_block_length);
+		key.deserialize(buf, options.allow_virtual_data, remaining_block_length);
 	}
 	catch (const std::system_error&)
 	{
@@ -178,7 +178,7 @@ bool version_info_from_resource_impl(
 			case version_info_value_type::text:
 				{
 					auto& value = block.get_value().emplace<packed_utf16_c_string>();
-					value.deserialize(buf, options.allow_virtual_memory, value_length);
+					value.deserialize(buf, options.allow_virtual_data, value_length);
 					if (value.data_size() != value_length)
 						block.add_error(version_info_reader_errc::invalid_string_value_length);
 				}

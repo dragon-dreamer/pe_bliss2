@@ -58,7 +58,7 @@ public:
 public:
 	//When deserializing, buf should point to the end of optional header
 	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
-		std::uint32_t number_of_rva_and_sizes, bool allow_virtual_memory = false);
+		std::uint32_t number_of_rva_and_sizes, bool allow_virtual_data = false);
 	void serialize(buffers::output_buffer_interface& buf,
 		bool write_virtual_part = true) const;
 

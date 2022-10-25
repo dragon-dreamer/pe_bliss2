@@ -17,7 +17,7 @@ enum class bitmap_reader_errc
 
 struct [[nodiscard]] bitmap_read_options
 {
-	bool allow_virtual_memory = false;
+	bool allow_virtual_data = false;
 	bool copy_memory = false;
 };
 

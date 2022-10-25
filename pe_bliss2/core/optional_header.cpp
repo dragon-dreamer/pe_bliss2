@@ -16,7 +16,7 @@ namespace pe_bliss::core
 {
 
 void optional_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	packed_struct<std::uint16_t> magic_value;
 	try
@@ -38,8 +38,8 @@ void optional_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& bu
 
 	try
 	{
-		std::visit([&buf, allow_virtual_memory](auto& obj) {
-			obj.deserialize(buf, allow_virtual_memory);
+		std::visit([&buf, allow_virtual_data](auto& obj) {
+			obj.deserialize(buf, allow_virtual_data);
 		}, header_);
 	}
 	catch (const std::system_error&)

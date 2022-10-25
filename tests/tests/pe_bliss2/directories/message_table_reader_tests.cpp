@@ -186,7 +186,7 @@ TEST(MessageTableReaderTests, ReadValidVirtual)
 		table_data.size() - 2u); //last string bytes are virtual
 	buffers::input_virtual_buffer vbuf(std::move(buf), 2u);
 	buffers::input_buffer_stateful_wrapper_ref ref(vbuf);
-	auto table = message_table_from_resource(ref, { .allow_virtual_memory = true });
+	auto table = message_table_from_resource(ref, { .allow_virtual_data = true });
 	ASSERT_EQ(table.get_message_blocks().size(), number_of_blocks);
 	validate_block1(table);
 	validate_block2(table);

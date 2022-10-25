@@ -103,7 +103,7 @@ public:
 	//When deserializing, buffer should point to the file header
 	//(next field after image signature)
 	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
-		bool allow_virtual_memory = false);
+		bool allow_virtual_data = false);
 	void serialize(buffers::output_buffer_interface& buf,
 		bool write_virtual_part = true) const;
 

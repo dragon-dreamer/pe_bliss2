@@ -824,22 +824,22 @@ using debug_directory_details = debug_directory_base<error_list>;
 [[nodiscard]]
 misc_debug_directory_details parse_misc_directory(
 	buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory);
+	bool allow_virtual_data);
 
 [[nodiscard]]
 repro_debug_directory_details parse_repro_directory(
 	buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory);
+	bool allow_virtual_data);
 
 [[nodiscard]]
 spgo_debug_directory_details parse_spgo_directory(
 	buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory);
+	bool allow_virtual_data);
 
 [[nodiscard]]
 debug_directory_details::underlying_directory_type
 	parse_codeview_directory(buffers::input_buffer_stateful_wrapper& wrapper,
-		bool allow_virtual_memory);
+		bool allow_virtual_data);
 
 [[nodiscard]]
 omap_to_src_debug_directory_details parse_omap_to_src_directory(
@@ -869,18 +869,18 @@ coff_debug_directory_details parse_coff_directory(
 [[nodiscard]]
 vc_feature_debug_directory_details parse_vc_feature_debug_directory(
 	buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory);
+	bool allow_virtual_data);
 
 [[nodiscard]]
 mpx_debug_directory_details parse_mpx_debug_directory(
 	buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory);
+	bool allow_virtual_data);
 
 [[nodiscard]]
 ex_dllcharacteristics_debug_directory_details
 	parse_ex_dllcharacteristics_debug_directory(
 		buffers::input_buffer_stateful_wrapper& wrapper,
-		bool allow_virtual_memory);
+		bool allow_virtual_data);
 } //namespace pe_bliss::debug
 
 namespace std

@@ -176,7 +176,7 @@ TEST(VersionInfoReaderTests, VirtualInfo)
 	buffers::input_buffer_stateful_wrapper wrapper(virtual_buf);
 
 	auto root = version_info_from_resource(wrapper,
-		{ .allow_virtual_memory = true });
+		{ .allow_virtual_data = true });
 	validate_version_info(root, false);
 }
 

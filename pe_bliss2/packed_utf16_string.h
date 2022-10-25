@@ -47,7 +47,7 @@ public:
 	}
 
 	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
-		bool allow_virtual_memory);
+		bool allow_virtual_data);
 	std::size_t serialize(buffers::output_buffer_interface& buf,
 		bool write_virtual_part) const;
 	std::size_t serialize(std::byte* buf,

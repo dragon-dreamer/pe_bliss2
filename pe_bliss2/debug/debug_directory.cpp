@@ -64,12 +64,12 @@ namespace
 
 template<typename Dir>
 Dir parse_directory(buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	Dir result;
 	try
 	{
-		result.get_descriptor().deserialize(wrapper, allow_virtual_memory);
+		result.get_descriptor().deserialize(wrapper, allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{
@@ -80,17 +80,17 @@ Dir parse_directory(buffers::input_buffer_stateful_wrapper& wrapper,
 
 template<typename Dir>
 Dir parse_codeview_pdb(buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	wrapper.advance_rpos(-static_cast<std::int32_t>(
 		codeview_omf_debug_directory::signature_type::packed_size));
-	auto dir = parse_directory<Dir>(wrapper, allow_virtual_memory);
+	auto dir = parse_directory<Dir>(wrapper, allow_virtual_data);
 	if (dir.has_errors())
 		return dir;
 
 	try
 	{
-		dir.get_pdb_file_name().deserialize(wrapper, allow_virtual_memory);
+		dir.get_pdb_file_name().deserialize(wrapper, allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{
@@ -132,10 +132,10 @@ Dir parse_omap_src_directory(
 
 misc_debug_directory_details parse_misc_directory(
 	buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	auto result = parse_directory<misc_debug_directory_details>(
-		wrapper, allow_virtual_memory);
+		wrapper, allow_virtual_data);
 	const auto data_size = result.get_descriptor()->length;
 	if (!result.has_errors() && data_size)
 	{
@@ -145,12 +145,12 @@ misc_debug_directory_details parse_misc_directory(
 		if (result.get_descriptor()->unicode)
 		{
 			result.get_data().emplace<packed_utf16_c_string>().deserialize(
-				wrapper, allow_virtual_memory, data_size);
+				wrapper, allow_virtual_data, data_size);
 		}
 		else
 		{
 			result.get_data().emplace<packed_c_string>().deserialize(
-				wrapper, allow_virtual_memory, data_size);
+				wrapper, allow_virtual_data, data_size);
 		}
 	}
 
@@ -159,7 +159,7 @@ misc_debug_directory_details parse_misc_directory(
 
 repro_debug_directory_details parse_repro_directory(
 	buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	repro_debug_directory_details result;
 	if (!wrapper.size())
@@ -168,7 +168,7 @@ repro_debug_directory_details parse_repro_directory(
 	try
 	{
 		result.get_descriptor().emplace().deserialize(
-			wrapper, allow_virtual_memory);
+			wrapper, allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{
@@ -186,7 +186,7 @@ repro_debug_directory_details parse_repro_directory(
 	try
 	{
 		result.get_hash().emplace().deserialize(wrapper,
-			hash_size, allow_virtual_memory);
+			hash_size, allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{
@@ -198,12 +198,12 @@ repro_debug_directory_details parse_repro_directory(
 
 spgo_debug_directory_details parse_spgo_directory(
 	buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	spgo_debug_directory_details result;
 	try
 	{
-		result.get_string().deserialize(wrapper, allow_virtual_memory);
+		result.get_string().deserialize(wrapper, allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{
@@ -214,12 +214,12 @@ spgo_debug_directory_details parse_spgo_directory(
 
 debug_directory_details::underlying_directory_type
 	parse_codeview_directory(buffers::input_buffer_stateful_wrapper& wrapper,
-		bool allow_virtual_memory)
+		bool allow_virtual_data)
 {
 	codeview_omf_debug_directory_details result;
 	try
 	{
-		result.get_signature().deserialize(wrapper, allow_virtual_memory);
+		result.get_signature().deserialize(wrapper, allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{
@@ -231,10 +231,10 @@ debug_directory_details::underlying_directory_type
 	{
 	case codeview_signature::pdb2:
 		return parse_codeview_pdb<codeview_pdb2_debug_directory_details>(
-			wrapper, allow_virtual_memory);
+			wrapper, allow_virtual_data);
 	case codeview_signature::pdb7:
 		return parse_codeview_pdb<codeview_pdb7_debug_directory_details>(
-			wrapper, allow_virtual_memory);
+			wrapper, allow_virtual_data);
 	default:
 		return result;
 	}
@@ -454,27 +454,27 @@ coff_debug_directory_details parse_coff_directory(
 
 vc_feature_debug_directory_details parse_vc_feature_debug_directory(
 	buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	return parse_directory<vc_feature_debug_directory_details>(
-		wrapper, allow_virtual_memory);
+		wrapper, allow_virtual_data);
 }
 
 mpx_debug_directory_details parse_mpx_debug_directory(
 	buffers::input_buffer_stateful_wrapper& wrapper,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	return parse_directory<mpx_debug_directory_details>(
-		wrapper, allow_virtual_memory);
+		wrapper, allow_virtual_data);
 }
 
 ex_dllcharacteristics_debug_directory_details
 	parse_ex_dllcharacteristics_debug_directory(
 		buffers::input_buffer_stateful_wrapper& wrapper,
-		bool allow_virtual_memory)
+		bool allow_virtual_data)
 {
 	return parse_directory<ex_dllcharacteristics_debug_directory_details>(
-		wrapper, allow_virtual_memory);
+		wrapper, allow_virtual_data);
 }
 
 std::error_code make_error_code(debug_directory_errc e) noexcept
@@ -489,21 +489,21 @@ typename debug_directory_base<Bases...>::underlying_directory_type
 {
 	using enum debug_directory_type;
 	buffers::input_buffer_stateful_wrapper wrapper(raw_data_.data());
-	const bool allow_virtual_memory = options.allow_virtual_data;
+	const bool allow_virtual_data = options.allow_virtual_data;
 	switch (get_type())
 	{
 	case iltcg: return iltcg_debug_directory{};
 	case vc_feature: return { parse_vc_feature_debug_directory(
-		wrapper, allow_virtual_memory) };
+		wrapper, allow_virtual_data) };
 	case mpx: return { parse_mpx_debug_directory(
-		wrapper, allow_virtual_memory) };
+		wrapper, allow_virtual_data) };
 	case ex_dllcharacteristics: return {
 		parse_ex_dllcharacteristics_debug_directory(
-			wrapper, allow_virtual_memory) };
-	case misc: return { parse_misc_directory(wrapper, allow_virtual_memory) };
-	case repro: return { parse_repro_directory(wrapper, allow_virtual_memory) };
-	case spgo: return { parse_spgo_directory(wrapper, allow_virtual_memory) };
-	case codeview: return parse_codeview_directory(wrapper, allow_virtual_memory);
+			wrapper, allow_virtual_data) };
+	case misc: return { parse_misc_directory(wrapper, allow_virtual_data) };
+	case repro: return { parse_repro_directory(wrapper, allow_virtual_data) };
+	case spgo: return { parse_spgo_directory(wrapper, allow_virtual_data) };
+	case codeview: return parse_codeview_directory(wrapper, allow_virtual_data);
 	case omap_to_src: return { parse_omap_to_src_directory(wrapper, options) };
 	case omap_from_src: return { parse_src_to_omap_directory(wrapper, options) };
 	case fpo: return { parse_fpo_directory(wrapper, options) };

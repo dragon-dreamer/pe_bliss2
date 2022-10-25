@@ -24,7 +24,7 @@ public:
 	//When deserializing, buf should point to
 	//the section table start
 	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
-		std::uint16_t number_of_sections, bool allow_virtual_memory = false);
+		std::uint16_t number_of_sections, bool allow_virtual_data = false);
 	//When serializing, buf should point to
 	//the section table start
 	void serialize(buffers::output_buffer_interface& buf,

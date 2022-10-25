@@ -21,14 +21,14 @@ static_assert(sizeof(packed_utf16_string::string_type::value_type)
 	"This facility only supports strings with size of a character equal to 2 bytes");
 
 void packed_utf16_string::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	buffers::serialized_data_state state(buf);
 
 	std::uint16_t string_length{};
 	auto size_bytes_read = buf.read(sizeof(string_length),
 		reinterpret_cast<std::byte*>(&string_length));
-	if (!allow_virtual_memory && size_bytes_read != sizeof(string_length))
+	if (!allow_virtual_data && size_bytes_read != sizeof(string_length))
 		throw pe_error(utilities::generic_errc::buffer_overrun);
 
 	boost::endian::little_to_native_inplace(string_length);
@@ -50,7 +50,7 @@ void packed_utf16_string::deserialize(buffers::input_buffer_stateful_wrapper_ref
 	}
 	value.resize(index);
 
-	if (!allow_virtual_memory && physical_size != virtual_size)
+	if (!allow_virtual_data && physical_size != virtual_size)
 		throw pe_error(utilities::generic_errc::buffer_overrun);
 
 	value_ = std::move(value);

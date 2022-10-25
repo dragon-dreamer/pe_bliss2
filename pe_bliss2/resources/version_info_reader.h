@@ -33,7 +33,7 @@ std::error_code make_error_code(version_info_reader_errc) noexcept;
 
 struct [[nodiscard]] version_info_read_options
 {
-	bool allow_virtual_memory = false;
+	bool allow_virtual_data = false;
 	bool copy_value_memory = false;
 	std::uint32_t max_depth = 0xffu;
 };

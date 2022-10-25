@@ -16,7 +16,7 @@ namespace pe_bliss
 template<typename String>
 void packed_c_string_base<String>::deserialize(
 	buffers::input_buffer_stateful_wrapper_ref& buf,
-	bool allow_virtual_memory,
+	bool allow_virtual_data,
 	std::size_t max_physical_size)
 {
 	buffers::serialized_data_state state(buf);
@@ -43,7 +43,7 @@ void packed_c_string_base<String>::deserialize(
 		value.push_back(ch);
 	}
 
-	if (!allow_virtual_memory)
+	if (!allow_virtual_data)
 		throw pe_error(utilities::generic_errc::buffer_overrun);
 
 	if (max_physical_size < sizeof(ch)) // virtual nullbyte

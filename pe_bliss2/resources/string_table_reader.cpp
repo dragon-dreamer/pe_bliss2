@@ -18,7 +18,7 @@ string_table string_table_from_resource(buffers::input_buffer_stateful_wrapper_r
 	try
 	{
 		for (auto& str : result.get_list())
-			str.deserialize(buf, options.allow_virtual_memory);
+			str.deserialize(buf, options.allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{

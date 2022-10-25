@@ -48,7 +48,7 @@ std::error_code make_error_code(data_directories_errc e) noexcept
 }
 
 void data_directories::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
-	std::uint32_t number_of_rva_and_sizes, bool allow_virtual_memory)
+	std::uint32_t number_of_rva_and_sizes, bool allow_virtual_data)
 {
 	directories_.clear();
 	if (!number_of_rva_and_sizes)
@@ -59,7 +59,7 @@ void data_directories::deserialize(buffers::input_buffer_stateful_wrapper_ref& b
 	{
 		try
 		{
-			directories_[i].deserialize(buf, allow_virtual_memory);
+			directories_[i].deserialize(buf, allow_virtual_data);
 		}
 		catch (const std::system_error&)
 		{

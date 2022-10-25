@@ -12,14 +12,14 @@ namespace pe_bliss::detail
 
 void packed_byte_array_base::deserialize_impl(
 	buffers::input_buffer_stateful_wrapper_ref& buf, std::byte* data,
-	std::size_t size, std::size_t max_size, bool allow_virtual_memory)
+	std::size_t size, std::size_t max_size, bool allow_virtual_data)
 {
 	if (size > max_size)
 		throw pe_error(utilities::generic_errc::buffer_overrun);
 
 	buffers::serialized_data_state state(buf);
 	auto physical_size = buf.read(size, data);
-	if (!allow_virtual_memory && physical_size != size)
+	if (!allow_virtual_data && physical_size != size)
 		throw pe_error(utilities::generic_errc::buffer_overrun);
 
 	physical_size_ = physical_size;

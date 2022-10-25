@@ -176,7 +176,7 @@ void load_strings(version_info_details& result, const ChildList& children)
 
 template<typename ChildList>
 void load_var_file_info(version_info_details& result,
-	const ChildList& children, bool allow_virtual_memory)
+	const ChildList& children, bool allow_virtual_data)
 {
 	if (children.size() != 1u)
 		result.add_error(version_info_errc::invalid_var_file_info_children);
@@ -200,7 +200,7 @@ void load_var_file_info(version_info_details& result,
 				while (ref.rpos() < ref.size())
 				{
 					translation_data.get() = {};
-					translation_data.deserialize(ref, allow_virtual_memory);
+					translation_data.deserialize(ref, allow_virtual_data);
 					if (!result.get_translations().emplace(translation{
 						.lcid = translation_data->lcid, .cpid = translation_data->cpid }).second)
 					{
@@ -221,7 +221,7 @@ void load_var_file_info(version_info_details& result,
 
 template<typename... Bases>
 version_info_details get_version_info(const version_info_block_base<Bases...>& root,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	version_info_details result;
 	if (!root.get_key() || root.get_key()->value() != version_info_key)
@@ -241,7 +241,7 @@ version_info_details get_version_info(const version_info_block_base<Bases...>& r
 		{
 			buffers::input_buffer_stateful_wrapper_ref ref(*fixed_info->data());
 			result.get_file_version_info().get_descriptor().deserialize(ref,
-				allow_virtual_memory);
+				allow_virtual_data);
 		}
 		catch (const std::system_error&)
 		{
@@ -266,7 +266,7 @@ version_info_details get_version_info(const version_info_block_base<Bases...>& r
 		}
 		else if (key->value() == var_file_info_key && !has_translations)
 		{
-			load_var_file_info(result, child.get_children(), allow_virtual_memory);
+			load_var_file_info(result, child.get_children(), allow_virtual_data);
 			has_translations = true;
 		}
 		else
@@ -368,8 +368,8 @@ const std::u16string& version_info_base<Bases...>
 template version_info_base<>;
 template version_info_base<error_list>;
 template version_info_details get_version_info<>(const version_info_block_base<>& root,
-	bool allow_virtual_memory);
+	bool allow_virtual_data);
 template version_info_details get_version_info<error_list>(
-	const version_info_block_base<error_list>& root, bool allow_virtual_memory);
+	const version_info_block_base<error_list>& root, bool allow_virtual_data);
 
 } //namespace pe_bliss::resources

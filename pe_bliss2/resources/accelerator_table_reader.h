@@ -17,7 +17,7 @@ enum class accelerator_table_reader_errc
 
 struct [[nodiscard]] accelerator_table_read_options
 {
-	bool allow_virtual_memory = false;
+	bool allow_virtual_data = false;
 	std::uint16_t max_accelerator_count = 0xfff;
 };
 

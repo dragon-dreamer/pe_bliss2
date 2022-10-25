@@ -13,7 +13,7 @@ namespace pe_bliss::resources
 struct [[nodiscard]] string_table_read_options
 {
 	string_table::id_type string_table_id{};
-	bool allow_virtual_memory = false;
+	bool allow_virtual_data = false;
 };
 
 [[nodiscard]]

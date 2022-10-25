@@ -321,6 +321,6 @@ using version_info_details = version_info_base<error_list>;
 template<typename... Bases>
 [[nodiscard]]
 version_info_details get_version_info(const version_info_block_base<Bases...>& root,
-	bool allow_virtual_memory = false);
+	bool allow_virtual_data = false);
 
 } //namespace pe_bliss::resources

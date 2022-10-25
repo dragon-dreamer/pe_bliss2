@@ -11,11 +11,11 @@ namespace pe_bliss::core
 {
 
 void image_signature::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
-	bool allow_virtual_memory)
+	bool allow_virtual_data)
 {
 	try
 	{
-		get_descriptor().deserialize(buf, allow_virtual_memory);
+		get_descriptor().deserialize(buf, allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{

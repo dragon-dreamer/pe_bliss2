@@ -27,7 +27,7 @@ std::error_code make_error_code(message_table_reader_errc) noexcept;
 
 struct [[nodiscard]] message_table_read_options
 {
-	bool allow_virtual_memory = false;
+	bool allow_virtual_data = false;
 	std::uint32_t max_block_count = 0xfffu;
 	std::uint32_t max_message_count = 0xffffu;
 };

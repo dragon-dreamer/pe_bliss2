@@ -87,7 +87,7 @@ public:
 public:
 	//When deserializing, buf should point to optional header start (magic field)
 	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
-		bool allow_virtual_memory = false);
+		bool allow_virtual_data = false);
 	void serialize(buffers::output_buffer_interface& buf,
 		bool write_virtual_part = true) const;
 

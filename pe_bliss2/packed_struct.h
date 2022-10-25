@@ -47,12 +47,12 @@ public:
 		return *this;
 	}
 
-	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf, bool allow_virtual_memory)
+	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf, bool allow_virtual_data)
 	{
 		buffers::serialized_data_state state(buf);
 		std::array<std::byte, packed_size> data{};
 		auto physical_size = buf.read(packed_size, data.data());
-		if (!allow_virtual_memory && physical_size != packed_size)
+		if (!allow_virtual_data && physical_size != packed_size)
 			throw pe_error(utilities::generic_errc::buffer_overrun);
 
 		typename detail::packed_serialization<Endianness>
@@ -63,13 +63,13 @@ public:
 	}
 
 	void deserialize_until(buffers::input_buffer_stateful_wrapper_ref& buf,
-		std::size_t size, bool allow_virtual_memory)
+		std::size_t size, bool allow_virtual_data)
 	{
 		buffers::serialized_data_state state(buf);
 		std::array<std::byte, packed_size> data{};
 		size = (std::min)(size, packed_size);
 		auto physical_size = buf.read(size, data.data());
-		if (!allow_virtual_memory && physical_size != size)
+		if (!allow_virtual_data && physical_size != size)
 			throw pe_error(utilities::generic_errc::buffer_overrun);
 
 		typename detail::packed_serialization<Endianness>

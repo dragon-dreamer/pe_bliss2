@@ -12,7 +12,7 @@ namespace pe_bliss
 {
 
 void packed_byte_vector::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
-	std::size_t size, bool allow_virtual_memory)
+	std::size_t size, bool allow_virtual_data)
 {
 	buffers::serialized_data_state state(buf);
 
@@ -20,7 +20,7 @@ void packed_byte_vector::deserialize(buffers::input_buffer_stateful_wrapper_ref&
 	value.resize(size);
 	value.resize(buf.read(size, value.data()));
 
-	if (!allow_virtual_memory && value.size() != size)
+	if (!allow_virtual_data && value.size() != size)
 		throw pe_error(utilities::generic_errc::buffer_overrun);
 
 	value_ = std::move(value);

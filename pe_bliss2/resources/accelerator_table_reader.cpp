@@ -59,7 +59,7 @@ accelerator_table_details accelerator_table_from_resource(
 		auto& accel = accels.emplace_back();
 		try
 		{
-			accel.get_descriptor().deserialize(buf, options.allow_virtual_memory);
+			accel.get_descriptor().deserialize(buf, options.allow_virtual_data);
 		}
 		catch (const std::system_error&)
 		{
