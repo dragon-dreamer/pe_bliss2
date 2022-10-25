@@ -21,10 +21,10 @@ pe_error_wrapper validate_raw_size(const section_header& header,
 pe_error_wrapper validate_virtual_size(
 	const section_header& header) noexcept
 {
-	const auto virtual_size = header.base_struct()->virtual_size;
+	const auto virtual_size = header.get_descriptor()->virtual_size;
 	if (!virtual_size)
 	{
-		if (!header.base_struct()->size_of_raw_data)
+		if (!header.get_descriptor()->size_of_raw_data)
 			return section_errc::invalid_section_virtual_size;
 	}
 	return virtual_size < section_header::two_gb_size
@@ -34,7 +34,7 @@ pe_error_wrapper validate_virtual_size(
 pe_error_wrapper validate_raw_address(
 	const section_header& header) noexcept
 {
-	const auto& base_struct = header.base_struct().get();
+	const auto& base_struct = header.get_descriptor().get();
 	if (base_struct.size_of_raw_data == 0
 		&& base_struct.virtual_size == 0)
 	{
@@ -81,7 +81,7 @@ pe_error_wrapper validate_virtual_address_alignment(
 {
 	if (!std::has_single_bit(section_alignment))
 		return section_errc::invalid_section_virtual_address_alignment;
-	return (header.base_struct()->virtual_address % section_alignment) == 0
+	return (header.get_descriptor()->virtual_address % section_alignment) == 0
 		? pe_error_wrapper{} : section_errc::invalid_section_virtual_address_alignment;
 }
 

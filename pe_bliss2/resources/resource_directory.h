@@ -9,7 +9,7 @@
 
 #include "buffers/ref_buffer.h"
 #include "pe_bliss2/error_list.h"
-#include "pe_bliss2/packed_struct.h"
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/detail/resources/image_resource_directory.h"
 #include "pe_bliss2/pe_types.h"
 #include "pe_bliss2/resources/resource_types.h"
@@ -32,27 +32,15 @@ template<typename... Bases>
 class resource_directory_entry_base;
 
 template<typename... Bases>
-class [[nodiscard]] resource_directory_base : public Bases...
+class [[nodiscard]] resource_directory_base
+	: public detail::packed_struct_base<detail::resources::image_resource_directory>
+	, public Bases...
 {
 public:
-	using packed_descriptor_type = packed_struct<
-		detail::resources::image_resource_directory>;
 	using entry_type = resource_directory_entry_base<Bases...>;
 	using entry_list_type = std::vector<entry_type>;
 
 public:
-	[[nodiscard]]
-	const packed_descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	packed_descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	const entry_list_type& get_entries() const& noexcept
 	{
@@ -98,30 +86,15 @@ public:
 	entry_list_type::iterator entry_iterator_by_name(std::u16string_view name) noexcept;
 
 private:
-	packed_descriptor_type descriptor_;
 	entry_list_type entries_;
 };
 
 template<typename... Bases>
-class [[nodiscard]] resource_data_entry_base : public Bases...
+class [[nodiscard]] resource_data_entry_base
+	: public detail::packed_struct_base<detail::resources::image_resource_data_entry>
+	, public Bases...
 {
 public:
-	using packed_descriptor_type = packed_struct<
-		detail::resources::image_resource_data_entry>;
-
-public:
-	[[nodiscard]]
-	const packed_descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	packed_descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	const buffers::ref_buffer& get_raw_data() const noexcept
 	{
@@ -135,16 +108,15 @@ public:
 	}
 
 private:
-	packed_descriptor_type descriptor_;
 	buffers::ref_buffer raw_data_;
 };
 
 template<typename... Bases>
-class [[nodiscard]] resource_directory_entry_base : public Bases...
+class [[nodiscard]] resource_directory_entry_base
+	: public detail::packed_struct_base<detail::resources::image_resource_directory_entry>
+	, public Bases...
 {
 public:
-	using packed_descriptor_type = packed_struct<
-		detail::resources::image_resource_directory_entry>;
 	using name_or_id_type = std::variant<std::monostate,
 		resource_id_type, resource_name_type>;
 	using data_or_directory_type = std::variant<std::monostate,
@@ -152,18 +124,6 @@ public:
 		rva_type /* RVA of looped resource_directory_base */>;
 
 public:
-	[[nodiscard]]
-	const packed_descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	packed_descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	const name_or_id_type& get_name_or_id() const& noexcept
 	{
@@ -249,7 +209,6 @@ public:
 	const resource_data_entry_base<Bases...>& get_data() const;
 
 private:
-	packed_descriptor_type descriptor_;
 	name_or_id_type name_or_id_;
 	data_or_directory_type data_or_directory_;
 };

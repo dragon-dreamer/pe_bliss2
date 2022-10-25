@@ -26,7 +26,7 @@ public:
 		detail::image_optional_header_32>;
 	using optional_header_64_type = packed_struct<
 		detail::image_optional_header_64>;
-	using base_struct_type = std::variant<
+	using descriptor_type = std::variant<
 		optional_header_32_type, optional_header_64_type>;
 
 public:
@@ -127,13 +127,13 @@ public:
 	}
 
 	[[nodiscard]]
-	base_struct_type& base_struct() noexcept
+	descriptor_type& get_descriptor() noexcept
 	{
 		return header_;
 	}
 
 	[[nodiscard]]
-	const base_struct_type& base_struct() const noexcept
+	const descriptor_type& get_descriptor() const noexcept
 	{
 		return header_;
 	}
@@ -253,7 +253,7 @@ public:
 	void set_raw_number_of_rva_and_sizes(std::uint32_t number) noexcept;
 
 private:
-	base_struct_type header_;
+	descriptor_type header_;
 };
 
 } //namespace pe_bliss::detail::core

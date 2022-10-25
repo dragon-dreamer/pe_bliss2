@@ -36,7 +36,7 @@ void image::update_number_of_sections()
 	if (number_of_sections > (std::numeric_limits<number_of_sections_type>::max)())
 		throw pe_error(image_errc::too_many_sections);
 
-	file_header_.base_struct()->number_of_sections
+	file_header_.get_descriptor()->number_of_sections
 		= static_cast<number_of_sections_type>(number_of_sections);
 }
 
@@ -93,7 +93,7 @@ void image::update_full_headers_buffer(bool keep_headers_gap_data)
 	buffers::output_memory_buffer buffer(data);
 	dos_header_.serialize(buffer);
 	dos_stub_.serialize(buffer);
-	buffer.set_wpos(dos_header_.base_struct()->e_lfanew);
+	buffer.set_wpos(dos_header_.get_descriptor()->e_lfanew);
 	image_signature_.serialize(buffer);
 	file_header_.serialize(buffer);
 	auto optional_header_buffer_pos = buffer.wpos();
@@ -101,7 +101,7 @@ void image::update_full_headers_buffer(bool keep_headers_gap_data)
 	data_directories_.serialize(buffer);
 
 	buffer.set_wpos(optional_header_buffer_pos
-		+ file_header_.base_struct()->size_of_optional_header);
+		+ file_header_.get_descriptor()->size_of_optional_header);
 	section_table_.serialize(buffer);
 
 	data.resize(optional_header_.get_raw_size_of_headers());

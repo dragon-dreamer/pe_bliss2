@@ -25,14 +25,14 @@ bool validate(const dos_header& header,
 
 pe_error_wrapper validate_magic(const dos_header& header) noexcept
 {
-	if (header.base_struct()->e_magic != dos_header::mz_magic_value)
+	if (header.get_descriptor()->e_magic != dos_header::mz_magic_value)
 		return dos_header_errc::invalid_dos_header_signature;
 	return {};
 }
 
 pe_error_wrapper validate_e_lfanew(const dos_header& header) noexcept
 {
-	auto e_lfanew = header.base_struct()->e_lfanew;
+	auto e_lfanew = header.get_descriptor()->e_lfanew;
 
 	if (!utilities::math::is_aligned<std::uint32_t>(e_lfanew))
 		return dos_header_errc::unaligned_e_lfanew;

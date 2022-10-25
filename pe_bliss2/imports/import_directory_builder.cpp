@@ -89,7 +89,7 @@ template<template <detail::executable_pointer> typename ImportedLibrary,
 built_size get_built_size_impl(const std::vector<ImportedLibrary<Va>>& libraries,
 	const builder_options& options)
 {
-	static constexpr auto descriptor_size = ImportedLibrary<Va>::packed_descriptor_type::packed_size;
+	static constexpr auto descriptor_size = ImportedLibrary<Va>::descriptor_type::packed_size;
 	auto descriptors_size = static_cast<std::uint64_t>(descriptor_size)
 		* (libraries.size() + 1u); //Terminating descriptor
 
@@ -168,7 +168,7 @@ void build_in_place_impl(image::image& instance, const std::vector<ImportedLibra
 
 	//Terminating descriptor
 	last_descriptor_rva = struct_to_rva(instance, last_descriptor_rva,
-		typename ImportedLibrary<Va>::packed_descriptor_type{}, true, true);
+		typename ImportedLibrary<Va>::descriptor_type{}, true, true);
 
 	rva_type first_iat_rva = (std::numeric_limits<rva_type>::max)(), last_iat_rva{};
 	rva_type first_ilt_rva = (std::numeric_limits<rva_type>::max)(), last_ilt_rva{};
@@ -395,7 +395,7 @@ build_result build_new_impl(buffers::output_buffer_interface& buf,
 	auto descriptor_rva = options.directory_rva;
 	safe_rva_type thunk_rva = descriptor_rva;
 	thunk_rva += (libraries.size() + 1u)
-		* ImportedLibrary<Va>::packed_descriptor_type::packed_size;
+		* ImportedLibrary<Va>::descriptor_type::packed_size;
 
 	bool has_thunks_together_with_descriptors = size_info.ilt_thunk_count || !options.iat_rva;
 	if (has_thunks_together_with_descriptors)
@@ -432,7 +432,7 @@ build_result build_new_impl(buffers::output_buffer_interface& buf,
 	//Terminator
 	packed_struct<detail::imports::image_import_descriptor>{}.serialize(buf, true);
 	result.descriptors_size = static_cast<std::uint32_t>((libraries.size() + 1u)
-		* ImportedLibrary<Va>::packed_descriptor_type::packed_size);
+		* ImportedLibrary<Va>::descriptor_type::packed_size);
 
 	return result;
 }

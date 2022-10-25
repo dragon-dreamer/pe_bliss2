@@ -44,8 +44,8 @@ TEST(FileHeaderTests, GetSetTest)
 TEST(FileHeaderTests, SectionTableStartTest)
 {
 	file_header header;
-	header.base_struct()->size_of_optional_header = 0xe0u;
-	header.base_struct().get_state().set_buffer_pos(0x123u);
+	header.get_descriptor()->size_of_optional_header = 0xe0u;
+	header.get_descriptor().get_state().set_buffer_pos(0x123u);
 	EXPECT_EQ(header.get_section_table_buffer_pos(), 0xe0u + 0x123u
 		+ detail::packed_reflection::get_type_size<detail::image_file_header>());
 }
@@ -77,12 +77,12 @@ TEST(FileHeaderTests, DeserializeSerializeTest)
 
 	ASSERT_NO_THROW(header.deserialize(ref, true));
 	EXPECT_EQ(header.get_machine_type(), file_header::machine_type::i386);
-	EXPECT_EQ(header.base_struct()->number_of_sections, 0x250u);
-	EXPECT_EQ(header.base_struct()->time_date_stamp, 0x04030201u);
-	EXPECT_EQ(header.base_struct()->pointer_to_symbol_table, 0x08070605u);
-	EXPECT_EQ(header.base_struct()->number_of_symbols, 0x0c0b0a09u);
-	EXPECT_EQ(header.base_struct()->size_of_optional_header, 0x7856u);
-	EXPECT_EQ(header.base_struct()->characteristics,
+	EXPECT_EQ(header.get_descriptor()->number_of_sections, 0x250u);
+	EXPECT_EQ(header.get_descriptor()->time_date_stamp, 0x04030201u);
+	EXPECT_EQ(header.get_descriptor()->pointer_to_symbol_table, 0x08070605u);
+	EXPECT_EQ(header.get_descriptor()->number_of_symbols, 0x0c0b0a09u);
+	EXPECT_EQ(header.get_descriptor()->size_of_optional_header, 0x7856u);
+	EXPECT_EQ(header.get_descriptor()->characteristics,
 		file_header::characteristics::executable_image);
 
 	std::vector<std::byte> outdata;

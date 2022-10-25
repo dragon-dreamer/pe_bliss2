@@ -87,21 +87,21 @@ TEST(SectionHeaderTests, EmptySectionHeaderTest)
 TEST(SectionHeaderTests, SectionHeaderNameTest1)
 {
 	section_header header;
-	header.base_struct()->name[0] = static_cast<std::uint8_t>('a');
+	header.get_descriptor()->name[0] = static_cast<std::uint8_t>('a');
 	EXPECT_EQ(header.get_name(), "a");
-	header.base_struct()->name[std::size(header.base_struct()->name) - 1]
+	header.get_descriptor()->name[std::size(header.get_descriptor()->name) - 1]
 		= static_cast<std::uint8_t>('b');
 
-	std::string name(std::size(header.base_struct()->name), '\0');
+	std::string name(std::size(header.get_descriptor()->name), '\0');
 	name[0] = 'a';
 	name.back() = 'b';
 	EXPECT_EQ(header.get_name(), name);
 
-	header.base_struct()->name[1]
+	header.get_descriptor()->name[1]
 		= static_cast<std::uint8_t>('b');
-	header.base_struct()->name[2]
+	header.get_descriptor()->name[2]
 		= static_cast<std::uint8_t>('c');
-	header.base_struct()->name[std::size(header.base_struct()->name) - 1]
+	header.get_descriptor()->name[std::size(header.get_descriptor()->name) - 1]
 		= 0;
 	EXPECT_EQ(header.get_name(), "abc");
 }
@@ -203,7 +203,7 @@ TEST(SectionHeaderTests, CharacteristicsTest)
 	EXPECT_TRUE(header.is_pageable());
 	EXPECT_TRUE(header.is_cacheable());
 
-	EXPECT_EQ(header.base_struct()->characteristics,
+	EXPECT_EQ(header.get_descriptor()->characteristics,
 		section_header::characteristics::mem_write);
 
 	EXPECT_EQ(header.get_characteristics(),
@@ -356,5 +356,5 @@ TEST(SectionHeaderTests, DeserializeErrorTest)
 		section_errc::unable_to_read_section_table);
 }
 
-// Serialize calls base_struct().serialize()
+// Serialize calls get_descriptor().serialize()
 // and thus does not require special tests

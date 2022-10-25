@@ -280,7 +280,7 @@ void load_resource_directory(const image::image& instance, const loader_options&
 		try
 		{
 			current_rva
-				+= resources::resource_directory_entry_details::packed_descriptor_type::packed_size;
+				+= resources::resource_directory_entry_details::descriptor_type::packed_size;
 		}
 		catch (const std::system_error&)
 		{

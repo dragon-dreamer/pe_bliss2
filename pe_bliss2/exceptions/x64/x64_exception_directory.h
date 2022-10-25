@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "pe_bliss2/error_list.h"
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/detail/exceptions/image_runtime_function_entry.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
@@ -93,19 +94,13 @@ enum class opcode_id : std::uint8_t
 
 template<std::size_t Nodes = 0u>
 class [[nodiscard]] opcode_base
+	: public detail::packed_struct_base<detail::exceptions::unwind_code<Nodes>>
 {
 public:
 	static constexpr std::uint32_t node_count = Nodes;
 
 public:
-	using descriptor_type = packed_struct<detail::exceptions::unwind_code<Nodes>>;
 	static_assert(Nodes <= 2u);
-
-public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept;
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept;
 
 public:
 	[[nodiscard]]
@@ -117,9 +112,6 @@ public:
 public:
 	void set_uwop_code(opcode_id opcode) noexcept;
 	void set_operation_info(std::uint8_t info);
-
-private:
-	descriptor_type descriptor_;
 };
 
 template<opcode_id Opcode>
@@ -346,9 +338,9 @@ public:
 };
 
 class [[nodiscard]] unwind_info
+	: public detail::packed_struct_base<detail::exceptions::unwind_info>
 {
 public:
-	using descriptor_type = packed_struct<detail::exceptions::unwind_info>;
 	using unwind_code_type = std::variant<push_nonvol, alloc_large<1u>, alloc_large<2u>,
 		alloc_small, set_fpreg, save_nonvol, save_nonvol_far,
 		epilog, spare, save_xmm128, save_xmm128_far,
@@ -356,11 +348,6 @@ public:
 	using unwind_code_list_type = std::vector<unwind_code_type>;
 
 public:
-	[[nodiscard]]
-	inline descriptor_type& get_descriptor() noexcept;
-	[[nodiscard]]
-	inline const descriptor_type& get_descriptor() const noexcept;
-
 	[[nodiscard]]
 	inline unwind_code_list_type& get_unwind_code_list() & noexcept;
 	[[nodiscard]]
@@ -392,27 +379,21 @@ public:
 	void set_scaled_frame_register_offset(std::uint8_t offset);
 
 private:
-	descriptor_type descriptor_;
 	unwind_code_list_type unwind_code_list_;
 };
 
 template<typename... Bases>
 class [[nodiscard]] runtime_function_base
-	: public Bases...
+	: public detail::packed_struct_base<detail::exceptions::image_runtime_function_entry>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::exceptions::image_runtime_function_entry>;
 	using runtime_function_ptr = std::unique_ptr<runtime_function_base<Bases...>>;
 	using exception_handler_rva_type = packed_struct<rva_type>;
 	using additional_info_type = std::variant<std::monostate,
 		exception_handler_rva_type, runtime_function_ptr>;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept;
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept;
-
 	[[nodiscard]]
 	unwind_info& get_unwind_info() noexcept;
 	[[nodiscard]]
@@ -426,7 +407,6 @@ public:
 	additional_info_type get_additional_info() && noexcept;
 
 private:
-	descriptor_type descriptor_;
 	unwind_info unwind_info_;
 	additional_info_type additional_info_;
 };

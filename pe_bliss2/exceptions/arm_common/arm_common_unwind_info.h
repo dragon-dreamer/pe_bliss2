@@ -13,6 +13,7 @@
 
 #include "boost/endian/conversion.hpp"
 
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/packed_byte_array.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
@@ -45,10 +46,9 @@ namespace pe_bliss::exceptions::arm_common
 std::error_code make_error_code(exception_directory_errc) noexcept;
 
 template<bool HasCondition>
-class [[nodiscard]] epilog_info
+class [[nodiscard]] epilog_info : public detail::packed_struct_base<std::uint32_t>
 {
 public:
-	using descriptor_type = packed_struct<std::uint32_t>;
 	using epilog_start_index_type = std::conditional_t<
 		HasCondition, std::uint8_t, std::uint16_t>;
 
@@ -58,12 +58,6 @@ public:
 	static constexpr std::uint32_t epilog_start_index_shift
 		= HasCondition ? 24u : 22u;
 	static constexpr std::uint8_t unconditional_epilog = 0x0eu;
-
-public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept;
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept;
 
 public:
 	//The offset in bytes, divided by 2 (?),
@@ -89,9 +83,6 @@ public:
 	void set_epilog_start_index(epilog_start_index_type index);
 	void set_epilog_condition(std::uint8_t condition)
 		requires (HasCondition);
-
-private:
-	descriptor_type descriptor_;
 };
 
 template<std::size_t Length,
@@ -174,19 +165,14 @@ template<typename RuntimeFunctionEntry,
 	typename PackedUnwindData, typename ExtendedUnwindRecord,
 	typename... Bases>
 class [[nodiscard]] runtime_function_base
-	: public Bases...
+	: public detail::packed_struct_base<RuntimeFunctionEntry>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<RuntimeFunctionEntry>;
 	using unwind_info_type = std::variant<
 		std::monostate, PackedUnwindData, ExtendedUnwindRecord>;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept;
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept;
-
 	[[nodiscard]]
 	unwind_info_type& get_unwind_info() noexcept;
 	[[nodiscard]]
@@ -196,7 +182,6 @@ public:
 	bool has_extended_unwind_record() const noexcept;
 
 private:
-	descriptor_type descriptor_;
 	unwind_info_type unwind_info_;
 };
 

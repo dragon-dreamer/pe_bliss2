@@ -30,17 +30,17 @@ std::uint32_t get_built_size_impl(const Directory& directory) noexcept
 	utilities::safe_uint<std::uint32_t> result = 0;
 	for (const auto& entry : directory)
 	{
-		result += std::remove_cvref_t<decltype(entry)>::packed_descriptor_type::packed_size;
+		result += std::remove_cvref_t<decltype(entry)>::descriptor_type::packed_size;
 		result += entry.get_library_name().value().size() + 1u; /* nullbyte */
 		for (const auto& ref : entry.get_references())
 		{
-			result += std::remove_cvref_t<decltype(ref)>::packed_descriptor_type::packed_size;
+			result += std::remove_cvref_t<decltype(ref)>::descriptor_type::packed_size;
 			result += ref.get_library_name().value().size() + 1u; /* nullbyte */
 		}
 	}
 
 	//Terminator
-	result += Directory::value_type::packed_descriptor_type::packed_size;
+	result += Directory::value_type::descriptor_type::packed_size;
 	return result.value();
 }
 
@@ -116,7 +116,7 @@ std::uint32_t build_new_impl(buffers::output_buffer_interface& buf, Directory& d
 	auto descriptor_count = get_descriptor_count(directory) + 1;
 	auto start_pos = buf.wpos();
 	auto strings_offset = descriptor_count
-		* Directory::value_type::packed_descriptor_type::packed_size;
+		* Directory::value_type::descriptor_type::packed_size;
 
 	for (auto& entry : directory)
 	{
@@ -126,7 +126,7 @@ std::uint32_t build_new_impl(buffers::output_buffer_interface& buf, Directory& d
 			write_descriptor(ref, strings_offset, buf);
 	}
 
-	typename Directory::value_type::packed_descriptor_type{}.serialize(buf, true);
+	typename Directory::value_type::descriptor_type{}.serialize(buf, true);
 
 	for (auto& entry : directory)
 	{

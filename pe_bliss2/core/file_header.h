@@ -111,7 +111,7 @@ public:
 	[[nodiscard]]
 	machine_type get_machine_type() const noexcept
 	{
-		return static_cast<machine_type>(base_struct()->machine);
+		return static_cast<machine_type>(get_descriptor()->machine);
 	}
 
 	[[nodiscard]]
@@ -121,17 +121,17 @@ public:
 	characteristics::value get_characteristics() const noexcept
 	{
 		return static_cast<characteristics::value>(
-			base_struct()->characteristics);
+			get_descriptor()->characteristics);
 	}
 
 	void set_machine_type(machine_type type) noexcept
 	{
-		base_struct()->machine = static_cast<std::uint16_t>(type);
+		get_descriptor()->machine = static_cast<std::uint16_t>(type);
 	}
 
 	void set_characteristics(characteristics::value value) noexcept
 	{
-		base_struct()->characteristics = value;
+		get_descriptor()->characteristics = value;
 	}
 
 	[[nodiscard]] bool is_dll() const noexcept

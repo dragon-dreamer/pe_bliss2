@@ -686,7 +686,7 @@ TEST(OptionalHeaderTests, ValidateSizeOfImageTest2)
 
 	section::section_header section_header;
 	section_header.set_virtual_size(0xa00u);
-	section_header.base_struct()->virtual_address = 0x1000u;
+	section_header.get_descriptor()->virtual_address = 0x1000u;
 	EXPECT_NO_THROW(validate_size_of_image(&section_header, header).throw_on_error());
 
 	header.set_raw_size_of_image(0x1a00u);

@@ -12,6 +12,7 @@
 #include "buffers/ref_buffer.h"
 #include "pe_bliss2/core/file_header.h"
 #include "pe_bliss2/detail/debug/image_debug_directory.h"
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/packed_byte_vector.h"
 #include "pe_bliss2/packed_struct.h"
@@ -105,9 +106,9 @@ enum class coff_storage_class : std::uint8_t
 };
 
 class [[nodiscard]] coff_symbol
+	: public detail::packed_struct_base<detail::debug::coff_symbol>
 {
 public:
-	using descriptor_type = packed_struct<detail::debug::coff_symbol>;
 	using name_type = std::variant<std::string, packed_c_string>;
 
 	static constexpr std::int16_t section_number_undef
@@ -118,18 +119,6 @@ public:
 		= detail::debug::coff_section_number_debug;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	name_type& get_name() & noexcept
 	{
@@ -174,31 +163,19 @@ public:
 	}
 
 private:
-	descriptor_type descriptor_;
 	name_type name_;
 };
 
 template<typename... Bases>
-class [[nodiscard]] coff_debug_directory_base : public Bases...
+class [[nodiscard]] coff_debug_directory_base
+	: public detail::packed_struct_base<detail::debug::image_coff_symbols_header>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::debug::image_coff_symbols_header>;
 	using symbol_list_type = std::vector<coff_symbol>;
 	using string_table_length_type = packed_struct<std::uint32_t>;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	symbol_list_type& get_symbols() & noexcept
 	{
@@ -248,7 +225,6 @@ public:
 	}
 
 private:
-	descriptor_type descriptor_;
 	symbol_list_type coff_symbols_;
 	string_table_length_type string_table_length_;
 	buffers::ref_buffer string_table_;
@@ -258,24 +234,11 @@ using coff_debug_directory = coff_debug_directory_base<>;
 using coff_debug_directory_details = coff_debug_directory_base<error_list>;
 
 template<typename Descriptor, typename... Bases>
-class [[nodiscard]] codeview_pdb_debug_directory_base : public Bases...
+class [[nodiscard]] codeview_pdb_debug_directory_base
+	: public detail::packed_struct_base<Descriptor>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<Descriptor>;
-
-public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	packed_c_string& get_pdb_file_name() & noexcept
 	{
@@ -295,7 +258,6 @@ public:
 	}
 
 private:
-	descriptor_type descriptor_;
 	packed_c_string pdb_file_name_;
 };
 
@@ -367,23 +329,9 @@ enum class fpo_frame_type
 };
 
 class [[nodiscard]] fpo_entry
+	: public detail::packed_struct_base<detail::debug::fpo_data>
 {
 public:
-	using descriptor_type = packed_struct<detail::debug::fpo_data>;
-
-public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	std::uint8_t get_prolog_byte_count() const noexcept
 	{
@@ -417,9 +365,6 @@ public:
 		return static_cast<fpo_frame_type>(
 			(descriptor_->flags & 0xc000u) >> 14u);
 	}
-
-private:
-	descriptor_type descriptor_;
 };
 
 template<typename... Bases>
@@ -460,25 +405,14 @@ enum class misc_data_type
 };
 
 template<typename... Bases>
-class [[nodiscard]] misc_debug_directory_base : public Bases...
+class [[nodiscard]] misc_debug_directory_base
+	: public detail::packed_struct_base<detail::debug::image_debug_misc>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::debug::image_debug_misc>;
 	using data_type = std::variant<packed_c_string, packed_utf16_c_string>;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	data_type& get_data() & noexcept
 	{
@@ -504,7 +438,6 @@ public:
 	}
 
 private:
-	descriptor_type descriptor_;
 	data_type data_;
 };
 
@@ -559,26 +492,10 @@ using src_to_omap_debug_directory_details = src_to_omap_debug_directory_base<
 	error_list>;
 
 template<typename... Bases>
-class [[nodiscard]] vc_feature_debug_directory_base : public Bases...
+class [[nodiscard]] vc_feature_debug_directory_base
+	: public detail::packed_struct_base<detail::debug::image_debug_vc_feature>
+	, public Bases...
 {
-public:
-	using descriptor_type = packed_struct<detail::debug::image_debug_vc_feature>;
-
-public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
-private:
-	descriptor_type descriptor_;
 };
 
 using vc_feature_debug_directory = vc_feature_debug_directory_base<>;
@@ -593,23 +510,9 @@ enum class pogo_type
 };
 
 class [[nodiscard]] pogo_debug_entry
+	: public detail::packed_struct_base<detail::debug::pogo_entry>
 {
 public:
-	using descriptor_type = packed_struct<detail::debug::pogo_entry>;
-
-public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	packed_c_string& get_name() & noexcept
 	{
@@ -629,30 +532,18 @@ public:
 	}
 
 private:
-	descriptor_type descriptor_;
 	packed_c_string name_;
 };
 
 template<typename... Bases>
-class [[nodiscard]] pogo_debug_directory_base : public Bases...
+class [[nodiscard]] pogo_debug_directory_base
+	: public detail::packed_struct_base<detail::debug::pogo_header>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::debug::pogo_header>;
 	using entry_list_type = std::vector<pogo_debug_entry>;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	pogo_type get_pogo_type() const noexcept
 	{
@@ -678,7 +569,6 @@ public:
 	}
 
 private:
-	descriptor_type descriptor_;
 	entry_list_type entries_;
 };
 
@@ -688,27 +578,12 @@ using pogo_debug_directory_details = pogo_debug_directory_base<error_list>;
 class [[nodiscard]] iltcg_debug_directory {};
 
 template<typename... Bases>
-class [[nodiscard]] mpx_debug_directory_base : public Bases...
+class [[nodiscard]] mpx_debug_directory_base
+	: public detail::packed_struct_base<detail::debug::image_debug_mpx>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::debug::image_debug_mpx>;
 	static constexpr std::uint32_t signature = detail::debug::mpx_signature;
-
-public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
-private:
-	descriptor_type descriptor_;
 };
 
 using mpx_debug_directory = mpx_debug_directory_base<>;
@@ -806,32 +681,16 @@ struct image_dllcharacteristics_ex final
 }; //namespace image_dllcharacteristics_ex
 
 template<typename... Bases>
-class [[nodiscard]] ex_dllcharacteristics_debug_directory_base : public Bases...
+class [[nodiscard]] ex_dllcharacteristics_debug_directory_base
+	: public detail::packed_struct_base<detail::debug::image_debug_dllcharacteristics_ex>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::debug::image_debug_dllcharacteristics_ex>;
-
-public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	image_dllcharacteristics_ex::value get_characteristics() const noexcept
 	{
 		return static_cast<image_dllcharacteristics_ex::value>(descriptor_->flags);
 	}
-
-private:
-	descriptor_type descriptor_;
 };
 
 using ex_dllcharacteristics_debug_directory
@@ -872,10 +731,11 @@ struct [[nodiscard]] debug_directory_parse_options
 };
 
 template<typename... Bases>
-class [[nodiscard]] debug_directory_base : public Bases...
+class [[nodiscard]] debug_directory_base
+	: public detail::packed_struct_base<detail::debug::image_debug_directory>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::debug::image_debug_directory>;
 	using underlying_directory_type = std::variant<
 		coff_debug_directory_details,
 		codeview_pdb7_debug_directory_details,
@@ -895,18 +755,6 @@ public:
 	>;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	buffers::ref_buffer get_raw_data() && noexcept
 	{
@@ -936,7 +784,6 @@ public:
 		const debug_directory_parse_options& options = {}) const;
 
 private:
-	descriptor_type descriptor_;
 	buffers::ref_buffer raw_data_;
 };
 

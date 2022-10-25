@@ -26,11 +26,11 @@ void section_table::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 		if (!is_virtual)
 		{
 			header.deserialize(buf, allow_virtual_memory);
-			is_virtual = header.base_struct().is_virtual();
+			is_virtual = header.get_descriptor().is_virtual();
 		}
 		else
 		{
-			header.base_struct().set_physical_size(0u);
+			header.get_descriptor().set_physical_size(0u);
 		}
 	}
 }
@@ -105,7 +105,7 @@ std::uint64_t section_table::get_raw_data_end_offset(
 	std::uint64_t result = 0;
 	for (const auto& header : headers_)
 	{
-		if (!header.base_struct()->pointer_to_raw_data)
+		if (!header.get_descriptor()->pointer_to_raw_data)
 			continue;
 
 		std::uint64_t section_end = header.get_pointer_to_raw_data();

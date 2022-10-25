@@ -47,9 +47,9 @@ std::uint32_t get_built_size_impl(const Directory& relocs, const builder_options
 
 	utilities::safe_uint<std::uint32_t> result;
 	result += descriptor_count
-		* Directory::value_type::packed_descriptor_type::packed_size;
+		* Directory::value_type::descriptor_type::packed_size;
 	result += total_elem_count
-		* Directory::value_type::entry_list_type::value_type::packed_descriptor_type::packed_size;
+		* Directory::value_type::entry_list_type::value_type::descriptor_type::packed_size;
 	return result.value();
 }
 
@@ -109,7 +109,7 @@ std::uint32_t build_new_impl(buffers::output_buffer_interface& buf, Directory& r
 		utilities::safe_uint<std::uint32_t> size;
 		size += descriptor.packed_size;
 		size += elem_count * Directory::value_type::entry_list_type
-			::value_type::packed_descriptor_type::packed_size;
+			::value_type::descriptor_type::packed_size;
 		size += requires_alignment * sizeof(detail::relocations::type_or_offset_entry);
 
 		descriptor->size_of_block = size.value();

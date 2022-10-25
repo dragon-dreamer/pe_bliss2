@@ -9,6 +9,7 @@
 
 #include "buffers/ref_buffer.h"
 #include "pe_bliss2/detail/concepts.h"
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/detail/tls/image_tls_directory.h"
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/packed_struct.h"
@@ -36,21 +37,16 @@ class [[nodiscard]] tls_callback_details
 
 template<typename Directory, typename TlsCallback>
 class [[nodiscard]] tls_directory_base
+	: public detail::packed_struct_base<Directory>
 {
 public:
 	using va_type = decltype(Directory::address_of_callbacks);
-	using packed_descriptor_type = packed_struct<Directory>;
 
 	using index_type = std::uint32_t;
 	using callback_type = TlsCallback;
 	using callback_list_type = std::vector<callback_type>;
 
 public:
-	[[nodiscard]]
-	const packed_descriptor_type& get_descriptor() const noexcept;
-	[[nodiscard]]
-	packed_descriptor_type& get_descriptor() noexcept;
-
 	[[nodiscard]]
 	const buffers::ref_buffer& get_raw_data() const noexcept;
 	[[nodiscard]]
@@ -68,7 +64,6 @@ public:
 	void set_max_type_alignment(std::uint32_t alignment);
 
 private:
-	packed_descriptor_type descriptor_;
 	buffers::ref_buffer raw_data_;
 	callback_list_type callbacks_;
 };

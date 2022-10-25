@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "pe_bliss2/error_list.h"
-#include "pe_bliss2/packed_struct.h"
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
 #include "pe_bliss2/relocations/relocation_entry.h"
 
@@ -14,10 +14,10 @@ namespace pe_bliss::relocations
 
 template<typename RelocationEntry>
 class [[nodiscard]] base_relocation_base
+	: public detail::packed_struct_base<detail::relocations::image_base_relocation>
 {
 public:
 	using entry_list_type = std::vector<RelocationEntry>;
-	using packed_descriptor_type = packed_struct<detail::relocations::image_base_relocation>;
 
 public:
 	[[nodiscard]]
@@ -37,20 +37,7 @@ public:
 		return std::move(relocations_);
 	}
 
-	[[nodiscard]]
-	const packed_descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	packed_descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
 private:
-	packed_descriptor_type descriptor_;
 	entry_list_type relocations_;
 };
 

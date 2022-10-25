@@ -53,7 +53,7 @@ void image_builder::build(const image& instance, buffers::output_buffer_interfac
 	if (section_tbl.get_section_headers().size() != sections.size())
 		throw pe_error(image_builder_errc::inconsistent_section_headers_and_data);
 
-	const auto& dos_hdr = instance.get_dos_header().base_struct();
+	const auto& dos_hdr = instance.get_dos_header().get_descriptor();
 	const auto& image_signature = instance.get_image_signature();
 	const auto& file_header = instance.get_file_header();
 	const auto& optional_header = instance.get_optional_header();
@@ -65,9 +65,9 @@ void image_builder::build(const image& instance, buffers::output_buffer_interfac
 	{
 		if (!sections.empty())
 		{
-			section_table_offset += core::image_signature::packed_struct_type::packed_size;
-			section_table_offset += core::file_header::packed_struct_type::packed_size;
-			section_table_offset += file_header.base_struct()->size_of_optional_header;
+			section_table_offset += core::image_signature::descriptor_type::packed_size;
+			section_table_offset += core::file_header::descriptor_type::packed_size;
+			section_table_offset += file_header.get_descriptor()->size_of_optional_header;
 			section_table_offset += buffer_start_pos;
 
 			auto section_hdr = section_tbl.get_section_headers().cbegin();

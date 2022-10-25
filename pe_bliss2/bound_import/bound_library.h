@@ -5,32 +5,17 @@
 #include <vector>
 
 #include "pe_bliss2/detail/bound_import/image_bound_import_descriptor.h"
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/packed_c_string.h"
-#include "pe_bliss2/packed_struct.h"
 
 namespace pe_bliss::detail::bound_import
 {
 
 template<typename Descriptor>
-class [[nodiscard]] bound_library_base
+class [[nodiscard]] bound_library_base : public packed_struct_base<Descriptor>
 {
 public:
-	using packed_descriptor_type = packed_struct<Descriptor>;
-
-public:
-	[[nodiscard]]
-	const packed_descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	packed_descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	const packed_c_string& get_library_name() const & noexcept
 	{
@@ -50,7 +35,6 @@ public:
 	}
 
 private:
-	packed_descriptor_type descriptor_;
 	packed_c_string library_name_;
 };
 

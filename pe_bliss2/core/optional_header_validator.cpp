@@ -220,7 +220,7 @@ pe_error_wrapper validate_size_of_image(
 		return {};
 	}
 
-	auto real_size_of_image = last_section->base_struct()->virtual_address;
+	auto real_size_of_image = last_section->get_descriptor()->virtual_address;
 	if (!utilities::math::add_if_safe(real_size_of_image,
 		last_section->get_virtual_size(oh.get_raw_section_alignment())))
 	{

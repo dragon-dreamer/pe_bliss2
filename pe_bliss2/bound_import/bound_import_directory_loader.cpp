@@ -161,7 +161,7 @@ std::optional<bound_library_details_list> load(const image::image& instance,
 
 	auto descriptors_end_offset = (descriptor_count + 1u)
 		* static_cast<std::uint32_t>(
-			bound_library_details_list::value_type::packed_descriptor_type::packed_size);
+			bound_library_details_list::value_type::descriptor_type::packed_size);
 	for (auto& entry : list)
 	{
 		check_name_offset(entry, descriptors_end_offset);

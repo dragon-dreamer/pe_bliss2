@@ -39,7 +39,7 @@ void dump_section_name(formatter& fmt, const pe_bliss::section::section_header& 
 
 void dump_section_header(formatter& fmt, const pe_bliss::section::section_header& header)
 {
-	fmt.print_structure("Section header", header.base_struct(), std::array{
+	fmt.print_structure("Section header", header.get_descriptor(), std::array{
 		value_info{"name", true,
 			std::bind(dump_section_name, std::ref(fmt), std::cref(header)), false},
 		value_info{"virtual_size"},

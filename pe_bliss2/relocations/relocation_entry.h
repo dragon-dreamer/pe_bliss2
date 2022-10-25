@@ -6,6 +6,7 @@
 #include <system_error>
 #include <type_traits>
 
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
 #include "pe_bliss2/core/file_header.h"
 #include "pe_bliss2/error_list.h"
@@ -43,27 +44,14 @@ enum class relocation_type : std::uint8_t
 };
 
 class [[nodiscard]] relocation_entry
+	: public detail::packed_struct_base<detail::relocations::type_or_offset_entry>
 {
 public:
-	using packed_descriptor_type = packed_struct<
-		detail::relocations::type_or_offset_entry>;
 	using address_type = std::uint16_t;
 	using optional_param_type = std::optional<
 		packed_struct<std::uint16_t>>;
 
 public:
-	[[nodiscard]]
-	const packed_descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	packed_descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	const optional_param_type& get_param() const noexcept
 	{
@@ -104,7 +92,6 @@ public:
 	}
 
 private:
-	packed_descriptor_type descriptor_;
 	optional_param_type param_;
 };
 

@@ -8,7 +8,7 @@
 
 void dump_dos_header(formatter& fmt, const pe_bliss::dos::dos_header& header)
 {
-	fmt.print_structure("DOS header", header.base_struct(), std::array{
+	fmt.print_structure("DOS header", header.get_descriptor(), std::array{
 		value_info{"e_magic"},
 		value_info{"e_cblp"},
 		value_info{"e_cp"},

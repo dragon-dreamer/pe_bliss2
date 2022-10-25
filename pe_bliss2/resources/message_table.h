@@ -7,7 +7,7 @@
 #include <vector>
 #include <utility>
 
-#include "pe_bliss2/packed_struct.h"
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/detail/resources/message_table.h"
 #include "pe_bliss2/error_list.h"
 
@@ -103,27 +103,15 @@ using unicode_message = message_string<message_encoding::unicode>;
 using utf8_message = message_string<message_encoding::utf8>;
 
 template<typename... Bases>
-class [[nodiscard]] message_entry_base : public Bases...
+class [[nodiscard]] message_entry_base
+	: public detail::packed_struct_base<detail::resources::message_resource_entry>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<
-		detail::resources::message_resource_entry>;
 	using message_type = std::variant<std::monostate,
 		ansi_message, unicode_message, utf8_message>;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	const message_type& get_message() const& noexcept
 	{
@@ -143,36 +131,23 @@ public:
 	}
 
 private:
-	descriptor_type descriptor_;
 	message_type message_;
 };
 
 template<typename... Bases>
-class [[nodiscard]] message_block_base : public Bases...
+class [[nodiscard]] message_block_base
+	: public detail::packed_struct_base<detail::resources::message_resource_block>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<
-		detail::resources::message_resource_block>;
 	using id_type = std::uint32_t;
 	using message_entry_list_type = std::vector<
 		message_entry_base<Bases...>>;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]] id_type get_start_id() const noexcept
 	{
-		return descriptor_->low_id;
+		return this->descriptor_->low_id;
 	}
 
 	void set_start_id(id_type start_id) noexcept;
@@ -196,30 +171,18 @@ public:
 	}
 
 private:
-	descriptor_type descriptor_;
 	message_entry_list_type entries_;
 };
 
 template<typename... Bases>
-class [[nodiscard]] message_table_base : public Bases...
+class [[nodiscard]] message_table_base
+	: public detail::packed_struct_base<detail::resources::message_resource_data>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::resources::message_resource_data>;
 	using message_block_list_type = std::vector<message_block_base<Bases...>>;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	message_block_list_type& get_message_blocks() & noexcept
 	{
@@ -239,7 +202,6 @@ public:
 	}
 
 private:
-	descriptor_type descriptor_;
 	message_block_list_type message_blocks_;
 };
 

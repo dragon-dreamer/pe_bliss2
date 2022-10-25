@@ -35,12 +35,12 @@ public:
 	[[nodiscard]]
 	signature_type get_signature() const noexcept
 	{
-		return base_struct().get();
+		return get_descriptor().get();
 	}
 
 	void set_signature(signature_type signature) noexcept
 	{
-		base_struct() = signature;
+		get_descriptor() = signature;
 	}
 };
 

@@ -3,37 +3,23 @@
 namespace pe_bliss::exceptions::x64
 {
 template<std::size_t Nodes>
-typename opcode_base<Nodes>::descriptor_type&
-	opcode_base<Nodes>::get_descriptor() noexcept
-{
-	return descriptor_;
-}
-
-template<std::size_t Nodes>
-const typename opcode_base<Nodes>::descriptor_type&
-	opcode_base<Nodes>::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
-template<std::size_t Nodes>
 opcode_id opcode_base<Nodes>::get_uwop_code() const noexcept
 {
 	return static_cast<opcode_id>(
-		descriptor_->unwind_operation_code_and_info & 0xfu);
+		this->descriptor_->unwind_operation_code_and_info & 0xfu);
 }
 
 template<std::size_t Nodes>
 std::uint8_t opcode_base<Nodes>::get_operation_info() const noexcept
 {
-	return (descriptor_->unwind_operation_code_and_info & 0xf0u) >> 4u;
+	return (this->descriptor_->unwind_operation_code_and_info & 0xf0u) >> 4u;
 }
 
 template<std::size_t Nodes>
 void opcode_base<Nodes>::set_uwop_code(opcode_id opcode) noexcept
 {
-	descriptor_->unwind_operation_code_and_info &= ~0xfu;
-	descriptor_->unwind_operation_code_and_info
+	this->descriptor_->unwind_operation_code_and_info &= ~0xfu;
+	this->descriptor_->unwind_operation_code_and_info
 		|= static_cast<std::uint8_t>(opcode) & 0xfu;
 }
 
@@ -43,8 +29,8 @@ void opcode_base<Nodes>::set_operation_info(std::uint8_t info)
 	if (info > 0xfu)
 		throw pe_error(exception_directory_errc::invalid_operation_info);
 
-	descriptor_->unwind_operation_code_and_info &= ~0xf0u;
-	descriptor_->unwind_operation_code_and_info |= info << 4u;
+	this->descriptor_->unwind_operation_code_and_info &= ~0xf0u;
+	this->descriptor_->unwind_operation_code_and_info |= info << 4u;
 }
 
 template<std::size_t Nodes>
@@ -139,17 +125,6 @@ inline std::uint64_t set_fpreg_large::get_offset() const noexcept
 	return get_descriptor()->node * 16ull;
 }
 
-inline unwind_info::descriptor_type& unwind_info::get_descriptor() noexcept
-{
-	return descriptor_;
-}
-
-inline const unwind_info::descriptor_type& unwind_info
-	::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
 inline unwind_info::unwind_code_list_type& unwind_info
 	::get_unwind_code_list() & noexcept
 {
@@ -187,20 +162,6 @@ inline std::uint8_t unwind_info::get_scaled_frame_register_offset() const noexce
 inline void unwind_info::clear_frame_register() noexcept
 {
 	descriptor_->frame_register_and_offset &= ~0xfu;
-}
-
-template<typename... Bases>
-typename runtime_function_base<Bases...>::descriptor_type&
-	runtime_function_base<Bases...>::get_descriptor() noexcept
-{
-	return descriptor_;
-}
-
-template<typename... Bases>
-const typename runtime_function_base<Bases...>::descriptor_type&
-	runtime_function_base<Bases...>::get_descriptor() const noexcept
-{
-	return descriptor_;
 }
 
 template<typename... Bases>

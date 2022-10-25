@@ -33,7 +33,7 @@ public:
 			buf.set_wpos(buffer_offset);
 		}
 
-		auto& dos_header = instance.get_dos_header().base_struct();
+		auto& dos_header = instance.get_dos_header().get_descriptor();
 		dos_header->e_magic = dos::dos_header::mz_magic_value;
 
 		dos_header->e_lfanew = dos_header.packed_size + dos_stub_size;
@@ -41,11 +41,11 @@ public:
 		instance.get_dos_stub().copied_data().resize(dos_stub_size);
 		instance.get_dos_stub().copied_data()[0] = dos_stub_first_byte;
 
-		instance.get_image_signature().base_struct()
+		instance.get_image_signature().get_descriptor()
 			= core::image_signature::pe_signature;
 		instance.get_file_header().set_machine_type(
 			core::file_header::machine_type::i386);
-		instance.get_file_header().base_struct()->size_of_optional_header
+		instance.get_file_header().get_descriptor()->size_of_optional_header
 			= static_cast<std::uint32_t>(instance.get_optional_header().get_size_of_structure()
 				+ number_of_data_directories * core::data_directories::directory_packed_size);
 
@@ -56,9 +56,9 @@ public:
 		instance.get_data_directories().get_directories()[0]->virtual_address
 			= static_cast<std::uint32_t>(first_dir_rva_byte);
 
-		full_headers_length = dos::dos_header::packed_struct_type::packed_size
-			+ core::image_signature::packed_struct_type::packed_size
-			+ core::file_header::packed_struct_type::packed_size
+		full_headers_length = dos::dos_header::descriptor_type::packed_size
+			+ core::image_signature::descriptor_type::packed_size
+			+ core::file_header::descriptor_type::packed_size
 			+ instance.get_optional_header().get_size_of_structure()
 			+ core::data_directories::directory_packed_size * number_of_data_directories
 			+ dos_stub_size;
@@ -76,7 +76,7 @@ public:
 		EXPECT_EQ(data_span[0], std::byte{ 'M' });
 		EXPECT_EQ(data_span[1], std::byte{ 'Z' });
 
-		std::size_t offset = dos::dos_header::packed_struct_type::packed_size;
+		std::size_t offset = dos::dos_header::descriptor_type::packed_size;
 		EXPECT_EQ(data_span[offset], dos_stub_first_byte);
 
 		offset += dos_stub_size;
@@ -84,12 +84,12 @@ public:
 		EXPECT_EQ(data_span[offset], std::byte{ 'P' });
 		EXPECT_EQ(data_span[offset + 1], std::byte{ 'E' });
 
-		offset += core::image_signature::packed_struct_type::packed_size;
+		offset += core::image_signature::descriptor_type::packed_size;
 		//machine
 		EXPECT_EQ(data_span[offset], std::byte{ 0x4c });
 		EXPECT_EQ(data_span[offset + 1], std::byte{ 0x01 });
 
-		offset += core::file_header::packed_struct_type::packed_size;
+		offset += core::file_header::descriptor_type::packed_size;
 		//optional header magic (x86)
 		EXPECT_EQ(data_span[offset], std::byte{ 0x0b });
 		EXPECT_EQ(data_span[offset + 1], std::byte{ 0x01 });
@@ -136,14 +136,14 @@ TEST_P(ImageBuilderTestsFixture, BuildNoSections)
 TEST_P(ImageBuilderTestsFixture, BuildOverlappingELfanew)
 {
 	static constexpr std::uint32_t overlapping_e_lfanew = 4u;
-	instance.get_dos_header().base_struct()->e_lfanew = overlapping_e_lfanew;
+	instance.get_dos_header().get_descriptor()->e_lfanew = overlapping_e_lfanew;
 	instance.get_dos_stub().copied_data().clear();
 	EXPECT_NO_THROW(image::image_builder::build(instance, buf));
 
 	auto data_span = get_data_span();
 	ASSERT_EQ(data_span.size(), overlapping_e_lfanew
-		+ core::image_signature::packed_struct_type::packed_size
-		+ core::file_header::packed_struct_type::packed_size
+		+ core::image_signature::descriptor_type::packed_size
+		+ core::file_header::descriptor_type::packed_size
 		+ instance.get_optional_header().get_size_of_structure()
 		+ core::data_directories::directory_packed_size * number_of_data_directories);
 
@@ -184,9 +184,9 @@ TEST_P(ImageBuilderTestsFixture, BuildWithSections)
 
 	instance.get_section_table().get_section_headers().reserve(2);
 	auto& header1 = instance.get_section_table()
-		.get_section_headers().emplace_back().base_struct();
+		.get_section_headers().emplace_back().get_descriptor();
 	auto& header2 = instance.get_section_table()
-		.get_section_headers().emplace_back().base_struct();
+		.get_section_headers().emplace_back().get_descriptor();
 
 	header1->name[0] = section1_first_name_char;
 	header1->pointer_to_raw_data = section1_headers_offset;
@@ -209,7 +209,7 @@ TEST_P(ImageBuilderTestsFixture, BuildWithSections)
 	auto offset = validate_pe_headers();
 
 	EXPECT_EQ(data_span[offset], std::byte{ section1_first_name_char });
-	offset += section::section_header::packed_struct_type::packed_size;
+	offset += section::section_header::descriptor_type::packed_size;
 	EXPECT_EQ(data_span[offset], std::byte{ section2_first_name_char });
 
 	EXPECT_EQ(data_span[header1->pointer_to_raw_data], section1_first_data_byte);
@@ -222,21 +222,21 @@ TEST_P(ImageBuilderTestsFixture, BuildWithOptionalHeaderGap)
 	static constexpr std::byte first_extra_headers_byte{ 0xef };
 
 	instance.get_full_headers_buffer().copied_data().resize(full_headers_length
-		+ section::section_header::packed_struct_type::packed_size
+		+ section::section_header::descriptor_type::packed_size
 		+ optional_header_gap);
 	instance.get_full_headers_buffer().copied_data()[full_headers_length]
 		= first_extra_headers_byte;
 
 	instance.get_section_table().get_section_headers().resize(1);
 	instance.get_section_data_list().resize(1);
-	instance.get_file_header().base_struct()->size_of_optional_header
+	instance.get_file_header().get_descriptor()->size_of_optional_header
 		+= optional_header_gap;
 
 	EXPECT_NO_THROW(image::image_builder::build(instance, buf));
 
 	auto data_span = get_data_span();
 	ASSERT_EQ(data_span.size(), full_headers_length + optional_header_gap
-		+ section::section_header::packed_struct_type::packed_size);
+		+ section::section_header::descriptor_type::packed_size);
 	validate_pe_headers();
 
 	EXPECT_EQ(data_span[full_headers_length], first_extra_headers_byte);

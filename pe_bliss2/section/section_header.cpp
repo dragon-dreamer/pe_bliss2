@@ -21,7 +21,7 @@ void section_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf
 {
 	try
 	{
-		base_struct().deserialize(buf, allow_virtual_memory);
+		get_descriptor().deserialize(buf, allow_virtual_memory);
 	}
 	catch (const std::system_error&)
 	{
@@ -33,7 +33,7 @@ void section_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf
 void section_header::serialize(buffers::output_buffer_interface& buf,
 	bool write_virtual_part) const
 {
-	base_struct().serialize(buf, write_virtual_part);
+	get_descriptor().serialize(buf, write_virtual_part);
 }
 
 rva_type section_header::rva_from_section_offset(
@@ -48,12 +48,12 @@ rva_type section_header::rva_from_section_offset(
 
 std::string_view section_header::get_name() const noexcept
 {
-	auto begin = base_struct()->name;
+	auto begin = get_descriptor()->name;
 	auto end = begin + sizeof(detail::image_section_header::name) - 1;
 	while (end >= begin && !*end)
 		--end;
 
-	return { reinterpret_cast<const char*>(base_struct()->name),
+	return { reinterpret_cast<const char*>(get_descriptor()->name),
 		static_cast<std::size_t>(end - begin + 1) };
 }
 
@@ -62,27 +62,27 @@ section_header& section_header::set_name(std::string_view name)
 	if (name.size() > sizeof(detail::image_section_header::name))
 		throw pe_error(utilities::generic_errc::buffer_overrun);
 
-	std::fill(std::begin(base_struct()->name),
-		std::end(base_struct()->name), static_cast<std::uint8_t>(0u));
-	std::copy(std::begin(name), std::end(name), base_struct()->name);
+	std::fill(std::begin(get_descriptor()->name),
+		std::end(get_descriptor()->name), static_cast<std::uint8_t>(0u));
+	std::copy(std::begin(name), std::end(name), get_descriptor()->name);
 	return *this;
 }
 
 rva_type section_header::get_rva() const noexcept
 {
-	return base_struct()->virtual_address;
+	return get_descriptor()->virtual_address;
 }
 
 section_header& section_header::set_rva(std::uint32_t rva) noexcept
 {
-	base_struct()->virtual_address = rva;
+	get_descriptor()->virtual_address = rva;
 	return *this;
 }
 
 std::uint32_t section_header::get_raw_size(
 	std::uint32_t section_alignment) const noexcept
 {
-	auto raw_size = base_struct()->size_of_raw_data;
+	auto raw_size = get_descriptor()->size_of_raw_data;
 	auto virtual_size = get_virtual_size(section_alignment);
 	if (raw_size > virtual_size)
 		raw_size = virtual_size;
@@ -92,9 +92,9 @@ std::uint32_t section_header::get_raw_size(
 std::uint32_t section_header::get_virtual_size(
 	std::uint32_t section_alignment) const noexcept
 {
-	auto virtual_size = base_struct()->virtual_size;
+	auto virtual_size = get_descriptor()->virtual_size;
 	if (!virtual_size)
-		virtual_size = base_struct()->size_of_raw_data;
+		virtual_size = get_descriptor()->size_of_raw_data;
 	if (!std::has_single_bit(section_alignment))
 		return virtual_size;
 
@@ -106,12 +106,12 @@ std::uint32_t section_header::get_virtual_size(
 
 bool section_header::is_low_alignment() const noexcept
 {
-	return base_struct()->virtual_address == get_pointer_to_raw_data();
+	return get_descriptor()->virtual_address == get_pointer_to_raw_data();
 }
 
 std::uint32_t section_header::get_pointer_to_raw_data() const noexcept
 {
-	auto result = base_struct()->pointer_to_raw_data;
+	auto result = get_descriptor()->pointer_to_raw_data;
 	if (result <= max_raw_address_rounded_to_0)
 		result = 0;
 	return result;
@@ -120,7 +120,7 @@ std::uint32_t section_header::get_pointer_to_raw_data() const noexcept
 section_header& section_header::set_pointer_to_raw_data(
 	std::uint32_t pointer_to_raw_data) noexcept
 {
-	base_struct()->pointer_to_raw_data = pointer_to_raw_data;
+	get_descriptor()->pointer_to_raw_data = pointer_to_raw_data;
 	return *this;
 }
 
@@ -128,13 +128,13 @@ section_header::characteristics::value
 	section_header::get_characteristics() const noexcept
 {
 	return static_cast<characteristics::value>(
-		base_struct()->characteristics);
+		get_descriptor()->characteristics);
 }
 
 section_header& section_header::set_characteristics(
 	characteristics::value value) noexcept
 {
-	base_struct()->characteristics = value;
+	get_descriptor()->characteristics = value;
 	return *this;
 }
 
@@ -183,8 +183,8 @@ bool section_header::is_cacheable() const noexcept
 void section_header::toggle_characteristic(bool toggle,
 	std::uint32_t flag) noexcept
 {
-	base_struct()->characteristics
-		^= ((0u - toggle) ^ base_struct()->characteristics) & flag;
+	get_descriptor()->characteristics
+		^= ((0u - toggle) ^ get_descriptor()->characteristics) & flag;
 }
 
 section_header& section_header::set_writable(bool writable) noexcept
@@ -231,7 +231,7 @@ section_header& section_header::set_non_cacheable(bool non_cacheable) noexcept
 
 bool section_header::empty() const noexcept
 {
-	return base_struct()->size_of_raw_data == 0;
+	return get_descriptor()->size_of_raw_data == 0;
 }
 
 section_header& section_header::set_virtual_size(
@@ -242,18 +242,18 @@ section_header& section_header::set_virtual_size(
 		if (empty())
 			throw pe_error(section_errc::invalid_section_virtual_size);
 
-		base_struct()->virtual_size = base_struct()->size_of_raw_data;
+		get_descriptor()->virtual_size = get_descriptor()->size_of_raw_data;
 	}
 	else
 	{
-		base_struct()->virtual_size = virtual_size;
+		get_descriptor()->virtual_size = virtual_size;
 	}
 	return *this;
 }
 
 section_header& section_header::set_raw_size(std::uint32_t raw_size) noexcept
 {
-	base_struct()->size_of_raw_data = raw_size;
+	get_descriptor()->size_of_raw_data = raw_size;
 	return *this;
 }
 

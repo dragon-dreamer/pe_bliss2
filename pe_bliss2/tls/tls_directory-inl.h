@@ -5,20 +5,6 @@
 namespace pe_bliss::tls
 {
 template<typename Directory, typename TlsCallback>
-const typename tls_directory_base<Directory, TlsCallback>::packed_descriptor_type&
-	tls_directory_base<Directory, TlsCallback>::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
-template<typename Directory, typename TlsCallback>
-typename tls_directory_base<Directory, TlsCallback>::packed_descriptor_type&
-	tls_directory_base<Directory, TlsCallback>::get_descriptor() noexcept
-{
-	return descriptor_;
-}
-
-template<typename Directory, typename TlsCallback>
 const buffers::ref_buffer& tls_directory_base<Directory,
 	TlsCallback>::get_raw_data() const noexcept
 {
@@ -56,7 +42,7 @@ template<typename Directory, typename TlsCallback>
 std::uint32_t tls_directory_base<Directory, TlsCallback>
 	::get_max_type_alignment() const noexcept
 {
-	std::uint32_t alignment = descriptor_->characteristics & 0xf00000u;
+	std::uint32_t alignment = this->descriptor_->characteristics & 0xf00000u;
 	if (!alignment)
 		return 0;
 
@@ -73,10 +59,10 @@ void tls_directory_base<Directory, TlsCallback>
 	if (!std::has_single_bit(alignment))
 		throw pe_error(tls_directory_errc::invalid_alignment_value);
 
-	descriptor_->characteristics &= ~0xf00000u;
+	this->descriptor_->characteristics &= ~0xf00000u;
 	if (!alignment)
 		return;
 
-	descriptor_->characteristics |= std::bit_width(alignment) << 20u;
+	this->descriptor_->characteristics |= std::bit_width(alignment) << 20u;
 }
 } //namespace pe_bliss::tls

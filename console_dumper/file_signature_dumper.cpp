@@ -9,7 +9,7 @@
 void dump_file_signature(formatter& fmt,
 	const pe_bliss::core::image_signature& signature)
 {
-	fmt.print_structure("File header signature", signature.base_struct(), std::array{
+	fmt.print_structure("File header signature", signature.get_descriptor(), std::array{
 		value_info{"signature"},
 	});
 }

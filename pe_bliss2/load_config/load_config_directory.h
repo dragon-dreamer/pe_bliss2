@@ -17,6 +17,7 @@
 #include "pe_bliss2/packed_c_string.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/relocations/image_base_relocation.h"
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/pe_types.h"
 
@@ -596,22 +597,17 @@ private:
 };
 
 template<typename... Bases>
-class [[nodiscard]] bdd_info : public Bases...
+class [[nodiscard]] bdd_info
+	: public detail::packed_struct_base<detail::load_config::image_bdd_info>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<
-		detail::load_config::image_bdd_info>;
 	using dynamic_relocation_type = packed_struct<
 		detail::load_config::image_bdd_dynamic_relocation>;
 	using dynamic_relocation_list_type = std::vector<
 		dynamic_relocation_type>;
 
 public:
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept;
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept;
-
 	[[nodiscard]]
 	const dynamic_relocation_list_type& get_relocations() const& noexcept;
 	[[nodiscard]]
@@ -620,7 +616,6 @@ public:
 	dynamic_relocation_list_type get_relocations() && noexcept;
 
 private:
-	descriptor_type descriptor_;
 	dynamic_relocation_list_type relocations_;
 };
 
@@ -670,11 +665,12 @@ private:
 };
 
 template<typename... Bases>
-class [[nodiscard]] function_override_dynamic_relocation_item : public Bases...
+class [[nodiscard]] function_override_dynamic_relocation_item
+	: public detail::packed_struct_base<
+		detail::load_config::image_function_override_dynamic_relocation>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<
-		detail::load_config::image_function_override_dynamic_relocation>;
 	using rva_type = packed_struct<std::uint32_t>;
 	using rva_list_type = std::vector<rva_type>;
 	using base_relocation_list_base = dynamic_relocation_list_base<
@@ -683,11 +679,6 @@ public:
 	using bdd_info_type = bdd_info<Bases...>;
 
 public:
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept;
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept;
-
 	[[nodiscard]]
 	const rva_list_type& get_rvas() const& noexcept;
 	[[nodiscard]]
@@ -710,7 +701,6 @@ public:
 	bdd_info_type get_bdd_info() && noexcept;
 
 private:
-	descriptor_type descriptor_;
 	rva_list_type rvas_;
 	base_relocation_list_type base_relocations_;
 	bdd_info_type bdd_info_;
@@ -845,17 +835,12 @@ private:
 };
 
 class [[nodiscard]] epilogue_branch_descriptor
+	: public detail::packed_struct_base<std::uint16_t>
 {
 public:
-	using descriptor_type = packed_struct<std::uint16_t>;
 	using value_type = packed_byte_vector;
 
 public:
-	[[nodiscard]]
-	inline const descriptor_type& get_descriptor() const noexcept;
-	[[nodiscard]]
-	inline descriptor_type& get_descriptor() noexcept;
-
 	[[nodiscard]]
 	inline const value_type& get_value() const& noexcept;
 	[[nodiscard]]
@@ -877,7 +862,6 @@ public:
 	void set_disp_size(std::uint8_t disp_size);
 
 private:
-	descriptor_type descriptor_;
 	value_type value_;
 };
 
@@ -1015,18 +999,13 @@ enum class enclave_import_match : std::uint32_t
 
 template<typename... Bases>
 class [[nodiscard]] enclave_import_base
-	: public Bases...
+	: public detail::packed_struct_base<detail::load_config::image_enclave_import>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::load_config::image_enclave_import>;
 	using extra_data_type = packed_byte_vector;
 
 public:
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept;
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept;
-
 	[[nodiscard]]
 	const packed_c_string& get_name() const& noexcept;
 	[[nodiscard]]
@@ -1047,7 +1026,6 @@ public:
 	void set_match(enclave_import_match match) noexcept;
 
 private:
-	descriptor_type descriptor_;
 	packed_c_string name_;
 	extra_data_type extra_data_;
 };
@@ -1070,19 +1048,14 @@ struct enclave_flags final : utilities::static_class
 
 template<detail::executable_pointer Va, typename... Bases>
 class [[nodiscard]] enclave_config_base
-	: public Bases...
+	: public detail::packed_struct_base<detail::load_config::image_enclave_config<Va>>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::load_config::image_enclave_config<Va>>;
 	using enclave_import_list_type = std::vector<enclave_import_base<Bases...>>;
 	using extra_data_type = packed_byte_vector;
 
 public:
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept;
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept;
-	
 	[[nodiscard]]
 	const enclave_import_list_type& get_imports() const& noexcept;
 	[[nodiscard]]
@@ -1107,28 +1080,22 @@ public:
 	void set_flags(enclave_flags::value flags) noexcept;
 
 private:
-	descriptor_type descriptor_;
 	enclave_import_list_type import_list_;
 	extra_data_type extra_data_;
 };
 
 template<typename... Bases>
 class [[nodiscard]] volatile_metadata_base
-	: public Bases...
+	: public detail::packed_struct_base<detail::load_config::image_volatile_metadata>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::load_config::image_volatile_metadata>;
 	using packed_rva_type = packed_struct<rva_type>;
 	using range_entry_type = packed_struct<detail::load_config::range_table_entry>;
 	using packed_rva_list_type = std::vector<packed_rva_type>;
 	using range_entry_list_type = std::vector<range_entry_type>;
 
 public:
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept;
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept;
-
 	[[nodiscard]]
 	const packed_rva_list_type& get_access_rva_table() const& noexcept;
 	[[nodiscard]]
@@ -1144,17 +1111,17 @@ public:
 	range_entry_list_type get_range_table() && noexcept;
 
 private:
-	descriptor_type descriptor_;
 	packed_rva_list_type access_rva_table_;
 	range_entry_list_type range_table_;
 };
 
 template<typename Descriptor, typename... Bases>
-class [[nodiscard]] load_config_directory_impl : public Bases...
+class [[nodiscard]] load_config_directory_impl
+	: public detail::packed_struct_base<Descriptor>
+	, public Bases...
 {
 public:
 	using size_type = packed_struct<std::uint32_t>;
-	using packed_descriptor_type = packed_struct<Descriptor>;
 	using pointer_type = typename Descriptor::pointer_type;
 	using packed_rva_type = packed_struct<rva_type>;
 	using packed_rva_optional_list_type = std::optional<std::vector<packed_rva_type>>;
@@ -1178,9 +1145,6 @@ public:
 	bool version_exactly_matches() const noexcept;
 
 	[[nodiscard]]
-	const packed_descriptor_type& get_descriptor() const noexcept;
-
-	[[nodiscard]]
 	std::uint32_t get_descriptor_size() const noexcept;
 
 	[[nodiscard]]
@@ -1189,9 +1153,6 @@ public:
 	const size_type& get_size() const noexcept;
 
 public:
-	[[nodiscard]]
-	packed_descriptor_type& get_descriptor() noexcept;
-
 	void set_version(version ver);
 
 public:
@@ -1274,7 +1235,6 @@ public: //GuardEH
 
 private:
 	size_type size_{};
-	packed_descriptor_type descriptor_;
 	lock_prefix_table_type lock_prefixes_;
 	handler_table_type safeseh_handler_table_;
 	guard_function_table_type guard_cf_function_table_;

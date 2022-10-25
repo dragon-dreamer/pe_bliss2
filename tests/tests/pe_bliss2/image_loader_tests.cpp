@@ -409,7 +409,7 @@ void test_full_image(const buffers::input_buffer_ptr& buf,
 	EXPECT_EQ(section_headers[0].get_name(), "testsect");
 	EXPECT_EQ(section_headers[1].get_rva(), 0x6000u);
 
-	EXPECT_EQ(result.image.get_dos_header().base_struct()->e_lfanew, 0x48u);
+	EXPECT_EQ(result.image.get_dos_header().get_descriptor()->e_lfanew, 0x48u);
 
 	EXPECT_EQ(result.image.get_dos_stub().is_copied(), options.dos_stub_copied);
 	EXPECT_EQ(result.image.get_dos_stub().copied_data()[0], std::byte{ 'a' });

@@ -7,10 +7,10 @@
 #include <vector>
 
 #include "buffers/ref_buffer.h"
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/detail/resources/version_info.h"
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/packed_c_string.h"
-#include "pe_bliss2/packed_struct.h"
 
 namespace pe_bliss::resources
 {
@@ -22,28 +22,17 @@ enum class version_info_value_type : std::uint16_t
 };
 
 template<typename... Bases>
-class [[nodiscard]] version_info_block_base : public Bases...
+class [[nodiscard]] version_info_block_base
+	: public detail::packed_struct_base<detail::resources::version_info_block>
+	, public Bases...
 {
 public:
-	using descriptor_type = packed_struct<detail::resources::version_info_block>;
 	using key_type = std::optional<packed_utf16_c_string>;
 	using child_list_type = std::vector<version_info_block_base<Bases...>>;
 	using value_type = std::variant<std::monostate,
 		buffers::ref_buffer, packed_utf16_c_string>;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	key_type& get_key() & noexcept
 	{
@@ -105,7 +94,6 @@ public:
 	}
 
 private:
-	descriptor_type descriptor_;
 	key_type key_;
 	value_type value_;
 	child_list_type children_;

@@ -83,8 +83,8 @@ TEST(SectionTableTests, DeserializeTest2)
 	ASSERT_NO_THROW(table.deserialize(ref, 3u, true));
 	EXPECT_EQ(table.get_section_headers().size(), 3u);
 	for (const auto& header : table.get_section_headers()) {
-		EXPECT_EQ(header.base_struct().get(), detail::image_section_header{});
-		EXPECT_EQ(header.base_struct().physical_size(), 0u);
+		EXPECT_EQ(header.get_descriptor().get(), detail::image_section_header{});
+		EXPECT_EQ(header.get_descriptor().physical_size(), 0u);
 	}
 }
 
@@ -150,9 +150,9 @@ TEST(SectionTableTests, DeserializeTest3)
 	ASSERT_EQ(table.get_section_headers().size(), 3u);
 
 	const auto& headers = table.get_section_headers();
-	EXPECT_EQ(headers[0].base_struct().get(), section_header0);
-	EXPECT_EQ(headers[1].base_struct().get(), section_header1);
-	EXPECT_EQ(headers[2].base_struct().get(), detail::image_section_header{});
+	EXPECT_EQ(headers[0].get_descriptor().get(), section_header0);
+	EXPECT_EQ(headers[1].get_descriptor().get(), section_header1);
+	EXPECT_EQ(headers[2].get_descriptor().get(), detail::image_section_header{});
 }
 
 TEST(SectionTableTests, DeserializeTest4)
@@ -169,17 +169,17 @@ TEST(SectionTableTests, DeserializeTest4)
 
 	ASSERT_EQ(table.get_section_headers().size(), 2u);
 	const auto& headers = table.get_section_headers();
-	EXPECT_EQ(headers[0].base_struct().get(), section_header0);
+	EXPECT_EQ(headers[0].get_descriptor().get(), section_header0);
 }
 
 TEST(SectionTableTests, SerializeTest1)
 {
 	section_table table;
 	section_header header0;
-	header0.base_struct() = section_header0;
+	header0.get_descriptor() = section_header0;
 	section_header header1;
-	header1.base_struct() = section_header1;
-	header1.base_struct().set_physical_size(section_header_data.size() -
+	header1.get_descriptor() = section_header1;
+	header1.get_descriptor().set_physical_size(section_header_data.size() -
 		detail::packed_reflection::get_type_size<detail::image_section_header>());
 	table.get_section_headers().emplace_back(header0);
 	table.get_section_headers().emplace_back(header1);
@@ -194,7 +194,7 @@ TEST(SectionTableTests, SerializeTest1)
 	data.clear();
 	buf.set_wpos(0);
 	ASSERT_NO_THROW(table.serialize(buf, true));
-	ASSERT_EQ(data.size(), header0.base_struct().packed_size * 2u);
+	ASSERT_EQ(data.size(), header0.get_descriptor().packed_size * 2u);
 	EXPECT_TRUE(std::equal(section_header_data.cbegin(),
 		section_header_data.cend(), data.cbegin()));
 }
@@ -399,17 +399,17 @@ TEST(SectionTableTests, GetRawDataEndOffsetTest)
 	EXPECT_EQ(table.get_raw_data_end_offset(0x1000), 0u);
 
 	auto& s1 = table.get_section_headers().emplace_back();
-	s1.base_struct()->size_of_raw_data = 0x200u;
-	s1.base_struct()->pointer_to_raw_data = 0x800u;
+	s1.get_descriptor()->size_of_raw_data = 0x200u;
+	s1.get_descriptor()->pointer_to_raw_data = 0x800u;
 	auto& s2 = table.get_section_headers().emplace_back();
-	s2.base_struct()->size_of_raw_data = 0x200u;
-	s2.base_struct()->pointer_to_raw_data = 0x400u;
+	s2.get_descriptor()->size_of_raw_data = 0x200u;
+	s2.get_descriptor()->pointer_to_raw_data = 0x400u;
 
 	EXPECT_EQ(table.get_raw_data_end_offset(0x1000), 0xa00u);
 
-	s2.base_struct()->size_of_raw_data
+	s2.get_descriptor()->size_of_raw_data
 		= (std::numeric_limits<std::uint32_t>::max)() - 1u;
-	s2.base_struct()->pointer_to_raw_data = s2.base_struct()->size_of_raw_data;
+	s2.get_descriptor()->pointer_to_raw_data = s2.get_descriptor()->size_of_raw_data;
 
 	std::uint64_t expected = (std::numeric_limits<std::uint32_t>::max)() - 1u;
 	expected *= 2u;

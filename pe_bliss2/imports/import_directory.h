@@ -8,8 +8,8 @@
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/packed_c_string.h"
-#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/imports/image_import_descriptor.h"
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/imports/imported_address.h"
 
 namespace pe_bliss::imports
@@ -20,11 +20,10 @@ namespace pe_bliss::imports
 
 template<typename ImportedAddressList>
 class [[nodiscard]] imported_library_base
+	: public detail::packed_struct_base<detail::imports::image_import_descriptor>
 {
 public:
 	using imported_address_list = ImportedAddressList;
-	using packed_descriptor_type = packed_struct<
-		detail::imports::image_import_descriptor>;
 
 public:
 	[[nodiscard]]
@@ -71,18 +70,6 @@ public:
 	}
 
 	[[nodiscard]]
-	const packed_descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	packed_descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-	
-	[[nodiscard]]
 	const imported_address_list& get_imports() const & noexcept
 	{
 		return imports_;
@@ -101,7 +88,6 @@ public:
 	}
 
 public:
-	packed_descriptor_type descriptor_;
 	packed_c_string library_name_;
 	imported_address_list imports_;
 };

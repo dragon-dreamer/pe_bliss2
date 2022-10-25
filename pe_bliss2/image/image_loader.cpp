@@ -77,8 +77,8 @@ image_load_result image_loader::load(
 		if (options.dos_header_validation.validate_e_lfanew)
 			dos::validate_e_lfanew(dos_hdr).throw_on_error();
 
-		auto e_lfanew = dos_hdr.base_struct()->e_lfanew;
-		if (e_lfanew < dos::dos_header::packed_struct_type::packed_size)
+		auto e_lfanew = dos_hdr.get_descriptor()->e_lfanew;
+		if (e_lfanew < dos::dos_header::descriptor_type::packed_size)
 		{
 			wrapper.set_rpos(e_lfanew);
 		}
@@ -102,7 +102,7 @@ image_load_result image_loader::load(
 		if (options.validate_size_of_optional_header)
 		{
 			if (auto err = validate_size_of_optional_header(
-				file_hdr.base_struct()->size_of_optional_header,
+				file_hdr.get_descriptor()->size_of_optional_header,
 				optional_hdr); err)
 			{
 				result.warnings.add_error(err);
@@ -133,7 +133,7 @@ image_load_result image_loader::load(
 		}
 
 		auto& section_tbl = instance.get_section_table();
-		section_tbl.deserialize(wrapper, file_hdr.base_struct()->number_of_sections,
+		section_tbl.deserialize(wrapper, file_hdr.get_descriptor()->number_of_sections,
 			options.allow_virtual_headers);
 
 		const auto& section_headers = section_tbl.get_section_headers();

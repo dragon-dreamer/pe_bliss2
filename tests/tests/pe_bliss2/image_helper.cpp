@@ -27,7 +27,7 @@ pe_bliss::image::image create_test_image(const test_image_options& options)
 			core::optional_header::optional_header_32_type>();
 	}
 
-	auto& dos_struct = instance.get_dos_header().base_struct();
+	auto& dos_struct = instance.get_dos_header().get_descriptor();
 	dos_struct->e_magic = dos::dos_header::mz_magic_value;
 	dos_struct->e_lfanew = options.e_lfanew;
 
@@ -40,7 +40,7 @@ pe_bliss::image::image create_test_image(const test_image_options& options)
 	instance.get_section_data_list().resize(options.sections.size());
 	instance.update_number_of_sections();
 
-	instance.get_file_header().base_struct()->size_of_optional_header
+	instance.get_file_header().get_descriptor()->size_of_optional_header
 		= static_cast<std::uint16_t>(
 			instance.get_optional_header().get_size_of_structure()
 			+ instance.get_data_directories().get_directories().size()
@@ -48,11 +48,11 @@ pe_bliss::image::image create_test_image(const test_image_options& options)
 
 	instance.get_optional_header().set_raw_size_of_headers(
 		static_cast<std::uint32_t>(options.e_lfanew
-			+ core::image_signature::packed_struct_type::packed_size
-			+ core::file_header::packed_struct_type::packed_size
-			+ instance.get_file_header().base_struct()->size_of_optional_header
+			+ core::image_signature::descriptor_type::packed_size
+			+ core::file_header::descriptor_type::packed_size
+			+ instance.get_file_header().get_descriptor()->size_of_optional_header
 			+ options.sections.size()
-			* section::section_header::packed_struct_type::packed_size)
+			* section::section_header::descriptor_type::packed_size)
 	);
 
 	instance.get_optional_header().set_raw_image_base(options.image_base);

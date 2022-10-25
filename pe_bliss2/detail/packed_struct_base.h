@@ -13,23 +13,23 @@ class packed_struct_base
 {
 public:
 	using underlying_struct_type = Struct;
-	using packed_struct_type = typename packed_struct<Struct, Endianness>;
+	using descriptor_type = typename packed_struct<Struct, Endianness>;
 
 public:
 	[[nodiscard]]
-	packed_struct_type& base_struct() noexcept
+	descriptor_type& get_descriptor() noexcept
 	{
-		return struct_;
+		return descriptor_;
 	}
 
 	[[nodiscard]]
-	const packed_struct_type& base_struct() const noexcept
+	const descriptor_type& get_descriptor() const noexcept
 	{
-		return struct_;
+		return descriptor_;
 	}
 
-private:
-	packed_struct_type struct_;
+protected:
+	descriptor_type descriptor_;
 };
 
 } //namespace pe_bliss::detail

@@ -92,7 +92,7 @@ void dump_file_header_machine(formatter& fmt, const pe_bliss::core::file_header&
 
 void dump_file_header(formatter& fmt, const pe_bliss::core::file_header& header)
 {
-	fmt.print_structure("File header", header.base_struct(), std::array{
+	fmt.print_structure("File header", header.get_descriptor(), std::array{
 		value_info{"machine", true, std::bind(
 			dump_file_header_machine, std::ref(fmt), std::cref(header))},
 		value_info{"number_of_sections"},

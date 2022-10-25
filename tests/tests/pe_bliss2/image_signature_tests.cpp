@@ -26,7 +26,7 @@ TEST(ImageSignatureTests, EmptyTest)
 	EXPECT_EQ(signature.get_signature(), 0u);
 	signature.set_signature(123u);
 	EXPECT_EQ(signature.get_signature(), 123u);
-	EXPECT_EQ(signature.base_struct().get(), 123u);
+	EXPECT_EQ(signature.get_descriptor().get(), 123u);
 }
 
 TEST(ImageSignatureTests, DeserializeSerializeTest)

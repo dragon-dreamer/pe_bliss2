@@ -95,7 +95,7 @@ TEST(ImageTests, UpdateNumberOfSectionsTest)
 	pe_image instance;
 	instance.get_section_table().get_section_headers().resize(5u);
 	EXPECT_NO_THROW(instance.update_number_of_sections());
-	EXPECT_EQ(instance.get_file_header().base_struct()->number_of_sections, 5u);
+	EXPECT_EQ(instance.get_file_header().get_descriptor()->number_of_sections, 5u);
 
 	instance.get_section_table().get_section_headers().resize(
 		(std::numeric_limits<std::uint16_t>::max)() + 1u);
@@ -177,8 +177,8 @@ TEST_P(ImageTestsFixture, UpdateFullHeadersBufferTest)
 		auto& full_headers_buffer = instance
 			.get_full_headers_buffer().copied_data();
 		full_headers_buffer.resize(
-			dos::dos_header::packed_struct_type::packed_size + 100u);
-		full_headers_buffer[dos::dos_header::packed_struct_type::packed_size
+			dos::dos_header::descriptor_type::packed_size + 100u);
+		full_headers_buffer[dos::dos_header::descriptor_type::packed_size
 			+ 5u] = std::byte{ 0xcdu };
 	}
 
@@ -195,13 +195,13 @@ TEST_P(ImageTestsFixture, UpdateFullHeadersBufferTest)
 	const auto& data = buf.copied_data();
 
 	auto expected_size = options.e_lfanew
-		+ core::image_signature::packed_struct_type::packed_size
-		+ core::file_header::packed_struct_type::packed_size
+		+ core::image_signature::descriptor_type::packed_size
+		+ core::file_header::descriptor_type::packed_size
 		+ instance.get_optional_header().get_size_of_structure()
 		+ instance.get_data_directories().get_directories().size()
 		* core::data_directories::directory_packed_size
 		+ instance.get_section_table().get_section_headers().size()
-		* section::section_header::packed_struct_type::packed_size;
+		* section::section_header::descriptor_type::packed_size;
 	EXPECT_EQ(data.size(), expected_size);
 
 	EXPECT_EQ(data[0], std::byte{ 'M' });
@@ -213,15 +213,15 @@ TEST_P(ImageTestsFixture, UpdateFullHeadersBufferTest)
 		+ sizeof(std::uint16_t)], std::byte{3u});
 	// Optional header magic
 	EXPECT_EQ(data[options.e_lfanew
-		+ core::image_signature::packed_struct_type::packed_size
-		+ core::file_header::packed_struct_type::packed_size], std::byte{ 0x0bu });
+		+ core::image_signature::descriptor_type::packed_size
+		+ core::file_header::descriptor_type::packed_size], std::byte{ 0x0bu });
 	EXPECT_EQ(data[options.e_lfanew
-		+ core::image_signature::packed_struct_type::packed_size
-		+ core::file_header::packed_struct_type::packed_size + 1u], std::byte{ 0x01u });
+		+ core::image_signature::descriptor_type::packed_size
+		+ core::file_header::descriptor_type::packed_size + 1u], std::byte{ 0x01u });
 	// First data directory
 	auto first_data_dir_offset = options.e_lfanew
-		+ core::image_signature::packed_struct_type::packed_size
-		+ core::file_header::packed_struct_type::packed_size
+		+ core::image_signature::descriptor_type::packed_size
+		+ core::file_header::descriptor_type::packed_size
 		+ sizeof(std::uint16_t) //optional header magic
 		+ core::optional_header::optional_header_32_type::packed_size;
 	EXPECT_EQ(data[first_data_dir_offset], std::byte{ 0xabu });
@@ -240,7 +240,7 @@ TEST_P(ImageTestsFixture, UpdateFullHeadersBufferTest)
 
 	auto last_section_entry_offset = section_table_offset
 		+ (options.sections.size() - 1)
-		* section::section_header::packed_struct_type::packed_size;
+		* section::section_header::descriptor_type::packed_size;
 	// Letters of last section name
 	EXPECT_EQ(data[last_section_entry_offset], std::byte{ 'x' });
 	EXPECT_EQ(data[last_section_entry_offset + 1], std::byte{ 'y' });
@@ -248,12 +248,12 @@ TEST_P(ImageTestsFixture, UpdateFullHeadersBufferTest)
 	// Data between header gaps
 	if (addHeaderGapData && keepHeaderGapData)
 	{
-		EXPECT_EQ(data[dos::dos_header::packed_struct_type::packed_size
+		EXPECT_EQ(data[dos::dos_header::descriptor_type::packed_size
 			+ 5u], std::byte{ 0xcdu });
 	}
 	else
 	{
-		EXPECT_EQ(data[dos::dos_header::packed_struct_type::packed_size
+		EXPECT_EQ(data[dos::dos_header::descriptor_type::packed_size
 			+ 5u], std::byte{});
 	}
 }

@@ -29,7 +29,7 @@ void section_data::deserialize(const section_header& header,
 	try
 	{
 		utilities::safe_uint<std::size_t> buffer_pos(options.image_loaded_to_memory
-			? header.base_struct()->virtual_address
+			? header.get_descriptor()->virtual_address
 			: header.get_pointer_to_raw_data());
 		buffer_pos += options.image_start_buffer_pos;
 

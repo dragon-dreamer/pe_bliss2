@@ -13,9 +13,9 @@
 #include <utility>
 #include <variant>
 
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/detail/resources/version_info.h"
 #include "pe_bliss2/error_list.h"
-#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/resources/version_info_block.h"
 
 namespace pe_bliss::resources
@@ -138,25 +138,13 @@ struct file_flags final
 };
 
 class [[nodiscard]] file_version_info
+	: public detail::packed_struct_base<detail::resources::vs_fixedfileinfo>
 {
 public:
-	using descriptor_type = packed_struct<detail::resources::vs_fixedfileinfo>;
 	using file_subtype_type = std::variant<
 		std::monostate, driver_file_subtype, font_file_subtype>;
 
 public:
-	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	file_os get_file_os() const noexcept
 	{
@@ -215,9 +203,6 @@ private:
 			<< (ls & 0xffffu);
 		return ss.str();
 	}
-
-private:
-	descriptor_type descriptor_;
 };
 
 namespace impl

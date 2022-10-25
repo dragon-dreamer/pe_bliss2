@@ -6,8 +6,8 @@
 
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/packed_c_string.h"
-#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/detail/exports/image_export_directory.h"
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/exports/exported_address.h"
 #include "pe_bliss2/pe_types.h"
 
@@ -16,23 +16,13 @@ namespace pe_bliss::exports
 
 template<typename ExportedAddressList>
 class [[nodiscard]] export_directory_base
+	: public detail::packed_struct_base<detail::exports::image_export_directory>
 {
 public:
-	using packed_descriptor_type = packed_struct<detail::exports::image_export_directory>;
 	using export_list_type = ExportedAddressList;
 	using exported_address_type = export_list_type::value_type;
 
 public:
-	[[nodiscard]] packed_descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]] const packed_descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
 	[[nodiscard]]
 	packed_c_string& get_library_name() & noexcept
 	{
@@ -100,7 +90,6 @@ public:
 	ordinal_type get_last_free_ordinal() const;
 
 private:
-	packed_descriptor_type descriptor_;
 	packed_c_string library_name_;
 	export_list_type exported_addresses_;
 };

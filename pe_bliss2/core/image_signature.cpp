@@ -15,7 +15,7 @@ void image_signature::deserialize(buffers::input_buffer_stateful_wrapper_ref& bu
 {
 	try
 	{
-		base_struct().deserialize(buf, allow_virtual_memory);
+		get_descriptor().deserialize(buf, allow_virtual_memory);
 	}
 	catch (const std::system_error&)
 	{
@@ -27,7 +27,7 @@ void image_signature::deserialize(buffers::input_buffer_stateful_wrapper_ref& bu
 void image_signature::serialize(buffers::output_buffer_interface& buf,
 	bool write_virtual_part) const
 {
-	base_struct().serialize(buf, write_virtual_part);
+	get_descriptor().serialize(buf, write_virtual_part);
 }
 
 } //namespace pe_bliss::core

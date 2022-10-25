@@ -15,7 +15,7 @@ void dos_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 {
 	try
 	{
-		base_struct().deserialize(buf, allow_virtual_memory);
+		get_descriptor().deserialize(buf, allow_virtual_memory);
 	}
 	catch (const std::system_error&)
 	{
@@ -27,7 +27,7 @@ void dos_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 void dos_header::serialize(buffers::output_buffer_interface& buf,
 	bool write_virtual_part) const
 {
-	base_struct().serialize(buf, write_virtual_part);
+	get_descriptor().serialize(buf, write_virtual_part);
 }
 
 } //namespace pe_bliss::dos

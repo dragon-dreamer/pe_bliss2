@@ -8,7 +8,7 @@ namespace pe_bliss::core
 
 pe_error_wrapper validate(const image_signature& header) noexcept
 {
-	if (header.base_struct().get() != image_signature::pe_signature)
+	if (header.get_descriptor().get() != image_signature::pe_signature)
 		return image_signature_errc::invalid_pe_signature;
 	return {};
 }

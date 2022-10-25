@@ -118,5 +118,5 @@ void dump_optional_header(formatter& fmt,
 {
 	std::visit([&fmt, &header] (const auto& value) {
 		dump_optional_header(fmt, header, value);
-	}, header.base_struct());
+	}, header.get_descriptor());
 }

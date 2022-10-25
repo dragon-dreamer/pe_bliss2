@@ -115,7 +115,7 @@ template<typename Descriptor, typename... Bases>
 bool load_config_directory_impl<Descriptor, Bases...>::version_exactly_matches() const noexcept
 {
 	auto size = get_descriptor_size();
-	if (size == packed_descriptor_type::packed_size)
+	if (size == load_config_directory_impl<Descriptor, Bases...>::descriptor_type::packed_size)
 		return true;
 	for (std::size_t i = 0; i != field_offsets<Descriptor>.size(); ++i)
 	{
@@ -130,7 +130,8 @@ void load_config_directory_impl<Descriptor, Bases...>::set_version(version ver)
 {
 	if (ver == version::memcpy_guard)
 	{
-		size_ = packed_descriptor_type::packed_size + size_.packed_size;
+		size_ = load_config_directory_impl<Descriptor, Bases...>::descriptor_type::packed_size
+			+ size_.packed_size;
 		return;
 	}
 
@@ -151,7 +152,7 @@ template<typename Descriptor, typename... Bases>
 std::uint8_t load_config_directory_impl<Descriptor,
 	Bases...>::get_guard_cf_function_table_stride() const noexcept
 {
-	return static_cast<std::uint8_t>((descriptor_->cf_guard.guard_flags
+	return static_cast<std::uint8_t>((this->descriptor_->cf_guard.guard_flags
 		& detail::load_config::guard_flags::cf_function_table_size_mask)
 		>> detail::load_config::guard_flags::cf_function_table_size_shift);
 }
@@ -166,7 +167,7 @@ void load_config_directory_impl<Descriptor,
 		throw pe_error(load_config_errc::invalid_stride_value);
 	}
 
-	descriptor_->cf_guard.guard_flags |= (stride
+	this->descriptor_->cf_guard.guard_flags |= (stride
 		<< detail::load_config::guard_flags::cf_function_table_size_shift);
 }
 

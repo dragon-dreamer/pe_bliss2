@@ -459,20 +459,6 @@ typename arm64x_dynamic_relocation_add_delta_base<Bases...>::value_type&
 }
 
 template<typename... Bases>
-const typename bdd_info<Bases...>::descriptor_type&
-	bdd_info<Bases...>::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
-template<typename... Bases>
-typename bdd_info<Bases...>::descriptor_type&
-	bdd_info<Bases...>::get_descriptor() noexcept
-{
-	return descriptor_;
-}
-
-template<typename... Bases>
 const typename bdd_info<Bases...>::dynamic_relocation_list_type&
 	bdd_info<Bases...>::get_relocations() const& noexcept
 {
@@ -491,20 +477,6 @@ typename bdd_info<Bases...>::dynamic_relocation_list_type
 	bdd_info<Bases...>::get_relocations() && noexcept
 {
 	return std::move(relocations_);
-}
-
-template<typename... Bases>
-const typename function_override_dynamic_relocation_item<Bases...>::descriptor_type&
-	function_override_dynamic_relocation_item<Bases...>::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
-template<typename... Bases>
-typename function_override_dynamic_relocation_item<Bases...>::descriptor_type&
-	function_override_dynamic_relocation_item<Bases...>::get_descriptor() noexcept
-{
-	return descriptor_;
 }
 
 template<typename... Bases>
@@ -728,18 +700,6 @@ inline prologue_dynamic_relocation_header::data_type
 	return std::move(data_);
 }
 
-inline const epilogue_branch_descriptor::descriptor_type&
-	epilogue_branch_descriptor::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
-inline epilogue_branch_descriptor::descriptor_type&
-	epilogue_branch_descriptor::get_descriptor() noexcept
-{
-	return descriptor_;
-}
-
 inline const epilogue_branch_descriptor::value_type&
 	epilogue_branch_descriptor::get_value() const& noexcept
 {
@@ -944,20 +904,6 @@ typename dynamic_relocation_table_base<Pointer, Bases...>::relocation_list_type
 }
 
 template<typename... Bases>
-const typename enclave_import_base<Bases...>::descriptor_type&
-	enclave_import_base<Bases...>::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
-template<typename... Bases>
-typename enclave_import_base<Bases...>::descriptor_type&
-	enclave_import_base<Bases...>::get_descriptor() noexcept
-{
-	return descriptor_;
-}
-
-template<typename... Bases>
 const packed_c_string& enclave_import_base<Bases...>::get_name() const& noexcept
 {
 	return name_;
@@ -999,27 +945,13 @@ typename enclave_import_base<Bases...>::extra_data_type
 template<typename... Bases>
 typename enclave_import_match enclave_import_base<Bases...>::get_match() const noexcept
 {
-	return static_cast<enclave_import_match>(descriptor_->match_type);
+	return static_cast<enclave_import_match>(this->descriptor_->match_type);
 }
 
 template<typename... Bases>
 void enclave_import_base<Bases...>::set_match(enclave_import_match match) noexcept
 {
-	descriptor_->match_type = static_cast<std::uint32_t>(match);
-}
-
-template<detail::executable_pointer Va, typename... Bases>
-const typename enclave_config_base<Va, Bases...>::descriptor_type&
-	enclave_config_base<Va, Bases...>::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
-template<detail::executable_pointer Va, typename... Bases>
-typename enclave_config_base<Va, Bases...>::descriptor_type&
-	enclave_config_base<Va, Bases...>::get_descriptor() noexcept
-{
-	return descriptor_;
+	this->descriptor_->match_type = static_cast<std::uint32_t>(match);
 }
 
 template<detail::executable_pointer Va, typename... Bases>
@@ -1068,40 +1000,26 @@ template<detail::executable_pointer Va, typename... Bases>
 enclave_policy_flags::value enclave_config_base<Va, Bases...>
 	::get_policy_flags() const noexcept
 {
-	return static_cast<enclave_policy_flags::value>(descriptor_->policy_flags);
+	return static_cast<enclave_policy_flags::value>(this->descriptor_->policy_flags);
 }
 
 template<detail::executable_pointer Va, typename... Bases>
 void enclave_config_base<Va, Bases...>::set_policy_flags(
 	enclave_policy_flags::value flags) noexcept
 {
-	descriptor_->policy_flags = flags;
+	this->descriptor_->policy_flags = flags;
 }
 
 template<detail::executable_pointer Va, typename... Bases>
 enclave_flags::value enclave_config_base<Va, Bases...>::get_flags() const noexcept
 {
-	return static_cast<enclave_flags::value>(descriptor_->enclave_flags);
+	return static_cast<enclave_flags::value>(this->descriptor_->enclave_flags);
 }
 
 template<detail::executable_pointer Va, typename... Bases>
 void enclave_config_base<Va, Bases...>::set_flags(enclave_flags::value flags) noexcept
 {
-	descriptor_->enclave_flags = flags;
-}
-
-template<typename... Bases>
-const typename volatile_metadata_base<Bases...>::descriptor_type&
-	volatile_metadata_base<Bases...>::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
-template<typename... Bases>
-typename volatile_metadata_base<Bases...>::descriptor_type&
-	volatile_metadata_base<Bases...>::get_descriptor() noexcept
-{
-	return descriptor_;
+	this->descriptor_->enclave_flags = flags;
 }
 
 template<typename... Bases>
@@ -1147,13 +1065,6 @@ typename volatile_metadata_base<Bases...>::range_entry_list_type
 }
 
 template<typename Descriptor, typename... Bases>
-const typename load_config_directory_impl<Descriptor, Bases...>::packed_descriptor_type&
-	load_config_directory_impl<Descriptor, Bases...>::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
-template<typename Descriptor, typename... Bases>
 std::uint32_t load_config_directory_impl<Descriptor, Bases...>
 	::get_descriptor_size() const noexcept
 {
@@ -1175,13 +1086,6 @@ const typename load_config_directory_impl<Descriptor, Bases...>::size_type&
 	load_config_directory_impl<Descriptor, Bases...>::get_size() const noexcept
 {
 	return size_;
-}
-
-template<typename Descriptor, typename... Bases>
-typename load_config_directory_impl<Descriptor, Bases...>::packed_descriptor_type&
-	load_config_directory_impl<Descriptor, Bases...>::get_descriptor() noexcept
-{
-	return descriptor_;
 }
 
 template<typename Descriptor, typename... Bases>
@@ -1209,42 +1113,42 @@ template<typename Descriptor, typename... Bases>
 global_flags::value load_config_directory_impl<Descriptor, Bases...>
 	::get_global_flags_set() const noexcept
 {
-	return static_cast<global_flags::value>(descriptor_->base.global_flags_set);
+	return static_cast<global_flags::value>(this->descriptor_->base.global_flags_set);
 }
 
 template<typename Descriptor, typename... Bases>
 global_flags::value load_config_directory_impl<Descriptor, Bases...>
 	::get_global_flags_clear() const noexcept
 {
-	return static_cast<global_flags::value>(descriptor_->base.global_flags_clear);
+	return static_cast<global_flags::value>(this->descriptor_->base.global_flags_clear);
 }
 
 template<typename Descriptor, typename... Bases>
 void load_config_directory_impl<Descriptor, Bases...>::set_global_flags_set(
 	global_flags::value flags) noexcept
 {
-	descriptor_->base.global_flags_set = flags;
+	this->descriptor_->base.global_flags_set = flags;
 }
 
 template<typename Descriptor, typename... Bases>
 void load_config_directory_impl<Descriptor, Bases...>::set_global_flags_clear(
 	global_flags::value flags) noexcept
 {
-	descriptor_->base.global_flags_clear = flags;
+	this->descriptor_->base.global_flags_clear = flags;
 }
 
 template<typename Descriptor, typename... Bases>
 process_heap_flags::value load_config_directory_impl<Descriptor, Bases...>
 	::get_process_heap_flags() const noexcept
 {
-	return static_cast<process_heap_flags::value>(descriptor_->base.process_heap_flags);
+	return static_cast<process_heap_flags::value>(this->descriptor_->base.process_heap_flags);
 }
 
 template<typename Descriptor, typename... Bases>
 void load_config_directory_impl<Descriptor, Bases...>::set_process_heap_flags(
 	process_heap_flags::value flags) noexcept
 {
-	descriptor_->base.process_heap_flags = flags;
+	this->descriptor_->base.process_heap_flags = flags;
 }
 
 template<typename Descriptor, typename... Bases>
@@ -1252,14 +1156,14 @@ dependent_load_flags::value load_config_directory_impl<Descriptor, Bases...>
 	::get_dependent_load_flags() const noexcept
 {
 	return static_cast<dependent_load_flags::value>(
-		descriptor_->base.dependent_load_flags);
+		this->descriptor_->base.dependent_load_flags);
 }
 
 template<typename Descriptor, typename... Bases>
 void load_config_directory_impl<Descriptor, Bases...>::set_dependent_load_flags(
 	dependent_load_flags::value flags) noexcept
 {
-	descriptor_->base.dependent_load_flags = flags;
+	this->descriptor_->base.dependent_load_flags = flags;
 }
 
 template<typename Descriptor, typename... Bases>
@@ -1287,14 +1191,14 @@ template<typename Descriptor, typename... Bases>
 guard_flags::value load_config_directory_impl<Descriptor, Bases...>
 	::get_guard_flags() const noexcept
 {
-	return static_cast<guard_flags::value>(descriptor_->cf_guard.guard_flags);
+	return static_cast<guard_flags::value>(this->descriptor_->cf_guard.guard_flags);
 }
 
 template<typename Descriptor, typename... Bases>
 void load_config_directory_impl<Descriptor, Bases...>::set_guard_flags(
 	guard_flags::value flags) noexcept
 {
-	descriptor_->cf_guard.guard_flags = flags;
+	this->descriptor_->cf_guard.guard_flags = flags;
 }
 
 template<typename Descriptor, typename... Bases>

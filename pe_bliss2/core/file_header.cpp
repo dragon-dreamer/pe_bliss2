@@ -48,8 +48,8 @@ std::size_t file_header::get_section_table_buffer_pos() const noexcept
 {
 	static constexpr auto file_header_size
 		= detail::packed_reflection::get_type_size<detail::image_file_header>();
-	return base_struct()->size_of_optional_header + file_header_size
-		+ base_struct().get_state().buffer_pos();
+	return get_descriptor()->size_of_optional_header + file_header_size
+		+ get_descriptor().get_state().buffer_pos();
 }
 
 void file_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
@@ -57,7 +57,7 @@ void file_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 {
 	try
 	{
-		base_struct().deserialize(buf, allow_virtual_memory);
+		get_descriptor().deserialize(buf, allow_virtual_memory);
 	}
 	catch (const std::system_error&)
 	{
@@ -69,7 +69,7 @@ void file_header::deserialize(buffers::input_buffer_stateful_wrapper_ref& buf,
 void file_header::serialize(buffers::output_buffer_interface& buf,
 	bool write_virtual_part) const
 {
-	base_struct().serialize(buf, write_virtual_part);
+	get_descriptor().serialize(buf, write_virtual_part);
 }
 
 } //namespace pe_bliss::core

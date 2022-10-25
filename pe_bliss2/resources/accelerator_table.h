@@ -6,9 +6,9 @@
 #include <variant>
 #include <vector>
 
+#include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/detail/resources/accelerator.h"
 #include "pe_bliss2/error_list.h"
-#include "pe_bliss2/packed_struct.h"
 
 namespace pe_bliss::resources
 {
@@ -230,31 +230,16 @@ struct key_modifier final
 std::string_view virtual_key_code_to_string(virtual_key_code code) noexcept;
 
 class accelerator
+	: public detail::packed_struct_base<detail::resources::accelerator>
 {
 public:
-	using descriptor_type = packed_struct<detail::resources::accelerator>;
 	using key_code_type = std::variant<acsii_key_code, virtual_key_code>;
 
 public:
 	[[nodiscard]]
-	descriptor_type& get_descriptor() noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
-	const descriptor_type& get_descriptor() const noexcept
-	{
-		return descriptor_;
-	}
-
-	[[nodiscard]]
 	key_modifier::value get_key_modifiers() const noexcept;
 
 	[[nodiscard]] key_code_type get_key_code() const noexcept;
-
-private:
-	descriptor_type descriptor_;
 };
 
 template<typename... Bases>

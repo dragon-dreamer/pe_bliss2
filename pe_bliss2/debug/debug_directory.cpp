@@ -349,7 +349,7 @@ coff_debug_directory_details parse_coff_directory(
 	auto number_of_symbols = result.get_descriptor()->number_of_symbols;
 	if (options.file_header)
 	{
-		const auto& fh_descriptor = options.file_header->base_struct().get();
+		const auto& fh_descriptor = options.file_header->get_descriptor().get();
 		if (fh_descriptor.number_of_symbols != number_of_symbols)
 			result.add_error(debug_directory_errc::number_of_symbols_mismatch);
 		if (fh_descriptor.pointer_to_symbol_table

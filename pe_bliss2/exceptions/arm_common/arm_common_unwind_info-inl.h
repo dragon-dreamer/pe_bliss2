@@ -2,20 +2,6 @@
 
 namespace pe_bliss::exceptions::arm_common
 {
-template<bool HasCondition>
-typename epilog_info<HasCondition>::descriptor_type&
-	epilog_info<HasCondition>::get_descriptor() noexcept
-{
-	return descriptor_;
-}
-
-template<bool HasCondition>
-const typename epilog_info<HasCondition>::descriptor_type&
-	epilog_info<HasCondition>::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
 template<std::size_t Length, std::uint8_t Matcher, std::uint8_t MatcherMask>
 void unwind_code_common<Length, Matcher, MatcherMask>::init() noexcept
 {
@@ -148,26 +134,6 @@ template<typename RuntimeFunctionEntry,
 	typename PackedUnwindData, typename ExtendedUnwindRecord,
 	typename... Bases>
 typename runtime_function_base<RuntimeFunctionEntry, PackedUnwindData,
-	ExtendedUnwindRecord, Bases...>::descriptor_type& runtime_function_base<RuntimeFunctionEntry,
-	PackedUnwindData, ExtendedUnwindRecord, Bases...>::get_descriptor() noexcept
-{
-	return descriptor_;
-}
-
-template<typename RuntimeFunctionEntry,
-	typename PackedUnwindData, typename ExtendedUnwindRecord,
-	typename... Bases>
-const typename runtime_function_base<RuntimeFunctionEntry, PackedUnwindData,
-	ExtendedUnwindRecord, Bases...>::descriptor_type& runtime_function_base<RuntimeFunctionEntry,
-	PackedUnwindData, ExtendedUnwindRecord, Bases...>::get_descriptor() const noexcept
-{
-	return descriptor_;
-}
-
-template<typename RuntimeFunctionEntry,
-	typename PackedUnwindData, typename ExtendedUnwindRecord,
-	typename... Bases>
-typename runtime_function_base<RuntimeFunctionEntry, PackedUnwindData,
 	ExtendedUnwindRecord, Bases...>::unwind_info_type& runtime_function_base<RuntimeFunctionEntry,
 	PackedUnwindData, ExtendedUnwindRecord, Bases...>::get_unwind_info() noexcept
 {
@@ -195,7 +161,7 @@ bool runtime_function_base<RuntimeFunctionEntry,
 	//30 bits of the second .pdata word. If Flag is 0, then the remaining bits
 	//form an Exception Information RVA (with the two lowest bits implicitly 0).
 	//If Flag is non-zero, then the remaining bits form a Packed Unwind Data structure.
-	return !(descriptor_->unwind_data & 0b11u);
+	return !(this->descriptor_->unwind_data & 0b11u);
 }
 
 inline extended_unwind_record_base::main_header_type&
