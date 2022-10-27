@@ -46,6 +46,8 @@ struct debug_directory_category : std::error_category
 			return "Mismatching file header and COFF header pointer to symbol table";
 		case unable_to_deserialize_symbols:
 			return "Unable to deserialize COFF symbols";
+		case virtual_coff_string_table:
+			return "COFF string table is virtual";
 		default:
 			return {};
 		}
@@ -142,15 +144,22 @@ misc_debug_directory_details parse_misc_directory(
 		if (!utilities::math::is_aligned<std::uint32_t>(data_size))
 			result.add_error(debug_directory_errc::unaligned_data_size);
 
-		if (result.get_descriptor()->unicode)
+		try
 		{
-			result.get_data().emplace<packed_utf16_c_string>().deserialize(
-				wrapper, allow_virtual_data, data_size);
+			if (result.get_descriptor()->unicode)
+			{
+				result.get_data().emplace<packed_utf16_c_string>().deserialize(
+					wrapper, allow_virtual_data, data_size);
+			}
+			else
+			{
+				result.get_data().emplace<packed_c_string>().deserialize(
+					wrapper, allow_virtual_data, data_size);
+			}
 		}
-		else
+		catch (const std::system_error&)
 		{
-			result.get_data().emplace<packed_c_string>().deserialize(
-				wrapper, allow_virtual_data, data_size);
+			result.add_error(debug_directory_errc::unable_to_deserialize_name);
 		}
 	}
 
@@ -294,6 +303,7 @@ pogo_debug_directory_details parse_pogo_directory(
 
 	const auto relative_offset = wrapper.get_buffer()->relative_offset();
 	auto max_entries = options.max_debug_entry_count;
+	std::int32_t to_advance = 0;
 	while (wrapper.rpos() < wrapper.size())
 	{
 		if (!max_entries--)
@@ -305,6 +315,7 @@ pogo_debug_directory_details parse_pogo_directory(
 		auto& entry = result.get_entries().emplace_back();
 		try
 		{
+			wrapper.advance_rpos(to_advance);
 			entry.get_descriptor().deserialize(wrapper, options.allow_virtual_data);
 		}
 		catch (const std::system_error&)
@@ -325,8 +336,8 @@ pogo_debug_directory_details parse_pogo_directory(
 				break;
 			}
 
-			wrapper.advance_rpos(static_cast<std::int32_t>(
-				aligned_offset - non_aligned_offset));
+			to_advance = static_cast<std::int32_t>(
+				aligned_offset - non_aligned_offset);
 		}
 		catch (const std::system_error&)
 		{
@@ -368,7 +379,7 @@ coff_debug_directory_details parse_coff_directory(
 			throw pe_error(utilities::generic_errc::integer_overflow);
 		}
 
-		utilities::safe_uint string_table_pos = wrapper.rpos();
+		utilities::safe_uint string_table_pos = result.get_descriptor()->lva_to_first_symbol;
 		string_table_pos += number_of_symbols * coff_symbol::descriptor_type::packed_size;
 		wrapper.set_rpos(string_table_pos.value());
 		result.get_string_table_length().deserialize(wrapper, options.allow_virtual_data);
@@ -377,6 +388,12 @@ coff_debug_directory_details parse_coff_directory(
 				- coff_debug_directory_details::string_table_length_type::packed_size,
 				result.get_string_table_length().get()),
 			options.copy_coff_string_table_memory);
+		if (!options.allow_virtual_data
+			&& result.get_string_table_buffer().data()->virtual_size())
+		{
+			result.add_error(debug_directory_errc::virtual_coff_string_table);
+		}
+
 		wrapper.set_rpos(result.get_descriptor()->lva_to_first_symbol);
 	}
 	catch (const std::system_error&)
@@ -392,7 +409,7 @@ coff_debug_directory_details parse_coff_directory(
 	}
 
 	auto& symbols = result.get_symbols();
-	while (number_of_symbols--)
+	while (number_of_symbols)
 	{
 		auto& symbol = symbols.emplace_back();
 		auto& descriptor = symbol.get_descriptor();
@@ -447,6 +464,17 @@ coff_debug_directory_details parse_coff_directory(
 			result.add_error(debug_directory_errc::unable_to_deserialize_symbols);
 			break;
 		}
+
+		std::uint32_t symbols_to_skip = 1;
+		symbols_to_skip += descriptor->aux_symbol_number;
+		if (symbols_to_skip > number_of_symbols)
+		{
+			if (!result.has_error(debug_directory_errc::too_many_symbols))
+				result.add_error(debug_directory_errc::unable_to_deserialize_symbols);
+			break;
+		}
+		
+		number_of_symbols -= symbols_to_skip;
 	}
 
 	return result;

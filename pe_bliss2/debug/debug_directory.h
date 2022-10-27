@@ -38,7 +38,8 @@ enum class debug_directory_errc
 	too_many_symbols,
 	too_many_entries,
 	number_of_symbols_mismatch,
-	pointer_to_symbol_table_mismatch
+	pointer_to_symbol_table_mismatch,
+	virtual_coff_string_table
 };
 
 std::error_code make_error_code(debug_directory_errc) noexcept;
@@ -138,7 +139,7 @@ public:
 	}
 
 	[[nodiscard]]
-	coff_symbol_type get_symbol_type() const noexcept
+	coff_symbol_type get_type() const noexcept
 	{
 		if (descriptor_->type == detail::debug::coff_type_long_double)
 			return coff_symbol_type::sym_long_double;
@@ -147,7 +148,7 @@ public:
 	}
 
 	[[nodiscard]]
-	coff_symbol_type_attr get_symbol_type_attr() const noexcept
+	coff_symbol_type_attr get_type_attr() const noexcept
 	{
 		if (descriptor_->type == detail::debug::coff_type_long_double)
 			return coff_symbol_type_attr::no_derived;
@@ -348,15 +349,13 @@ public:
 	[[nodiscard]]
 	bool is_seh_in_func() const noexcept
 	{
-		return static_cast<bool>(
-			(descriptor_->flags & 0x800u) >> 11u);
+		return static_cast<bool>(descriptor_->flags & 0x800u);
 	}
 
 	[[nodiscard]]
 	bool is_ebp_allocated() const noexcept
 	{
-		return static_cast<bool>(
-			(descriptor_->flags & 0x1000u) >> 12u);
+		return static_cast<bool>(descriptor_->flags & 0x1000u);
 	}
 
 	[[nodiscard]]
