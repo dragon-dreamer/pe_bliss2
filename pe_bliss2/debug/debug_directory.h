@@ -794,19 +794,19 @@ public:
 
 public:
 	[[nodiscard]]
-	list_type get_raw_data() && noexcept
+	list_type get_entries() && noexcept
 	{
 		return std::move(list_);
 	}
 
 	[[nodiscard]]
-	list_type& get_raw_data() & noexcept
+	list_type& get_entries() & noexcept
 	{
 		return list_;
 	}
 
 	[[nodiscard]]
-	const list_type& get_raw_data() const& noexcept
+	const list_type& get_entries() const& noexcept
 	{
 		return list_;
 	}
