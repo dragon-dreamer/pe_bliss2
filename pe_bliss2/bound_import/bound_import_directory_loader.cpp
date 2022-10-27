@@ -1,5 +1,6 @@
 #include "pe_bliss2/bound_import/bound_import_directory_loader.h"
 
+#include <string>
 #include <system_error>
 
 #include "pe_bliss2/core/data_directories.h"

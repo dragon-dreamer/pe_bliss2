@@ -29,6 +29,7 @@ struct [[nodiscard]] loader_options
 	bool allow_virtual_data = false;
 };
 
+[[nodiscard]]
 std::optional<bound_library_details_list> load(const image::image& instance,
 	const loader_options& options = {});
 
