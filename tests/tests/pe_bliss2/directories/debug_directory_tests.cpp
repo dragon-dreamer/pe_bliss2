@@ -421,6 +421,14 @@ constexpr std::array pogo_directory{
 	std::byte{'c'}, std::byte{},
 };
 
+constexpr std::array pogo_directory_aligned{
+	std::byte{1}, std::byte{2}, std::byte{3}, std::byte{4}, //signature
+
+	std::byte{5}, std::byte{6}, std::byte{7}, std::byte{8}, //start_rva
+	std::byte{6}, std::byte{7}, std::byte{8}, std::byte{9}, //size
+	std::byte{'a'}, std::byte{'b'}, std::byte{}, std::byte{},
+};
+
 void check_pogo_directory(const pogo_debug_directory_details& dir)
 {
 	EXPECT_EQ(dir.get_descriptor()->signature, 0x04030201u);
@@ -440,6 +448,17 @@ TEST(DebugDirectoryTest, ParsePogo)
 	check_pogo_directory(dir);
 	EXPECT_EQ(dir.get_entries()[1].get_name().value(), "c");
 	EXPECT_FALSE(dir.get_entries()[1].get_name().is_virtual());
+}
+
+TEST(DebugDirectoryTest, ParsePogoAligned)
+{
+	auto dir = parse_debug_directory<parse_pogo_directory>(pogo_directory_aligned,
+		debug_directory_parse_options{});
+	expect_contains_errors(dir);
+	EXPECT_EQ(dir.get_descriptor()->signature, 0x04030201u);
+	ASSERT_EQ(dir.get_entries().size(), 1u);
+	EXPECT_EQ(dir.get_entries()[0].get_descriptor()->size, 0x09080706u);
+	EXPECT_EQ(dir.get_entries()[0].get_name().value(), "ab");
 }
 
 TEST(DebugDirectoryTest, ParsePogoVirtualError)
@@ -809,4 +828,13 @@ TEST(DebugDirectoryTest, DebugDirectory)
 	check_debug_type<fpo_debug_directory_details>(fpo);
 	check_debug_type<pogo_debug_directory_details>(pogo);
 	check_debug_type<coff_debug_directory_details>(coff);
+}
+
+TEST(DebugDirectoryTest, UnsupportedDebugDirectory)
+{
+	debug_directory dir;
+	dir.get_descriptor()->type = 12345678u;
+	expect_throw_pe_error([&dir]() {
+		(void)dir.get_underlying_directory();
+	}, debug_directory_errc::unsupported_type);
 }

@@ -304,7 +304,7 @@ pogo_debug_directory_details parse_pogo_directory(
 	const auto relative_offset = wrapper.get_buffer()->relative_offset();
 	auto max_entries = options.max_debug_entry_count;
 	std::int32_t to_advance = 0;
-	while (wrapper.rpos() < wrapper.size())
+	while (wrapper.rpos() + to_advance < wrapper.size())
 	{
 		if (!max_entries--)
 		{
