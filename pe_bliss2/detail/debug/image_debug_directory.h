@@ -55,6 +55,7 @@ constexpr std::uint32_t clsid = 11u;
 constexpr std::uint32_t vc_feature = 12u;
 constexpr std::uint32_t pogo = 13u; //aka coffgrp
 constexpr std::uint32_t iltcg = 14u; //additionally present and empty when /LTCG:incremental is selected
+//Intel MPX technology debug info
 constexpr std::uint32_t mpx = 15u;
 //PE determinism or reproducibility.
 //The presence of an entry of type IMAGE_DEBUG_TYPE_REPRO indicates the PE file is built
@@ -288,6 +289,17 @@ struct image_debug_vc_feature
 };
 
 constexpr std::uint32_t mpx_signature = 0x5042524au; //JRBP
+
+//This flag is used to determine whether Intel Memory Protection Extensions
+//(MPX) should be enabled for this application
+constexpr std::uint32_t image_mpx_enable = 1u;
+//This flag determines whether the driver or a runtime DLL will be
+//providing the Intel MPX runtime support.
+constexpr std::uint32_t image_mpx_enable_driver_runtime = 2u;
+//This flag determines the behavior on a #BR for a bounds violation.
+//If set, the driver will immediately terminate the application.
+//If cleared then the exception will be passed up to the application exception handler.
+constexpr std::uint32_t image_mpx_enable_fast_fail_on_bnd_exception = 4u;
 
 struct image_debug_mpx
 {

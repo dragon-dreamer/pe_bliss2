@@ -576,6 +576,17 @@ using pogo_debug_directory_details = pogo_debug_directory_base<error_list>;
 
 class [[nodiscard]] iltcg_debug_directory {};
 
+struct mpx_flags final
+{
+	enum value
+	{
+		enable = detail::debug::image_mpx_enable,
+		enable_driver_runtime = detail::debug::image_mpx_enable_driver_runtime,
+		enable_fast_fail_on_bnd_exception
+			= detail::debug::image_mpx_enable_fast_fail_on_bnd_exception
+	};
+};
+
 template<typename... Bases>
 class [[nodiscard]] mpx_debug_directory_base
 	: public detail::packed_struct_base<detail::debug::image_debug_mpx>
@@ -583,6 +594,12 @@ class [[nodiscard]] mpx_debug_directory_base
 {
 public:
 	static constexpr std::uint32_t signature = detail::debug::mpx_signature;
+
+	[[nodiscard]]
+	mpx_flags::value get_flags() const noexcept
+	{
+		return static_cast<mpx_flags::value>(descriptor_->flags);
+	}
 };
 
 using mpx_debug_directory = mpx_debug_directory_base<>;
