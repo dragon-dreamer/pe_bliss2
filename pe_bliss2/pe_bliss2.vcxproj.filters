@@ -582,6 +582,9 @@
     <ClInclude Include="debug\debug_directory.h">
       <Filter>Header Files\debug</Filter>
     </ClInclude>
+    <ClInclude Include="debug\debug_directory_loader.h">
+      <Filter>Header Files\debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -858,6 +861,9 @@
       <Filter>Source Files\resources</Filter>
     </ClCompile>
     <ClCompile Include="debug\debug_directory.cpp">
+      <Filter>Source Files\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\debug_directory_loader.cpp">
       <Filter>Source Files\debug</Filter>
     </ClCompile>
   </ItemGroup>

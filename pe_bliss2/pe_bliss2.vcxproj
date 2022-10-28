@@ -34,6 +34,7 @@
     <ClInclude Include="core\optional_header_validator.h" />
     <ClInclude Include="core\overlay.h" />
     <ClInclude Include="debug\debug_directory.h" />
+    <ClInclude Include="debug\debug_directory_loader.h" />
     <ClInclude Include="detail\bound_import\image_bound_import_descriptor.h" />
     <ClInclude Include="detail\debug\image_debug_directory.h" />
     <ClInclude Include="detail\endian_convert.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="core\optional_header_validator.cpp" />
     <ClCompile Include="core\overlay.cpp" />
     <ClCompile Include="debug\debug_directory.cpp" />
+    <ClCompile Include="debug\debug_directory_loader.cpp" />
     <ClCompile Include="detail\rich\rich_header_utils.cpp" />
     <ClCompile Include="dos\dos_header.cpp" />
     <ClCompile Include="dos\dos_header_errc.cpp" />
