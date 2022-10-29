@@ -270,7 +270,7 @@ void dump_runtime_function(formatter& fmt, const pe_bliss::exceptions::x64::runt
 			fmt.print_structure("Opcode descriptor", opcode.get_descriptor(), std::array{
 				value_info{"offset_in_prolog"},
 				value_info{"unwind_operation_code_and_info", true,
-					[&fmt, &opcode] (std::size_t) { dump_opcode_id_and_register(fmt, opcode); }},
+					[&fmt, &opcode] (std::size_t, std::size_t) { dump_opcode_id_and_register(fmt, opcode); }},
 				value_info{"node"}
 			});
 			dump_unwind_code(fmt, opcode);
