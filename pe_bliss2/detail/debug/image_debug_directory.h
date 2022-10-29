@@ -154,14 +154,14 @@ constexpr std::uint8_t coff_type_uchar = 12;
 constexpr std::uint8_t coff_type_ushort = 13;
 constexpr std::uint8_t coff_type_uint = 14;
 constexpr std::uint8_t coff_type_ulong = 15;
-constexpr std::uint8_t coff_type_mask = 0xffu;
+constexpr std::uint8_t coff_type_mask = 0xfu;
 constexpr std::uint8_t coff_type_long_double = 16;
 
-constexpr std::uint16_t coff_type_attr_mask = 0x300u;
+constexpr std::uint16_t coff_type_attr_mask = 0x30u;
 constexpr std::uint16_t coff_type_no_derived = 0u;
-constexpr std::uint16_t coff_type_pointer = 0x100u;
-constexpr std::uint16_t coff_type_function_return_value = 0x200u;
-constexpr std::uint16_t coff_type_array = 0x300u;
+constexpr std::uint16_t coff_type_pointer = 0x10u;
+constexpr std::uint16_t coff_type_function_return_value = 0x20u;
+constexpr std::uint16_t coff_type_array = 0x30u;
 
 constexpr std::uint8_t coff_storage_class_null = 0u;
 constexpr std::uint8_t coff_storage_class_automatic = 1u;
@@ -208,7 +208,7 @@ struct fpo_data
 	/*
 	//flags:
 	std::uint16_t cb_prolog : 8; //# bytes in prolog
-	std::uint16_t cb_regs : 3; //# regs saved
+	std::uint16_t cb_regs : 3; //# saved regs count
 	std::uint16_t f_has_seh : 1; //TRUE if SEH in func
 	std::uint16_t f_use_bp : 1; //TRUE if EBP has been allocated
 	std::uint16_t reserved : 1; //reserved for future use
