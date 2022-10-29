@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <optional>
 #include <system_error>
 #include <type_traits>
@@ -22,7 +23,9 @@ enum class debug_directory_loader_errc
 	excessive_data_in_directory,
 	unable_to_load_entries,
 	unable_to_load_raw_data,
-	rva_and_file_offset_do_not_match
+	rva_and_file_offset_do_not_match,
+	too_many_debug_directories,
+	too_big_raw_data
 };
 
 std::error_code make_error_code(debug_directory_loader_errc) noexcept;
@@ -33,6 +36,8 @@ struct [[nodiscard]] loader_options
 	bool include_overlay = true;
 	bool allow_virtual_data = false;
 	bool copy_raw_data = false;
+	std::uint32_t max_debug_directories = 0xffu;
+	std::uint32_t max_raw_data_size = 10'000'000;
 };
 
 [[nodiscard]]

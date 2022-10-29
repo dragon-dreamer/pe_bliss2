@@ -41,6 +41,10 @@ struct debug_directory_loader_error_category : std::error_category
 			return "Unable to load raw debug entry data";
 		case rva_and_file_offset_do_not_match:
 			return "Debug data RVA and file offset do not match";
+		case too_many_debug_directories:
+			return "Too many debug directories";
+		case too_big_raw_data:
+			return "Too big raw debug data";
 		default:
 			return {};
 		}
@@ -56,6 +60,12 @@ void load_debug_data(const image::image& instance, debug_directory_details& entr
 	const loader_options& options)
 {
 	const auto& descriptor = entry.get_descriptor().get();
+	if (descriptor.size_of_data > options.max_raw_data_size)
+	{
+		entry.add_error(debug_directory_loader_errc::too_big_raw_data);
+		return;
+	}
+
 	auto& buf = entry.get_raw_data();
 	rva_type rva = descriptor.address_of_raw_data;
 	auto file_offset = descriptor.pointer_to_raw_data;
@@ -152,8 +162,15 @@ std::optional<debug_directory_list_details> load(const image::image& instance,
 		return result;
 	}
 
+	auto max_debug_directories = options.max_debug_directories;
 	while (start_rva <= end_rva)
 	{
+		if (!max_debug_directories--)
+		{
+			list.add_error(debug_directory_loader_errc::too_many_debug_directories);
+			return result;
+		}
+
 		auto& entry = list.get_entries().emplace_back();
 		try
 		{
@@ -179,8 +196,11 @@ std::optional<debug_directory_list_details> load(const image::image& instance,
 		}
 	}
 
-	if (start_rva <= end_rva)
+	if (start_rva != end_rva
+		+ debug_directory_list_details::list_type::value_type::descriptor_type::packed_size)
+	{
 		list.add_error(debug_directory_loader_errc::excessive_data_in_directory);
+	}
 
 	return result;
 }
