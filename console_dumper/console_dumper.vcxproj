@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bound_imports_dumper.cpp" />
+    <ClCompile Include="debug_dumper.cpp" />
     <ClCompile Include="dos_header_dumper.cpp" />
     <ClCompile Include="dos_stub_dumper.cpp" />
     <ClCompile Include="exceptions_dumper.cpp" />
@@ -180,6 +181,7 @@
   <ItemGroup>
     <ClInclude Include="bound_imports_dumper.h" />
     <ClInclude Include="color_provider.h" />
+    <ClInclude Include="debug_dumper.h" />
     <ClInclude Include="dos_header_dumper.h" />
     <ClInclude Include="dos_stub_dumper.h" />
     <ClInclude Include="exceptions_dumper.h" />

@@ -3,6 +3,7 @@
 
 #include "color_provider.h"
 #include "bound_imports_dumper.h"
+#include "debug_dumper.h"
 #include "dos_header_dumper.h"
 #include "dos_stub_dumper.h"
 #include "exceptions_dumper.h"
@@ -44,6 +45,7 @@ void dump_pe(const pe_bliss::image::image& image)
 	dump_load_config(fmt, image);
 	dump_exceptions(fmt, image);
 	dump_resources(fmt, image);
+	dump_debug(fmt, image);
 }
 
 int main(int argc, char* argv[]) try
