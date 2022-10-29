@@ -33,7 +33,7 @@ struct value_info
 {
 	const char* name = nullptr;
 	bool is_hex = true;
-	std::function<void(std::size_t)> formatter;
+	std::function<void(std::size_t, std::size_t)> formatter;
 	bool output_value = true;
 };
 
@@ -97,7 +97,7 @@ public:
 		if (!info.output_value)
 		{
 			if (info.formatter)
-				info.formatter(left_padding);
+				info.formatter(left_padding, 0u);
 			stream_ << '\n';
 			return;
 		}
@@ -106,12 +106,13 @@ public:
 		{
 			if (i && left_padding)
 				stream_ << std::setfill(' ') << std::setw(left_padding) << "";
-			print_value(info, arr[i], i ? left_padding : 0);
+			print_value(info, arr[i], i ? left_padding : 0, i);
 		}
 	}
 
 	template<typename T>
-	void print_value(const value_info& info, const T& value, std::size_t left_padding = 0)
+	void print_value(const value_info& info, const T& value, std::size_t left_padding = 0,
+		std::size_t arr_index = 0)
 	{
 		if (info.output_value)
 		{
@@ -120,7 +121,7 @@ public:
 		}
 
 		if (info.formatter)
-			info.formatter(left_padding);
+			info.formatter(left_padding, arr_index);
 
 		stream_ << '\n';
 	}
