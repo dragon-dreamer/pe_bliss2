@@ -321,6 +321,12 @@
     <ClCompile Include="tests\pe_bliss2\checksum_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2</Filter>
     </ClCompile>
+    <ClCompile Include="tests\utilities\shannon_entropy_tests.cpp">
+      <Filter>Source Files\tests\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\image_shannon_entropy_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">

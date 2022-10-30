@@ -228,6 +228,7 @@
     <ClCompile Include="tests\pe_bliss2\image_helper.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_section_search_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\image_shannon_entropy_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_signature_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\image_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\load_config_loader_tests.cpp" />
@@ -255,6 +256,7 @@
     <ClCompile Include="tests\utilities\math_tests.cpp" />
     <ClCompile Include="tests\utilities\safe_uint_tests.cpp" />
     <ClCompile Include="tests\utilities\scoped_guard_tests.cpp" />
+    <ClCompile Include="tests\utilities\shannon_entropy_tests.cpp" />
     <ClCompile Include="tests\utilities\static_class_tests.cpp" />
     <ClCompile Include="tests\utilities\string_tests.cpp" />
   </ItemGroup>
