@@ -38,6 +38,7 @@ const char* debug_type_to_string(pe_bliss::debug::debug_directory_type type)
 	case iltcg: return "ILTCG";
 	case mpx: return "MPX";
 	case repro: return "Repro";
+	case mpdb: return "MPDB";
 	case spgo: return "SPGO";
 	case pdbhash: return "PDB Hash";
 	case ex_dllcharacteristics: return "Ex DLL Characteristics";
@@ -290,12 +291,12 @@ void dump_debug_directory(formatter& fmt,
 
 		fmt.print_field_name("Prolog byte count");
 		fmt.get_stream() << ": ";
-		fmt.print_string(std::to_string(entry.get_prolog_byte_count()));
+		fmt.print_value(entry.get_prolog_byte_count());
 		fmt.get_stream() << '\n';
 
 		fmt.print_field_name("Saved regs count");
 		fmt.get_stream() << ": ";
-		fmt.print_string(std::to_string(entry.get_saved_regs()));
+		fmt.print_value(entry.get_saved_regs());
 		fmt.get_stream() << '\n';
 
 		fmt.print_field_name("Frame type");
@@ -499,6 +500,18 @@ void dump_debug_directory(formatter& fmt,
 	fmt.print_packed_string(dir.get_algorithm());
 	fmt.get_stream() << '\n';
 	fmt.print_bytes("Hash", dir.get_hash());
+}
+
+void dump_debug_directory(formatter& fmt,
+	const pe_bliss::debug::mpdb_debug_directory_details& dir)
+{
+	fmt.print_structure("MPDB debug directory", dir.get_descriptor(), std::array{
+		value_info{"signature"},
+		value_info{"uncompressed_size"}
+	});
+	fmt.print_structure_name("Compressed size");
+	fmt.get_stream() << ": ";
+	fmt.print_value(dir.get_compressed_pdb().size());
 }
 } //namespace
 

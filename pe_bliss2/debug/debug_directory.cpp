@@ -48,6 +48,8 @@ struct debug_directory_category : std::error_category
 			return "Unable to deserialize COFF symbols";
 		case virtual_coff_string_table:
 			return "COFF string table is virtual";
+		case virtual_pdb_data:
+			return "Compressed PDB data is virtual";
 		default:
 			return {};
 		}
@@ -533,6 +535,31 @@ pdb_hash_debug_directory_details parse_pdbhash_directory(
 	return result;
 }
 
+mpdb_debug_directory_details parse_mpdb_directory(
+	buffers::input_buffer_stateful_wrapper& wrapper,
+	const debug_directory_parse_options& options)
+{
+	auto result = parse_directory<mpdb_debug_directory_details>(wrapper,
+		options.allow_virtual_data);
+	if (result.has_errors())
+		return result;
+
+	try
+	{
+		result.get_compressed_pdb().deserialize(
+			buffers::reduce(wrapper.get_buffer(), wrapper.rpos()),
+			options.copy_mpdb_memory);
+		if (!options.allow_virtual_data && result.get_compressed_pdb().virtual_size())
+			result.add_error(debug_directory_errc::virtual_pdb_data);
+	}
+	catch (const std::system_error&)
+	{
+		result.add_error(debug_directory_errc::unable_to_deserialize_symbols);
+	}
+
+	return result;
+}
+
 std::error_code make_error_code(debug_directory_errc e) noexcept
 {
 	return { static_cast<int>(e), debug_directory_category_instance };
@@ -567,6 +594,7 @@ typename debug_directory_base<Bases...>::underlying_directory_type
 	case coff: return { parse_coff_directory(wrapper, options) };
 	case pdbhash: return { parse_pdbhash_directory(wrapper,
 		options.allow_virtual_data) };
+	case mpdb: return { parse_mpdb_directory(wrapper, options) };
 	default: break;
 	}
 	throw pe_error(debug_directory_errc::unsupported_type);

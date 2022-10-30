@@ -71,6 +71,8 @@ constexpr std::uint32_t repro = 16u;
 //contains a null-terminated unicode (2-byte) string
 //likely related to sample profile guided optimization (/SPGO and /SPD:sample_profile_file options)
 constexpr std::uint32_t spgo = 18u;
+//Embedded portable PDB
+constexpr std::uint32_t mpdb = 17u;
 constexpr std::uint32_t pdbhash = 19u;
 //Extended DLL characteristics bits.
 //If the Type field is set to IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS,
@@ -336,6 +338,13 @@ struct image_debug_omap
 {
 	std::uint32_t rva;
 	std::uint32_t rva_to;
+};
+
+struct image_debug_mpdb
+{
+	std::uint32_t signature;
+	std::uint32_t uncompressed_size;
+	//std::byte[] pdb_data;
 };
 
 } //namespace pe_bliss::detail::debug

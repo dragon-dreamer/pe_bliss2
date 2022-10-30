@@ -39,7 +39,8 @@ enum class debug_directory_errc
 	too_many_entries,
 	number_of_symbols_mismatch,
 	pointer_to_symbol_table_mismatch,
-	virtual_coff_string_table
+	virtual_coff_string_table,
+	virtual_pdb_data
 };
 
 std::error_code make_error_code(debug_directory_errc) noexcept;
@@ -762,6 +763,40 @@ private:
 using pdb_hash_debug_directory = pdb_hash_debug_directory_base<>;
 using pdb_hash_debug_directory_details = pdb_hash_debug_directory_base<error_list>;
 
+template<typename... Bases>
+class [[nodiscard]] mpdb_debug_directory_base
+	: public detail::packed_struct_base<detail::debug::image_debug_mpdb>
+	, public Bases...
+{
+public:
+	static constexpr std::uint32_t signature = 0x4244504du; //'MPDB'
+
+public:
+	[[nodiscard]]
+	buffers::ref_buffer& get_compressed_pdb() & noexcept
+	{
+		return compressed_pdb_;
+	}
+
+	[[nodiscard]]
+	const buffers::ref_buffer& get_compressed_pdb() const& noexcept
+	{
+		return compressed_pdb_;
+	}
+
+	[[nodiscard]]
+	buffers::ref_buffer get_compressed_pdb() && noexcept
+	{
+		return std::move(compressed_pdb_);
+	}
+
+private:
+	buffers::ref_buffer compressed_pdb_;
+};
+
+using mpdb_debug_directory = mpdb_debug_directory_base<>;
+using mpdb_debug_directory_details = mpdb_debug_directory_base<error_list>;
+
 enum class debug_directory_type
 {
 	coff = detail::debug::image_debug_type::coff,
@@ -782,6 +817,7 @@ enum class debug_directory_type
 	repro = detail::debug::image_debug_type::repro,
 	spgo = detail::debug::image_debug_type::spgo,
 	pdbhash = detail::debug::image_debug_type::pdbhash,
+	mpdb = detail::debug::image_debug_type::mpdb,
 	ex_dllcharacteristics = detail::debug::image_debug_type::ex_dllcharacteristics
 };
 
@@ -793,6 +829,7 @@ struct [[nodiscard]] debug_directory_parse_options
 	//Optional, used for COFF validation purposes
 	const core::file_header* file_header{};
 	bool copy_coff_string_table_memory = false;
+	bool copy_mpdb_memory = false;
 };
 
 template<typename... Bases>
@@ -817,7 +854,8 @@ public:
 		repro_debug_directory_details,
 		spgo_debug_directory_details,
 		ex_dllcharacteristics_debug_directory_details,
-		pdb_hash_debug_directory_details
+		pdb_hash_debug_directory_details,
+		mpdb_debug_directory_details
 	>;
 
 public:
@@ -952,6 +990,11 @@ ex_dllcharacteristics_debug_directory_details
 pdb_hash_debug_directory_details parse_pdbhash_directory(
 	buffers::input_buffer_stateful_wrapper& wrapper,
 	bool allow_virtual_data);
+
+[[nodiscard]]
+mpdb_debug_directory_details parse_mpdb_directory(
+	buffers::input_buffer_stateful_wrapper& wrapper,
+	const debug_directory_parse_options& options);
 } //namespace pe_bliss::debug
 
 namespace std
