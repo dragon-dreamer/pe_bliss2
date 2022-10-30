@@ -877,3 +877,56 @@ TEST(DebugDirectoryTest, ParsePdbHashVirtual)
 	EXPECT_EQ(dir.get_hash().data_size(), 5u);
 	EXPECT_EQ(dir.get_hash().physical_size(), 4u);
 }
+
+namespace
+{
+constexpr std::array mpdb_directory{
+	std::byte{1}, std::byte{2}, std::byte{3}, std::byte{4}, //signature
+	std::byte{5}, std::byte{6}, std::byte{7}, std::byte{8}, //uncompressed_size
+	std::byte{'a'}, std::byte{'b'}, std::byte{'c'}, //compressed data
+};
+} //namespace
+
+TEST(DebugDirectoryTest, ParseMpdb)
+{
+	auto dir = parse_debug_directory<parse_mpdb_directory>(
+		mpdb_directory, debug_directory_parse_options{});
+	expect_contains_errors(dir);
+	EXPECT_EQ(dir.get_descriptor()->signature, 0x04030201u);
+	EXPECT_FALSE(dir.get_compressed_pdb().is_copied());
+	EXPECT_EQ(dir.get_compressed_pdb().copied_data(), std::vector(
+		mpdb_directory.end() - 3, mpdb_directory.end()));
+}
+
+TEST(DebugDirectoryTest, ParseMpdbCopy)
+{
+	auto dir = parse_debug_directory<parse_mpdb_directory>(
+		mpdb_directory, debug_directory_parse_options{ .copy_mpdb_memory = true });
+	expect_contains_errors(dir);
+	EXPECT_EQ(dir.get_descriptor()->signature, 0x04030201u);
+	EXPECT_TRUE(dir.get_compressed_pdb().is_copied());
+	EXPECT_EQ(dir.get_compressed_pdb().copied_data(), std::vector(
+		mpdb_directory.end() - 3, mpdb_directory.end()));
+}
+
+TEST(DebugDirectoryTest, ParseMpdbVirtualError)
+{
+	auto dir = parse_virtual_debug_directory<parse_mpdb_directory>(
+		mpdb_directory, 1u, debug_directory_parse_options{ .allow_virtual_data = false });
+	expect_contains_errors(dir, debug_directory_errc::virtual_pdb_data);
+	EXPECT_EQ(dir.get_descriptor()->signature, 0x04030201u);
+	EXPECT_FALSE(dir.get_compressed_pdb().is_copied());
+	EXPECT_EQ(dir.get_compressed_pdb().copied_data(), std::vector(
+		mpdb_directory.end() - 3, mpdb_directory.end() - 1));
+}
+
+TEST(DebugDirectoryTest, ParseMpdbVirtual)
+{
+	auto dir = parse_virtual_debug_directory<parse_mpdb_directory>(
+		mpdb_directory, 1u, debug_directory_parse_options{ .allow_virtual_data = true });
+	expect_contains_errors(dir);
+	EXPECT_EQ(dir.get_descriptor()->signature, 0x04030201u);
+	EXPECT_FALSE(dir.get_compressed_pdb().is_copied());
+	EXPECT_EQ(dir.get_compressed_pdb().copied_data(), std::vector(
+		mpdb_directory.end() - 3, mpdb_directory.end() - 1));
+}
