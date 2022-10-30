@@ -57,16 +57,25 @@ std::uint64_t calculate_checksum_impl(std::uint64_t checksum,
 		throw pe_bliss::pe_error(pe_bliss::image::checksum_errc::unaligned_buffer);
 
 	buffers::input_buffer_stateful_wrapper_ref ref(buf);
-	std::array<std::byte, sizeof(std::uint32_t)> data{};
-	std::uint32_t dword{};
+	static constexpr std::size_t temp_buffer_size
+		= sizeof(pe_bliss::image::image_checksum_type) * 128u;
+	std::array<std::byte, temp_buffer_size> temp;
+	pe_bliss::image::image_checksum_type dword{};
 	while (physical_size)
 	{
-		physical_size -= sizeof(dword);
-		ref.read(sizeof(std::uint32_t), data.data());
-		pe_bliss::detail::packed_serialization<>::deserialize(dword, data.data());
-		checksum = (checksum & 0xffffffffull) + dword + (checksum >> 32ull);
-		if (checksum > max_value)
-			checksum = (checksum & 0xffffffffull) + (checksum >> 32ull);
+		auto read_bytes = std::min(physical_size, temp_buffer_size);
+		physical_size -= read_bytes;
+		ref.read(read_bytes, temp.data());
+		const auto* ptr = temp.data();
+		for (std::size_t i = 0; i != read_bytes;
+			i += sizeof(pe_bliss::image::image_checksum_type),
+			ptr += sizeof(pe_bliss::image::image_checksum_type))
+		{
+			pe_bliss::detail::packed_serialization<>::deserialize(dword, ptr);
+			checksum = (checksum & 0xffffffffull) + dword + (checksum >> 32ull);
+			if (checksum > max_value)
+				checksum = (checksum & 0xffffffffull) + (checksum >> 32ull);
+		}
 	}
 
 	return checksum;
