@@ -180,6 +180,7 @@
     <ClCompile Include="tests\pe_bliss2\bytes_to_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\byte_array_from_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\byte_vector_from_va_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\checksum_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\compid_database_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\data_directories_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\accelerator_table_loader_tests.cpp" />
