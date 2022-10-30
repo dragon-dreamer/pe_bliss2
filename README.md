@@ -126,6 +126,7 @@ The library is aimed at being able to provide as much information about the PE f
   - CMake project and cross-platform compilation support
   - More features to console_dumper
   - .NET tables support (read-only)
+  - .NET resources support (read-only)
   - Trustlets
   - Entropy calculation
 - Low proirity
