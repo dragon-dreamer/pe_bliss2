@@ -39,6 +39,7 @@ const char* debug_type_to_string(pe_bliss::debug::debug_directory_type type)
 	case mpx: return "MPX";
 	case repro: return "Repro";
 	case spgo: return "SPGO";
+	case pdbhash: return "PDB Hash";
 	case ex_dllcharacteristics: return "Ex DLL Characteristics";
 	default: return "Unknown";
 	}
@@ -489,6 +490,16 @@ void dump_debug_directory(formatter& fmt,
 	});
 }
 
+void dump_debug_directory(formatter& fmt,
+	const pe_bliss::debug::pdb_hash_debug_directory_details& dir)
+{
+	fmt.print_structure_name("PDB hash debug directory");
+	fmt.get_stream() << '\n';
+	fmt.print_string("Algorithm");
+	fmt.print_packed_string(dir.get_algorithm());
+	fmt.get_stream() << '\n';
+	fmt.print_bytes("Hash", dir.get_hash());
+}
 } //namespace
 
 void dump_debug(formatter& fmt, const pe_bliss::image::image& image) try

@@ -71,6 +71,7 @@ constexpr std::uint32_t repro = 16u;
 //contains a null-terminated unicode (2-byte) string
 //likely related to sample profile guided optimization (/SPGO and /SPD:sample_profile_file options)
 constexpr std::uint32_t spgo = 18u;
+constexpr std::uint32_t pdbhash = 19u;
 //Extended DLL characteristics bits.
 //If the Type field is set to IMAGE_DEBUG_TYPE_EX_DLLCHARACTERISTICS,
 //the debug raw data contains extended DLL characteristics bits,

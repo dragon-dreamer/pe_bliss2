@@ -714,6 +714,54 @@ using ex_dllcharacteristics_debug_directory
 using ex_dllcharacteristics_debug_directory_details
 	= ex_dllcharacteristics_debug_directory_base<error_list>;
 
+template<typename... Bases>
+class [[nodiscard]] pdb_hash_debug_directory_base : public Bases...
+{
+public:
+	[[nodiscard]]
+	packed_c_string& get_algorithm() & noexcept
+	{
+		return algorithm_;
+	}
+
+	[[nodiscard]]
+	const packed_c_string& get_algorithm() const& noexcept
+	{
+		return algorithm_;
+	}
+
+	[[nodiscard]]
+	packed_c_string get_algorithm() && noexcept
+	{
+		return std::move(algorithm_);
+	}
+
+	[[nodiscard]]
+	packed_byte_vector& get_hash() & noexcept
+	{
+		return hash_;
+	}
+
+	[[nodiscard]]
+	const packed_byte_vector& get_hash() const& noexcept
+	{
+		return hash_;
+	}
+
+	[[nodiscard]]
+	packed_byte_vector get_hash() && noexcept
+	{
+		return std::move(hash_);
+	}
+
+private:
+	packed_c_string algorithm_;
+	packed_byte_vector hash_;
+};
+
+using pdb_hash_debug_directory = pdb_hash_debug_directory_base<>;
+using pdb_hash_debug_directory_details = pdb_hash_debug_directory_base<error_list>;
+
 enum class debug_directory_type
 {
 	coff = detail::debug::image_debug_type::coff,
@@ -733,6 +781,7 @@ enum class debug_directory_type
 	mpx = detail::debug::image_debug_type::mpx,
 	repro = detail::debug::image_debug_type::repro,
 	spgo = detail::debug::image_debug_type::spgo,
+	pdbhash = detail::debug::image_debug_type::pdbhash,
 	ex_dllcharacteristics = detail::debug::image_debug_type::ex_dllcharacteristics
 };
 
@@ -767,7 +816,8 @@ public:
 		mpx_debug_directory_details,
 		repro_debug_directory_details,
 		spgo_debug_directory_details,
-		ex_dllcharacteristics_debug_directory_details
+		ex_dllcharacteristics_debug_directory_details,
+		pdb_hash_debug_directory_details
 	>;
 
 public:
@@ -897,6 +947,11 @@ ex_dllcharacteristics_debug_directory_details
 	parse_ex_dllcharacteristics_debug_directory(
 		buffers::input_buffer_stateful_wrapper& wrapper,
 		bool allow_virtual_data);
+
+[[nodiscard]]
+pdb_hash_debug_directory_details parse_pdbhash_directory(
+	buffers::input_buffer_stateful_wrapper& wrapper,
+	bool allow_virtual_data);
 } //namespace pe_bliss::debug
 
 namespace std
