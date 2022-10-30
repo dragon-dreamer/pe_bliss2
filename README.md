@@ -21,6 +21,7 @@ The library is aimed at being able to provide as much information about the PE f
 - DOS Stub, Rich header parsing (unit-tested)
   - Rich COMPID database (unit-tested)
 - Section table parsing (unit-tested)
+- PE checksum calculation for aligned executables (unit-tested)
 - Directory support:
   - Bound import:
     - Read (unit-tested)
@@ -116,7 +117,6 @@ The library is aimed at being able to provide as much information about the PE f
     - Special signers
   - Basic .NET directory support (read-only)
   - Import redirects (apisetschema.dll)
-  - PE checksum calculation
 - Medium priority
   - Menu resource support
   - Dialogs resource support
