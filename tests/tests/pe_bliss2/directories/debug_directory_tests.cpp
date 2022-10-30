@@ -838,3 +838,42 @@ TEST(DebugDirectoryTest, UnsupportedDebugDirectory)
 		(void)dir.get_underlying_directory();
 	}, debug_directory_errc::unsupported_type);
 }
+
+namespace
+{
+constexpr std::array pdb_hash_directory{
+	std::byte{'a'}, std::byte{'b'}, std::byte{'c'}, std::byte{}, //algorithm
+	std::byte{2}, std::byte{3}, std::byte{4}, std::byte{5}, std::byte{0} //hash
+};
+} //namespace
+
+TEST(DebugDirectoryTest, ParsePdbHash)
+{
+	auto dir = parse_debug_directory<parse_pdbhash_directory>(
+		pdb_hash_directory);
+	expect_contains_errors(dir);
+	EXPECT_EQ(dir.get_algorithm().value(), "abc");
+	EXPECT_EQ(dir.get_hash().value(), std::vector(
+		pdb_hash_directory.end() - 5, pdb_hash_directory.end()));
+	EXPECT_EQ(dir.get_hash().physical_size(), 5u);
+}
+
+TEST(DebugDirectoryTest, ParsePdbHashVirtualError)
+{
+	auto dir = parse_virtual_debug_directory<parse_pdbhash_directory>(
+		pdb_hash_directory, 1u, false);
+	EXPECT_EQ(dir.get_algorithm().value(), "abc");
+	expect_contains_errors(dir, debug_directory_errc::unable_to_deserialize_hash);
+}
+
+TEST(DebugDirectoryTest, ParsePdbHashVirtual)
+{
+	auto dir = parse_virtual_debug_directory<parse_pdbhash_directory>(
+		pdb_hash_directory, 1u, true);
+	expect_contains_errors(dir);
+	EXPECT_EQ(dir.get_algorithm().value(), "abc");
+	EXPECT_EQ(dir.get_hash().value(), std::vector(
+		pdb_hash_directory.end() - 5, pdb_hash_directory.end() - 1));
+	EXPECT_EQ(dir.get_hash().data_size(), 5u);
+	EXPECT_EQ(dir.get_hash().physical_size(), 4u);
+}
