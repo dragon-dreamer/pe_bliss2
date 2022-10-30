@@ -105,6 +105,8 @@ The library is aimed at being able to provide as much information about the PE f
     - Intel MPX
     - EX DLL Characteristics (CET Shadow Stack flags)
     - ILTCG (Incremental link-time code generation flag)
+    - PDB Hash
+    - MPDB (Embedded Portable PDB)
 - Address conversions (RVA/VA/file offsets, unit-tested)
 - Overlay at the end of file parsing (unit-tested)
 - Simple console dumper of PE/PE+ files (no extended configuration yet)
