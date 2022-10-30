@@ -65,6 +65,8 @@ void load_debug_data(const image::image& instance, debug_directory_details& entr
 		entry.add_error(debug_directory_loader_errc::too_big_raw_data);
 		return;
 	}
+	if (!descriptor.size_of_data)
+		return;
 
 	auto& buf = entry.get_raw_data();
 	rva_type rva = descriptor.address_of_raw_data;

@@ -219,12 +219,9 @@ TEST_F(DebugLoaderTestFixture, ZeroDirectory)
 	auto dirs = debug::load(instance);
 	ASSERT_TRUE(dirs);
 	ASSERT_EQ(dirs->get_entries().size(), 3u);
-	expect_contains_errors(dirs->get_entries()[0],
-		debug::debug_directory_loader_errc::no_rva_and_file_offset);
-	expect_contains_errors(dirs->get_entries()[1],
-		debug::debug_directory_loader_errc::no_rva_and_file_offset);
-	expect_contains_errors(dirs->get_entries()[2],
-		debug::debug_directory_loader_errc::no_rva_and_file_offset);
+	expect_contains_errors(dirs->get_entries()[0]);
+	expect_contains_errors(dirs->get_entries()[1]);
+	expect_contains_errors(dirs->get_entries()[2]);
 }
 
 TEST_F(DebugLoaderTestFixture, NormalDirectory)
