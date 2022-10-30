@@ -22,6 +22,7 @@ The library is aimed at being able to provide as much information about the PE f
   - Rich COMPID database (unit-tested)
 - Section table parsing (unit-tested)
 - PE checksum calculation for aligned executables (unit-tested)
+- Shannon entropy calculation (unit-tested)
 - Directory support:
   - Bound import:
     - Read (unit-tested)
