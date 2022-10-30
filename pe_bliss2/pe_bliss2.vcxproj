@@ -96,6 +96,7 @@
     <ClInclude Include="image\rva_file_offset_converter.h" />
     <ClInclude Include="image\section_data_from_va.h" />
     <ClInclude Include="image\section_data_length_from_va.h" />
+    <ClInclude Include="image\shannon_entropy.h" />
     <ClInclude Include="image\string_from_va.h" />
     <ClInclude Include="image\string_to_va.h" />
     <ClInclude Include="image\struct_from_va.h" />
@@ -214,6 +215,7 @@
     <ClCompile Include="image\rva_file_offset_converter.cpp" />
     <ClCompile Include="image\section_data_from_va.cpp" />
     <ClCompile Include="image\section_data_length_from_va.cpp" />
+    <ClCompile Include="image\shannon_entropy.cpp" />
     <ClCompile Include="image\string_from_va.cpp" />
     <ClCompile Include="image\string_to_va.cpp" />
     <ClCompile Include="imports\import_directory_builder.cpp">
