@@ -1,5 +1,6 @@
 #include "pe_bliss2/dotnet/dotnet_directory.h"
 
+#include <cassert>
 #include <string>
 #include <system_error>
 #include <unordered_set>
@@ -61,6 +62,8 @@ metadata_header_details parse_metadata_header(
 	const buffers::input_buffer_ptr& metadata_buf,
 	const metadata_header_parse_options& options)
 {
+	assert(!!metadata_buf);
+
 	metadata_header_details result;
 
 	buffers::input_buffer_stateful_wrapper ref(metadata_buf);
