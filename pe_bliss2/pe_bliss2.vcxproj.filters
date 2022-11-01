@@ -163,6 +163,15 @@
     <Filter Include="Source Files\debug">
       <UniqueIdentifier>{d8ffc7db-3008-436d-a493-cdb22bd11cfa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\dotnet">
+      <UniqueIdentifier>{8e8efcef-9404-4aa0-b93b-27facb526f16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\dotnet">
+      <UniqueIdentifier>{1f4ea03a-b241-4f02-aebd-3aed9ef601b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\dotnet">
+      <UniqueIdentifier>{3c9cadb1-5d67-429d-8885-e2a6957f05a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detail\packed_serialization.h">
@@ -591,6 +600,12 @@
     <ClInclude Include="image\shannon_entropy.h">
       <Filter>Header Files\image</Filter>
     </ClInclude>
+    <ClInclude Include="detail\dotnet\image_dotnet_directory.h">
+      <Filter>Header Files\detail\dotnet</Filter>
+    </ClInclude>
+    <ClInclude Include="dotnet\dotnet_directory.h">
+      <Filter>Header Files\dotnet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -877,6 +892,9 @@
     </ClCompile>
     <ClCompile Include="image\shannon_entropy.cpp">
       <Filter>Source Files\image</Filter>
+    </ClCompile>
+    <ClCompile Include="dotnet\dotnet_directory.cpp">
+      <Filter>Source Files\dotnet</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
