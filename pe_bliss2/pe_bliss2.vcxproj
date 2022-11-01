@@ -68,6 +68,7 @@
     <ClInclude Include="dos\dos_header_validator.h" />
     <ClInclude Include="dos\dos_stub.h" />
     <ClInclude Include="dotnet\dotnet_directory.h" />
+    <ClInclude Include="dotnet\dotnet_directory_loader.h" />
     <ClInclude Include="error_list.h" />
     <ClInclude Include="exceptions\arm64\arm64_exception_directory.h" />
     <ClInclude Include="exceptions\arm64\arm64_exception_directory_loader.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="dos\dos_header_validator.cpp" />
     <ClCompile Include="dos\dos_stub.cpp" />
     <ClCompile Include="dotnet\dotnet_directory.cpp" />
+    <ClCompile Include="dotnet\dotnet_directory_loader.cpp" />
     <ClCompile Include="error_list.cpp" />
     <ClCompile Include="exceptions\arm64\arm64_exception_directory.cpp" />
     <ClCompile Include="exceptions\arm64\arm64_exception_directory_loader.cpp" />
