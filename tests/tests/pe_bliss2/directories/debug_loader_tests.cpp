@@ -1,6 +1,7 @@
 #include "pe_bliss2/debug/debug_directory_loader.h"
 
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <vector>
 
