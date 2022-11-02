@@ -370,7 +370,7 @@ void read_cf_guard_rva_table(const image::image& instance,
 	auto& table = optional_table.emplace();
 	rva_type prev_rva{};
 	bool is_sorted = true;
-	table.reserve(function_count);
+	table.reserve(static_cast<std::size_t>(function_count));
 	while (function_count--)
 	{
 		GuardFunction& func = table.emplace_back();
@@ -1742,7 +1742,7 @@ void load_ehcont_targets(const image::image& instance, const loader_options& opt
 
 	rva_type prev{};
 	bool is_sorted = true;
-	targets.reserve(count);
+	targets.reserve(static_cast<std::size_t>(count));
 	while (count--)
 	{
 		try

@@ -1430,7 +1430,7 @@ native_manifest_details parse_manifest(const manifest_accessor_interface& access
 	else
 	{
 		auto& identity = result.get_assembly_identity();
-		if (assembly_identity_elem->get_node_index() != !!has_no_inherit)
+		if (assembly_identity_elem->get_node_index() != static_cast<std::size_t>(has_no_inherit))
 			identity.add_error(manifest_errc::invalid_assembly_identity_element_position);
 		if (assembly_elem_it->next_child())
 			identity.add_error(manifest_errc::multiple_assembly_identities);
