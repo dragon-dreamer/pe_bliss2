@@ -1,6 +1,7 @@
 #include "buffers/input_buffer_stateful_wrapper.h"
 
 #include <system_error>
+#include <utility>
 
 #include "utilities/math.h"
 #include "utilities/generic_error.h"
@@ -60,6 +61,13 @@ input_buffer_stateful_wrapper::input_buffer_stateful_wrapper(
 	const input_buffer_ptr& buf) noexcept
 	: input_buffer_stateful_wrapper_ref(*buf)
 	, buf_(buf)
+{
+}
+
+input_buffer_stateful_wrapper::input_buffer_stateful_wrapper(
+	input_buffer_ptr&& buf) noexcept
+	: input_buffer_stateful_wrapper_ref(*buf)
+	, buf_(std::move(buf))
 {
 }
 

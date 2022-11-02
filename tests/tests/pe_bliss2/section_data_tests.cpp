@@ -80,19 +80,21 @@ void deserialize_no_copy_test(std::uint32_t extra_virtual_size)
 		55u, absolute_offset, relative_offset);
 	EXPECT_CALL(*buffer_mock, read(_, _, _)).Times(0);
 
-	buffers::input_buffer_stateful_wrapper wrapper(buffer_mock);
-
 	section_data data;
 	auto header = create_section_header();
 	header.set_virtual_size(raw_size + extra_virtual_size);
-	data.deserialize(header, wrapper, {
-		.section_alignment = 128u,
-		.copy_memory = false,
-		.image_loaded_to_memory = false,
-		.image_start_buffer_pos = image_start_buffer_pos
-	});
+	{
+		buffers::input_buffer_stateful_wrapper wrapper(buffer_mock);
 
-	check_buffer(data, extra_virtual_size);
+		data.deserialize(header, wrapper, {
+			.section_alignment = 128u,
+			.copy_memory = false,
+			.image_loaded_to_memory = false,
+			.image_start_buffer_pos = image_start_buffer_pos
+			});
+
+		check_buffer(data, extra_virtual_size);
+	}
 	EXPECT_EQ(buffer_mock.use_count(), 2);
 
 	EXPECT_CALL(*buffer_mock, read(
@@ -108,17 +110,19 @@ void deserialize_copy_test(std::uint32_t extra_virtual_size)
 	EXPECT_CALL(*buffer_mock, read(pointer_to_raw_data
 		+ image_start_buffer_pos, raw_size, _));
 
-	buffers::input_buffer_stateful_wrapper wrapper(buffer_mock);
-
 	section_data data;
 	auto header = create_section_header();
 	header.set_virtual_size(raw_size + extra_virtual_size);
-	data.deserialize(header, wrapper, {
-		.section_alignment = 128u,
-		.copy_memory = true,
-		.image_loaded_to_memory = false,
-		.image_start_buffer_pos = image_start_buffer_pos
-	});
+
+	{
+		buffers::input_buffer_stateful_wrapper wrapper(buffer_mock);
+		data.deserialize(header, wrapper, {
+			.section_alignment = 128u,
+			.copy_memory = true,
+			.image_loaded_to_memory = false,
+			.image_start_buffer_pos = image_start_buffer_pos
+			});
+	}
 
 	check_buffer(data, extra_virtual_size);
 	EXPECT_EQ(buffer_mock.use_count(), 1);
@@ -156,16 +160,19 @@ TEST(SectionDataTests, DeserializeLoadedTest)
 	EXPECT_CALL(*buffer_mock, read(
 		rva + image_start_buffer_pos, raw_size, _));
 
-	buffers::input_buffer_stateful_wrapper wrapper(buffer_mock);
 	auto header = create_section_header();
 	header.set_rva(rva);
 	section_data data;
-	data.deserialize(header, wrapper, {
-		.section_alignment = 128u,
-		.copy_memory = true,
-		.image_loaded_to_memory = true,
-		.image_start_buffer_pos = image_start_buffer_pos
-	});
+
+	{
+		buffers::input_buffer_stateful_wrapper wrapper(buffer_mock);
+		data.deserialize(header, wrapper, {
+			.section_alignment = 128u,
+			.copy_memory = true,
+			.image_loaded_to_memory = true,
+			.image_start_buffer_pos = image_start_buffer_pos
+			});
+	}
 
 	EXPECT_EQ(buffer_mock.use_count(), 1);
 }

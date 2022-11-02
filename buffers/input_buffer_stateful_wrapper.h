@@ -36,10 +36,11 @@ class [[nodiscard]] input_buffer_stateful_wrapper
 {
 public:
 	input_buffer_stateful_wrapper(const input_buffer_ptr& buf) noexcept;
+	input_buffer_stateful_wrapper(input_buffer_ptr&& buf) noexcept;
 
 	const input_buffer_ptr& get_buffer() const noexcept;
 
 private:
-	const input_buffer_ptr& buf_;
+	input_buffer_ptr buf_;
 };
 } //namespace buffers
