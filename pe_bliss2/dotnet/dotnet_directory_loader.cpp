@@ -51,7 +51,7 @@ struct dotnet_directory_loader_error_category : std::error_category
 
 const dotnet_directory_loader_error_category dotnet_directory_loader_error_category_instance;
 
-void load_buffer(const pe_bliss::image::image& instance,
+bool load_buffer(const pe_bliss::image::image& instance,
 	pe_bliss::dotnet::cor20_header_details& directory,
 	buffers::ref_buffer& buf,
 	const pe_bliss::detail::image_data_directory& dir,
@@ -63,16 +63,18 @@ void load_buffer(const pe_bliss::image::image& instance,
 	try
 	{
 		auto data = pe_bliss::image::section_data_from_rva(instance, dir.virtual_address,
-			dir.size, options.include_headers, options.allow_virtual_data);
+			dir.size, options.include_headers, true);
 		buf.deserialize(data, copy_memory);
 
 		if (!options.allow_virtual_data && data->virtual_size())
 			directory.add_error(virtual_data_error);
+
+		return true;
 	}
 	catch (const std::system_error&)
 	{
 		directory.add_error(load_error);
-		return;
+		return false;
 	}
 }
 
@@ -88,9 +90,12 @@ void load_buffer(const pe_bliss::image::image& instance,
 	if (!dir.size || !dir.virtual_address)
 		return;
 
-	load_buffer(instance, directory,
+	if (!load_buffer(instance, directory,
 		buf.emplace(), dir, load_error, virtual_data_error,
-		options, copy_memory);
+		options, copy_memory))
+	{
+		buf.reset();
+	}
 }
 
 } //namespace
@@ -135,13 +140,18 @@ std::optional<cor20_header_details> load(const image::image& instance,
 
 	const auto& meta_data = directory.get_descriptor()->meta_data;
 	if (!meta_data.virtual_address || !meta_data.size)
+	{
 		directory.add_error(dotnet_directory_loader_errc::empty_metadata);
+	}
+	else
+	{
+		load_buffer(instance, directory, directory.get_metadata(),
+			meta_data,
+			dotnet_directory_loader_errc::unable_to_load_metadata,
+			dotnet_directory_loader_errc::virtual_metadata,
+			options, options.copy_metadata_memory);
+	}
 
-	load_buffer(instance, directory, directory.get_metadata(),
-		meta_data,
-		dotnet_directory_loader_errc::unable_to_load_metadata,
-		dotnet_directory_loader_errc::virtual_metadata,
-		options, options.copy_metadata_memory);
 	load_buffer(instance, directory, directory.get_resources(),
 		directory.get_descriptor()->resources,
 		dotnet_directory_loader_errc::unable_to_load_resources,
