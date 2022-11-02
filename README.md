@@ -120,7 +120,6 @@ The library is aimed at being able to provide as much information about the PE f
   - Security directory support (authenticode)
     - Image signature verification/calculation
     - Special signers
-  - Basic .NET directory support (read-only)
   - Import redirects (apisetschema.dll)
 - Medium priority
   - Menu resource support
