@@ -107,6 +107,8 @@ The library is aimed at being able to provide as much information about the PE f
     - ILTCG (Incremental link-time code generation flag)
     - PDB Hash
     - MPDB (Embedded Portable PDB)
+  - .NET
+    - Basic headers support (readonly, unit-tested)
 - Address conversions (RVA/VA/file offsets, unit-tested)
 - Overlay at the end of file parsing (unit-tested)
 - Simple console dumper of PE/PE+ files (no extended configuration yet)
@@ -125,8 +127,9 @@ The library is aimed at being able to provide as much information about the PE f
   - Dialogs resource support
   - CMake project and cross-platform compilation support
   - More features to console_dumper
-  - .NET tables support (read-only)
+  - .NET streams and tables support (read-only)
   - .NET resources support (read-only)
+  - .NET strong name signatures (read-only)
   - Trustlets
   - Entropy calculation
 - Low proirity
@@ -144,6 +147,7 @@ The library is aimed at being able to provide as much information about the PE f
   - COFF debug aux symbols support
   - COFF debug line numbers support
   - VB5/VB6 structures (project info, DLLCall imports, modules, object table)
+  - NGEN .NET files
 
 ## Library requirements
 - C++20 or newer.
