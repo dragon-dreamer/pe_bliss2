@@ -91,7 +91,7 @@ void deserialize_no_copy_test(std::uint32_t extra_virtual_size)
 			.copy_memory = false,
 			.image_loaded_to_memory = false,
 			.image_start_buffer_pos = image_start_buffer_pos
-			});
+		});
 
 		check_buffer(data, extra_virtual_size);
 	}
@@ -121,7 +121,7 @@ void deserialize_copy_test(std::uint32_t extra_virtual_size)
 			.copy_memory = true,
 			.image_loaded_to_memory = false,
 			.image_start_buffer_pos = image_start_buffer_pos
-			});
+		});
 	}
 
 	check_buffer(data, extra_virtual_size);
@@ -171,7 +171,7 @@ TEST(SectionDataTests, DeserializeLoadedTest)
 			.copy_memory = true,
 			.image_loaded_to_memory = true,
 			.image_start_buffer_pos = image_start_buffer_pos
-			});
+		});
 	}
 
 	EXPECT_EQ(buffer_mock.use_count(), 1);

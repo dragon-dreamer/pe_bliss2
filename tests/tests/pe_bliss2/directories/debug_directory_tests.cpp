@@ -298,13 +298,13 @@ template<typename T>
 class OmapSrcTest : public testing::Test
 {
 public:
-	static constexpr auto Parser = T::Parser;
+	static constexpr auto parser = T::parser;
 };
 
 template<auto Parser>
 struct debug_info_parser
 {
-	static constexpr auto Parser = Parser;
+	static constexpr auto parser = Parser;
 };
 
 using omap_src_tested_types = ::testing::Types<
@@ -316,7 +316,7 @@ TYPED_TEST_SUITE(OmapSrcTest, omap_src_tested_types);
 
 TYPED_TEST(OmapSrcTest, ParseOmapSrc)
 {
-	auto dir = parse_debug_directory<TestFixture::Parser>(omap_src_directory,
+	auto dir = parse_debug_directory<TestFixture::parser>(omap_src_directory,
 		debug_directory_parse_options{});
 	expect_contains_errors(dir);
 	ASSERT_EQ(dir.get_mappings().size(), 2u);
@@ -326,7 +326,7 @@ TYPED_TEST(OmapSrcTest, ParseOmapSrc)
 
 TYPED_TEST(OmapSrcTest, ParseOmapSrcVirtualError)
 {
-	auto dir = parse_virtual_debug_directory<TestFixture::Parser>(omap_src_directory,
+	auto dir = parse_virtual_debug_directory<TestFixture::parser>(omap_src_directory,
 		2u, debug_directory_parse_options{ .allow_virtual_data = false });
 	expect_contains_errors(dir, debug_directory_errc::unable_to_deserialize);
 	ASSERT_EQ(dir.get_mappings().size(), 2u);
@@ -335,7 +335,7 @@ TYPED_TEST(OmapSrcTest, ParseOmapSrcVirtualError)
 
 TYPED_TEST(OmapSrcTest, ParseOmapSrcVirtual)
 {
-	auto dir = parse_virtual_debug_directory<TestFixture::Parser>(omap_src_directory,
+	auto dir = parse_virtual_debug_directory<TestFixture::parser>(omap_src_directory,
 		2u, debug_directory_parse_options{ .allow_virtual_data = true });
 	expect_contains_errors(dir);
 	ASSERT_EQ(dir.get_mappings().size(), 2u);
@@ -345,7 +345,7 @@ TYPED_TEST(OmapSrcTest, ParseOmapSrcVirtual)
 
 TYPED_TEST(OmapSrcTest, ParseOmapSrcLimit)
 {
-	auto dir = parse_debug_directory<TestFixture::Parser>(omap_src_directory,
+	auto dir = parse_debug_directory<TestFixture::parser>(omap_src_directory,
 		debug_directory_parse_options{ .max_debug_entry_count = 1u });
 	expect_contains_errors(dir, debug_directory_errc::too_many_entries);
 	ASSERT_EQ(dir.get_mappings().size(), 1u);
