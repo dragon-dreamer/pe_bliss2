@@ -350,6 +350,7 @@ constexpr std::array products
 	product_mapping{ 0x0ff, 31823, product_type::visual_studio_2022_17_4_0_preview2_0 },
 	product_mapping{ 0x0ff, 31921, product_type::visual_studio_2022_17_4_0_preview3_0 },
 	product_mapping{ 0x0ff, 31931, product_type::visual_studio_2022_17_4_0_preview4_0 },
+	product_mapping{ 0x0ff, 31932, product_type::visual_studio_2022_17_4_0_preview5_0 },
 	product_mapping{ 0x100, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x100, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x100, 23918, product_type::visual_studio_2015_update2 },
@@ -440,6 +441,7 @@ constexpr std::array products
 	product_mapping{ 0x100, 31823, product_type::visual_studio_2022_17_4_0_preview2_0 },
 	product_mapping{ 0x100, 31921, product_type::visual_studio_2022_17_4_0_preview3_0 },
 	product_mapping{ 0x100, 31931, product_type::visual_studio_2022_17_4_0_preview4_0 },
+	product_mapping{ 0x100, 31932, product_type::visual_studio_2022_17_4_0_preview5_0 },
 	product_mapping{ 0x101, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x101, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x101, 23918, product_type::visual_studio_2015_update2 },
@@ -530,6 +532,7 @@ constexpr std::array products
 	product_mapping{ 0x101, 31823, product_type::visual_studio_2022_17_4_0_preview2_0 },
 	product_mapping{ 0x101, 31921, product_type::visual_studio_2022_17_4_0_preview3_0 },
 	product_mapping{ 0x101, 31931, product_type::visual_studio_2022_17_4_0_preview4_0 },
+	product_mapping{ 0x101, 31932, product_type::visual_studio_2022_17_4_0_preview5_0 },
 	product_mapping{ 0x102, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x102, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x102, 23918, product_type::visual_studio_2015_update2 },
@@ -620,6 +623,7 @@ constexpr std::array products
 	product_mapping{ 0x102, 31823, product_type::visual_studio_2022_17_4_0_preview2_0 },
 	product_mapping{ 0x102, 31921, product_type::visual_studio_2022_17_4_0_preview3_0 },
 	product_mapping{ 0x102, 31931, product_type::visual_studio_2022_17_4_0_preview4_0 },
+	product_mapping{ 0x102, 31932, product_type::visual_studio_2022_17_4_0_preview5_0 },
 	product_mapping{ 0x103, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x103, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x103, 23918, product_type::visual_studio_2015_update2 },
@@ -709,6 +713,7 @@ constexpr std::array products
 	product_mapping{ 0x103, 31823, product_type::visual_studio_2022_17_4_0_preview2_0 },
 	product_mapping{ 0x103, 31921, product_type::visual_studio_2022_17_4_0_preview3_0 },
 	product_mapping{ 0x103, 31931, product_type::visual_studio_2022_17_4_0_preview4_0 },
+	product_mapping{ 0x103, 31932, product_type::visual_studio_2022_17_4_0_preview5_0 },
 	product_mapping{ 0x104, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x104, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x104, 23918, product_type::visual_studio_2015_update2 },
@@ -799,6 +804,7 @@ constexpr std::array products
 	product_mapping{ 0x104, 31823, product_type::visual_studio_2022_17_4_0_preview2_0 },
 	product_mapping{ 0x104, 31921, product_type::visual_studio_2022_17_4_0_preview3_0 },
 	product_mapping{ 0x104, 31931, product_type::visual_studio_2022_17_4_0_preview4_0 },
+	product_mapping{ 0x104, 31932, product_type::visual_studio_2022_17_4_0_preview5_0 },
 	product_mapping{ 0x105, 23026, product_type::visual_studio_2015 },
 	product_mapping{ 0x105, 23506, product_type::visual_studio_2015_update1 },
 	product_mapping{ 0x105, 23918, product_type::visual_studio_2015_update2 },
@@ -888,7 +894,8 @@ constexpr std::array products
 	product_mapping{ 0x105, 31721, product_type::visual_studio_2022_17_4_0_preview1_0 },
 	product_mapping{ 0x105, 31823, product_type::visual_studio_2022_17_4_0_preview2_0 },
 	product_mapping{ 0x105, 31921, product_type::visual_studio_2022_17_4_0_preview3_0 },
-	product_mapping{ 0x105, 31931, product_type::visual_studio_2022_17_4_0_preview4_0 }
+	product_mapping{ 0x105, 31931, product_type::visual_studio_2022_17_4_0_preview4_0 },
+	product_mapping{ 0x105, 31932, product_type::visual_studio_2022_17_4_0_preview5_0 }
 };
 
 static_assert(std::is_sorted(products.cbegin(), products.cend()),
@@ -1133,6 +1140,7 @@ const char* compid_database::product_type_to_string(product_type type) noexcept
 	case visual_studio_2022_17_4_0_preview2_0: return "Visual Studio 2022 17.4.0 Preview 2.0";
 	case visual_studio_2022_17_4_0_preview3_0: return "Visual Studio 2022 17.4.0 Preview 3.0";
 	case visual_studio_2022_17_4_0_preview4_0: return "Visual Studio 2022 17.4.0 Preview 4.0";
+	case visual_studio_2022_17_4_0_preview5_0: return "Visual Studio 2022 17.4.0 Preview 5.0";
 	case unmarked_object: return "Unmarked object";
 	default: return "Unknown";
 	}
