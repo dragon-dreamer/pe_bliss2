@@ -5,6 +5,7 @@
 #include <system_error>
 #include <type_traits>
 
+#include "pe_bliss2/error_list.h"
 #include "pe_bliss2/resources/icon_cursor.h"
 #include "pe_bliss2/resources/resource_directory.h"
 #include "pe_bliss2/resources/resource_types.h"
@@ -16,7 +17,12 @@ enum class icon_cursor_reader_errc
 {
 	unable_to_read_header = 1,
 	unable_to_read_group_entry_header,
-	unable_to_read_data
+	unable_to_read_data,
+	different_number_of_headers_and_data,
+	invalid_header,
+	invalid_size,
+	invalid_dimensions,
+	invalid_hotspot
 };
 
 std::error_code make_error_code(icon_cursor_reader_errc) noexcept;
@@ -71,6 +77,17 @@ template<typename... Bases>
 	resource_id_type language, std::u16string_view cursor_group_name,
 	const icon_cursor_read_options& options = {});
 
+struct [[nodiscard]] icon_cursor_validation_options
+{
+	bool write_virtual_part = false;
+};
+
+[[nodiscard]]
+error_list validate_icon(const icon_group& group,
+	const icon_cursor_validation_options& options = {});
+[[nodiscard]]
+error_list validate_cursor(const cursor_group& group,
+	const icon_cursor_validation_options& options = {});
 } //namespace pe_bliss::resources
 
 namespace std

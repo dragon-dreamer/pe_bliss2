@@ -16,10 +16,6 @@ namespace pe_bliss::resources
 enum class icon_cursor_writer_errc
 {
 	different_number_of_headers_and_data = 1,
-	invalid_header,
-	invalid_size,
-	invalid_dimensions,
-	invalid_hotspot
 };
 
 std::error_code make_error_code(icon_cursor_writer_errc) noexcept;
@@ -32,7 +28,6 @@ using file_cursor_group = icon_cursor_group<detail::resources::cursor_header,
 struct [[nodiscard]] icon_cursor_write_options
 {
 	bool write_virtual_part = false;
-	bool strict_format_check = true;
 };
 
 [[nodiscard]]

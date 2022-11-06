@@ -2,15 +2,18 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <string>
 #include <system_error>
 
 #include "buffers/ref_buffer.h"
 #include "buffers/input_buffer_stateful_wrapper.h"
 #include "pe_bliss2/error_list.h"
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/resources/resource_directory.h"
 #include "pe_bliss2/resources/resource_reader.h"
+#include "utilities/math.h"
 
 namespace
 {
@@ -33,6 +36,16 @@ struct icon_cursor_reader_error_category : std::error_category
 			return "Unable to read icon or cursor group entry header";
 		case unable_to_read_data:
 			return "Unable to read icon or cursor data";
+		case invalid_header:
+			return "Invalid icon or cursor header";
+		case invalid_size:
+			return "Invalid icon or cursor size";
+		case invalid_dimensions:
+			return "Invalid icon or cursor dimensions";
+		case invalid_hotspot:
+			return "Invalid cursor hotspot";
+		case different_number_of_headers_and_data:
+			return "Different number of icon or cursor group entry headers and corresponding data entries";
 		default:
 			return {};
 		}
@@ -283,4 +296,77 @@ template cursor_group cursor_group_from_resource_by_lang<error_list>(
 	resource_id_type language, std::u16string_view cursor_group_name,
 	const icon_cursor_read_options& options);
 
+namespace
+{
+template<typename Group, typename HeaderValidator>
+error_list validate_impl(const Group& group,
+	const icon_cursor_validation_options& options,
+	HeaderValidator&& header_validator)
+{
+	error_list result;
+
+	const auto& header = group.get_header();
+	if (header->reserved || header->type != Group::type)
+		result.add_error(icon_cursor_reader_errc::invalid_header);
+
+	const auto& res_headers = group.get_resource_group_headers();
+	std::size_t current_offset = Group::header_type::packed_size;
+	current_offset += Group::resource_group_header_type::packed_size
+		* res_headers.size();
+	auto& data = group.get_data_list();
+	if (data.size() != res_headers.size())
+	{
+		result.add_error(icon_cursor_reader_errc::different_number_of_headers_and_data);
+		return result;
+	}
+
+	for (std::size_t i = 0; i != res_headers.size(); ++i)
+	{
+		const auto& res_header = res_headers[i].get();
+		header_validator(res_header, data[i], result);
+		auto size = options.write_virtual_part
+			? data[i].size() : data[i].physical_size();
+		if (size > (std::numeric_limits<std::uint32_t>::max)())
+			result.add_error(icon_cursor_reader_errc::invalid_size);
+		if (current_offset > (std::numeric_limits<std::uint32_t>::max)())
+			result.add_error(icon_cursor_reader_errc::invalid_size);
+		if (!utilities::math::is_sum_safe(current_offset, size))
+			result.add_error(icon_cursor_reader_errc::invalid_size);
+
+		current_offset += size;
+	}
+
+	return result;
+}
+} //namespace
+
+error_list validate_icon(const icon_group& group,
+	const icon_cursor_validation_options& options)
+{
+	return validate_impl(group, options,
+		[] (const auto&, const auto&, const auto&) constexpr {});
+}
+
+error_list validate_cursor(const cursor_group& group,
+	const icon_cursor_validation_options& options)
+{
+	return validate_impl(group, options,
+	[](const auto& res_header, const auto& data, error_list& errors) {
+		packed_struct<detail::resources::cursor_hotspots> hotspots;
+		{
+			buffers::input_buffer_stateful_wrapper_ref ref(*data.data());
+			hotspots.deserialize(ref, true);
+		}
+		if (res_header.width > (std::numeric_limits<std::uint8_t>::max)()
+			|| res_header.height / 2u > (std::numeric_limits<std::uint8_t>::max)())
+		{
+			errors.add_error(icon_cursor_reader_errc::invalid_dimensions);
+		}
+		if (hotspots->hotspot_x > res_header.width - 1u
+			|| hotspots->hotspot_y > res_header.height - 1u)
+		{
+			errors.add_error(icon_cursor_reader_errc::invalid_hotspot);
+		}
+	});
+}
 } //namespace pe_bliss::resources

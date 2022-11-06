@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <limits>
 #include <string>
 #include <system_error>
 #include <utility>
@@ -13,7 +12,6 @@
 #include "pe_bliss2/detail/resources/icon_cursor.h"
 #include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/pe_error.h"
-#include "utilities/math.h"
 
 namespace
 {
@@ -32,14 +30,6 @@ struct icon_cursor_writer_error_category : std::error_category
 		{
 		case different_number_of_headers_and_data:
 			return "Different number of icon or cursor group entry headers and corresponding data entries";
-		case invalid_header:
-			return "Invalid icon or cursor header";
-		case invalid_size:
-			return "Invalid icon or cursor size";
-		case invalid_dimensions:
-			return "Invalid icon or cursor dimensions";
-		case invalid_hotspot:
-			return "Invalid cursor hotspot";
 		default:
 			return {};
 		}
@@ -65,12 +55,6 @@ FileGroup to_file_format_impl(Group&& group,
 	HeaderFormatter&& header_formatter)
 {
 	const auto& header = group.get_header();
-	if (options.strict_format_check)
-	{
-		if (header->reserved || header->type != FileGroup::type)
-			throw pe_error(icon_cursor_writer_errc::invalid_header);
-	}
-
 	FileGroup result;
 	result.get_header() = header;
 	result.get_data_list() = std::forward<Group>(group).get_data_list();
@@ -91,15 +75,6 @@ FileGroup to_file_format_impl(Group&& group,
 		auto size = options.write_virtual_part ? data[i].size() : data[i].physical_size();
 		file_header.size_in_bytes = static_cast<std::uint32_t>(size);
 		file_header.image_offset = static_cast<std::uint32_t>(current_offset);
-		if (options.strict_format_check)
-		{
-			if (size > (std::numeric_limits<std::uint32_t>::max)())
-				throw pe_error(icon_cursor_writer_errc::invalid_size);
-			if (current_offset > (std::numeric_limits<std::uint32_t>::max)())
-				throw pe_error(icon_cursor_writer_errc::invalid_size);
-			if (!utilities::math::is_sum_safe(current_offset, size))
-				throw pe_error(icon_cursor_writer_errc::invalid_size);
-		}
 		current_offset += size;
 	}
 
@@ -140,19 +115,6 @@ file_cursor_group to_cursor_file_format_impl(Group&& group,
 		file_header.height = static_cast<std::uint8_t>(res_header.height / 2u);
 		file_header.hotspot_x = hotspots->hotspot_x;
 		file_header.hotspot_y = hotspots->hotspot_y;
-		if (options.strict_format_check)
-		{
-			if (res_header.width > (std::numeric_limits<std::uint8_t>::max)()
-				|| res_header.height / 2u > (std::numeric_limits<std::uint8_t>::max)())
-			{
-				throw pe_error(icon_cursor_writer_errc::invalid_dimensions);
-			}
-			if (file_header.hotspot_x > res_header.width - 1u
-				|| file_header.hotspot_y > res_header.height - 1u)
-			{
-				throw pe_error(icon_cursor_writer_errc::invalid_hotspot);
-			}
-		}
 	});
 }
 
@@ -161,12 +123,6 @@ void write_impl(const Group& group,
 	buffers::output_buffer_interface& buf,
 	const icon_cursor_write_options& options)
 {
-	if (options.strict_format_check
-		&& group.get_resource_group_headers().size() != group.get_data_list().size())
-	{
-		throw pe_error(icon_cursor_writer_errc::different_number_of_headers_and_data);
-	}
-
 	group.get_header().serialize(buf, options.write_virtual_part);
 	for (const auto& entry_header : group.get_resource_group_headers())
 		entry_header.serialize(buf, options.write_virtual_part);
