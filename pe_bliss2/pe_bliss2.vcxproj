@@ -58,6 +58,7 @@
     <ClInclude Include="detail\packed_struct_base.h" />
     <ClInclude Include="detail\resources\accelerator.h" />
     <ClInclude Include="detail\resources\bitmap.h" />
+    <ClInclude Include="detail\resources\icon_cursor.h" />
     <ClInclude Include="detail\resources\image_resource_directory.h" />
     <ClInclude Include="detail\resources\message_table.h" />
     <ClInclude Include="detail\resources\version_info.h" />
@@ -130,6 +131,9 @@
     <ClInclude Include="resources\bitmap_writer.h" />
     <ClInclude Include="resources\cpid.h" />
     <ClInclude Include="resources\guid.h" />
+    <ClInclude Include="resources\icon_cursor.h" />
+    <ClInclude Include="resources\icon_cursor_reader.h" />
+    <ClInclude Include="resources\icon_cursor_writer.h" />
     <ClInclude Include="resources\lcid.h" />
     <ClInclude Include="resources\manifest-inl.h" />
     <ClInclude Include="resources\manifest.h" />
@@ -258,6 +262,8 @@
     <ClCompile Include="resources\bitmap_reader.cpp" />
     <ClCompile Include="resources\cpid.cpp" />
     <ClCompile Include="resources\guid.cpp" />
+    <ClCompile Include="resources\icon_cursor_reader.cpp" />
+    <ClCompile Include="resources\icon_cursor_writer.cpp" />
     <ClCompile Include="resources\lcid.cpp" />
     <ClCompile Include="resources\manifest.cpp" />
     <ClCompile Include="resources\manifest_accessor_interface.cpp" />
