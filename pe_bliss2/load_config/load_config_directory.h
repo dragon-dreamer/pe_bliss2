@@ -406,15 +406,15 @@ public:
 	//Relative offset from image_base_relocation RVA
 	[[nodiscard]]
 	std::uint32_t get_page_relative_offset() const noexcept
-		requires (!is_scalar);
+		requires (!dynamic_relocation_base<RelocationType>::is_scalar);
 	[[nodiscard]]
 	std::uint32_t get_page_relative_offset() const noexcept
-		requires (is_scalar);
+		requires (dynamic_relocation_base<RelocationType>::is_scalar);
 
 	void set_page_relative_offset(std::uint32_t offset)
-		requires (!is_scalar);
+		requires (!dynamic_relocation_base<RelocationType>::is_scalar);
 	void set_page_relative_offset(std::uint32_t offset)
-		requires (is_scalar);
+		requires (dynamic_relocation_base<RelocationType>::is_scalar);
 
 public:
 	[[nodiscard]]

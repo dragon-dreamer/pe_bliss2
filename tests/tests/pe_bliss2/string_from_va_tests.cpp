@@ -39,7 +39,7 @@ public:
 
 public:
 	explicit StringFromVaFixtureBase(std::uint32_t section_string_rva)
-		: instance(create_test_image({}))
+		: instance(create_test_image(test_image_options()))
 		, section_string_rva(section_string_rva)
 	{
 	}

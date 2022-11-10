@@ -273,7 +273,7 @@ void extended_unwind_record<EpilogInfo,
 template<typename EpilogInfo, typename UnwindRecordOptions>
 bool extended_unwind_record<EpilogInfo,
 	UnwindRecordOptions>::is_function_fragment() const noexcept
-	requires (has_f_bit)
+	requires (extended_unwind_record<EpilogInfo, UnwindRecordOptions>::has_f_bit)
 {
 	return (main_header_.get() & 0x400000u) != 0u;
 }
@@ -281,7 +281,7 @@ bool extended_unwind_record<EpilogInfo,
 template<typename EpilogInfo, typename UnwindRecordOptions>
 void extended_unwind_record<EpilogInfo,
 	UnwindRecordOptions>::set_is_function_fragment(bool is_fragment) noexcept
-	requires (has_f_bit)
+	requires (extended_unwind_record<EpilogInfo, UnwindRecordOptions>::has_f_bit)
 {
 	if (is_fragment)
 		main_header_.get() |= 0x400000u;

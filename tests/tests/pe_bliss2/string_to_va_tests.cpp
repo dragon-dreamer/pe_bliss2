@@ -45,7 +45,7 @@ public:
 	std::uint32_t section_arr_rva{};
 
 	StringToVaFixture()
-		: instance(create_test_image({}))
+		: instance(create_test_image(test_image_options()))
 	{
 		instance.update_full_headers_buffer();
 		auto& section = instance.get_section_data_list()[1];

@@ -269,7 +269,7 @@ public:
 public:
 	static constexpr auto function_length_multiplier
 		= UnwindRecordOptions::function_length_multiplier;
-	static constexpr auto has_f_bit = UnwindRecordOptions::has_f_bit;
+	static constexpr bool has_f_bit = UnwindRecordOptions::has_f_bit;
 
 public:
 	static constexpr std::uint32_t base_epilog_count_mask
@@ -307,7 +307,7 @@ public:
 	//that all prologue processing should be ignored.
 	[[nodiscard]]
 	bool is_function_fragment() const noexcept
-		requires (has_f_bit);
+		requires (extended_unwind_record<EpilogInfo, UnwindRecordOptions>::has_f_bit);
 
 	//Has two meanings, depending on the state of E bit (single_epilog_info_packed):
 	//If E is 0, it specifies the count of the total number of epilog scopes.
@@ -331,7 +331,7 @@ public:
 	void set_function_length(std::uint32_t length);
 
 	void set_is_function_fragment(bool is_fragment) noexcept
-		requires (has_f_bit);
+		requires (extended_unwind_record<EpilogInfo, UnwindRecordOptions>::has_f_bit);
 
 private:
 	[[nodiscard]]

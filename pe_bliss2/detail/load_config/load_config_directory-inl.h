@@ -279,7 +279,7 @@ const typename chpe_x86_metadata_base<Bases...>::metadata_type&
 template<typename RelocationType>
 std::uint32_t dynamic_relocation_base<RelocationType>
 	::get_page_relative_offset() const noexcept
-	requires (!is_scalar)
+	requires (!dynamic_relocation_base<RelocationType>::is_scalar)
 {
 	return get_relocation()->metadata & page_relative_offset_mask;
 }
@@ -287,7 +287,7 @@ std::uint32_t dynamic_relocation_base<RelocationType>
 template<typename RelocationType>
 std::uint32_t dynamic_relocation_base<RelocationType>
 	::get_page_relative_offset() const noexcept
-	requires (is_scalar)
+	requires (dynamic_relocation_base<RelocationType>::is_scalar)
 {
 	return get_relocation().get() & page_relative_offset_mask;
 }
@@ -295,7 +295,7 @@ std::uint32_t dynamic_relocation_base<RelocationType>
 template<typename RelocationType>
 void dynamic_relocation_base<RelocationType>
 	::set_page_relative_offset(std::uint32_t offset)
-	requires (!is_scalar)
+	requires (!dynamic_relocation_base<RelocationType>::is_scalar)
 {
 	if (offset > max_page_reative_offset)
 		throw pe_error(load_config_errc::invalid_page_relative_offset);
@@ -307,7 +307,7 @@ void dynamic_relocation_base<RelocationType>
 template<typename RelocationType>
 void dynamic_relocation_base<RelocationType>
 	::set_page_relative_offset(std::uint32_t offset)
-	requires (is_scalar)
+	requires (dynamic_relocation_base<RelocationType>::is_scalar)
 {
 	if (offset > max_page_reative_offset)
 		throw pe_error(load_config_errc::invalid_page_relative_offset);
