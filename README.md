@@ -88,6 +88,7 @@ The library is aimed at being able to provide as much information about the PE f
           - Files, COM classes, typelibs, COM interface proxy stubs, window classes
       - Message tables (read-only, unit-tested)
       - Version info (read-only, unit-tested)
+      - Icon, cursor groups (read, write to file, unit-tested)
   - Debug directory support (read-only, unit-tested)
     - MISC
     - Repro (PE determinism or reproducibility)
@@ -115,7 +116,6 @@ The library is aimed at being able to provide as much information about the PE f
 
 ## Approximate roadmap
 - High priority
-  - Icons, cursors resource support
   - MUI resource support
   - Security directory support (authenticode)
     - Image signature verification/calculation
@@ -130,7 +130,6 @@ The library is aimed at being able to provide as much information about the PE f
   - .NET resources support (read-only)
   - .NET strong name signatures (read-only)
   - Trustlets
-  - Entropy calculation
 - Low proirity
   - Unit tests for exports modification code
   - Unit tests for imports modification code
