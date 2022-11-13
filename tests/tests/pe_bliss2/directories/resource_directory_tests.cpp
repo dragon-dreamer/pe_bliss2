@@ -132,3 +132,63 @@ TEST(ResourceDirectoryTests, EntryByName)
 	EXPECT_EQ(dir.entry_by_name(u"abc").get_name().value(), u"abc");
 	EXPECT_EQ(std::as_const(dir).entry_by_name(u"abc").get_name().value(), u"abc");
 }
+
+TEST(ResourceDirectoryTests, EmplaceDirEntryById)
+{
+	resource_directory dir;
+	auto& entry = dir.try_emplace_entry_by_id(123u, directory_entry_contents::directory);
+	EXPECT_EQ(entry.get_id(), 123u);
+	ASSERT_TRUE(entry.has_directory());
+	
+	auto& entry2 = dir.try_emplace_entry_by_id(123u, directory_entry_contents::directory);
+	EXPECT_EQ(&entry, &entry2);
+
+	expect_throw_pe_error([&dir] {
+		(void)dir.try_emplace_entry_by_id(123u, directory_entry_contents::data);
+	}, resource_directory_errc::entry_does_not_contain_data);
+}
+
+TEST(ResourceDirectoryTests, EmplaceDataEntryById)
+{
+	resource_directory dir;
+	auto& entry = dir.try_emplace_entry_by_id(123u, directory_entry_contents::data);
+	EXPECT_EQ(entry.get_id(), 123u);
+	ASSERT_TRUE(entry.has_data());
+
+	auto& entry2 = dir.try_emplace_entry_by_id(123u, directory_entry_contents::data);
+	EXPECT_EQ(&entry, &entry2);
+
+	expect_throw_pe_error([&dir] {
+		(void)dir.try_emplace_entry_by_id(123u, directory_entry_contents::directory);
+	}, resource_directory_errc::entry_does_not_contain_directory);
+}
+
+TEST(ResourceDirectoryTests, EmplaceDirEntryByName)
+{
+	resource_directory dir;
+	auto& entry = dir.try_emplace_entry_by_name(u"abc", directory_entry_contents::directory);
+	EXPECT_EQ(entry.get_name().value(), u"abc");
+	ASSERT_TRUE(entry.has_directory());
+
+	auto& entry2 = dir.try_emplace_entry_by_name(u"abc", directory_entry_contents::directory);
+	EXPECT_EQ(&entry, &entry2);
+
+	expect_throw_pe_error([&dir] {
+		(void)dir.try_emplace_entry_by_name(u"abc", directory_entry_contents::data);
+	}, resource_directory_errc::entry_does_not_contain_data);
+}
+
+TEST(ResourceDirectoryTests, EmplaceDataEntryByName)
+{
+	resource_directory dir;
+	auto& entry = dir.try_emplace_entry_by_name(directory_entry_contents::data, u"abc");
+	EXPECT_EQ(entry.get_name().value(), u"abc");
+	ASSERT_TRUE(entry.has_data());
+
+	auto& entry2 = dir.try_emplace_entry_by_name(directory_entry_contents::data, u"abc");
+	EXPECT_EQ(&entry, &entry2);
+
+	expect_throw_pe_error([&dir] {
+		(void)dir.try_emplace_entry_by_name(directory_entry_contents::directory, u"abc");
+	}, resource_directory_errc::entry_does_not_contain_directory);
+}
