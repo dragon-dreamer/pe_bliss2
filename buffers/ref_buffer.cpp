@@ -68,27 +68,7 @@ ref_buffer& ref_buffer::operator=(const ref_buffer& other)
 	if (&other == this)
 		return *this;
 
-	if (const auto* buf = std::get_if<copied_buffer>(&other.buffer_); buf)
-	{
-		auto buf_copy = std::make_shared<input_container_buffer>(
-			buf->container->absolute_offset(), buf->container->relative_offset());
-		buf_copy->get_container() = buf->container->get_container();
-		if (buf->buffer->virtual_size())
-		{
-			auto buf_ptr = buf_copy.get();
-			auto virtual_buf_copy = std::make_shared<input_virtual_buffer>(
-				std::move(buf_copy), buf->buffer->virtual_size());
-			buffer_ = copied_buffer(buf_ptr, std::move(virtual_buf_copy));
-		}
-		else
-		{
-			buffer_ = copied_buffer(buf_copy.get(), std::move(buf_copy));
-		}
-	}
-	else
-	{
-		buffer_ = other.buffer_;
-	}
+	buffer_.emplace<buffer_ref>(other.data());
 	return *this;
 }
 
