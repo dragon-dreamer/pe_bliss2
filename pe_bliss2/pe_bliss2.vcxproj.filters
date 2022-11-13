@@ -621,6 +621,9 @@
     <ClInclude Include="resources\icon_cursor_writer.h">
       <Filter>Header Files\resources</Filter>
     </ClInclude>
+    <ClInclude Include="resources\resource_writer.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">

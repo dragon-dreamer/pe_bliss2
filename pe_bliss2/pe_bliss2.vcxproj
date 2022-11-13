@@ -146,6 +146,7 @@
     <ClInclude Include="resources\resource_reader.h" />
     <ClInclude Include="resources\resource_reader_errc.h" />
     <ClInclude Include="resources\resource_types.h" />
+    <ClInclude Include="resources\resource_writer.h" />
     <ClInclude Include="resources\string_table.h" />
     <ClInclude Include="resources\string_table_reader.h" />
     <ClInclude Include="resources\string_table_writer.h" />
