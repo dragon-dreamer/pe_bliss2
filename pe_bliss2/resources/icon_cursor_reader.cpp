@@ -353,15 +353,24 @@ error_list validate_cursor(const cursor_group& group,
 	return validate_impl(group, options,
 	[](const auto& res_header, const auto& data, error_list& errors) {
 		packed_struct<detail::resources::cursor_hotspots> hotspots;
-		{
-			buffers::input_buffer_stateful_wrapper_ref ref(*data.data());
-			hotspots.deserialize(ref, true);
-		}
-		if (res_header.width > (std::numeric_limits<std::uint8_t>::max)()
+		if (!res_header.width || !res_header.height
+			|| res_header.width > (std::numeric_limits<std::uint8_t>::max)()
 			|| res_header.height / 2u > (std::numeric_limits<std::uint8_t>::max)())
 		{
 			errors.add_error(icon_cursor_reader_errc::invalid_dimensions);
 		}
+
+		try
+		{
+			buffers::input_buffer_stateful_wrapper_ref ref(*data.data());
+			hotspots.deserialize(ref, true);
+		}
+		catch (const std::system_error&)
+		{
+			errors.add_error(icon_cursor_reader_errc::invalid_hotspot);
+			return;
+		}
+
 		if (hotspots->hotspot_x > res_header.width - 1u
 			|| hotspots->hotspot_y > res_header.height - 1u)
 		{
