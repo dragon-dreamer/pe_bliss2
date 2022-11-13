@@ -16,6 +16,7 @@ namespace pe_bliss::resources
 enum class icon_cursor_writer_errc
 {
 	different_number_of_headers_and_data = 1,
+	invalid_hotspot
 };
 
 std::error_code make_error_code(icon_cursor_writer_errc) noexcept;

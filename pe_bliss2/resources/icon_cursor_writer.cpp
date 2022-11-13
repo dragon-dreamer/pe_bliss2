@@ -30,6 +30,8 @@ struct icon_cursor_writer_error_category : std::error_category
 		{
 		case different_number_of_headers_and_data:
 			return "Different number of icon or cursor group entry headers and corresponding data entries";
+		case invalid_hotspot:
+			return "Invalid cursor hotspot";
 		default:
 			return {};
 		}
@@ -106,7 +108,16 @@ file_cursor_group to_cursor_file_format_impl(Group&& group,
 		packed_struct<detail::resources::cursor_hotspots> hotspots;
 		{
 			buffers::input_buffer_stateful_wrapper_ref ref(*data.data());
-			hotspots.deserialize(ref, true);
+			try
+			{
+				hotspots.deserialize(ref, true);
+			}
+			catch (const std::system_error&)
+			{
+				std::throw_with_nested(
+					pe_error(icon_cursor_writer_errc::invalid_hotspot));
+			}
+
 			auto cursor_data = buffers::reduce(data.data(),
 				packed_struct<detail::resources::cursor_hotspots>::packed_size);
 			data.deserialize(cursor_data, false);
