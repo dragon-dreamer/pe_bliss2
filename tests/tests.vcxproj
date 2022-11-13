@@ -203,6 +203,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\guid_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\icon_cursor_reader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\icon_cursor_validation_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\icon_cursor_writer_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\imported_directory_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\import_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\load_config_directory_tests.cpp" />
