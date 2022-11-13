@@ -201,6 +201,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\export_directory_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\export_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\guid_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\icon_cursor_reader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\imported_directory_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\import_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\load_config_directory_tests.cpp" />
@@ -213,6 +214,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\resources_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\resource_directory_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\resource_reader_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\resource_writer_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\string_table_reader_writer_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\string_table_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\tls_directory_tests.cpp" />
