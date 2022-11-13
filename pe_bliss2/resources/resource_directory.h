@@ -31,6 +31,12 @@ std::error_code make_error_code(resource_directory_errc) noexcept;
 template<typename... Bases>
 class resource_directory_entry_base;
 
+enum class directory_entry_contents
+{
+	directory,
+	data
+};
+
 template<typename... Bases>
 class [[nodiscard]] resource_directory_base
 	: public detail::packed_struct_base<detail::resources::image_resource_directory>
@@ -84,6 +90,13 @@ public:
 	entry_list_type::const_iterator entry_iterator_by_name(std::u16string_view name) const noexcept;
 	[[nodiscard]]
 	entry_list_type::iterator entry_iterator_by_name(std::u16string_view name) noexcept;
+
+	entry_type& try_emplace_entry_by_id(resource_id_type id,
+		directory_entry_contents contents);
+	entry_type& try_emplace_entry_by_name(std::u16string_view name,
+		directory_entry_contents contents);
+	entry_type& try_emplace_entry_by_name(directory_entry_contents contents,
+		std::u16string&& name);
 
 private:
 	entry_list_type entries_;
