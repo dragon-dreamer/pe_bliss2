@@ -63,6 +63,7 @@
     <ClInclude Include="detail\resources\message_table.h" />
     <ClInclude Include="detail\resources\version_info.h" />
     <ClInclude Include="detail\rich\rich_header_utils.h" />
+    <ClInclude Include="detail\security\image_security_directory.h" />
     <ClInclude Include="detail\tls\image_tls_directory.h" />
     <ClInclude Include="dos\dos_header.h" />
     <ClInclude Include="dos\dos_header_errc.h" />

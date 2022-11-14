@@ -172,6 +172,15 @@
     <Filter Include="Header Files\detail\dotnet">
       <UniqueIdentifier>{3c9cadb1-5d67-429d-8885-e2a6957f05a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\detail\security">
+      <UniqueIdentifier>{808dedc5-4fef-4b3f-83a4-675241c37b77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\security">
+      <UniqueIdentifier>{5d7be726-d741-49a7-b835-11ae705f490e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\security">
+      <UniqueIdentifier>{15a2608d-2360-4a68-86b8-c9bf0a6f3a80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detail\packed_serialization.h">
@@ -623,6 +632,9 @@
     </ClInclude>
     <ClInclude Include="resources\resource_writer.h">
       <Filter>Header Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\security\image_security_directory.h">
+      <Filter>Header Files\detail\security</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
