@@ -345,6 +345,9 @@
     <ClCompile Include="tests\pe_bliss2\directories\icon_cursor_writer_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2\directories</Filter>
     </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\security_directory_loader_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">
