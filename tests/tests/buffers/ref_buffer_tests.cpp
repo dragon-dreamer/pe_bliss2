@@ -143,6 +143,14 @@ TEST(BufferTests, CopiedRefBufferTest)
 	}
 }
 
+TEST(BufferTests, CopiedRefBufferTest2)
+{
+	buffers::ref_buffer buf;
+	buf.copy_referenced_buffer();
+	auto buf2 = buf;
+	EXPECT_EQ(buf.data(), buf2.data());
+}
+
 TEST(BufferTests, ReferencedRefBufferTest)
 {
 	auto input_buf = create_input_container_buffer(100u);
