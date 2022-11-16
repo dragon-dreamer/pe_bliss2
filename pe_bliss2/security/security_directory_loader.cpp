@@ -7,6 +7,8 @@
 #include "buffers/input_buffer_section.h"
 #include "buffers/input_buffer_stateful_wrapper.h"
 #include "pe_bliss2/image/image.h"
+#include "utilities/math.h"
+#include "utilities/safe_uint.h"
 
 namespace
 {
@@ -32,6 +34,10 @@ struct security_directory_loader_error_category : std::error_category
 			return "Invalid security directory entry size";
 		case invalid_directory_size:
 			return "Invalid security directory size";
+		case unaligned_directory:
+			return "Security directory is not aligned";
+		case too_many_entries:
+			return "Too many securty directory entries";
 		default:
 			return {};
 		}
@@ -63,7 +69,7 @@ std::optional<security_directory_details> load(const image::image& instance,
 	auto& directory = result.emplace();
 
 	auto overlay_data = instance.get_overlay().data();
-	auto overlay_offset = overlay_data->absolute_offset();
+	utilities::safe_uint overlay_offset = overlay_data->absolute_offset();
 	if (!overlay_data->size() || security_dir_info->virtual_address < overlay_offset)
 	{
 		directory.add_error(security_directory_loader_errc::invalid_directory);
@@ -73,7 +79,7 @@ std::optional<security_directory_details> load(const image::image& instance,
 	buffers::input_buffer_stateful_wrapper_ref ref(*overlay_data);
 	try
 	{
-		ref.set_rpos(security_dir_info->virtual_address - overlay_offset);
+		ref.set_rpos(security_dir_info->virtual_address - overlay_offset.value());
 	}
 	catch (const std::system_error&)
 	{
@@ -81,15 +87,26 @@ std::optional<security_directory_details> load(const image::image& instance,
 		return result;
 	}
 
+	if (!utilities::math::is_aligned<sizeof(std::uint64_t)>(security_dir_info->virtual_address))
+		directory.add_error(security_directory_loader_errc::unaligned_directory);
+
 	std::size_t size = security_dir_info->size;
 	static constexpr auto descriptor_size = security_directory_details
 		::certificate_entry_list_type::value_type::descriptor_type::packed_size;
+	auto max_entries = options.max_entries;
 	while (size >= descriptor_size)
 	{
+		if (!max_entries--)
+		{
+			directory.add_error(security_directory_loader_errc::too_many_entries);
+			return result;
+		}
+
 		auto& entry = directory.get_entries().emplace_back();
 		try
 		{
 			entry.get_descriptor().deserialize(ref, false);
+			overlay_offset += descriptor_size;
 		}
 		catch (const std::system_error&)
 		{
@@ -118,6 +135,7 @@ std::optional<security_directory_details> load(const image::image& instance,
 			{
 				entry.get_certificate().deserialize(buffers::reduce(overlay_data,
 					ref.rpos(), certificate_size), options.copy_raw_data);
+				ref.advance_rpos(static_cast<std::int32_t>(certificate_size));
 			}
 			catch (const std::system_error&)
 			{
@@ -127,6 +145,26 @@ std::optional<security_directory_details> load(const image::image& instance,
 		}
 
 		size -= certificate_size;
+
+		if (size)
+		{
+			try
+			{
+				overlay_offset += certificate_size;
+				auto old_offset = overlay_offset.value();
+				overlay_offset.align_up(sizeof(std::uint64_t));
+				std::size_t alignment_size = overlay_offset.value() - old_offset;
+				if (size < alignment_size)
+					break;
+				ref.advance_rpos(static_cast<std::int32_t>(alignment_size));
+				size -= alignment_size;
+			}
+			catch (const std::system_error&)
+			{
+				entry.add_error(security_directory_loader_errc::invalid_entry);
+				return result;
+			}
+		}
 	}
 
 	if (size)
