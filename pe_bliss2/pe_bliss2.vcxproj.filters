@@ -636,6 +636,12 @@
     <ClInclude Include="detail\security\image_security_directory.h">
       <Filter>Header Files\detail\security</Filter>
     </ClInclude>
+    <ClInclude Include="security\security_directory.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\security_directory_loader.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -934,6 +940,9 @@
     </ClCompile>
     <ClCompile Include="resources\icon_cursor_writer.cpp">
       <Filter>Source Files\resources</Filter>
+    </ClCompile>
+    <ClCompile Include="security\security_directory_loader.cpp">
+      <Filter>Source Files\security</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -166,6 +166,8 @@
     <ClInclude Include="section\section_table.h" />
     <ClInclude Include="section\section_errc.h" />
     <ClInclude Include="section\section_table_validator.h" />
+    <ClInclude Include="security\security_directory.h" />
+    <ClInclude Include="security\security_directory_loader.h" />
     <ClInclude Include="tls\tls_directory.h" />
     <ClInclude Include="tls\tls_directory_builder.h" />
     <ClInclude Include="tls\tls_directory_loader.h" />
@@ -294,6 +296,7 @@
     <ClCompile Include="section\section_errc.cpp" />
     <ClCompile Include="section\section_table_validator.cpp" />
     <ClInclude Include="tls\tls_directory-inl.h" />
+    <ClCompile Include="security\security_directory_loader.cpp" />
     <ClCompile Include="tls\tls_directory.cpp" />
     <ClCompile Include="tls\tls_directory_builder.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
