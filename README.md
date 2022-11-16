@@ -109,7 +109,9 @@ The library is aimed at being able to provide as much information about the PE f
     - PDB Hash
     - MPDB (Embedded Portable PDB)
   - .NET
-    - Basic headers support (readonly, unit-tested)
+    - Basic headers support (read-only, unit-tested)
+  - Security directory (Authenticode)
+    - Very basic support only, raw descriptors and certificate data (read-only, unit-tested)
 - Address conversions (RVA/VA/file offsets, unit-tested)
 - Overlay at the end of file parsing (unit-tested)
 - Simple console dumper of PE/PE+ files (no extended configuration yet)
