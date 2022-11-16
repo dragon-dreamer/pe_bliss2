@@ -91,21 +91,21 @@ void load_debug_data(const image::image& instance, debug_directory_details& entr
 
 		if (!rva)
 		{
-			if (!options.include_overlay
-				|| !instance.get_overlay().data()->size())
+			auto overlay_data = instance.get_overlay().data();
+			if (!options.include_overlay || !overlay_data->size())
 			{
 				entry.add_error(debug_directory_loader_errc::invalid_file_offset);
 				return;
 			}
 
-			auto overlay_offset = instance.get_overlay().data()->absolute_offset();
+			auto overlay_offset = overlay_data->absolute_offset();
 			if (file_offset < overlay_offset)
 			{
 				entry.add_error(debug_directory_loader_errc::invalid_file_offset);
 				return;
 			}
 
-			buf.deserialize(buffers::reduce(instance.get_overlay().data(),
+			buf.deserialize(buffers::reduce(overlay_data,
 				file_offset - overlay_offset, descriptor.size_of_data),
 				options.copy_raw_data);
 			return;
