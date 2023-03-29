@@ -315,7 +315,7 @@ void PrintTo(__uint128_t v, ::std::ostream* os) {
     low = low / 10 + high_mod * 1844674407370955161 + carry / 10;
 
     char digit = static_cast<char>(carry % 10);
-    *--p = '0' + digit;
+    *--p = static_cast<char>('0' + digit);
   }
   *os << p;
 }
@@ -528,7 +528,7 @@ void PrintStringTo(const ::std::string& s, ostream* os) {
   }
 }
 
-#ifdef __cpp_char8_t
+#ifdef __cpp_lib_char8_t
 void PrintU8StringTo(const ::std::u8string& s, ostream* os) {
   PrintCharsAsStringTo(s.data(), s.size(), os);
 }
