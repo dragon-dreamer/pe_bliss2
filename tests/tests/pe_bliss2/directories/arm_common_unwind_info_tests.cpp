@@ -103,6 +103,69 @@ class UnwindCodeCommonTests : public testing::Test
 {
 public:
 	static constexpr std::uint32_t width = T::value;
+
+	template<typename Code>
+	void test2(Code& code)
+	{
+		code.get_descriptor().value()[0] = std::byte{ 0xaau };
+		code.get_descriptor().value()[1] = std::byte{ 0xaau };
+
+		EXPECT_EQ((code.get_value<0, 9>()), 0b1010101010u);
+
+		expect_throw_pe_error([&code] {
+			code.set_value<0, 9>(0x400u);
+		}, utilities::generic_errc::integer_overflow);
+		EXPECT_EQ((code.get_value<0, 9>()), 0b1010101010u);
+
+		EXPECT_NO_THROW((code.set_value<0, 9>(0x3ffu)));
+		EXPECT_EQ((code.get_value<0, 9>()), 0x3ffu);
+		EXPECT_EQ(code.get_descriptor().value()[0], std::byte{ 0xffu });
+		EXPECT_EQ(code.get_descriptor().value()[1], std::byte{ 0xeau });
+	}
+
+	template<typename Code>
+	void test3(Code& code)
+	{
+		code.get_descriptor().value()[0] = std::byte{ 0xaau };
+		code.get_descriptor().value()[1] = std::byte{ 0xaau };
+		code.get_descriptor().value()[2] = std::byte{ 0xaau };
+
+		EXPECT_EQ((code.get_value<5, 23>()), 0b0101010101010101010u);
+
+		expect_throw_pe_error([&code] {
+			code.set_value<5, 23>(0x80000u);
+		}, utilities::generic_errc::integer_overflow);
+		EXPECT_EQ((code.get_value<5, 23>()), 0b0101010101010101010u);
+
+		EXPECT_NO_THROW((code.set_value<5, 23>(0u)));
+		EXPECT_EQ((code.get_value<5, 23>()), 0u);
+		EXPECT_EQ(code.get_descriptor().value()[0], std::byte{ 0xa8u });
+		EXPECT_EQ(code.get_descriptor().value()[1], std::byte{});
+		EXPECT_EQ(code.get_descriptor().value()[2], std::byte{});
+	}
+
+	template<typename Code>
+	void test4(Code& code)
+	{
+		code.get_descriptor().value()[0] = std::byte{ 0xaau };
+		code.get_descriptor().value()[1] = std::byte{ 0xaau };
+		code.get_descriptor().value()[2] = std::byte{ 0xaau };
+		code.get_descriptor().value()[3] = std::byte{ 0xaau };
+
+		EXPECT_EQ((code.get_value<3, 30>()), 0b101010101010101010101010101u);
+
+		expect_throw_pe_error([&code] {
+			code.set_value<3, 30>(0x10000000u);
+		}, utilities::generic_errc::integer_overflow);
+		EXPECT_EQ((code.get_value<3, 30>()), 0b101010101010101010101010101u);
+
+		EXPECT_NO_THROW((code.set_value<3, 30>(0xaaaaaaau)));
+		EXPECT_EQ((code.get_value<3, 30>()), 0xaaaaaaau);
+		EXPECT_EQ(code.get_descriptor().value()[0], std::byte{ 0xb5u });
+		EXPECT_EQ(code.get_descriptor().value()[1], std::byte{ 0x55u });
+		EXPECT_EQ(code.get_descriptor().value()[2], std::byte{ 0x55u });
+		EXPECT_EQ(code.get_descriptor().value()[3], std::byte{ 0x54u });
+	}
 };
 
 using unwind_code_common_tested_types = ::testing::Types<
@@ -145,64 +208,13 @@ TYPED_TEST(UnwindCodeCommonTests, UnwindCodeCommonValue)
 	EXPECT_EQ((code.get_value<0, 7>()), 1u);
 
 	if constexpr (TestFixture::width >= 2u)
-	{
-		code.get_descriptor().value()[0] = std::byte{ 0xaau };
-		code.get_descriptor().value()[1] = std::byte{ 0xaau };
-
-		EXPECT_EQ((code.get_value<0, 9>()), 0b1010101010u);
-
-		expect_throw_pe_error([&code] {
-			code.set_value<0, 9>(0x400u);
-		}, utilities::generic_errc::integer_overflow);
-		EXPECT_EQ((code.get_value<0, 9>()), 0b1010101010u);
-
-		EXPECT_NO_THROW((code.set_value<0, 9>(0x3ffu)));
-		EXPECT_EQ((code.get_value<0, 9>()), 0x3ffu);
-		EXPECT_EQ(code.get_descriptor().value()[0], std::byte{ 0xffu });
-		EXPECT_EQ(code.get_descriptor().value()[1], std::byte{ 0xeau });
-	}
+		this->test2(code);
 
 	if constexpr (TestFixture::width >= 3u)
-	{
-		code.get_descriptor().value()[0] = std::byte{ 0xaau };
-		code.get_descriptor().value()[1] = std::byte{ 0xaau };
-		code.get_descriptor().value()[2] = std::byte{ 0xaau };
-
-		EXPECT_EQ((code.get_value<5, 23>()), 0b0101010101010101010u);
-
-		expect_throw_pe_error([&code] {
-			code.set_value<5, 23>(0x80000u);
-		}, utilities::generic_errc::integer_overflow);
-		EXPECT_EQ((code.get_value<5, 23>()), 0b0101010101010101010u);
-
-		EXPECT_NO_THROW((code.set_value<5, 23>(0u)));
-		EXPECT_EQ((code.get_value<5, 23>()), 0u);
-		EXPECT_EQ(code.get_descriptor().value()[0], std::byte{ 0xa8u });
-		EXPECT_EQ(code.get_descriptor().value()[1], std::byte{});
-		EXPECT_EQ(code.get_descriptor().value()[2], std::byte{});
-	}
+		this->test3(code);
 
 	if constexpr (TestFixture::width >= 4u)
-	{
-		code.get_descriptor().value()[0] = std::byte{ 0xaau };
-		code.get_descriptor().value()[1] = std::byte{ 0xaau };
-		code.get_descriptor().value()[2] = std::byte{ 0xaau };
-		code.get_descriptor().value()[3] = std::byte{ 0xaau };
-
-		EXPECT_EQ((code.get_value<3, 30>()), 0b101010101010101010101010101u);
-		
-		expect_throw_pe_error([&code] {
-			code.set_value<3, 30>(0x10000000u);
-		}, utilities::generic_errc::integer_overflow);
-		EXPECT_EQ((code.get_value<3, 30>()), 0b101010101010101010101010101u);
-		
-		EXPECT_NO_THROW((code.set_value<3, 30>(0xaaaaaaau)));
-		EXPECT_EQ((code.get_value<3, 30>()), 0xaaaaaaau);
-		EXPECT_EQ(code.get_descriptor().value()[0], std::byte{ 0xb5u });
-		EXPECT_EQ(code.get_descriptor().value()[1], std::byte{ 0x55u });
-		EXPECT_EQ(code.get_descriptor().value()[2], std::byte{ 0x55u });
-		EXPECT_EQ(code.get_descriptor().value()[3], std::byte{ 0x54u });
-	}
+		this->test4(code);
 }
 
 TEST(ArmCommonUnwindInfoTests, RuntimeFunctionBase)

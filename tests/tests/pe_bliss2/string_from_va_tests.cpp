@@ -50,17 +50,17 @@ public:
 		switch (GetParam())
 		{
 		case function_type::va32:
-			return string_from_va<String>(instance,
+			return pe_bliss::image::string_from_va<String>(instance,
 				static_cast<std::uint32_t>(rva
 					+ instance.get_optional_header().get_raw_image_base()),
 				include_headers, allow_virtual_data);
 		case function_type::va64:
-			return string_from_va<String>(instance,
+			return pe_bliss::image::string_from_va<String>(instance,
 				static_cast<std::uint64_t>(rva
 					+ instance.get_optional_header().get_raw_image_base()),
 				include_headers, allow_virtual_data);
 		default: //rva
-			return string_from_rva<String>(instance, rva,
+			return pe_bliss::image::string_from_rva<String>(instance, rva,
 				include_headers, allow_virtual_data);
 		}
 	}
