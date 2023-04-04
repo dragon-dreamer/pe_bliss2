@@ -62,13 +62,13 @@ public:
 		{
 			high_entropy_va = 0x0020, //ASLR with 64 bit address space.
 			dynamic_base = 0x0040, //The DLL can be relocated at load time.
-			//Code integrity checks are forced.If you set this flag and a section contains only uninitialized data,
+			//Code integrity checks are forced. If you set this flag and a section contains only uninitialized data,
 			//set the PointerToRawData member of IMAGE_SECTION_HEADER for that section to zero;
 			//otherwise, the image will fail to load because the digital signature cannot be verified.
 			force_integrity = 0x0080,
-			nx_compat = 0x0100, //The image is compatible with data execution prevention(DEP).
+			nx_compat = 0x0100, //The image is compatible with data execution prevention (DEP).
 			no_isolation = 0x0200, //The image is isolation aware, but should not be isolated.
-			//The image does not use structured exception handling(SEH). No handlers can be called in this image.
+			//The image does not use structured exception handling (SEH). No handlers can be called in this image.
 			no_seh = 0x0400,
 			no_bind = 0x0800, //Do not bind the image.
 			appcontainer = 0x1000, //Image should execute in an AppContainer.
