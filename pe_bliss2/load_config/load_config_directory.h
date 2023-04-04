@@ -1140,6 +1140,8 @@ public:
 public:
 	[[nodiscard]]
 	version get_version() const noexcept;
+	[[nodiscard]]
+	bool is_version_at_least(version ver) const noexcept;
 
 	[[nodiscard]]
 	bool version_exactly_matches() const noexcept;

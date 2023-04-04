@@ -112,6 +112,13 @@ version load_config_directory_impl<Descriptor, Bases...>::get_version() const no
 }
 
 template<typename Descriptor, typename... Bases>
+bool load_config_directory_impl<Descriptor, Bases...>::is_version_at_least(
+	version ver) const noexcept
+{
+	return static_cast<std::size_t>(get_version()) >= static_cast<std::size_t>(ver);
+}
+
+template<typename Descriptor, typename... Bases>
 bool load_config_directory_impl<Descriptor, Bases...>::version_exactly_matches() const noexcept
 {
 	auto size = get_descriptor_size();
