@@ -56,14 +56,15 @@ std::error_code make_error_code(image_loader_errc e) noexcept
 	return { static_cast<int>(e), image_loader_error_category_instance };
 }
 
-image_load_result image_loader::load(
+void image_loader::load(
+	image& instance,
+	error_list& warnings,
+	std::exception_ptr& fatal_error,
 	const buffers::input_buffer_ptr& buffer,
 	const image_load_options& options)
 {
 	buffers::input_buffer_stateful_wrapper wrapper(buffer);
 
-	image_load_result result;
-	image& instance = result.image;
 	auto buffer_size = wrapper.size();
 
 	try
@@ -93,7 +94,7 @@ image_load_result image_loader::load(
 		instance.get_image_signature().deserialize(
 			wrapper, options.allow_virtual_headers);
 		if (options.validate_image_signature)
-			validate(instance.get_image_signature()).throw_on_error();
+			core::validate(instance.get_image_signature()).throw_on_error();
 
 		auto& file_hdr = instance.get_file_header();
 		auto& optional_hdr = instance.get_optional_header();
@@ -105,11 +106,11 @@ image_load_result image_loader::load(
 				file_hdr.get_descriptor()->size_of_optional_header,
 				optional_hdr); err)
 			{
-				result.warnings.add_error(err);
+				warnings.add_error(err);
 			}
 		}
-		validate(optional_hdr, options.optional_header_validation,
-			file_hdr.is_dll(), result.warnings);
+		core::validate(optional_hdr, options.optional_header_validation,
+			file_hdr.is_dll(), warnings);
 
 		instance.get_data_directories().deserialize(wrapper,
 			optional_hdr.get_number_of_rva_and_sizes(), options.allow_virtual_headers);
@@ -119,7 +120,7 @@ image_load_result image_loader::load(
 			if (auto err = validate_image_base(optional_hdr,
 				instance.has_relocations()); err)
 			{
-				result.warnings.add_error(err);
+				warnings.add_error(err);
 			}
 		}
 
@@ -139,7 +140,7 @@ image_load_result image_loader::load(
 		const auto& section_headers = section_tbl.get_section_headers();
 		if (options.validate_sections)
 		{
-			section::validate_section_headers(optional_hdr, section_headers, result.warnings);
+			section::validate_section_headers(optional_hdr, section_headers, warnings);
 		}
 
 		if (options.load_section_data)
@@ -160,7 +161,7 @@ image_load_result image_loader::load(
 				}
 				catch (const pe_error& e)
 				{
-					result.warnings.add_error(e.code(),
+					warnings.add_error(e.code(),
 						std::distance(section_headers.cbegin(), it));
 				}
 			}
@@ -178,7 +179,7 @@ image_load_result image_loader::load(
 			}
 			catch (const pe_error& e)
 			{
-				result.warnings.add_error(e.code());
+				warnings.add_error(e.code());
 			}
 		}
 
@@ -186,8 +187,8 @@ image_load_result image_loader::load(
 		{
 			const auto* last_section = section_headers.empty()
 				? nullptr : &section_headers.back();
-			if (auto err = validate_size_of_image(last_section, optional_hdr); err)
-				result.warnings.add_error(err);
+			if (auto err = core::validate_size_of_image(last_section, optional_hdr); err)
+				warnings.add_error(err);
 		}
 
 		if (options.load_full_headers_buffer)
@@ -202,16 +203,23 @@ image_load_result image_loader::load(
 			}
 			catch (...)
 			{
-				result.warnings.add_error(
+				warnings.add_error(
 					image_loader_errc::unable_to_load_full_headers_buffer);
 			}
 		}
 	}
 	catch (const std::system_error&)
 	{
-		result.fatal_error = std::current_exception();
+		fatal_error = std::current_exception();
 	}
+}
 
+image_load_result image_loader::load(
+	const buffers::input_buffer_ptr& buffer,
+	const image_load_options& options)
+{
+	image_load_result result;
+	load(result.image, result.warnings, result.fatal_error, buffer, options);
 	return result;
 }
 

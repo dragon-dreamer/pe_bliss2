@@ -63,6 +63,14 @@ public:
 	static image_load_result load(
 		const buffers::input_buffer_ptr& buffer,
 		const image_load_options& options = {});
+
+	[[nodiscard]]
+	static void load(
+		image& instance,
+		error_list& warnings,
+		std::exception_ptr& fatal_error,
+		const buffers::input_buffer_ptr& buffer,
+		const image_load_options& options = {});
 };
 
 std::error_code make_error_code(image_loader_errc) noexcept;
