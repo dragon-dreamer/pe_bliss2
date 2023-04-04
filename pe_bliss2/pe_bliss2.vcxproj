@@ -93,6 +93,7 @@
     <ClInclude Include="image\byte_array_from_va.h" />
     <ClInclude Include="image\byte_vector_from_va.h" />
     <ClInclude Include="image\checksum.h" />
+    <ClInclude Include="image\format_detector.h" />
     <ClInclude Include="image\image.h" />
     <ClInclude Include="image\image_builder.h" />
     <ClInclude Include="image\image_errc.h" />
@@ -220,6 +221,7 @@
     <ClCompile Include="image\buffer_to_va.cpp" />
     <ClCompile Include="image\byte_vector_from_va.cpp" />
     <ClCompile Include="image\checksum.cpp" />
+    <ClCompile Include="image\format_detector.cpp" />
     <ClCompile Include="image\image.cpp" />
     <ClCompile Include="image\image_builder.cpp" />
     <ClCompile Include="image\image_errc.cpp" />

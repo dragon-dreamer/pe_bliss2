@@ -642,6 +642,9 @@
     <ClInclude Include="security\security_directory_loader.h">
       <Filter>Header Files\security</Filter>
     </ClInclude>
+    <ClInclude Include="image\format_detector.h">
+      <Filter>Header Files\image</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">
@@ -943,6 +946,9 @@
     </ClCompile>
     <ClCompile Include="security\security_directory_loader.cpp">
       <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="image\format_detector.cpp">
+      <Filter>Source Files\image</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
