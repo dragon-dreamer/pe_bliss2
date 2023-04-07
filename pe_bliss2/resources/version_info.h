@@ -226,14 +226,21 @@ using translation_string_map_type = std::unordered_map<translation, string_value
 
 namespace keys
 {
+//Required keys:
 constexpr std::u16string_view company_name_key(u"CompanyName");
 constexpr std::u16string_view file_description_key(u"FileDescription");
 constexpr std::u16string_view file_version_key(u"FileVersion");
 constexpr std::u16string_view internal_name_key(u"InternalName");
-constexpr std::u16string_view legal_copyright_key(u"LegalCopyright");
 constexpr std::u16string_view original_filename_key(u"OriginalFilename");
 constexpr std::u16string_view product_name_key(u"ProductName");
 constexpr std::u16string_view product_version_key(u"ProductVersion");
+
+//Optional keys:
+constexpr std::u16string_view comments_key(u"Comments");
+constexpr std::u16string_view legal_copyright_key(u"LegalCopyright");
+constexpr std::u16string_view legal_trademarks_key(u"LegalTrademarks");
+constexpr std::u16string_view private_build_key(u"PrivateBuild");
+constexpr std::u16string_view special_build_key(u"SpecialBuild");
 } //namespace keys
 
 template<typename... Bases>
