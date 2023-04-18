@@ -103,8 +103,9 @@ void read_forwarded_name_or_rva(const image::image& instance,
 	{
 		try
 		{
+			//Exported RVA can be virtual
 			(void)struct_from_rva<std::byte>(instance, exported_addr,
-				options.include_headers, options.allow_virtual_data);
+				options.include_headers, true);
 		}
 		catch (const std::system_error&)
 		{
