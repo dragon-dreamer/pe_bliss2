@@ -58,7 +58,7 @@ using namespace pe_bliss::resources;
 bool align_buffer(
 	version_info_block_details& block,
 	buffers::input_buffer_stateful_wrapper& buf,
-	std::uint16_t* const remaining_block_length)
+	std::uint16_t& remaining_block_length)
 {
 	const auto file_offset = buf.get_buffer()->absolute_offset() + buf.rpos();
 	auto aligned_file_offset = file_offset;
@@ -69,15 +69,15 @@ bool align_buffer(
 	}
 
 	auto difference = static_cast<std::uint16_t>(aligned_file_offset - file_offset);
-	if (remaining_block_length)
+	if (!difference)
+		return true;
+
+	if (remaining_block_length < difference)
 	{
-		if (*remaining_block_length < difference)
-		{
-			block.add_error(resource_reader_errc::buffer_read_error);
-			return false;
-		}
-		*remaining_block_length -= difference;
+		block.add_error(resource_reader_errc::buffer_read_error);
+		return false;
 	}
+	remaining_block_length -= difference;
 
 	try
 	{
@@ -151,7 +151,7 @@ bool version_info_from_resource_impl(
 
 	if (value_length)
 	{
-		if (!align_buffer(block, buf, &remaining_block_length))
+		if (!align_buffer(block, buf, remaining_block_length))
 			return false;
 
 		if (block.get_value_type() == version_info_value_type::text)
@@ -198,6 +198,9 @@ bool version_info_from_resource_impl(
 		remaining_block_length -= static_cast<std::uint16_t>(value_length);
 	}
 
+	if (!align_buffer(block, buf, remaining_block_length))
+		return false;
+
 	if (!remaining_block_length)
 		return true;
 
@@ -224,7 +227,7 @@ bool version_info_from_resource_impl(
 		buffers::input_buffer_stateful_wrapper child_buf(child_section);
 		while (child_buf.rpos() != child_buf.size())
 		{
-			if (!align_buffer(block, child_buf, &remaining_block_length))
+			if (!align_buffer(block, child_buf, remaining_block_length))
 				return false;
 			auto start_rpos = child_buf.rpos();
 			if (!version_info_from_resource_impl(
