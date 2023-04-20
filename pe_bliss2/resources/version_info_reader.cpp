@@ -198,6 +198,9 @@ bool version_info_from_resource_impl(
 		remaining_block_length -= static_cast<std::uint16_t>(value_length);
 	}
 
+	if (!remaining_block_length)
+		return true;
+
 	if (!align_buffer(block, buf, remaining_block_length))
 		return false;
 
