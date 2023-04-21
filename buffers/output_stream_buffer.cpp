@@ -19,7 +19,13 @@ std::size_t output_stream_buffer::size()
 {
     stream_.clear();
     utilities::scoped_guard guard([this, old_pos = stream_.tellp()]{
-        stream_.seekp(old_pos);
+        try
+        {
+            stream_.seekp(old_pos);
+        }
+        catch (...)
+        {
+        }
     });
     stream_.seekp(0, std::ios_base::end);
     return static_cast<std::size_t>(stream_.tellp());

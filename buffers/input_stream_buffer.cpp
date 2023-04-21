@@ -17,7 +17,13 @@ input_stream_buffer::input_stream_buffer(std::shared_ptr<std::istream> stream)
     stream_->exceptions(std::ios_base::badbit | std::ios_base::failbit);
 
     utilities::scoped_guard guard([this, old_pos = stream_->tellg()]{
-        stream_->seekg(old_pos);
+        try
+        {
+            stream_->seekg(old_pos);
+        }
+        catch (...)
+        {
+        }
     });
     stream_->seekg(0, std::ios_base::end);
     size_ = static_cast<std::size_t>(stream_->tellg());
@@ -41,7 +47,13 @@ std::size_t input_stream_buffer::read(std::size_t pos,
 
     stream_->exceptions(std::ios_base::badbit);
     utilities::scoped_guard guard([this] {
-        stream_->exceptions(std::ios_base::badbit | std::ios_base::failbit);
+        try
+        {
+            stream_->exceptions(std::ios_base::badbit | std::ios_base::failbit);
+        }
+        catch (...)
+        {
+        }
     });
     stream_->seekg(pos, std::ios::beg);
     stream_->read(reinterpret_cast<char*>(data), count);
