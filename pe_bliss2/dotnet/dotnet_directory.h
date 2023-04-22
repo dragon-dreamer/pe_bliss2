@@ -33,15 +33,19 @@ enum class dotnet_directory_errc
 
 std::error_code make_error_code(dotnet_directory_errc) noexcept;
 
-enum class comimage_flags
+struct comimage_flags final
 {
-	ilonly = detail::dotnet::comimage_flags::ilonly,
-	x32bitrequired = detail::dotnet::comimage_flags::x32bitrequired,
-	il_library = detail::dotnet::comimage_flags::il_library,
-	strongnamesigned = detail::dotnet::comimage_flags::strongnamesigned,
-	native_entrypoint = detail::dotnet::comimage_flags::native_entrypoint,
-	trackdebugdata = detail::dotnet::comimage_flags::trackdebugdata,
-	x32bitpreferred = detail::dotnet::comimage_flags::x32bitpreferred
+	comimage_flags() = delete;
+	enum value
+	{
+		ilonly = detail::dotnet::comimage_flags::ilonly,
+		x32bitrequired = detail::dotnet::comimage_flags::x32bitrequired,
+		il_library = detail::dotnet::comimage_flags::il_library,
+		strongnamesigned = detail::dotnet::comimage_flags::strongnamesigned,
+		native_entrypoint = detail::dotnet::comimage_flags::native_entrypoint,
+		trackdebugdata = detail::dotnet::comimage_flags::trackdebugdata,
+		x32bitpreferred = detail::dotnet::comimage_flags::x32bitpreferred
+	};
 };
 
 template<typename... Bases>
@@ -51,9 +55,9 @@ class [[nodiscard]] cor20_header_base
 {
 public:
 	[[nodiscard]]
-	comimage_flags get_flags() const noexcept
+	comimage_flags::value get_flags() const noexcept
 	{
-		return static_cast<comimage_flags>(descriptor_->flags);
+		return static_cast<comimage_flags::value>(descriptor_->flags);
 	}
 
 	[[nodiscard]] const buffers::ref_buffer& get_metadata() const& noexcept
