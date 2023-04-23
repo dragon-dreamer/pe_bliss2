@@ -6,8 +6,8 @@
 #include <variant>
 #include <vector>
 
+#include "pe_bliss2/delay_import/delay_import_directory_loader.h"
 #include "pe_bliss2/detail/concepts.h"
-#include "pe_bliss2/detail/imports/image_import_descriptor.h"
 #include "pe_bliss2/image/image.h"
 #include "pe_bliss2/image/string_from_va.h"
 #include "pe_bliss2/image/struct_from_va.h"
@@ -54,6 +54,8 @@ struct import_directory_loader_error_category : std::error_category
 			return "Empty imported library name";
 		case empty_import_name:
 			return "Empty import name";
+		case address_and_unload_table_thunks_differ:
+			return "Delayload import address and unload table thunks differ";
 		default:
 			return {};
 		}
@@ -133,9 +135,9 @@ std::uint32_t to_ordinal(std::uint32_t thunk) noexcept
 	return thunk & ~detail::imports::image_ordinal_flag32;
 }
 
-template<typename Import, typename Va>
+template<typename Import, typename Va, typename Descriptor>
 void add_imported_va(const image::image& instance,
-	Import& new_import, imported_library_details<Va>& library)
+	Import& new_import, imported_library_details<Va, Descriptor>& library)
 {
 	if ((library.has_lookup_table() && library.is_bound()) || instance.is_loaded_to_memory())
 	{
@@ -145,11 +147,12 @@ void add_imported_va(const image::image& instance,
 	}
 }
 
-template<typename Va>
+template<typename Va, typename Descriptor>
 bool load_import(const image::image& instance, const loader_options& options,
 	utilities::safe_uint<rva_type>& lookup_rva,
 	utilities::safe_uint<rva_type>& address_rva,
-	imported_library_details<Va>& library)
+	[[maybe_unused]] utilities::safe_uint<rva_type>& unload_rva,
+	imported_library_details<Va, Descriptor>& library)
 {
 	auto& imports = library.get_imports();
 	auto& new_import = imports.emplace_back();
@@ -162,6 +165,15 @@ bool load_import(const image::image& instance, const loader_options& options,
 				options.include_headers, options.allow_virtual_data);
 		}
 
+		if constexpr (imported_library_details<Va, Descriptor>::is_delayload)
+		{
+			if (unload_rva)
+			{
+				struct_from_rva(instance, unload_rva.value(), new_import.get_unload_entry().emplace(),
+					options.include_headers, options.allow_virtual_data);
+			}
+		}
+
 		struct_from_rva(instance, address_rva.value(), new_import.get_address(),
 			options.include_headers, options.allow_virtual_data);
 	}
@@ -172,7 +184,8 @@ bool load_import(const image::image& instance, const loader_options& options,
 		return false;
 	}
 
-	using packed_va_type = typename imported_address<Va>::packed_va_type;
+	using packed_va_type = typename imported_address<Va,
+		imported_library_details<Va, Descriptor>::is_delayload>::packed_va_type;
 	if (!new_import.get_lookup().value_or(packed_va_type{}).get()
 		&& !new_import.get_address().get())
 	{
@@ -180,17 +193,28 @@ bool load_import(const image::image& instance, const loader_options& options,
 		return false;
 	}
 
-	if (lookup_rva && !instance.is_loaded_to_memory() && !library.is_bound())
+	if constexpr (!imported_library_details<Va, Descriptor>::is_delayload)
 	{
-		if (new_import.get_lookup()->get() != new_import.get_address().get())
-			new_import.add_error(import_directory_loader_errc::lookup_and_address_table_thunks_differ);
-	}
+		if (lookup_rva && !instance.is_loaded_to_memory() && !library.is_bound())
+		{
+			if (new_import.get_lookup()->get() != new_import.get_address().get())
+				new_import.add_error(import_directory_loader_errc::lookup_and_address_table_thunks_differ);
+		}
 
-	if (!lookup_rva && instance.is_loaded_to_memory())
+		if (!lookup_rva && instance.is_loaded_to_memory())
+		{
+			new_import.get_import_info().template emplace<imported_function_address<Va>>()
+				.get_imported_va() = new_import.get_address();
+			return true;
+		}
+	}
+	else
 	{
-		new_import.get_import_info().template emplace<imported_function_address<Va>>()
-			.get_imported_va() = new_import.get_address();
-		return true;
+		if (unload_rva)
+		{
+			if (new_import.get_address().get() != new_import.get_unload_entry()->get())
+				new_import.add_error(import_directory_loader_errc::address_and_unload_table_thunks_differ);
+		}
 	}
 
 	auto thunk = new_import.get_lookup()
@@ -250,12 +274,12 @@ bool load_import(const image::image& instance, const loader_options& options,
 	return true;
 }
 
-template<typename Va, typename Directory>
+template<typename Va, typename Directory, typename Descriptor>
 void load_impl(const image::image& instance, const loader_options& options,
-	rva_type current_descriptor_rva, std::vector<imported_library_details<Va>>& import_list,
+	rva_type current_descriptor_rva,
+	std::vector<imported_library_details<Va, Descriptor>>& import_list,
 	Directory& directory)
 {
-	packed_struct<Va> thunk;
 	while ((current_descriptor_rva = load_library(
 		instance, options, current_descriptor_rva, import_list, directory)) != 0u)
 	{
@@ -263,6 +287,9 @@ void load_impl(const image::image& instance, const loader_options& options,
 		auto& descriptor = library.get_descriptor();
 		utilities::safe_uint current_lookup_rva = descriptor->lookup_table;
 		utilities::safe_uint current_address_rva = descriptor->address_table;
+		utilities::safe_uint<rva_type> current_unload_rva;
+		if constexpr (imported_library_details<Va, Descriptor>::is_delayload)
+			current_unload_rva = descriptor->unload_information_table_rva;
 
 		if (!current_lookup_rva && !current_address_rva)
 		{
@@ -277,12 +304,14 @@ void load_impl(const image::image& instance, const loader_options& options,
 		}
 
 		while (load_import(instance, options,
-			current_lookup_rva, current_address_rva, library))
+			current_lookup_rva, current_address_rva, current_unload_rva, library))
 		{
 			try
 			{
 				if (current_lookup_rva)
 					current_lookup_rva += sizeof(Va);
+				if (current_unload_rva)
+					current_unload_rva += sizeof(Va);
 
 				current_address_rva += sizeof(Va);
 			}
@@ -293,6 +322,37 @@ void load_impl(const image::image& instance, const loader_options& options,
 			}
 		}
 	}
+}
+
+template<typename Directory>
+std::optional<Directory> load_generic(const image::image& instance,
+	const loader_options& options)
+{
+	std::optional<Directory> result;
+	if (!instance.get_data_directories().has_directory(options.target_directory))
+		return result;
+
+	auto& dir = instance.get_data_directories().get_directory(
+		options.target_directory);
+	auto imports_rva = dir->virtual_address;
+	if (!imports_rva || !dir->size)
+		return result;
+
+	auto& directory = result.emplace();
+	if (instance.is_64bit())
+	{
+		load_impl(instance, options, imports_rva,
+			directory.get_list().emplace<std::vector<typename Directory::imported_library64_type>>(),
+			directory);
+	}
+	else
+	{
+		load_impl(instance, options, imports_rva,
+			directory.get_list().emplace<std::vector<typename Directory::imported_library32_type>>(),
+			directory);
+	}
+
+	return result;
 }
 
 } //namespace
@@ -308,28 +368,18 @@ std::error_code make_error_code(import_directory_loader_errc e) noexcept
 std::optional<import_directory_details> load(const image::image& instance,
 	const loader_options& options)
 {
-	std::optional<import_directory_details> result;
-	if (!instance.get_data_directories().has_imports())
-		return result;
-
-	auto imports_rva = instance.get_data_directories().get_directory(
-		options.target_directory)->virtual_address;
-
-	auto& directory = result.emplace();
-	if (instance.is_64bit())
-	{
-		load_impl(instance, options, imports_rva,
-			directory.get_list().emplace<std::vector<imported_library_details<std::uint64_t>>>(),
-			directory);
-	}
-	else
-	{
-		load_impl(instance, options, imports_rva,
-			directory.get_list().emplace<std::vector<imported_library_details<std::uint32_t>>>(),
-			directory);
-	}
-
-	return result;
+	return load_generic<import_directory_details>(instance, options);
 }
 
 } //namespace pe_bliss::imports
+
+namespace pe_bliss::delay_import
+{
+
+std::optional<delay_import_directory_details> load(const image::image& instance,
+	const loader_options& options)
+{
+	return load_generic<delay_import_directory_details>(instance, options);
+}
+
+} //namespace pe_bliss::delay_import

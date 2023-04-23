@@ -115,7 +115,7 @@ private:
 	name_type name_;
 };
 
-template<detail::executable_pointer Va>
+template<detail::executable_pointer Va, bool HasUnloadIat>
 class [[nodiscard]] imported_address
 {
 public:
@@ -173,15 +173,38 @@ private:
 };
 
 template<detail::executable_pointer Va>
+class [[nodiscard]] imported_address<Va, true>
+	: public imported_address<Va, false>
+{
+public:
+	[[nodiscard]]
+	typename imported_address<Va, false>
+		::optional_va_type& get_unload_entry() noexcept
+	{
+		return unload_entry_;
+	}
+
+	[[nodiscard]]
+	const typename imported_address<Va, false>
+		::optional_va_type& get_unload_entry() const noexcept
+	{
+		return unload_entry_;
+	}
+
+private:
+	typename imported_address<Va, false>::optional_va_type unload_entry_;
+};
+
+template<detail::executable_pointer Va, bool HasUnloadIat>
 class [[nodiscard]] imported_address_details
-	: public imported_address<Va>
+	: public imported_address<Va, HasUnloadIat>
 	, public error_list
 {
 };
 
-template<detail::executable_pointer Va>
-using imported_address_list = std::vector<imported_address<Va>>;
-template<detail::executable_pointer Va>
-using imported_address_details_list = std::vector<imported_address_details<Va>>;
+template<detail::executable_pointer Va, bool HasUnloadIat>
+using imported_address_list = std::vector<imported_address<Va, HasUnloadIat>>;
+template<detail::executable_pointer Va, bool HasUnloadIat>
+using imported_address_details_list = std::vector<imported_address_details<Va, HasUnloadIat>>;
 
 } //namespace pe_bliss::imports

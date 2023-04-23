@@ -1,12 +1,14 @@
 #include "gtest/gtest.h"
 
 #include "pe_bliss2/imports/import_directory.h"
+#include "pe_bliss2/detail/imports/image_import_descriptor.h"
 
 using namespace pe_bliss;
 
 TEST(ImportDirectoryTests, ImportedLibraryBound)
 {
-	imports::imported_library<std::uint32_t> lib;
+	imports::imported_library<std::uint32_t,
+		detail::imports::image_import_descriptor> lib;
 	EXPECT_FALSE(lib.is_bound());
 
 	lib.set_bound();
@@ -19,7 +21,8 @@ TEST(ImportDirectoryTests, ImportedLibraryBound)
 
 TEST(ImportDirectoryTests, LookupTable)
 {
-	imports::imported_library<std::uint32_t> lib;
+	imports::imported_library<std::uint32_t,
+		detail::imports::image_import_descriptor> lib;
 	EXPECT_FALSE(lib.has_lookup_table());
 
 	lib.get_descriptor()->address_table = 1u;

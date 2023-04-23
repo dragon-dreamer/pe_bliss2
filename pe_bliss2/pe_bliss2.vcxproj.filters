@@ -181,6 +181,12 @@
     <Filter Include="Source Files\security">
       <UniqueIdentifier>{15a2608d-2360-4a68-86b8-c9bf0a6f3a80}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\detail\delay_import">
+      <UniqueIdentifier>{490f2327-3e2c-4c90-96cf-2d05ca000b17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\delay_import">
+      <UniqueIdentifier>{d7cffbdd-8ca0-445b-b0bc-d0d535898769}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="detail\packed_serialization.h">
@@ -644,6 +650,15 @@
     </ClInclude>
     <ClInclude Include="image\format_detector.h">
       <Filter>Header Files\image</Filter>
+    </ClInclude>
+    <ClInclude Include="detail\delay_import\image_delay_load_descriptor.h">
+      <Filter>Header Files\detail\delay_import</Filter>
+    </ClInclude>
+    <ClInclude Include="delay_import\delay_import_directory.h">
+      <Filter>Header Files\delay_import</Filter>
+    </ClInclude>
+    <ClInclude Include="delay_import\delay_import_directory_loader.h">
+      <Filter>Header Files\delay_import</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

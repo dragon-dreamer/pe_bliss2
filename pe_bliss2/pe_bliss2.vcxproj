@@ -35,8 +35,11 @@
     <ClInclude Include="core\overlay.h" />
     <ClInclude Include="debug\debug_directory.h" />
     <ClInclude Include="debug\debug_directory_loader.h" />
+    <ClInclude Include="delay_import\delay_import_directory.h" />
+    <ClInclude Include="delay_import\delay_import_directory_loader.h" />
     <ClInclude Include="detail\bound_import\image_bound_import_descriptor.h" />
     <ClInclude Include="detail\debug\image_debug_directory.h" />
+    <ClInclude Include="detail\delay_import\image_delay_load_descriptor.h" />
     <ClInclude Include="detail\dotnet\image_dotnet_directory.h" />
     <ClInclude Include="detail\endian_convert.h" />
     <ClInclude Include="detail\exceptions\image_runtime_function_entry.h" />

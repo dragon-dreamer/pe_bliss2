@@ -28,7 +28,8 @@ enum class import_directory_loader_errc
 	zero_iat,
 	invalid_imported_library_iat_ilt,
 	empty_library_name,
-	empty_import_name
+	empty_import_name,
+	address_and_unload_table_thunks_differ //delay load specific
 };
 
 std::error_code make_error_code(import_directory_loader_errc) noexcept;

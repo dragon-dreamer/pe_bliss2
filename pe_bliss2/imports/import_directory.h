@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <type_traits>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -16,38 +17,54 @@ namespace pe_bliss::imports
 {
 
 //TODO: apisetschema.dll redirects parser
-//TODO: IMAGE_DELAYLOAD_DESCRIPTOR is different from loader imports
 
-template<typename ImportedAddressList>
+template<typename ImportedAddressList, typename Descriptor>
 class [[nodiscard]] imported_library_base
-	: public detail::packed_struct_base<detail::imports::image_import_descriptor>
+	: public detail::packed_struct_base<Descriptor>
 {
 public:
 	using imported_address_list = ImportedAddressList;
 
+	static constexpr bool is_delayload = !std::is_same_v<
+		Descriptor, detail::imports::image_import_descriptor>;
+
 public:
 	[[nodiscard]]
-	bool is_bound() const noexcept
+	bool is_rva_based() const noexcept requires(is_delayload)
 	{
-		return descriptor_->time_date_stamp == 0xffffffffu;
+		return static_cast<bool>(this->get_descriptor()->all_attributes & 0x1u);
+	}
+
+public:
+	[[nodiscard]]
+	bool is_bound() const noexcept requires(!is_delayload)
+	{
+		return this->get_descriptor()->time_date_stamp == 0xffffffffu;
+	}
+
+	[[nodiscard]]
+	bool is_bound() const noexcept requires(is_delayload)
+	{
+		return this->get_descriptor()->time_date_stamp != 0u;
 	}
 
 	[[nodiscard]]
 	bool has_lookup_table() const noexcept
 	{
-		return descriptor_->lookup_table
-			&& descriptor_->lookup_table != descriptor_->address_table;
+		return this->get_descriptor()->lookup_table
+			&& this->get_descriptor()->lookup_table
+				!= this->get_descriptor()->address_table;
 	}
 
 public:
-	void set_bound() noexcept
+	void set_bound() noexcept requires(!is_delayload)
 	{
-		descriptor_->time_date_stamp = 0xffffffffu;
+		this->get_descriptor()->time_date_stamp = 0xffffffffu;
 	}
 
-	void remove_lookup_table() noexcept
+	void remove_lookup_table() noexcept requires(!is_delayload)
 	{
-		descriptor_->lookup_table = 0u;
+		this->get_descriptor()->lookup_table = 0u;
 	}
 
 public:
@@ -92,26 +109,33 @@ public:
 	imported_address_list imports_;
 };
 
-template<detail::executable_pointer Va>
+template<detail::executable_pointer Va, typename Descriptor>
 class [[nodiscard]] imported_library
-	: public imported_library_base<imported_address_list<Va>>
+	: public imported_library_base<imported_address_list<Va, !std::is_same_v<
+		Descriptor, detail::imports::image_import_descriptor>>, Descriptor>
 {
 };
 
-template<detail::executable_pointer Va>
+template<detail::executable_pointer Va, typename Descriptor>
 class [[nodiscard]] imported_library_details
-	: public imported_library_base<imported_address_details_list<Va>>
+	: public imported_library_base<imported_address_details_list<Va, !std::is_same_v<
+		Descriptor, detail::imports::image_import_descriptor>>, Descriptor>
 	, public error_list
 {
 };
 
-template<template <detail::executable_pointer> typename ImportedLibrary>
+template<template <detail::executable_pointer,
+	typename Descriptor> typename ImportedLibrary, typename Descriptor>
 class [[nodiscard]] import_directory_base
 {
 public:
+	using imported_library32_type = ImportedLibrary<std::uint32_t, Descriptor>;
+	using imported_library64_type = ImportedLibrary<std::uint64_t, Descriptor>;
+
+public:
 	using imported_library_list_type = std::variant<
-		std::vector<ImportedLibrary<std::uint32_t>>,
-		std::vector<ImportedLibrary<std::uint64_t>>
+		std::vector<imported_library32_type>,
+		std::vector<imported_library64_type>
 	>;
 
 public:
@@ -134,9 +158,11 @@ private:
 	imported_library_list_type list_;
 };
 
-using import_directory = import_directory_base<imported_library>;
+using import_directory = import_directory_base<imported_library,
+	detail::imports::image_import_descriptor>;
 class [[nodiscard]] import_directory_details
-	: public import_directory_base<imported_library_details>
+	: public import_directory_base<imported_library_details,
+		detail::imports::image_import_descriptor>
 	, public error_list
 {
 };
