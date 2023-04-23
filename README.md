@@ -38,6 +38,8 @@ The library is aimed at being able to provide as much information about the PE f
   - Imports (or same style delay imports):
     - Read (unit-tested)
     - Modify (untested)
+  - Delay load imports (including unload IAT)
+    - Read (partially tested)
   - Load configuration (including recent versions up to Windows 10 22H1, read-only, unit-tested):
     - Lock prefix table
     - Global flags
