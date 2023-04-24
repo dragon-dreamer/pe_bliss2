@@ -155,6 +155,7 @@
     <ClInclude Include="resources\string_table.h" />
     <ClInclude Include="resources\string_table_reader.h" />
     <ClInclude Include="resources\string_table_writer.h" />
+    <ClInclude Include="resources\version.h" />
     <ClInclude Include="resources\version_info.h" />
     <ClInclude Include="resources\version_info_block.h" />
     <ClInclude Include="resources\version_info_reader.h" />

@@ -15,6 +15,7 @@
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/resources/guid.h"
 #include "pe_bliss2/resources/lcid.h"
+#include "pe_bliss2/resources/version.h"
 
 namespace pe_bliss::resources
 {
@@ -102,34 +103,6 @@ enum class assembly_processor_architecture
 	any,
 	unspecified,
 	unknown
-};
-
-struct [[nodiscard]] short_version
-{
-	std::uint16_t major{};
-	std::uint16_t minor{};
-
-	[[nodiscard]]
-	friend constexpr bool operator==(const short_version&,
-		const short_version&) = default;
-	[[nodiscard]]
-	friend constexpr auto operator<=>(const short_version&,
-		const short_version&) = default;
-};
-
-struct [[nodiscard]] full_version
-{
-	std::uint16_t major{};
-	std::uint16_t minor{};
-	std::uint16_t build{};
-	std::uint16_t revision{};
-
-	[[nodiscard]]
-	friend constexpr bool operator==(const full_version&,
-		const full_version&) = default;
-	[[nodiscard]]
-	friend constexpr auto operator<=>(const full_version&,
-		const full_version&) = default;
 };
 
 struct [[nodiscard]] assembly_version : public full_version

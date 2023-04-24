@@ -660,6 +660,9 @@
     <ClInclude Include="delay_import\delay_import_directory_loader.h">
       <Filter>Header Files\delay_import</Filter>
     </ClInclude>
+    <ClInclude Include="resources\version.h">
+      <Filter>Header Files\resources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="address_converter.cpp">

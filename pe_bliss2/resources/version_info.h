@@ -2,10 +2,10 @@
 
 #include <compare>
 #include <cstdint>
+#include <format>
 #include <functional>
 #include <optional>
 #include <string>
-#include <sstream>
 #include <system_error>
 #include <type_traits>
 #include <unordered_map>
@@ -16,6 +16,7 @@
 #include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/detail/resources/version_info.h"
 #include "pe_bliss2/error_list.h"
+#include "pe_bliss2/resources/version.h"
 #include "pe_bliss2/resources/version_info_block.h"
 
 namespace pe_bliss::resources
@@ -190,18 +191,28 @@ public:
 			descriptor_->product_version_ls);
 	}
 
+	[[nodiscard]]
+	full_version get_file_version() const noexcept;
+	[[nodiscard]]
+	full_version get_product_version() const noexcept;
+
 private:
 	template<typename CharType>
 	[[nodiscard]]
 	static std::basic_string<CharType> get_version_string(
 		std::uint32_t ms, std::uint32_t ls)
 	{
-		std::basic_stringstream<CharType> ss;
-		ss << (ms >> 16u) << ss.widen(L'.')
-			<< (ms & 0xffffu) << ss.widen(L'.')
-			<< (ls >> 16u) << ss.widen(L'.')
-			<< (ls & 0xffffu);
-		return ss.str();
+		const auto ver = version_from_components(ms, ls);
+		if constexpr (std::is_same_v<CharType, char>)
+		{
+			return std::format("{}.{}.{}.{}", ver.major,
+				ver.minor, ver.build, ver.revision);
+		}
+		else
+		{
+			return std::format(L"{}.{}.{}.{}", ver.major,
+				ver.minor, ver.build, ver.revision);
+		}
 	}
 };
 

@@ -365,6 +365,18 @@ const std::u16string& version_info_base<Bases...>
 	return string_it->second;
 }
 
+full_version file_version_info::get_file_version() const noexcept
+{
+	return version_from_components(get_descriptor()->file_version_ms,
+		get_descriptor()->file_version_ls);
+}
+
+full_version file_version_info::get_product_version() const noexcept
+{
+	return version_from_components(get_descriptor()->product_version_ms,
+		get_descriptor()->product_version_ls);
+}
+
 template version_info_base<>;
 template version_info_base<error_list>;
 template version_info_details get_version_info<>(const version_info_block_base<>& root,
