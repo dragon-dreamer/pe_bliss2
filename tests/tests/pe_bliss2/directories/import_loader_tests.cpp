@@ -75,7 +75,8 @@ public:
 	void with_imports(const imports::import_directory_details& dir, Func&& func)
 	{
 		bool is_64bit = !!std::get_if<std::vector<
-			imports::imported_library_details<std::uint64_t>>>(&dir.get_list());
+			imports::imported_library_details<std::uint64_t,
+			detail::imports::image_import_descriptor>>>(&dir.get_list());
 		ASSERT_EQ(is_64bit, is_x64());
 		std::visit(std::forward<Func>(func), dir.get_list());
 	}
