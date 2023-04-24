@@ -602,9 +602,9 @@ lcid_info get_lcid_info_impl(lcid_type lcid) noexcept
 	case 0x046Au: return { .lcid = lcid, .language = lcid_language::yoruba, .location = "Nigeria", .language_tag = "yo-NG", .release = lcid_release_key::release_v };
 	case 0x0035u: return { .lcid = lcid, .language = lcid_language::zulu, .language_tag = "zu", .release = lcid_release_key::release_7 };
 	case 0x0435u: return { .lcid = lcid, .language = lcid_language::zulu, .location = "South Africa", .language_tag = "zu-ZA", .release = lcid_release_key::release_e1 };
-	case 0x0000u: return { .lcid = lcid, .language = lcid_language::neutral, .language_tag = "", .release = lcid_release_key::release_a };
-	case 0x0400u: return { .lcid = lcid, .language = lcid_language::process_default, .language_tag = "", .release = lcid_release_key::release_a };
-	case 0x0800u: return { .lcid = lcid, .language = lcid_language::system_default, .language_tag = "", .release = lcid_release_key::release_a };
+	case 0x0000u: return { .lcid = lcid, .language = lcid_language::neutral, .language_tag = "neutral", .release = lcid_release_key::release_a };
+	case 0x0400u: return { .lcid = lcid, .language = lcid_language::process_default, .language_tag = "process_default", .release = lcid_release_key::release_a };
+	case 0x0800u: return { .lcid = lcid, .language = lcid_language::system_default, .language_tag = "system_default", .release = lcid_release_key::release_a };
 	default: return {};
 	}
 }
