@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -10,13 +11,90 @@
 namespace pe_bliss::resources
 {
 
+template<typename Native>
+class [[nodiscard]] icon_group_header_base
+{
+public:
+	using header_type = packed_struct<Native>;
+
+public:
+	[[nodiscard]]
+	const header_type& native() const noexcept
+	{
+		return header_;
+	}
+
+	[[nodiscard]]
+	header_type& native() noexcept
+	{
+		return header_;
+	}
+
+	[[nodiscard]]
+	const header_type& operator->() const noexcept
+	{
+		return header_;
+	}
+
+	[[nodiscard]]
+	header_type& operator->() noexcept
+	{
+		return header_;
+	}
+
+	[[nodiscard]]
+	std::uint16_t get_bit_count() const noexcept
+	{
+		return native()->bit_count;
+	}
+
+private:
+	header_type header_;
+};
+
+class [[nodiscard]] icon_group_header final
+	: public icon_group_header_base<detail::resources::icon_group>
+{
+public:
+	[[nodiscard]]
+	std::uint32_t get_height() const noexcept
+	{
+		auto result = native()->height;
+		return result == 0u ? 256u : result;
+	}
+
+	[[nodiscard]]
+	std::uint32_t get_width() const noexcept
+	{
+		auto result = native()->width;
+		return result == 0u ? 256u : result;
+	}
+};
+
+class [[nodiscard]] cursor_group_header final
+	: public icon_group_header_base<detail::resources::cursor_group>
+{
+public:
+	[[nodiscard]]
+	std::uint32_t get_height() const noexcept
+	{
+		return native()->height / 2u;
+	}
+
+	[[nodiscard]]
+	std::uint32_t get_width() const noexcept
+	{
+		return native()->width;
+	}
+};
+
 template<typename Header, typename ResourceGroupHeader, std::uint16_t Type>
 class [[nodiscard]] icon_cursor_group
 {
 public:
 	static constexpr std::uint16_t type = Type;
 	using header_type = packed_struct<Header>;
-	using resource_group_header_type = packed_struct<ResourceGroupHeader>;
+	using resource_group_header_type = ResourceGroupHeader;
 	using resource_group_header_list_type
 		= std::vector<resource_group_header_type>;
 	using data_list_type = std::vector<buffers::ref_buffer>;
@@ -77,8 +155,8 @@ private:
 };
 
 using icon_group = icon_cursor_group<detail::resources::ico_header,
-	detail::resources::icon_group, detail::resources::icon_type>;
+	icon_group_header, detail::resources::icon_type>;
 using cursor_group = icon_cursor_group<detail::resources::cursor_header,
-	detail::resources::cursor_group, detail::resources::cursor_type>;
+	cursor_group_header, detail::resources::cursor_type>;
 
 } //namespace pe_bliss::resources

@@ -3,6 +3,7 @@
 #include <system_error>
 #include <type_traits>
 
+#include "pe_bliss2/packed_struct.h"
 #include "pe_bliss2/resources/icon_cursor.h"
 
 namespace buffers
@@ -21,10 +22,20 @@ enum class icon_cursor_writer_errc
 
 std::error_code make_error_code(icon_cursor_writer_errc) noexcept;
 
+class [[nodiscard]] icon_dir_entry_header final
+	: public icon_group_header_base<detail::resources::icondirentry>
+{
+};
+
+class [[nodiscard]] cursor_dir_entry_header final
+	: public icon_group_header_base<detail::resources::cursordirentry>
+{
+};
+
 using file_icon_group = icon_cursor_group<detail::resources::ico_header,
-	detail::resources::icondirentry, detail::resources::icon_type>;
+	icon_dir_entry_header, detail::resources::icon_type>;
 using file_cursor_group = icon_cursor_group<detail::resources::cursor_header,
-	detail::resources::cursordirentry, detail::resources::cursor_type>;
+	cursor_dir_entry_header, detail::resources::cursor_type>;
 
 struct [[nodiscard]] icon_cursor_write_options
 {

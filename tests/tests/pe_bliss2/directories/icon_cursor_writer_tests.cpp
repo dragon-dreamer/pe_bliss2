@@ -62,7 +62,7 @@ TEST(IconCursorWriterTests, IconToFileFormat)
 		data2.size());
 
 	static constexpr auto offset = file_icon_group::header_type::packed_size
-		+ file_icon_group::resource_group_header_type::packed_size * 2u;
+		+ file_icon_group::resource_group_header_type::header_type::packed_size * 2u;
 	EXPECT_EQ(file_group.get_resource_group_headers()[0]->image_offset,
 		offset);
 	EXPECT_EQ(file_group.get_resource_group_headers()[1]->image_offset,
@@ -118,7 +118,7 @@ TEST(IconCursorWriterTests, CursorToFileFormat)
 		data2.size() - hotspot_size);
 
 	static constexpr auto offset = file_icon_group::header_type::packed_size
-		+ file_icon_group::resource_group_header_type::packed_size * 2u;
+		+ file_icon_group::resource_group_header_type::header_type::packed_size * 2u;
 	EXPECT_EQ(file_group.get_resource_group_headers()[0]->image_offset,
 		offset);
 	EXPECT_EQ(file_group.get_resource_group_headers()[1]->image_offset,
@@ -173,7 +173,7 @@ buffers::output_memory_buffer::buffer_type get_expected_serialized_data(
 	buffers::output_memory_buffer buf(data);
 	group.get_header().serialize(buf, write_virtual_data);
 	for (const auto& entry_header : group.get_resource_group_headers())
-		entry_header.serialize(buf, write_virtual_data);
+		entry_header.native().serialize(buf, write_virtual_data);
 	for (const auto& data : group.get_data_list())
 		data.serialize(buf, write_virtual_data);
 	return data;

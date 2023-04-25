@@ -86,7 +86,7 @@ IconCursor get_icon_cursor(const buffers::ref_buffer& header_buf,
 	headers.reserve(result.get_header()->count);
 	for (std::uint16_t i = 0; i != result.get_header()->count; ++i)
 	{
-		auto& entry_header = headers.emplace_back();
+		auto& entry_header = headers.emplace_back().native();
 		try
 		{
 			entry_header.deserialize(header_ref, options.allow_virtual_data);
@@ -104,7 +104,7 @@ IconCursor get_icon_cursor(const buffers::ref_buffer& header_buf,
 	{
 		try
 		{
-			data_list.emplace_back(loader(headers[i]->number));
+			data_list.emplace_back(loader(headers[i].native()->number));
 		}
 		catch (const std::system_error&)
 		{
@@ -311,7 +311,7 @@ error_list validate_impl(const Group& group,
 
 	const auto& res_headers = group.get_resource_group_headers();
 	std::size_t current_offset = Group::header_type::packed_size;
-	current_offset += Group::resource_group_header_type::packed_size
+	current_offset += Group::resource_group_header_type::header_type::packed_size
 		* res_headers.size();
 	auto& data = group.get_data_list();
 	if (data.size() != res_headers.size())
@@ -322,7 +322,7 @@ error_list validate_impl(const Group& group,
 
 	for (std::size_t i = 0; i != res_headers.size(); ++i)
 	{
-		const auto& res_header = res_headers[i].get();
+		const auto& res_header = res_headers[i].native().get();
 		header_validator(res_header, data[i], result);
 		auto size = options.write_virtual_part
 			? data[i].size() : data[i].physical_size();

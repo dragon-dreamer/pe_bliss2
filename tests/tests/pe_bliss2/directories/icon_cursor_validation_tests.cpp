@@ -73,8 +73,8 @@ TEST(IconCursorValidationTests, CursorInvalidHotspot)
 	group.get_header()->type = cursor_group::type;
 	group.get_data_list().resize(1);
 	auto& header = group.get_resource_group_headers().emplace_back();
-	header->height = 16u;
-	header->width = 16u;
+	header.native()->height = 16u;
+	header.native()->width = 16u;
 	expect_contains_errors(validate_cursor(group),
 		icon_cursor_reader_errc::invalid_hotspot);
 }
@@ -90,8 +90,8 @@ TEST(IconCursorValidationTests, CursorInvalidHotspot2)
 	};
 	hotspot.copied_data().assign(hotspot_data.begin(), hotspot_data.end());
 	auto& header = group.get_resource_group_headers().emplace_back();
-	header->height = 16u;
-	header->width = 16u;
+	header.native()->height = 16u;
+	header.native()->width = 16u;
 	expect_contains_errors(validate_cursor(group),
 		icon_cursor_reader_errc::invalid_hotspot);
 }
@@ -107,7 +107,7 @@ TEST(IconCursorValidationTests, CursorValid)
 	};
 	hotspot.copied_data().assign(hotspot_data.begin(), hotspot_data.end());
 	auto& header = group.get_resource_group_headers().emplace_back();
-	header->height = 16u;
-	header->width = 16u;
+	header.native()->height = 16u;
+	header.native()->width = 16u;
 	expect_contains_errors(validate_cursor(group));
 }

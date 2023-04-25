@@ -62,7 +62,7 @@ FileGroup to_file_format_impl(Group&& group,
 	result.get_data_list() = std::forward<Group>(group).get_data_list();
 	const auto& res_headers = group.get_resource_group_headers();
 	std::size_t current_offset = FileGroup::header_type::packed_size;
-	current_offset += FileGroup::resource_group_header_type::packed_size
+	current_offset += FileGroup::resource_group_header_type::header_type::packed_size
 		* res_headers.size();
 	auto& data = result.get_data_list();
 	if (data.size() != res_headers.size())
@@ -71,8 +71,8 @@ FileGroup to_file_format_impl(Group&& group,
 	result.get_resource_group_headers().reserve(res_headers.size());
 	for (std::size_t i = 0; i != res_headers.size(); ++i)
 	{
-		const auto& res_header = res_headers[i].get();
-		auto& file_header = result.get_resource_group_headers().emplace_back().get();
+		const auto& res_header = res_headers[i].native().get();
+		auto& file_header = result.get_resource_group_headers().emplace_back().native().get();
 		header_formatter(res_header, file_header, data[i]);
 		auto size = options.write_virtual_part ? data[i].size() : data[i].physical_size();
 		file_header.size_in_bytes = static_cast<std::uint32_t>(size);
@@ -136,7 +136,7 @@ void write_impl(const Group& group,
 {
 	group.get_header().serialize(buf, options.write_virtual_part);
 	for (const auto& entry_header : group.get_resource_group_headers())
-		entry_header.serialize(buf, options.write_virtual_part);
+		entry_header.native().serialize(buf, options.write_virtual_part);
 	for (const auto& data : group.get_data_list())
 		data.serialize(buf, options.write_virtual_part);
 }
