@@ -93,6 +93,12 @@ public:
 		return std::move(children_);
 	}
 
+	[[nodiscard]]
+	bool empty() const noexcept
+	{
+		return get_descriptor()->value_length == 0u;
+	}
+
 private:
 	key_type key_;
 	value_type value_;

@@ -100,7 +100,7 @@ void validate_version_info(version_info_block_details& root,
 			ASSERT_TRUE(grandchild1.get_key().has_value());
 			EXPECT_EQ(grandchild1.get_key()->value(), u"g");
 			ASSERT_TRUE(std::holds_alternative<
-				std::monostate>(grandchild1.get_value()));
+				buffers::ref_buffer>(grandchild1.get_value()));
 			EXPECT_TRUE(grandchild1.get_children().empty());
 		}
 		else

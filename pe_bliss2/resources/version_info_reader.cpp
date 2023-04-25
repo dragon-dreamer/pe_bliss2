@@ -137,6 +137,31 @@ bool version_info_from_resource_impl(
 	remaining_block_length -= static_cast<std::uint16_t>(key.data_size());
 
 	std::uint32_t value_length = block.get_descriptor()->value_length;
+	if (!value_length)
+	{
+		switch (block.get_value_type())
+		{
+		case version_info_value_type::binary:
+			{
+				auto& value = block.get_value().emplace<buffers::ref_buffer>();
+				auto section = buffers::reduce(buf.get_buffer(), buf.rpos(), 0u);
+				value.deserialize(section, options.copy_value_memory);
+			}
+			break;
+		case version_info_value_type::text:
+			{
+				auto& state = block.get_value().emplace<packed_utf16_c_string>().get_state();
+				state.set_absolute_offset(buf.get_buffer()->absolute_offset());
+				state.set_relative_offset(buf.get_buffer()->relative_offset());
+				state.set_buffer_pos(buf.rpos());
+			}
+			break;
+		default:
+			block.add_error(version_info_reader_errc::unknown_value_type);
+			break;
+		}
+	}
+
 	if (!remaining_block_length)
 	{
 		//No value, no children
