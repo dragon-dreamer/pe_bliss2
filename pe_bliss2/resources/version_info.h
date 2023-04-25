@@ -13,6 +13,7 @@
 #include <utility>
 #include <variant>
 
+#include "buffers/ref_buffer.h"
 #include "pe_bliss2/detail/packed_struct_base.h"
 #include "pe_bliss2/detail/resources/version_info.h"
 #include "pe_bliss2/error_list.h"
@@ -48,7 +49,9 @@ enum class version_info_errc
 	invalid_string_translations,
 	duplicate_string_translations,
 	invalid_strings,
-	duplicate_strings
+	duplicate_strings,
+	duplicate_string_file_info,
+	duplicate_var_file_info
 };
 
 std::error_code make_error_code(version_info_errc) noexcept;
@@ -337,8 +340,15 @@ using version_info = version_info_base<>;
 using version_info_details = version_info_base<error_list>;
 
 template<typename... Bases>
+struct [[nodiscard]] version_info_load_options
+{
+	bool allow_virtual_data = false;
+	std::function<void(const version_info_block_base<Bases...>&)> on_unknown_block_key;
+};
+
+template<typename... Bases>
 [[nodiscard]]
 version_info_details get_version_info(const version_info_block_base<Bases...>& root,
-	bool allow_virtual_data = false);
+	const version_info_load_options<Bases...>& options = {});
 
 } //namespace pe_bliss::resources

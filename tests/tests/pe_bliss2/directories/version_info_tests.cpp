@@ -195,7 +195,7 @@ TEST(VersionInfoTests, VersionInfoFromBlock)
 	}
 
 	{
-		auto info = get_version_info(root, true);
+		auto info = get_version_info(root, { .allow_virtual_data = true });
 		expect_contains_errors(info,
 			version_info_errc::invalid_strings,
 			version_info_errc::invalid_string_translations);

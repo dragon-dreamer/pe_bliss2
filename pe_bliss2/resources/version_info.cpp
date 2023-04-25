@@ -67,6 +67,10 @@ struct version_info_error_category : std::error_category
 			return "Invalid strings";
 		case duplicate_strings:
 			return "Duplicate strings";
+		case duplicate_string_file_info:
+			return "Duplicate StringFileInfo key";
+		case duplicate_var_file_info:
+			return "Duplicate VarFileInfo key";
 		default:
 			return {};
 		}
@@ -221,7 +225,7 @@ void load_var_file_info(version_info_details& result,
 
 template<typename... Bases>
 version_info_details get_version_info(const version_info_block_base<Bases...>& root,
-	bool allow_virtual_data)
+	const version_info_load_options<Bases...>& options)
 {
 	version_info_details result;
 	if (!root.get_key() || root.get_key()->value() != version_info_key)
@@ -241,7 +245,7 @@ version_info_details get_version_info(const version_info_block_base<Bases...>& r
 		{
 			buffers::input_buffer_stateful_wrapper_ref ref(*fixed_info->data());
 			result.get_file_version_info().get_descriptor().deserialize(ref,
-				allow_virtual_data);
+				options.allow_virtual_data);
 		}
 		catch (const std::system_error&)
 		{
@@ -259,19 +263,34 @@ version_info_details get_version_info(const version_info_block_base<Bases...>& r
 			continue;
 		}
 
-		if (key->value() == string_file_info_key && !has_strings)
+		if (key->value() == string_file_info_key)
 		{
-			load_strings(result, child.get_children());
-			has_strings = true;
+			if (has_strings)
+			{
+				result.add_error(version_info_errc::duplicate_string_file_info);
+			}
+			else
+			{
+				load_strings(result, child.get_children());
+				has_strings = true;
+			}
 		}
-		else if (key->value() == var_file_info_key && !has_translations)
+		else if (key->value() == var_file_info_key)
 		{
-			load_var_file_info(result, child.get_children(), allow_virtual_data);
-			has_translations = true;
+			if (has_translations)
+			{
+				result.add_error(version_info_errc::duplicate_var_file_info);
+			}
+			else
+			{
+				load_var_file_info(result, child.get_children(), options.allow_virtual_data);
+				has_translations = true;
+			}
 		}
 		else
 		{
-			result.add_error(version_info_errc::unknown_version_info_key);
+			if (options.on_unknown_block_key)
+				options.on_unknown_block_key(child);
 		}
 	}
 
@@ -380,8 +399,9 @@ full_version file_version_info::get_product_version() const noexcept
 template version_info_base<>;
 template version_info_base<error_list>;
 template version_info_details get_version_info<>(const version_info_block_base<>& root,
-	bool allow_virtual_data);
+	const version_info_load_options<>& options);
 template version_info_details get_version_info<error_list>(
-	const version_info_block_base<error_list>& root, bool allow_virtual_data);
+	const version_info_block_base<error_list>& root,
+	const version_info_load_options<error_list>& options);
 
 } //namespace pe_bliss::resources
