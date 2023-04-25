@@ -4,6 +4,7 @@
 #include <exception>
 #include <stdexcept>
 #include <string_view>
+#include <type_traits>
 #include <variant>
 
 #include "pe_bliss2/resources/resource_directory.h"
@@ -127,12 +128,35 @@ bool for_each_resource(Directory& root, resource_type type, Func&& func)
 			if (!language_entry.has_data() || !language_entry.has_id())
 				continue;
 
-			if (std::forward<Func>(func)(name_id_entry.get_name_or_id(),
-				language_entry.get_id(),
-				language_entry.get_data().get_raw_data()))
+			bool result = false;
+			static constexpr bool invocable_with_name_id
+				= std::is_invocable_v<decltype(std::forward<Func>(func)),
+					decltype(name_id_entry.get_name_or_id()),
+					decltype(language_entry.get_id()),
+					decltype(language_entry.get_data().get_raw_data())>;
+			static constexpr bool invocable_with_name_id_entry
+				= std::is_invocable_v<decltype(std::forward<Func>(func)),
+					decltype(name_id_entry),
+					decltype(language_entry.get_id()),
+					decltype(language_entry.get_data().get_raw_data())>;
+
+			static_assert(invocable_with_name_id || invocable_with_name_id_entry);
+
+			if constexpr (invocable_with_name_id)
 			{
-				return true;
+				result = std::forward<Func>(func)(name_id_entry.get_name_or_id(),
+					language_entry.get_id(),
+					language_entry.get_data().get_raw_data());
 			}
+			else if constexpr (invocable_with_name_id_entry)
+			{
+				result = std::forward<Func>(func)(name_id_entry,
+					language_entry.get_id(),
+					language_entry.get_data().get_raw_data());
+			}
+
+			if (result)
+				return true;
 		}
 	}
 
