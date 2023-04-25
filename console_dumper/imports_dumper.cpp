@@ -65,9 +65,9 @@ void dump_import_info(formatter& fmt,
 		static_cast<const pe_bliss::imports::imported_function_address<Va>&>(hint_name));
 }
 
-template<typename Va>
+template<typename Va, typename Descriptor>
 void dump_imports(formatter& fmt,
-	const std::vector<pe_bliss::imports::imported_library_details<Va>>& imports) try
+	const std::vector<pe_bliss::imports::imported_library_details<Va, Descriptor>>& imports) try
 {
 	for (const auto& lib : imports)
 	{
