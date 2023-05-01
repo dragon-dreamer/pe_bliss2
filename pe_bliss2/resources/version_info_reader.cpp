@@ -295,7 +295,7 @@ version_info_block_details version_info_from_resource(
 {
 	version_info_block_details result;
 	version_info_from_resource_impl(result, buf, options, options.max_depth);
-	if (buf.rpos() != buf.size())
+	if (!options.ignore_excessive_data && buf.rpos() != buf.size())
 		result.add_error(version_info_reader_errc::excessive_data_in_buffer);
 	return result;
 }

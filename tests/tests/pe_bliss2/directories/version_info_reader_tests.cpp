@@ -163,7 +163,9 @@ TEST(VersionInfoReaderTests, CutInfo)
 	auto cut_buf = buffers::reduce(buf, 0u, buf->size() - 1u);
 	buffers::input_buffer_stateful_wrapper wrapper(cut_buf);
 
-	auto root = version_info_from_resource(wrapper);
+	auto root = version_info_from_resource(wrapper, {
+		.ignore_excessive_data = false
+	});
 	validate_version_info(root, false, 0xffu, true);
 }
 
@@ -188,7 +190,9 @@ TEST(VersionInfoReaderTests, VirtualInfoError)
 	auto virtual_buf = std::make_shared<buffers::input_virtual_buffer>(cut_buf, 3u);
 	buffers::input_buffer_stateful_wrapper wrapper(virtual_buf);
 
-	auto root = version_info_from_resource(wrapper);
+	auto root = version_info_from_resource(wrapper, {
+		.ignore_excessive_data = false
+	});
 	expect_contains_errors(root,
 		version_info_reader_errc::excessive_data_in_buffer);
 	ASSERT_EQ(root.get_children().size(), 1u);

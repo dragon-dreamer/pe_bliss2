@@ -36,6 +36,7 @@ struct [[nodiscard]] version_info_read_options
 	bool allow_virtual_data = false;
 	bool copy_value_memory = false;
 	std::uint32_t max_depth = 0xffu;
+	bool ignore_excessive_data = true;
 };
 
 [[nodiscard]]
