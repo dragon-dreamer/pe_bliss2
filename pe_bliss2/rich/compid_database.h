@@ -20,6 +20,15 @@ public:
 		assembly,
 		c_source,
 		cpp_source,
+		link_time_code_generation_c,
+		link_time_code_generation_cpp,
+		link_time_code_generation_msil,
+		pogo_profiling_instrument_c,
+		pogo_profiling_instrument_cpp,
+		pogo_profiling_optimize_c,
+		pogo_profiling_optimize_cpp,
+		cvtcil_c,
+		cvtcil_cpp,
 		unknown
 	};
 
@@ -126,6 +135,17 @@ public:
 		visual_studio_2019_16_11_1,
 		visual_studio_2019_16_11_5,
 		visual_studio_2019_16_11_6,
+		visual_studio_2019_16_11_8,
+		visual_studio_2019_16_11_9,
+		visual_studio_2019_16_11_10,
+		visual_studio_2019_16_11_11,
+		visual_studio_2019_16_11_12,
+		visual_studio_2019_16_11_13,
+		visual_studio_2019_16_11_14,
+		visual_studio_2019_16_11_15,
+		visual_studio_2019_16_11_17,
+		visual_studio_2019_16_11_21,
+		visual_studio_2019_16_11_24,
 		visual_studio_2022_17_0_0_preview2,
 		visual_studio_2022_17_0_0_preview3_1,
 		visual_studio_2022_17_0_0_preview4_0,
@@ -154,7 +174,22 @@ public:
 		visual_studio_2022_17_4_0_preview4_0,
 		visual_studio_2022_17_4_0_preview5_0,
 		visual_studio_2022_17_4_0_preview6_0,
+		visual_studio_2022_17_4_2,
+		visual_studio_2022_17_4_3,
+		visual_studio_2022_17_4_5,
+		visual_studio_2022_17_5_0_preview1_0,
+		visual_studio_2022_17_5_0_preview2_0,
+		visual_studio_2022_17_5_0_preview4_0,
+		visual_studio_2022_17_5_0,
+		visual_studio_2022_17_5_3,
+		visual_studio_2022_17_5_4,
+		visual_studio_2022_17_6_0_preview1_0,
+		visual_studio_2022_17_6_0_preview2_0,
+		visual_studio_2022_17_6_0_preview3_0,
+		visual_studio_2022_17_6_0_preview6_0,
 		unmarked_object,
+		cvtpgd, //CVTPGD tool
+		cvtpgd_1, //CVTPGD tool
 		unknown
 	};
 
