@@ -545,7 +545,7 @@ compid_database::tool_type compid_database::get_tool(std::uint16_t prod_id) noex
 	}
 }
 
-const char* compid_database::product_type_to_string(product_type type) noexcept
+std::string_view compid_database::product_type_to_string(product_type type) noexcept
 {
 	using enum compid_database::product_type;
 	switch (type)
@@ -710,7 +710,7 @@ const char* compid_database::product_type_to_string(product_type type) noexcept
 	}
 }
 
-const char* compid_database::tool_type_to_string(tool_type type) noexcept
+std::string_view compid_database::tool_type_to_string(tool_type type) noexcept
 {
 	using enum compid_database::tool_type;
 	switch (type)

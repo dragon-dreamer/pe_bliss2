@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string_view>
 
 #include "pe_bliss2/rich/rich_compid.h"
 #include "utilities/static_class.h"
@@ -210,10 +211,10 @@ public:
 	static tool_type get_tool(std::uint16_t prod_id) noexcept;
 
 	[[nodiscard]]
-	static const char* product_type_to_string(product_type type) noexcept;
+	static std::string_view product_type_to_string(product_type type) noexcept;
 
 	[[nodiscard]]
-	static const char* tool_type_to_string(tool_type type) noexcept;
+	static std::string_view tool_type_to_string(tool_type type) noexcept;
 };
 
 } //namespace pe_bliss::rich
