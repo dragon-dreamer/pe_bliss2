@@ -54,7 +54,7 @@ TEST(CompidDatabaseTests, GetProductTest)
 			compid_database::product_type::visual_studio_2022_17_2_0_preview2_1, true }));
 	EXPECT_EQ(compid_database::get_product({ 31300, 0x105 }),
 		(compid_database::product_type_info{
-			compid_database::product_type::visual_studio_2022_17_2_0_preview2_1, false }));
+			compid_database::product_type::visual_studio_2022_17_2_0_preview1_0, false }));
 	EXPECT_EQ(compid_database::get_product({ 0, 0x04 }),
 		(compid_database::product_type_info{
 			compid_database::product_type::visual_studio_6, false }));
@@ -62,6 +62,9 @@ TEST(CompidDatabaseTests, GetProductTest)
 		(std::numeric_limits<std::uint16_t>::max)(), 0x105 }),
 		(compid_database::product_type_info{
 			compid_database::product_type::unknown, true }));
+	EXPECT_EQ(compid_database::get_product({ 0x784b, 0x104 }),
+		(compid_database::product_type_info{
+			compid_database::product_type::visual_studio_2022_17_0_21, false }));
 }
 
 namespace

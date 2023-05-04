@@ -355,6 +355,7 @@ consteval auto merge_with_newer_products()
 		product_mapping{ 0, 30528, product_type::visual_studio_2022_17_0_0_preview4_0 },
 		product_mapping{ 0, 30704, product_type::visual_studio_2022_17_0_0_preview5_0 },
 		product_mapping{ 0, 30705, product_type::visual_studio_2022_17_0_0_preview7_0 },
+		product_mapping{ 0, 30712, product_type::visual_studio_2022_17_0_21 },
 		product_mapping{ 0, 30818, product_type::visual_studio_2022_17_1_0_preview1_0 },
 		product_mapping{ 0, 30919, product_type::visual_studio_2022_17_1_0_preview2_0 },
 		product_mapping{ 0, 31103, product_type::visual_studio_2022_17_1_0_preview3_0 },
@@ -365,6 +366,7 @@ consteval auto merge_with_newer_products()
 		product_mapping{ 0, 31328, product_type::visual_studio_2022_17_2_0_preview5_0 },
 		product_mapping{ 0, 31329, product_type::visual_studio_2022_17_2_1 },
 		product_mapping{ 0, 31332, product_type::visual_studio_2022_17_2_5 },
+		product_mapping{ 0, 31336, product_type::visual_studio_2022_17_2_15 },
 		product_mapping{ 0, 31424, product_type::visual_studio_2022_17_3_0_preview1_0 },
 		product_mapping{ 0, 31517, product_type::visual_studio_2022_17_3_0_preview2_0 },
 		product_mapping{ 0, 31627, product_type::visual_studio_2022_17_3_0_preview3_0 },
@@ -434,6 +436,9 @@ compid_database::product_type_info compid_database::get_product(
 	auto it = std::lower_bound(product_from, product_to, target);
 	if (it == product_to)
 		return {};
+
+	if (it->build_number > target.build_number && it != product_from)
+		--it;
 
 	return { .type = it->type, .exact = it->build_number == target.build_number };
 }
@@ -661,6 +666,7 @@ const char* compid_database::product_type_to_string(product_type type) noexcept
 	case visual_studio_2022_17_0_0_preview4_0: return "Visual Studio 2022 17.0.0 Preview 4.0";
 	case visual_studio_2022_17_0_0_preview5_0: return "Visual Studio 2022 17.0.0 Preview 5.0";
 	case visual_studio_2022_17_0_0_preview7_0: return "Visual Studio 2022 17.0.0 Preview 7.0";
+	case visual_studio_2022_17_0_21: return "Visual Studio 2022 17.0.21";
 	case visual_studio_2022_17_1_0_preview1_0: return "Visual Studio 2022 17.1.0 Preview 1.0";
 	case visual_studio_2022_17_1_0_preview2_0: return "Visual Studio 2022 17.1.0 Preview 2.0";
 	case visual_studio_2022_17_1_0_preview3_0: return "Visual Studio 2022 17.1.0 Preview 3.0";
@@ -671,6 +677,7 @@ const char* compid_database::product_type_to_string(product_type type) noexcept
 	case visual_studio_2022_17_2_0_preview5_0: return "Visual Studio 2022 17.2.0 Preview 5.0";
 	case visual_studio_2022_17_2_1: return "Visual Studio 2022 17.2.1";
 	case visual_studio_2022_17_2_5: return "Visual Studio 2022 17.2.5";
+	case visual_studio_2022_17_2_15: return "Visual Studio 2022 17.2.15";
 	case visual_studio_2022_17_3_0_preview1_0: return "Visual Studio 2022 17.3.0 Preview 1.0";
 	case visual_studio_2022_17_3_0_preview2_0: return "Visual Studio 2022 17.3.0 Preview 2.0";
 	case visual_studio_2022_17_3_0_preview3_0: return "Visual Studio 2022 17.3.0 Preview 3.0";
