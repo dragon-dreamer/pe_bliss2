@@ -255,6 +255,10 @@ constexpr std::u16string_view legal_copyright_key(u"LegalCopyright");
 constexpr std::u16string_view legal_trademarks_key(u"LegalTrademarks");
 constexpr std::u16string_view private_build_key(u"PrivateBuild");
 constexpr std::u16string_view special_build_key(u"SpecialBuild");
+
+//Compiler-specific
+//Embarcadero C++ builder
+constexpr std::u16string_view program_id(u"ProgramID");
 } //namespace keys
 
 template<typename... Bases>
