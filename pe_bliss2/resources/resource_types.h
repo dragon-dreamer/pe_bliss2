@@ -36,11 +36,11 @@ enum class resource_type : std::uint32_t
 
 enum class manifest_resource_id : std::uint32_t
 {
-	createprocess,
-	isolationaware,
-	isolationaware_nostaticimport,
-	isolationpolicy,
-	isolationpolicy_browser
+	createprocess = 1,
+	isolationaware = 2,
+	isolationaware_nostaticimport = 3,
+	isolationpolicy = 4,
+	isolationpolicy_browser = 5
 };
 
 using resource_type_list_type = std::vector<resource_type>;
