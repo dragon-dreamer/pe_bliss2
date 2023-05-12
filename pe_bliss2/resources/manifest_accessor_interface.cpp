@@ -19,6 +19,8 @@ struct manifest_loader_category : std::error_category
 		{
 		case invalid_xml:
 			return "Invalid manifest XML";
+		case absent_declaration:
+			return "Absent manifest XML declaration";
 		default:
 			return {};
 		}

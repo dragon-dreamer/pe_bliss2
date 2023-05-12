@@ -111,7 +111,10 @@ TEST(PugixmlManifestAccessorTests, Empty)
 
 TEST(PugixmlManifestAccessorTests, Invalid)
 {
-	expect_invalid_xml(manifest_no_decl);
+	auto accessor = pugixml::parse_manifest(buf_from_string(manifest_no_decl));
+	expect_contains_errors(accessor->get_errors(), manifest_loader_errc::absent_declaration);
+	EXPECT_NE(accessor->get_root(), nullptr) << manifest_no_decl;
+
 	expect_invalid_xml(double_decl);
 	expect_invalid_xml(double_root);
 	expect_invalid_xml("");

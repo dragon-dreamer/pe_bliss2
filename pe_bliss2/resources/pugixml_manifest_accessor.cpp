@@ -232,13 +232,14 @@ public:
 	xml_namespace_tracker() = default;
 
 	xml_namespace_tracker(pugi::xml_node node, namespace_registry& ns_registry,
-		std::size_t index, std::string_view ns, std::string_view name)
+		std::size_t index, std::string_view ns, std::string_view name,
+		error_list& errors)
 		: node_(std::move(node))
 		, index_(index)
 		, ns_(ns)
 		, name_(name)
 	{
-		load_node(ns_registry);
+		load_node(ns_registry, errors);
 	}
 
 public:
@@ -288,7 +289,8 @@ public:
 	}
 
 private:
-	void load_node(namespace_registry& ns_registry)
+	void load_node(namespace_registry& ns_registry,
+		error_list& errors)
 	{
 		bool has_declaration = false;
 		bool has_children = false;
@@ -342,7 +344,8 @@ private:
 			auto node_ns_name = get_ns_name(child, ns_layer);
 			auto& child_node = nodes_[node_ns_name].emplace_back(
 				child, ns_registry,
-				child_count_ - 1u, node_ns_name.first, node_ns_name.second);
+				child_count_ - 1u, node_ns_name.first, node_ns_name.second,
+				errors);
 
 			for (auto attr : child.attributes())
 			{
@@ -362,8 +365,11 @@ private:
 
 		if (node_.type() == pugi::node_document)
 		{
-			if (!child_count_ || !has_declaration)
+			if (!child_count_)
 				throw pe_error(manifest_loader_errc::invalid_xml);
+
+			if (!has_declaration)
+				errors.add_error(manifest_loader_errc::absent_declaration);
 		}
 	}
 
@@ -463,7 +469,7 @@ public:
 		namespace_registry registry;
 		try
 		{
-			ns_tracker = xml_namespace_tracker(doc, registry, 0u, {}, {});
+			ns_tracker = xml_namespace_tracker(doc, registry, 0u, {}, {}, errors);
 		}
 		catch (const pe_error& e)
 		{

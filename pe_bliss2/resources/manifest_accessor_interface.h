@@ -14,6 +14,7 @@ namespace pe_bliss::resources
 enum class manifest_loader_errc
 {
 	invalid_xml = 1,
+	absent_declaration = 2,
 };
 
 std::error_code make_error_code(manifest_loader_errc) noexcept;
