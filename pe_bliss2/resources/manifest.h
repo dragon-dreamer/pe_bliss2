@@ -737,12 +737,12 @@ enum class dpi_aware_value
 	//Windows Vista, Windows 7 and Windows 8:
 	// The current process is system dpi aware.
 	//Windows 8.1 and Windows 10:
-	// The current process is per - monitor dpi aware.
+	// The current process is per-monitor dpi aware.
 	dpi_aware_true_per_monitor,
 	//Windows Vista, Windows 7 and Windows 8:
 	// The behavior is the same as when the dpiAware is absent.
 	//Windows 8.1 and Windows 10:
-	// The current process is per - monitor dpi aware.
+	// The current process is per-monitor dpi aware.
 	dpi_aware_per_monitor,
 };
 
