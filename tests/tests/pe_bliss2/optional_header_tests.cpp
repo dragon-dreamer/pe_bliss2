@@ -451,6 +451,8 @@ TYPED_TEST(OptionalHeaderTests, ValidateSubsystemVersionTest)
 	optional_header header;
 	header.initialize_with<typename TestFixture::type>();
 
+	header.set_raw_subsystem(static_cast<std::uint16_t>(
+		optional_header::subsystem::windows_cui));
 	EXPECT_EQ(validate_subsystem_version(header),
 		optional_header_errc::too_low_subsystem_version);
 
@@ -520,6 +522,8 @@ TYPED_TEST(OptionalHeaderTests, ValidateTest)
 	optional_header header;
 	header.initialize_with<typename TestFixture::type>();
 
+	header.set_raw_subsystem(static_cast<std::uint16_t>(
+		optional_header::subsystem::windows_cui));
 	header.set_raw_address_of_entry_point(1u);
 	header.set_raw_file_alignment(0x8000u);
 	header.set_raw_section_alignment(0x10000u);

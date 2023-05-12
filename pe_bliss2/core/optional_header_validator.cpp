@@ -103,6 +103,9 @@ pe_error_wrapper validate_section_alignment(const optional_header& header) noexc
 
 pe_error_wrapper validate_subsystem_version(const optional_header& header) noexcept
 {
+	if (!header.is_windows_console() && !header.is_windows_gui())
+		return {};
+
 	//TODO: if SubsystemVersion is 6.30, the loader enforces the presence of the LoadConfig entry,
 	//with a valid cookie, unless GuardFlags are set to IMAGE_GUARD_SECURITY_COOKIE_UNUSED.
 	auto major_subsystem_version = header.get_raw_major_subsystem_version();
