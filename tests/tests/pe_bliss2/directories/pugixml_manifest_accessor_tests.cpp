@@ -163,10 +163,10 @@ TEST(PugixmlManifestAccessorTests, Nested)
 
 	EXPECT_EQ(xmlns1_nested1_it->next_child(), nullptr);
 
-	const auto* tag_attr = xmlns1_tag->get_attribute("xmlns1ns", "attr");
+	const auto* tag_attr = xmlns1_tag->get_attribute({}, "attr");
 	ASSERT_NE(tag_attr, nullptr);
 	EXPECT_EQ(tag_attr->get_name(), "attr");
-	EXPECT_EQ(tag_attr->get_namespace(), "xmlns1ns");
+	EXPECT_EQ(tag_attr->get_namespace(), "");
 	EXPECT_EQ(tag_attr->get_value(), "val2");
 
 	EXPECT_EQ(nested_it->next_child(), nullptr);

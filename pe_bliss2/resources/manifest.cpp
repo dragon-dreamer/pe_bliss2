@@ -73,7 +73,7 @@ struct manifest_category : std::error_category
 		case invalid_dependencies:
 			return "Invalid dependency elements format";
 		case invalid_dependend_assembly_element_position:
-			return "Invalid dependentAssembly element position";
+			return "Invalid assemblyIdentity element position within the dependentAssembly";
 		case invalid_file_size_string:
 			return "Invalid file size string";
 		case absent_file_name:
@@ -83,11 +83,11 @@ struct manifest_category : std::error_category
 		case absent_tlbid:
 			return "Absent TLBID";
 		case absent_version:
-			return "Absent version";
+			return "Absent TLBID version";
 		case absent_helpdir:
-			return "Absent help directory";
+			return "Absent TLBID help directory";
 		case absent_iid:
-			return "Absent IID";
+			return "Absent COM interface proxy stub IID";
 		case invalid_num_methods_string:
 			return "Invalid numMethods value";
 		case multiple_application_elements:
@@ -853,9 +853,9 @@ constexpr std::string_view msixv1_ns("urn:schemas-microsoft-com:msix.v1");
 template<typename Getter, manifest_errc Errc
 	= static_cast<manifest_errc>(0u), typename Result>
 void read_attribute(Result& result, const manifest_node_interface& elem,
-	std::string_view ns, std::string_view name)
+	std::string_view name)
 {
-	const auto* attr = elem.get_attribute(ns, name);
+	const auto* attr = elem.get_attribute({}, name);
 	if (attr)
 	{
 		Getter{}(result) = attr->get_value();
@@ -902,21 +902,21 @@ void load_assembly_identity(assembly_identity_details& identity,
 {
 	read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_type_raw(); }),
 		manifest_errc::absent_assembly_identity_type>
-		(identity, assembly_identity_elem, asmv1_ns, "type");
+		(identity, assembly_identity_elem, "type");
 	read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_name(); }),
 		manifest_errc::absent_assembly_identity_name>
-		(identity, assembly_identity_elem, asmv1_ns, "name");
+		(identity, assembly_identity_elem, "name");
 	read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_language_raw(); })>
-		(identity, assembly_identity_elem, asmv1_ns, "language");
+		(identity, assembly_identity_elem, "language");
 	read_attribute<decltype([](auto& r) -> decltype(auto)
 		{ return r.get_processor_architecture_raw(); })>
-		(identity, assembly_identity_elem, asmv1_ns, "processorArchitecture");
+		(identity, assembly_identity_elem, "processorArchitecture");
 	read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_version_raw(); }),
 		manifest_errc::absent_assembly_identity_version>
-		(identity, assembly_identity_elem, asmv1_ns, "version");
+		(identity, assembly_identity_elem, "version");
 	read_attribute<decltype([](auto& r) -> decltype(auto)
 		{ return r.get_public_key_token_raw(); })>
-		(identity, assembly_identity_elem, asmv1_ns, "publicKeyToken");
+		(identity, assembly_identity_elem, "publicKeyToken");
 }
 
 void load_compatibility(native_manifest_details& result,
@@ -942,7 +942,7 @@ void load_compatibility(native_manifest_details& result,
 	auto& compatibility = result.get_supported_os_list().emplace();
 	while (supported_os_elem)
 	{
-		const auto* id = supported_os_elem->get_attribute(compatibilityv1_ns, "Id");
+		const auto* id = supported_os_elem->get_attribute({}, "Id");
 		if (id)
 			compatibility.get_list_raw().emplace_back(id->get_value());
 
@@ -956,7 +956,7 @@ void load_compatibility(native_manifest_details& result,
 		if (application_elem_it->next_child())
 			compatibility.add_error(manifest_errc::multiple_maxversiontested_elements);
 
-		const auto* id = max_tested_elem->get_attribute(compatibilityv1_ns, "Id");
+		const auto* id = max_tested_elem->get_attribute({}, "Id");
 		if (id)
 			compatibility.get_max_tested_os_version_raw() = id->get_value();
 	}
@@ -981,30 +981,29 @@ void load_dependencies(native_manifest_details& result,
 			continue;
 		}
 
-		auto dependent_assembly_elem_it = dependent_assembly_elem->get_iterator();
-		const auto* assembly_identity_elem = dependent_assembly_elem_it->first_child(
-			asmv1_ns, "assemblyIdentity");
-		if (!assembly_identity_elem)
+		while (dependent_assembly_elem)
 		{
-			dependency_elem = assembly_elem_it.next_child();
-			result.add_error(manifest_errc::invalid_dependencies);
-			continue;
-		}
+			auto dependent_assembly_elem_it = dependent_assembly_elem->get_iterator();
+			const auto* assembly_identity_elem = dependent_assembly_elem_it->first_child(
+				asmv1_ns, "assemblyIdentity");
+			if (!assembly_identity_elem)
+			{
+				result.add_error(manifest_errc::invalid_dependencies);
+				break;
+			}
 
-		auto& dependency = dependencies.emplace_back();
-		if (dependent_assembly_elem->get_node_index() != 0u
-			|| assembly_identity_elem->get_node_index() != 0u)
-		{
-			dependency.add_error(
-				manifest_errc::invalid_dependend_assembly_element_position);
-		}
-		if (dependency_elem_it->next_child()
-			|| dependent_assembly_elem_it->next_child())
-		{
-			dependency.add_error(manifest_errc::multiple_assembly_identities);
-		}
+			auto& dependency = dependencies.emplace_back();
+			if (assembly_identity_elem->get_node_index() != 0u)
+			{
+				dependency.add_error(
+					manifest_errc::invalid_dependend_assembly_element_position);
+			}
+			if (dependent_assembly_elem_it->next_child())
+				dependency.add_error(manifest_errc::multiple_assembly_identities);
 
-		load_assembly_identity(dependency, *assembly_identity_elem);
+			load_assembly_identity(dependency, *assembly_identity_elem);
+			dependent_assembly_elem = dependency_elem_it->next_child();
+		}
 		dependency_elem = assembly_elem_it.next_child();
 	}
 }
@@ -1018,26 +1017,26 @@ void load_com_classes(assembly_file_details& result,
 	{
 		auto& com_class = com_classes.emplace_back();
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_description(); })>
-			(com_class, *com_class_elem, asmv1_ns, "description");
+			(com_class, *com_class_elem, "description");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_clsid_raw(); }),
 			manifest_errc::absent_clsid>
-			(com_class, *com_class_elem, asmv1_ns, "clsid");
+			(com_class, *com_class_elem, "clsid");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_threading_model_raw(); })>
-			(com_class, *com_class_elem, asmv1_ns, "threadingModel");
+			(com_class, *com_class_elem, "threadingModel");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_tlbid_raw(); })>
-			(com_class, *com_class_elem, asmv1_ns, "tlbid");
+			(com_class, *com_class_elem, "tlbid");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_progid_raw(); })>
-			(com_class, *com_class_elem, asmv1_ns, "progid");
+			(com_class, *com_class_elem, "progid");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_misc_status_raw(); })>
-			(com_class, *com_class_elem, asmv1_ns, "miscStatus");
+			(com_class, *com_class_elem, "miscStatus");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_misc_status_icon_raw(); }) >
-			(com_class, *com_class_elem, asmv1_ns, "miscStatusIcon");
+			(com_class, *com_class_elem, "miscStatusIcon");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_misc_status_content_raw(); }) >
-			(com_class, *com_class_elem, asmv1_ns, "miscStatusContent");
+			(com_class, *com_class_elem, "miscStatusContent");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_misc_status_thumbnail_raw(); }) >
-			(com_class, *com_class_elem, asmv1_ns, "miscStatusThumbnail");
+			(com_class, *com_class_elem, "miscStatusThumbnail");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_misc_status_docprint_raw(); }) >
-			(com_class, *com_class_elem, asmv1_ns, "miscStatusDocprint");
+			(com_class, *com_class_elem, "miscStatusDocprint");
 
 		auto com_class_it = com_class_elem->get_iterator();
 		const auto* progid_elem = com_class_it->first_child(asmv1_ns, "progid");
@@ -1067,17 +1066,17 @@ void load_typelibs(assembly_file_details& result,
 		auto& com_typelib = com_typelibs.emplace_back();
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_tlbid_raw(); }),
 			manifest_errc::absent_tlbid>
-			(com_typelib, *com_typelib_elem, asmv1_ns, "tlbid");
+			(com_typelib, *com_typelib_elem, "tlbid");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_version_raw(); }),
 			manifest_errc::absent_version>
-			(com_typelib, *com_typelib_elem, asmv1_ns, "version");
+			(com_typelib, *com_typelib_elem, "version");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_help_dir(); }),
 			manifest_errc::absent_helpdir>
-			(com_typelib, *com_typelib_elem, asmv1_ns, "helpdir");
+			(com_typelib, *com_typelib_elem, "helpdir");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_resource_id_raw(); })>
-			(com_typelib, *com_typelib_elem, asmv1_ns, "resourceid");
+			(com_typelib, *com_typelib_elem, "resourceid");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_flags_raw(); }) >
-			(com_typelib, *com_typelib_elem, asmv1_ns, "flags");
+			(com_typelib, *com_typelib_elem, "flags");
 
 		com_typelib_elem = file_elem_it.next_child();
 	}
@@ -1095,7 +1094,7 @@ void load_window_classes(assembly_file_details& result,
 		if (window_class.get_class().empty())
 			window_class.add_error(manifest_errc::empty_window_class);
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.is_versioned_raw(); })>
-			(window_class, *window_class_elem, asmv1_ns, "versioned");
+			(window_class, *window_class_elem, "versioned");
 
 		window_class_elem = file_elem_it.next_child();
 	}
@@ -1111,21 +1110,21 @@ void load_com_interface_proxy_stubs(ProxyStubs& stubs,
 		auto& stub = stubs.emplace_back();
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_iid_raw(); }),
 			manifest_errc::absent_iid>
-			(stub, *stub_elem, asmv1_ns, "iid");
+			(stub, *stub_elem, "iid");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_name(); })>
-			(stub, *stub_elem, asmv1_ns, "name");
+			(stub, *stub_elem, "name");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_tlbid_raw(); })>
-			(stub, *stub_elem, asmv1_ns, "tlbid");
+			(stub, *stub_elem, "tlbid");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_base_interface_raw(); })>
-			(stub, *stub_elem, asmv1_ns, "baseInterface");
+			(stub, *stub_elem, "baseInterface");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_num_methods_raw(); })>
-			(stub, *stub_elem, asmv1_ns, "numMethods");
+			(stub, *stub_elem, "numMethods");
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_proxy_stub_clsid32_raw(); })>
-			(stub, *stub_elem, asmv1_ns, "proxyStubClsid32");
+			(stub, *stub_elem, "proxyStubClsid32");
 		if constexpr (std::is_same_v<decltype(stub), com_interface_proxy_stub_details&>)
 		{
 			read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_threading_model_raw(); })>
-				(stub, *stub_elem, asmv1_ns, "threadingModel");
+				(stub, *stub_elem, "threadingModel");
 		}
 
 		stub_elem = elem_it.next_child();
@@ -1144,16 +1143,16 @@ void load_files(native_manifest_details& result,
 		
 		read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_name(); }),
 			manifest_errc::absent_file_name>
-			(file, *file_elem, asmv1_ns, "name");
+			(file, *file_elem, "name");
 		read_attribute<decltype([](auto& r) -> decltype(auto) {
 			return r.get_hash_algorithm_raw(); })>
-			(file, *file_elem, asmv1_ns, "hashalg");
+			(file, *file_elem, "hashalg");
 		read_attribute<decltype([](auto& r) -> decltype(auto) {
 			return r.get_hash_raw(); })>
-			(file, *file_elem, asmv1_ns, "hash");
+			(file, *file_elem, "hash");
 		read_attribute<decltype([](auto& r) -> decltype(auto) {
 			return r.get_size_raw(); })>
-			(file, *file_elem, asmv2_ns, "size");
+			(file, *file_elem, "size");
 
 		auto file_elem_it = file_elem->get_iterator();
 		load_com_classes(file, *file_elem_it);
@@ -1351,15 +1350,13 @@ void load_trust_info(native_manifest_details& result,
 		return;
 
 	auto& requested_privileges = result.get_requested_privileges().emplace();
-	const auto* level = requested_execution_level_elem->get_attribute(
-		requested_execution_level_elem->get_namespace(), "level");
+	const auto* level = requested_execution_level_elem->get_attribute({}, "level");
 	if (level)
 		requested_privileges.get_level_raw() = level->get_value();
 	else
 		result.add_error(manifest_errc::absent_requested_execution_level);
 
-	const auto* ui_access = requested_execution_level_elem->get_attribute(
-		requested_execution_level_elem->get_namespace(), "uiAccess");
+	const auto* ui_access = requested_execution_level_elem->get_attribute({}, "uiAccess");
 	if (ui_access)
 		requested_privileges.get_ui_access_raw() = ui_access->get_value();
 	else
@@ -1383,15 +1380,15 @@ void load_msix_identity(native_manifest_details& result,
 	read_attribute<decltype([](auto& r) -> decltype(auto) {
 		return r.get_publisher(); }),
 		manifest_errc::absent_msix_publisher>
-		(msix_identity, *msix_identity_elem, msixv1_ns, "publisher");
+		(msix_identity, *msix_identity_elem, "publisher");
 	read_attribute<decltype([](auto& r) -> decltype(auto) {
 		return r.get_package_name(); }),
 		manifest_errc::absent_msix_package_name>
-		(msix_identity, *msix_identity_elem, msixv1_ns, "packageName");
+		(msix_identity, *msix_identity_elem, "packageName");
 	read_attribute<decltype([](auto& r) -> decltype(auto) {
 		return r.get_application_id(); }),
 		manifest_errc::absent_msix_application_id>
-		(msix_identity, *msix_identity_elem, msixv1_ns, "applicationId");
+		(msix_identity, *msix_identity_elem, "applicationId");
 }
 } //namespace
 
@@ -1415,7 +1412,7 @@ native_manifest_details parse_manifest(const manifest_accessor_interface& access
 
 	read_attribute<decltype([](auto& r) -> decltype(auto) { return r.get_manifest_version(); }),
 		manifest_errc::absent_manifest_version>
-		(result, *assembly_elem, asmv1_ns, "manifestVersion");
+		(result, *assembly_elem, "manifestVersion");
 	if (result.get_manifest_version() != native_manifest::supported_manifest_version)
 		result.add_error(manifest_errc::invalid_manifest_version);
 

@@ -388,7 +388,8 @@ private:
 			if (name.empty() || name.find(':') != std::string_view::npos)
 				throw pe_error(manifest_loader_errc::invalid_xml);
 		}
-		else
+		else if constexpr ( //Attributes do not inherit namespaces
+			!std::is_same_v<Node, pugi::xml_attribute>)
 		{
 			ns_name = ns_layer.get_default();
 		}

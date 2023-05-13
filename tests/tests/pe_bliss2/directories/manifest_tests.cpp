@@ -881,6 +881,10 @@ constexpr std::string_view dependencies_manifest(
 				<assemblyIdentity name="dep2" version="v2"
 					processorArchitecture="x86" language="en-us" publicKeyToken="token2" type="win32" />
 			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="dep3" version="v3"
+					processorArchitecture="x86" language="en-us" publicKeyToken="token3" type="win32" />
+			</dependentAssembly>
 		</dependency>)"
 	R"(</assembly>)"
 );
@@ -891,8 +895,8 @@ constexpr std::string_view invalid_dependencies_manifest(
 	R"(<assemblyIdentity name="assemblyName" version="1.2.3.4")"
 	R"( processorArchitecture="amd64" publicKeyToken="6595b64144ccf1df" type="win32" language="*" />)"
 	R"(<dependency>
-			<something/>
 			<dependentAssembly>
+				<something/>
 				<assemblyIdentity name="dep1" version="v1"
 					processorArchitecture="amd64" language="*" publicKeyToken="token1" type="win32" />
 			</dependentAssembly>
@@ -905,6 +909,8 @@ constexpr std::string_view invalid_dependencies_manifest(
 			<dependentAssembly>
 				<assemblyIdentity name="dep2" version="v2"
 					processorArchitecture="x86" language="en-us" publicKeyToken="token2" type="win32" />
+				<assemblyIdentity name="dep3" version="v3"
+					processorArchitecture="x86" language="en-us" publicKeyToken="token3" type="win32" />
 			</dependentAssembly>
 			<dependentAssembly/>
 		</dependency>)"
@@ -1398,10 +1404,17 @@ TEST_F(ManifestTestFixture, Dependencies)
 {
 	load(dependencies_manifest);
 	expect_contains_errors(manifest);
-	ASSERT_EQ(manifest.get_dependencies().size(), 2u);
+	ASSERT_EQ(manifest.get_dependencies().size(), 3u);
 	expect_contains_errors(manifest.get_dependencies()[0]);
 	expect_contains_errors(manifest.get_dependencies()[1]);
+	expect_contains_errors(manifest.get_dependencies()[2]);
 	verify_dependencies();
+	EXPECT_EQ(manifest.get_dependencies()[2].get_language_raw(), "en-us");
+	EXPECT_EQ(manifest.get_dependencies()[2].get_processor_architecture_raw(), "x86");
+	EXPECT_EQ(manifest.get_dependencies()[2].get_public_key_token_raw(), "token3");
+	EXPECT_EQ(manifest.get_dependencies()[2].get_type_raw(), "win32");
+	EXPECT_EQ(manifest.get_dependencies()[2].get_version_raw(), "v3");
+	EXPECT_EQ(manifest.get_dependencies()[2].get_name(), "dep3");
 }
 
 TEST_F(ManifestTestFixture, InvalidDependencies)
