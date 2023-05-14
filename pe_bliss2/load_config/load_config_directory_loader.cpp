@@ -62,7 +62,7 @@ struct load_config_directory_loader_error_category : std::error_category
 		case invalid_chpe_metadata:
 			return "Invalid hybrid PE metadata";
 		case invalid_chpe_range_entries:
-			return "Invalid hybrin PE range entries";
+			return "Invalid hybrid PE range entries";
 		case invalid_dynamic_relocation_table:
 			return "Invalid dynamic relocation table";
 		case invalid_dynamic_relocation_table_v2_size:
@@ -120,7 +120,7 @@ struct load_config_directory_loader_error_category : std::error_category
 		case unaligned_volatile_metadata_range_table_size:
 			return "Unaligned volatile metadata range table size";
 		case invalid_volatile_metadata_access_rva_table:
-			return "Invalid volatile metadata access table";
+			return "Invalid volatile metadata access RVA table";
 		case invalid_volatile_metadata_range_table:
 			return "Invalid volatile metadata range table";
 		case invalid_ehcont_targets:
