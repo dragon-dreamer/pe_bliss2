@@ -760,11 +760,8 @@ private:
 	dynamic_relocation_type dynamic_relocation_;
 };
 
-template<detail::executable_pointer Pointer, typename... Bases>
-class [[nodiscard]] dynamic_relocation_table_base_v1
-	: public dynamic_relocation_table_common<
-		detail::load_config::image_dynamic_relocation<Pointer>>
-	, public Bases...
+template<typename... Bases>
+class dynamic_relocation_table_base_v1_base
 {
 public:
 	using import_control_transfer_dynamic_fixup_list_type
@@ -775,9 +772,9 @@ public:
 		= dynamic_relocation_list_base<switchtable_branch_dynamic_relocation, Bases...>;
 	using arm64x_dynamic_fixup_list_type
 		= dynamic_relocation_list_base<std::variant<
-		arm64x_dynamic_relocation_zero_fill,
-		arm64x_dynamic_relocation_copy_data_base<Bases...>,
-		arm64x_dynamic_relocation_add_delta_base<Bases...>>, Bases...>;
+			arm64x_dynamic_relocation_zero_fill,
+			arm64x_dynamic_relocation_copy_data_base<Bases...>,
+			arm64x_dynamic_relocation_add_delta_base<Bases...>>, Bases...>;
 
 	using import_control_transfer_dynamic_relocation_list_type
 		= std::vector<import_control_transfer_dynamic_fixup_list_type>;
@@ -797,6 +794,18 @@ public:
 		arm64x_dynamic_relocation_list_type,
 		function_override_dynamic_relocation_list_type
 	>;
+};
+
+template<detail::executable_pointer Pointer, typename... Bases>
+class [[nodiscard]] dynamic_relocation_table_base_v1
+	: public dynamic_relocation_table_base_v1_base<Bases...>
+	, public dynamic_relocation_table_common<
+		detail::load_config::image_dynamic_relocation<Pointer>>
+	, public Bases...
+{
+public:
+	using fixup_list_type = typename dynamic_relocation_table_base_v1_base<
+		Bases...>::fixup_list_type;
 
 public:
 	[[nodiscard]]
