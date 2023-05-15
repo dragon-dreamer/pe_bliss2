@@ -280,6 +280,24 @@ void dump_runtime_function(formatter& fmt, const pe_bliss::exceptions::x64::runt
 	std::visit([&fmt, nested_level] (const auto& info) {
 		dump_additional_info(fmt, info, nested_level);
 	}, func.get_additional_info());
+
+	if (func.get_scope_table())
+	{
+		const auto& scope_table = func.get_scope_table().value();
+		fmt.print_field_name("Scope table record count");
+		fmt.print_offsets_and_value(scope_table.get_scope_record_count(), false);
+		fmt.get_stream() << '\n';
+
+		for (const auto& record : scope_table.get_records())
+		{
+			fmt.print_structure("Scope record", record, std::array{
+				value_info{"begin_address"},
+				value_info{"end_address"},
+				value_info{"handler_address"},
+				value_info{"jump_target"}
+			});
+		}
+	}
 }
 
 constexpr void dump_unwind_info(formatter&, std::monostate)
@@ -857,7 +875,12 @@ void dump_directory(formatter& fmt, const Directory& directory)
 
 void dump_exceptions(formatter& fmt, const pe_bliss::image::image& image) try
 {
-	auto exceptions = pe_bliss::exceptions::load(image, {});
+	pe_bliss::exceptions::x64::loader_options x64_loader_options{
+		.load_c_specific_handlers = true
+	};
+	auto exceptions = pe_bliss::exceptions::load(image, {
+		.x64_loader_options = x64_loader_options
+	});
 	if (exceptions.get_directories().empty())
 		return;
 
