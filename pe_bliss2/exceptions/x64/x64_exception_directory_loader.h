@@ -27,7 +27,10 @@ enum class exception_directory_loader_errc
 	invalid_exception_handler_rva,
 	invalid_chained_runtime_function_entry,
 	both_set_fpreg_types_used,
-	invalid_directory_size
+	invalid_directory_size,
+	invalid_c_specific_handler_record_count,
+	too_many_c_specific_handler_records,
+	invalid_c_specific_handler_record
 };
 
 std::error_code make_error_code(exception_directory_loader_errc) noexcept;
@@ -36,6 +39,8 @@ struct [[nodiscard]] loader_options
 {
 	bool include_headers = true;
 	bool allow_virtual_data = false;
+	bool load_c_specific_handlers = false;
+	std::uint32_t max_c_specific_records = 0xfffffu;
 };
 
 void load(const image::image& instance, const loader_options& options,

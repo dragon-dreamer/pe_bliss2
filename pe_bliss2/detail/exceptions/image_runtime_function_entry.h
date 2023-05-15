@@ -167,4 +167,15 @@ constexpr std::uint8_t unw_flag_chaininfo = 0x4u;
 
 constexpr std::uint32_t unwind_chain_limit = 32u;
 
+//struct scope_table
+//std::uint32_t count;
+//then array of scope_record[count]
+struct scope_record
+{
+    std::uint32_t begin_address;
+    std::uint32_t end_address;
+    std::uint32_t handler_address;
+    std::uint32_t jump_target;
+};
+
 } //namespace pe_bliss::detail::exceptions

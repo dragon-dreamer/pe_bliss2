@@ -198,6 +198,27 @@ typename runtime_function_base<Bases...>::additional_info_type
 }
 
 template<typename... Bases>
+typename runtime_function_base<Bases...>::scope_table_type&
+	runtime_function_base<Bases...>::get_scope_table() & noexcept
+{
+	return scope_table_;
+}
+
+template<typename... Bases>
+const typename runtime_function_base<Bases...>::scope_table_type&
+	runtime_function_base<Bases...>::get_scope_table() const& noexcept
+{
+	return scope_table_;
+}
+
+template<typename... Bases>
+typename runtime_function_base<Bases...>::scope_table_type
+	runtime_function_base<Bases...>::get_scope_table() && noexcept
+{
+	return std::move(scope_table_);
+}
+
+template<typename... Bases>
 typename exception_directory_base<Bases...>::runtime_function_list_type&
 	exception_directory_base<Bases...>::get_runtime_function_list() & noexcept
 {
@@ -216,5 +237,32 @@ typename exception_directory_base<Bases...>::runtime_function_list_type
 	exception_directory_base<Bases...>::get_runtime_function_list() && noexcept
 {
 	return std::move(runtime_function_list_);
+}
+
+inline scope_table::count_type& scope_table::get_scope_record_count() noexcept
+{
+	return count_;
+}
+
+inline const scope_table::count_type& scope_table
+	::get_scope_record_count() const noexcept
+{
+	return count_;
+}
+
+inline scope_table::record_list_type& scope_table::get_records() & noexcept
+{
+	return records_;
+}
+
+inline const scope_table::record_list_type& scope_table
+	::get_records() const& noexcept
+{
+	return records_;
+}
+
+inline scope_table::record_list_type scope_table::get_records() && noexcept
+{
+	return std::move(records_);
 }
 } //namespace pe_bliss::exceptions::x64

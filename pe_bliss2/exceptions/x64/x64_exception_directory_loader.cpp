@@ -1,5 +1,6 @@
 #include "pe_bliss2/exceptions/x64/x64_exception_directory_loader.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <string>
 #include <system_error>
@@ -58,6 +59,12 @@ struct x64_exception_directory_loader_error_category : std::error_category
 			"Both SET_FPREG and SET_FPREG_LARGE are used";
 		case invalid_directory_size:
 			return "Invalid exception directory size";
+		case invalid_c_specific_handler_record_count:
+			return "Invalid C-specific handler record count";
+		case too_many_c_specific_handler_records:
+			return "Too many C-specific handler records";
+		case invalid_c_specific_handler_record:
+			return "Invalid C-specific handler record";
 		default:
 			return {};
 		}
@@ -293,6 +300,53 @@ bool load_runtime_function(const image::image& instance, const loader_options& o
 		catch (const std::system_error&)
 		{
 			func.add_error(exception_directory_loader_errc::invalid_exception_handler_rva);
+		}
+
+		if (flags == unwind_flags::ehandler && options.load_c_specific_handlers)
+		{
+			auto& scope_table = func.get_scope_table().emplace();
+
+			try
+			{
+				unwind_info_rva += std::remove_cvref_t<decltype(rva)>::packed_size;
+				struct_from_rva(instance, unwind_info_rva.value(),
+					scope_table.get_scope_record_count(),
+					options.include_headers, options.allow_virtual_data);
+				unwind_info_rva += scope_table::count_type::packed_size;
+			}
+			catch (const std::system_error&)
+			{
+				func.add_error(
+					exception_directory_loader_errc::invalid_c_specific_handler_record_count);
+				func.get_scope_table().reset();
+				return true;
+			}
+
+			auto record_count = (std::min)(scope_table.get_scope_record_count().get(),
+				options.max_c_specific_records);
+			if (record_count > options.max_c_specific_records)
+			{
+				func.add_error(
+					exception_directory_loader_errc::too_many_c_specific_handler_records);
+			}
+
+			while (record_count--)
+			{
+				auto& record = scope_table.get_records().emplace_back();
+				try
+				{
+					struct_from_rva(instance, unwind_info_rva.value(),
+						record, options.include_headers, options.allow_virtual_data);
+					unwind_info_rva += scope_table::record_type::packed_size;
+				}
+				catch (const std::system_error&)
+				{
+					func.add_error(
+						exception_directory_loader_errc::invalid_c_specific_handler_record);
+					scope_table.get_records().pop_back();
+					return true;
+				}
+			}
 		}
 	}
 

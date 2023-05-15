@@ -382,6 +382,32 @@ private:
 	unwind_code_list_type unwind_code_list_;
 };
 
+// SCOPE_TABLE for __C_specific_handler
+class scope_table
+{
+public:
+	using count_type = packed_struct<rva_type>;
+	using record_type = packed_struct<detail::exceptions::scope_record>;
+	using record_list_type = std::vector<record_type>;
+
+public:
+	[[nodiscard]]
+	count_type& get_scope_record_count() noexcept;
+	[[nodiscard]]
+	const count_type& get_scope_record_count() const noexcept;
+
+	[[nodiscard]]
+	record_list_type& get_records() & noexcept;
+	[[nodiscard]]
+	const record_list_type& get_records() const& noexcept;
+	[[nodiscard]]
+	record_list_type get_records() && noexcept;
+
+private:
+	count_type count_;
+	record_list_type records_;
+};
+
 template<typename... Bases>
 class [[nodiscard]] runtime_function_base
 	: public detail::packed_struct_base<detail::exceptions::image_runtime_function_entry>
@@ -392,6 +418,7 @@ public:
 	using exception_handler_rva_type = packed_struct<rva_type>;
 	using additional_info_type = std::variant<std::monostate,
 		exception_handler_rva_type, runtime_function_ptr>;
+	using scope_table_type = std::optional<scope_table>;
 
 public:
 	[[nodiscard]]
@@ -406,9 +433,17 @@ public:
 	[[nodiscard]]
 	additional_info_type get_additional_info() && noexcept;
 
+	[[nodiscard]]
+	scope_table_type& get_scope_table() & noexcept;
+	[[nodiscard]]
+	const scope_table_type& get_scope_table() const& noexcept;
+	[[nodiscard]]
+	scope_table_type get_scope_table() && noexcept;
+
 private:
 	unwind_info unwind_info_;
 	additional_info_type additional_info_;
+	scope_table_type scope_table_;
 };
 
 template<typename... Bases>
