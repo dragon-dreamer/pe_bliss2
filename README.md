@@ -2,8 +2,6 @@
 
 ## The most advanced and thorough library to read and write Portable executable files
 
-**This is a work-in-progress active development project! Everything may change, and the library may contain critical bugs, do not use in production!**
-
 The [Portable executable](https://en.wikipedia.org/wiki/Portable_Executable) is a popular executable file format, which is extensively used in Windows family operating systems. It is as well utilized by the X-Box, EFI and some other environments. The **PE Bliss 2** library is a successor of the old and unsupported [PE Bliss](https://code.google.com/archive/p/portable-executable-library/) library.
 
 The library is aimed at being able to provide as much information about the PE file as possible, while being robust and keeping track of possible parsing or format errors and irregularities. Currently, the library is compiled using the MSVC compiler, but the code itself is cross-platform.
@@ -13,7 +11,7 @@ The library is aimed at being able to provide as much information about the PE f
   - Reading/modifying binaries either from a file, or from a memory buffer
   - Reading/modifying binaries, which are already loaded into memory by the Windows loader
   - Supports copying the full binary sections memory or referencing the existing memory buffer (read-only mode)
-  - Thread-safe when working with stateless buffers (i.e. an image does not reference a file) with the same image from different threads
+  - Thread-safe when working with stateless buffers (i.e. an image does not reference a file) with the same image from different threads (read-only mode)
   - Reading either physical only or physical and virtual data from PE files with bounds checking
 - Rebuilding PE/PE+ binaries to a file or a memory buffer (unit-tested)
 - DOS, File, Optional header parsing (unit-tested)
