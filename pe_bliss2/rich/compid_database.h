@@ -190,6 +190,9 @@ public:
 		visual_studio_2022_17_6_0_preview2_0,
 		visual_studio_2022_17_6_0_preview3_0,
 		visual_studio_2022_17_6_0_preview6_0,
+		visual_studio_2022_17_6_0,
+		visual_studio_2022_17_6_2 = visual_studio_2022_17_6_0,
+		visual_studio_2022_17_7_0_preview1_0,
 		unmarked_object,
 		cvtpgd, //CVTPGD tool
 		cvtpgd_1, //CVTPGD tool

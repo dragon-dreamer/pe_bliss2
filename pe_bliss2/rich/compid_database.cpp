@@ -392,6 +392,8 @@ consteval auto merge_with_newer_products()
 		product_mapping{ 0, 32502, product_type::visual_studio_2022_17_6_0_preview2_0 },
 		product_mapping{ 0, 32522, product_type::visual_studio_2022_17_6_0_preview3_0 },
 		product_mapping{ 0, 32530, product_type::visual_studio_2022_17_6_0_preview6_0 },
+		product_mapping{ 0, 32532, product_type::visual_studio_2022_17_6_0 },
+		product_mapping{ 0, 32705, product_type::visual_studio_2022_17_7_0_preview1_0 },
 	};
 
 	std::array<product_mapping,
@@ -703,6 +705,8 @@ std::string_view compid_database::product_type_to_string(product_type type) noex
 	case visual_studio_2022_17_6_0_preview2_0: return "Visual Studio 2022 17.6.0 Preview 2.0";
 	case visual_studio_2022_17_6_0_preview3_0: return "Visual Studio 2022 17.6.0 Preview 3.0";
 	case visual_studio_2022_17_6_0_preview6_0: return "Visual Studio 2022 17.6.0 Preview 6.0";
+	case visual_studio_2022_17_6_0: return "Visual Studio 2022 17.6.0";
+	case visual_studio_2022_17_7_0_preview1_0: return "Visual Studio 2022 17.7.0 Preview 1.0";
 	case unmarked_object: return "Unmarked object";
 	case cvtpgd: return "CVTPGD";
 	case cvtpgd_1: return "CVTPGD 1";
