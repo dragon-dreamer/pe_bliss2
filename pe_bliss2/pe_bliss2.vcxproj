@@ -19,302 +19,267 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="address_converter.h" />
-    <ClInclude Include="bit_stream.h" />
-    <ClInclude Include="bound_import\bound_import_directory_builder.h" />
-    <ClInclude Include="bound_import\bound_import_directory_loader.h" />
-    <ClInclude Include="bound_import\bound_library.h" />
-    <ClInclude Include="core\data_directories.h" />
-    <ClInclude Include="core\file_header.h" />
-    <ClInclude Include="core\image_signature.h" />
-    <ClInclude Include="core\image_signature_errc.h" />
-    <ClInclude Include="core\image_signature_validator.h" />
-    <ClInclude Include="core\optional_header.h" />
-    <ClInclude Include="core\optional_header_errc.h" />
-    <ClInclude Include="core\optional_header_validator.h" />
-    <ClInclude Include="core\overlay.h" />
-    <ClInclude Include="debug\debug_directory.h" />
-    <ClInclude Include="debug\debug_directory_loader.h" />
-    <ClInclude Include="delay_import\delay_import_directory.h" />
-    <ClInclude Include="delay_import\delay_import_directory_loader.h" />
-    <ClInclude Include="detail\bound_import\image_bound_import_descriptor.h" />
-    <ClInclude Include="detail\debug\image_debug_directory.h" />
-    <ClInclude Include="detail\delay_import\image_delay_load_descriptor.h" />
-    <ClInclude Include="detail\dotnet\image_dotnet_directory.h" />
-    <ClInclude Include="detail\endian_convert.h" />
-    <ClInclude Include="detail\exceptions\image_runtime_function_entry.h" />
-    <ClInclude Include="detail\exports\image_export_directory.h" />
-    <ClInclude Include="detail\image\image-inl.h" />
-    <ClInclude Include="detail\image_data_directory.h" />
-    <ClInclude Include="detail\image_dos_header.h" />
-    <ClInclude Include="detail\image_file_header.h" />
-    <ClInclude Include="detail\image_optional_header.h" />
-    <ClInclude Include="detail\image_section_header.h" />
-    <ClInclude Include="detail\imports\image_import_descriptor.h" />
-    <ClInclude Include="detail\concepts.h" />
-    <ClInclude Include="detail\load_config\image_load_config_directory.h" />
-    <ClInclude Include="detail\load_config\load_config_directory-inl.h" />
-    <ClInclude Include="detail\packed_buffer_serialization.h" />
-    <ClInclude Include="detail\packed_reflection.h" />
-    <ClInclude Include="detail\packed_serialization.h" />
-    <ClInclude Include="detail\relocations\image_base_relocation.h" />
-    <ClInclude Include="detail\packed_struct_base.h" />
-    <ClInclude Include="detail\resources\accelerator.h" />
-    <ClInclude Include="detail\resources\bitmap.h" />
-    <ClInclude Include="detail\resources\icon_cursor.h" />
-    <ClInclude Include="detail\resources\image_resource_directory.h" />
-    <ClInclude Include="detail\resources\message_table.h" />
-    <ClInclude Include="detail\resources\version_info.h" />
-    <ClInclude Include="detail\rich\rich_header_utils.h" />
-    <ClInclude Include="detail\security\image_security_directory.h" />
-    <ClInclude Include="detail\tls\image_tls_directory.h" />
-    <ClInclude Include="dos\dos_header.h" />
-    <ClInclude Include="dos\dos_header_errc.h" />
-    <ClInclude Include="dos\dos_header_validator.h" />
-    <ClInclude Include="dos\dos_stub.h" />
-    <ClInclude Include="dotnet\dotnet_directory.h" />
-    <ClInclude Include="dotnet\dotnet_directory_loader.h" />
-    <ClInclude Include="error_list.h" />
-    <ClInclude Include="exceptions\arm64\arm64_exception_directory.h" />
-    <ClInclude Include="exceptions\arm64\arm64_exception_directory_loader.h" />
-    <ClInclude Include="exceptions\arm\arm_exception_directory.h" />
-    <ClInclude Include="exceptions\arm\arm_exception_directory_loader.h" />
-    <ClInclude Include="exceptions\arm_common\arm_common_exception_directory_loader.h" />
-    <ClInclude Include="exceptions\arm_common\arm_common_unwind_info-inl.h" />
-    <ClInclude Include="exceptions\arm_common\arm_common_unwind_info.h" />
-    <ClInclude Include="exceptions\exception_directory.h" />
-    <ClInclude Include="exceptions\exception_directory_loader.h" />
-    <ClInclude Include="exceptions\x64\x64_exception_directory-inl.h" />
-    <ClInclude Include="exceptions\x64\x64_exception_directory.h" />
-    <ClInclude Include="exceptions\x64\x64_exception_directory_loader.h" />
-    <ClInclude Include="exports\exported_address.h" />
-    <ClInclude Include="exports\export_directory.h" />
-    <ClInclude Include="exports\export_directory_builder.h" />
-    <ClInclude Include="exports\export_directory_loader.h" />
-    <ClInclude Include="image\buffer_to_va.h" />
-    <ClInclude Include="image\bytes_to_va.h" />
-    <ClInclude Include="image\byte_array_from_va.h" />
-    <ClInclude Include="image\byte_vector_from_va.h" />
-    <ClInclude Include="image\checksum.h" />
-    <ClInclude Include="image\format_detector.h" />
-    <ClInclude Include="image\image.h" />
-    <ClInclude Include="image\image_builder.h" />
-    <ClInclude Include="image\image_errc.h" />
-    <ClInclude Include="image\image_loader.h" />
-    <ClInclude Include="image\image_section_search.h" />
-    <ClInclude Include="image\rva_file_offset_converter.h" />
-    <ClInclude Include="image\section_data_from_va.h" />
-    <ClInclude Include="image\section_data_length_from_va.h" />
-    <ClInclude Include="image\shannon_entropy.h" />
-    <ClInclude Include="image\string_from_va.h" />
-    <ClInclude Include="image\string_to_va.h" />
-    <ClInclude Include="image\struct_from_va.h" />
-    <ClInclude Include="image\struct_to_va.h" />
-    <ClInclude Include="imports\imported_address.h" />
-    <ClInclude Include="imports\import_directory.h" />
-    <ClInclude Include="imports\import_directory_builder.h" />
-    <ClInclude Include="imports\import_directory_loader.h" />
-    <ClInclude Include="load_config\load_config_directory.h" />
-    <ClInclude Include="load_config\load_config_directory_loader.h" />
-    <ClInclude Include="packed_byte_array.h" />
-    <ClInclude Include="packed_byte_vector.h" />
-    <ClInclude Include="packed_c_string.h" />
-    <ClInclude Include="packed_string_type.h" />
-    <ClInclude Include="packed_struct.h" />
-    <ClInclude Include="packed_utf16_string.h" />
-    <ClInclude Include="pe_error.h" />
-    <ClInclude Include="pe_types.h" />
-    <ClInclude Include="relocations\base_relocation.h" />
-    <ClInclude Include="relocations\image_rebase.h" />
-    <ClInclude Include="relocations\relocation_entry.h" />
-    <ClInclude Include="relocations\relocation_directory_builder.h" />
-    <ClInclude Include="relocations\relocation_directory_loader.h" />
-    <ClInclude Include="resources\accelerator_table.h" />
-    <ClInclude Include="resources\accelerator_table_reader.h" />
-    <ClInclude Include="resources\bitmap.h" />
-    <ClInclude Include="resources\bitmap_reader.h" />
-    <ClInclude Include="resources\bitmap_writer.h" />
-    <ClInclude Include="resources\cpid.h" />
-    <ClInclude Include="resources\guid.h" />
-    <ClInclude Include="resources\icon_cursor.h" />
-    <ClInclude Include="resources\icon_cursor_reader.h" />
-    <ClInclude Include="resources\icon_cursor_writer.h" />
-    <ClInclude Include="resources\lcid.h" />
-    <ClInclude Include="resources\manifest-inl.h" />
-    <ClInclude Include="resources\manifest.h" />
-    <ClInclude Include="resources\manifest_accessor_interface.h" />
-    <ClInclude Include="resources\message_table.h" />
-    <ClInclude Include="resources\message_table_reader.h" />
-    <ClInclude Include="resources\pugixml_manifest_accessor.h" />
-    <ClInclude Include="resources\resource_directory.h" />
-    <ClInclude Include="resources\resource_directory_loader.h" />
-    <ClInclude Include="resources\resource_reader.h" />
-    <ClInclude Include="resources\resource_reader_errc.h" />
-    <ClInclude Include="resources\resource_types.h" />
-    <ClInclude Include="resources\resource_writer.h" />
-    <ClInclude Include="resources\string_table.h" />
-    <ClInclude Include="resources\string_table_reader.h" />
-    <ClInclude Include="resources\string_table_writer.h" />
-    <ClInclude Include="resources\version.h" />
-    <ClInclude Include="resources\version_info.h" />
-    <ClInclude Include="resources\version_info_block.h" />
-    <ClInclude Include="resources\version_info_reader.h" />
-    <ClInclude Include="rich\compid_database.h" />
-    <ClInclude Include="rich\rich_compid.h" />
-    <ClInclude Include="rich\rich_header.h" />
-    <ClInclude Include="rich\rich_header_builder.h" />
-    <ClInclude Include="rich\rich_header_loader.h" />
-    <ClInclude Include="section\section_data.h" />
-    <ClInclude Include="section\section_header.h" />
-    <ClInclude Include="section\section_header_validator.h" />
-    <ClInclude Include="section\section_search.h" />
-    <ClInclude Include="section\section_table.h" />
-    <ClInclude Include="section\section_errc.h" />
-    <ClInclude Include="section\section_table_validator.h" />
-    <ClInclude Include="security\security_directory.h" />
-    <ClInclude Include="security\security_directory_loader.h" />
-    <ClInclude Include="tls\tls_directory.h" />
-    <ClInclude Include="tls\tls_directory_builder.h" />
-    <ClInclude Include="tls\tls_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\address_converter.h" />
+    <ClInclude Include="include\pe_bliss2\bit_stream.h" />
+    <ClInclude Include="include\pe_bliss2\bound_import\bound_import_directory_builder.h" />
+    <ClInclude Include="include\pe_bliss2\bound_import\bound_import_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\bound_import\bound_library.h" />
+    <ClInclude Include="include\pe_bliss2\core\data_directories.h" />
+    <ClInclude Include="include\pe_bliss2\core\file_header.h" />
+    <ClInclude Include="include\pe_bliss2\core\image_signature.h" />
+    <ClInclude Include="include\pe_bliss2\core\image_signature_errc.h" />
+    <ClInclude Include="include\pe_bliss2\core\image_signature_validator.h" />
+    <ClInclude Include="include\pe_bliss2\core\optional_header.h" />
+    <ClInclude Include="include\pe_bliss2\core\optional_header_errc.h" />
+    <ClInclude Include="include\pe_bliss2\core\optional_header_validator.h" />
+    <ClInclude Include="include\pe_bliss2\core\overlay.h" />
+    <ClInclude Include="include\pe_bliss2\debug\debug_directory.h" />
+    <ClInclude Include="include\pe_bliss2\debug\debug_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\delay_import\delay_import_directory.h" />
+    <ClInclude Include="include\pe_bliss2\delay_import\delay_import_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\detail\bound_import\image_bound_import_descriptor.h" />
+    <ClInclude Include="include\pe_bliss2\detail\concepts.h" />
+    <ClInclude Include="include\pe_bliss2\detail\debug\image_debug_directory.h" />
+    <ClInclude Include="include\pe_bliss2\detail\delay_import\image_delay_load_descriptor.h" />
+    <ClInclude Include="include\pe_bliss2\detail\dotnet\image_dotnet_directory.h" />
+    <ClInclude Include="include\pe_bliss2\detail\endian_convert.h" />
+    <ClInclude Include="include\pe_bliss2\detail\exceptions\image_runtime_function_entry.h" />
+    <ClInclude Include="include\pe_bliss2\detail\exports\image_export_directory.h" />
+    <ClInclude Include="include\pe_bliss2\detail\image\image-inl.h" />
+    <ClInclude Include="include\pe_bliss2\detail\image_data_directory.h" />
+    <ClInclude Include="include\pe_bliss2\detail\image_dos_header.h" />
+    <ClInclude Include="include\pe_bliss2\detail\image_file_header.h" />
+    <ClInclude Include="include\pe_bliss2\detail\image_optional_header.h" />
+    <ClInclude Include="include\pe_bliss2\detail\image_section_header.h" />
+    <ClInclude Include="include\pe_bliss2\detail\imports\image_import_descriptor.h" />
+    <ClInclude Include="include\pe_bliss2\detail\load_config\image_load_config_directory.h" />
+    <ClInclude Include="include\pe_bliss2\detail\load_config\load_config_directory-inl.h" />
+    <ClInclude Include="include\pe_bliss2\detail\packed_buffer_serialization.h" />
+    <ClInclude Include="include\pe_bliss2\detail\packed_reflection.h" />
+    <ClInclude Include="include\pe_bliss2\detail\packed_serialization.h" />
+    <ClInclude Include="include\pe_bliss2\detail\packed_struct_base.h" />
+    <ClInclude Include="include\pe_bliss2\detail\relocations\image_base_relocation.h" />
+    <ClInclude Include="include\pe_bliss2\detail\resources\accelerator.h" />
+    <ClInclude Include="include\pe_bliss2\detail\resources\bitmap.h" />
+    <ClInclude Include="include\pe_bliss2\detail\resources\icon_cursor.h" />
+    <ClInclude Include="include\pe_bliss2\detail\resources\image_resource_directory.h" />
+    <ClInclude Include="include\pe_bliss2\detail\resources\message_table.h" />
+    <ClInclude Include="include\pe_bliss2\detail\resources\version_info.h" />
+    <ClInclude Include="include\pe_bliss2\detail\rich\rich_header_utils.h" />
+    <ClInclude Include="include\pe_bliss2\detail\security\image_security_directory.h" />
+    <ClInclude Include="include\pe_bliss2\detail\tls\image_tls_directory.h" />
+    <ClInclude Include="include\pe_bliss2\dos\dos_header.h" />
+    <ClInclude Include="include\pe_bliss2\dos\dos_header_errc.h" />
+    <ClInclude Include="include\pe_bliss2\dos\dos_header_validator.h" />
+    <ClInclude Include="include\pe_bliss2\dos\dos_stub.h" />
+    <ClInclude Include="include\pe_bliss2\dotnet\dotnet_directory.h" />
+    <ClInclude Include="include\pe_bliss2\dotnet\dotnet_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\error_list.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\arm64\arm64_exception_directory.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\arm64\arm64_exception_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\arm\arm_exception_directory.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\arm\arm_exception_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\arm_common\arm_common_exception_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\arm_common\arm_common_unwind_info-inl.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\arm_common\arm_common_unwind_info.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\exception_directory.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\exception_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\x64\x64_exception_directory-inl.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\x64\x64_exception_directory.h" />
+    <ClInclude Include="include\pe_bliss2\exceptions\x64\x64_exception_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\exports\exported_address.h" />
+    <ClInclude Include="include\pe_bliss2\exports\export_directory.h" />
+    <ClInclude Include="include\pe_bliss2\exports\export_directory_builder.h" />
+    <ClInclude Include="include\pe_bliss2\exports\export_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\image\buffer_to_va.h" />
+    <ClInclude Include="include\pe_bliss2\image\bytes_to_va.h" />
+    <ClInclude Include="include\pe_bliss2\image\byte_array_from_va.h" />
+    <ClInclude Include="include\pe_bliss2\image\byte_vector_from_va.h" />
+    <ClInclude Include="include\pe_bliss2\image\checksum.h" />
+    <ClInclude Include="include\pe_bliss2\image\format_detector.h" />
+    <ClInclude Include="include\pe_bliss2\image\image.h" />
+    <ClInclude Include="include\pe_bliss2\image\image_builder.h" />
+    <ClInclude Include="include\pe_bliss2\image\image_errc.h" />
+    <ClInclude Include="include\pe_bliss2\image\image_loader.h" />
+    <ClInclude Include="include\pe_bliss2\image\image_section_search.h" />
+    <ClInclude Include="include\pe_bliss2\image\rva_file_offset_converter.h" />
+    <ClInclude Include="include\pe_bliss2\image\section_data_from_va.h" />
+    <ClInclude Include="include\pe_bliss2\image\section_data_length_from_va.h" />
+    <ClInclude Include="include\pe_bliss2\image\shannon_entropy.h" />
+    <ClInclude Include="include\pe_bliss2\image\string_from_va.h" />
+    <ClInclude Include="include\pe_bliss2\image\string_to_va.h" />
+    <ClInclude Include="include\pe_bliss2\image\struct_from_va.h" />
+    <ClInclude Include="include\pe_bliss2\image\struct_to_va.h" />
+    <ClInclude Include="include\pe_bliss2\imports\imported_address.h" />
+    <ClInclude Include="include\pe_bliss2\imports\import_directory.h" />
+    <ClInclude Include="include\pe_bliss2\imports\import_directory_builder.h" />
+    <ClInclude Include="include\pe_bliss2\imports\import_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\load_config\load_config_directory.h" />
+    <ClInclude Include="include\pe_bliss2\load_config\load_config_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\packed_byte_array.h" />
+    <ClInclude Include="include\pe_bliss2\packed_byte_vector.h" />
+    <ClInclude Include="include\pe_bliss2\packed_c_string.h" />
+    <ClInclude Include="include\pe_bliss2\packed_string_type.h" />
+    <ClInclude Include="include\pe_bliss2\packed_struct.h" />
+    <ClInclude Include="include\pe_bliss2\packed_utf16_string.h" />
+    <ClInclude Include="include\pe_bliss2\pe_error.h" />
+    <ClInclude Include="include\pe_bliss2\pe_types.h" />
+    <ClInclude Include="include\pe_bliss2\relocations\base_relocation.h" />
+    <ClInclude Include="include\pe_bliss2\relocations\image_rebase.h" />
+    <ClInclude Include="include\pe_bliss2\relocations\relocation_directory_builder.h" />
+    <ClInclude Include="include\pe_bliss2\relocations\relocation_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\relocations\relocation_entry.h" />
+    <ClInclude Include="include\pe_bliss2\resources\accelerator_table.h" />
+    <ClInclude Include="include\pe_bliss2\resources\accelerator_table_reader.h" />
+    <ClInclude Include="include\pe_bliss2\resources\bitmap.h" />
+    <ClInclude Include="include\pe_bliss2\resources\bitmap_reader.h" />
+    <ClInclude Include="include\pe_bliss2\resources\bitmap_writer.h" />
+    <ClInclude Include="include\pe_bliss2\resources\cpid.h" />
+    <ClInclude Include="include\pe_bliss2\resources\guid.h" />
+    <ClInclude Include="include\pe_bliss2\resources\icon_cursor.h" />
+    <ClInclude Include="include\pe_bliss2\resources\icon_cursor_reader.h" />
+    <ClInclude Include="include\pe_bliss2\resources\icon_cursor_writer.h" />
+    <ClInclude Include="include\pe_bliss2\resources\lcid.h" />
+    <ClInclude Include="include\pe_bliss2\resources\manifest-inl.h" />
+    <ClInclude Include="include\pe_bliss2\resources\manifest.h" />
+    <ClInclude Include="include\pe_bliss2\resources\manifest_accessor_interface.h" />
+    <ClInclude Include="include\pe_bliss2\resources\message_table.h" />
+    <ClInclude Include="include\pe_bliss2\resources\message_table_reader.h" />
+    <ClInclude Include="include\pe_bliss2\resources\pugixml_manifest_accessor.h" />
+    <ClInclude Include="include\pe_bliss2\resources\resource_directory.h" />
+    <ClInclude Include="include\pe_bliss2\resources\resource_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\resources\resource_reader.h" />
+    <ClInclude Include="include\pe_bliss2\resources\resource_reader_errc.h" />
+    <ClInclude Include="include\pe_bliss2\resources\resource_types.h" />
+    <ClInclude Include="include\pe_bliss2\resources\resource_writer.h" />
+    <ClInclude Include="include\pe_bliss2\resources\string_table.h" />
+    <ClInclude Include="include\pe_bliss2\resources\string_table_reader.h" />
+    <ClInclude Include="include\pe_bliss2\resources\string_table_writer.h" />
+    <ClInclude Include="include\pe_bliss2\resources\version.h" />
+    <ClInclude Include="include\pe_bliss2\resources\version_info.h" />
+    <ClInclude Include="include\pe_bliss2\resources\version_info_block.h" />
+    <ClInclude Include="include\pe_bliss2\resources\version_info_reader.h" />
+    <ClInclude Include="include\pe_bliss2\rich\compid_database.h" />
+    <ClInclude Include="include\pe_bliss2\rich\rich_compid.h" />
+    <ClInclude Include="include\pe_bliss2\rich\rich_header.h" />
+    <ClInclude Include="include\pe_bliss2\rich\rich_header_builder.h" />
+    <ClInclude Include="include\pe_bliss2\rich\rich_header_loader.h" />
+    <ClInclude Include="include\pe_bliss2\section\section_data.h" />
+    <ClInclude Include="include\pe_bliss2\section\section_errc.h" />
+    <ClInclude Include="include\pe_bliss2\section\section_header.h" />
+    <ClInclude Include="include\pe_bliss2\section\section_header_validator.h" />
+    <ClInclude Include="include\pe_bliss2\section\section_search.h" />
+    <ClInclude Include="include\pe_bliss2\section\section_table.h" />
+    <ClInclude Include="include\pe_bliss2\section\section_table_validator.h" />
+    <ClInclude Include="include\pe_bliss2\security\security_directory.h" />
+    <ClInclude Include="include\pe_bliss2\security\security_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\tls\tls_directory-inl.h" />
+    <ClInclude Include="include\pe_bliss2\tls\tls_directory.h" />
+    <ClInclude Include="include\pe_bliss2\tls\tls_directory_builder.h" />
+    <ClInclude Include="include\pe_bliss2\tls\tls_directory_loader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="address_converter.cpp" />
-    <ClCompile Include="bound_import\bound_import_directory_builder.cpp" />
-    <ClCompile Include="bound_import\bound_import_directory_loader.cpp" />
-    <ClCompile Include="core\data_directories.cpp" />
-    <ClCompile Include="core\file_header.cpp" />
-    <ClCompile Include="core\image_signature.cpp" />
-    <ClCompile Include="core\image_signature_errc.cpp" />
-    <ClCompile Include="core\image_signature_validator.cpp" />
-    <ClCompile Include="core\optional_header.cpp" />
-    <ClCompile Include="core\optional_header_errc.cpp" />
-    <ClCompile Include="core\optional_header_validator.cpp" />
-    <ClCompile Include="core\overlay.cpp" />
-    <ClCompile Include="debug\debug_directory.cpp" />
-    <ClCompile Include="debug\debug_directory_loader.cpp" />
-    <ClCompile Include="detail\rich\rich_header_utils.cpp" />
-    <ClCompile Include="dos\dos_header.cpp" />
-    <ClCompile Include="dos\dos_header_errc.cpp" />
-    <ClCompile Include="dos\dos_header_validator.cpp" />
-    <ClCompile Include="dos\dos_stub.cpp" />
-    <ClCompile Include="dotnet\dotnet_directory.cpp" />
-    <ClCompile Include="dotnet\dotnet_directory_loader.cpp" />
-    <ClCompile Include="error_list.cpp" />
-    <ClCompile Include="exceptions\arm64\arm64_exception_directory.cpp" />
-    <ClCompile Include="exceptions\arm64\arm64_exception_directory_loader.cpp" />
-    <ClCompile Include="exceptions\arm\arm_exception_directory.cpp" />
-    <ClCompile Include="exceptions\arm\arm_exception_directory_loader.cpp" />
-    <ClCompile Include="exceptions\arm_common\arm_common_exception_directory_loader.cpp" />
-    <ClCompile Include="exceptions\arm_common\arm_common_unwind_info.cpp" />
-    <ClCompile Include="exceptions\exception_directory_loader.cpp" />
-    <ClCompile Include="exceptions\x64\x64_exception_directory.cpp" />
-    <ClCompile Include="exceptions\x64\x64_exception_directory_loader.cpp" />
-    <ClCompile Include="exports\exported_address.cpp" />
-    <ClCompile Include="exports\export_directory.cpp" />
-    <ClCompile Include="exports\export_directory_builder.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="exports\export_directory_loader.cpp" />
-    <ClCompile Include="image\buffer_to_va.cpp" />
-    <ClCompile Include="image\byte_vector_from_va.cpp" />
-    <ClCompile Include="image\checksum.cpp" />
-    <ClCompile Include="image\format_detector.cpp" />
-    <ClCompile Include="image\image.cpp" />
-    <ClCompile Include="image\image_builder.cpp" />
-    <ClCompile Include="image\image_errc.cpp" />
-    <ClCompile Include="image\image_loader.cpp" />
-    <ClCompile Include="image\image_section_search.cpp" />
-    <ClCompile Include="image\rva_file_offset_converter.cpp" />
-    <ClCompile Include="image\section_data_from_va.cpp" />
-    <ClCompile Include="image\section_data_length_from_va.cpp" />
-    <ClCompile Include="image\shannon_entropy.cpp" />
-    <ClCompile Include="image\string_from_va.cpp" />
-    <ClCompile Include="image\string_to_va.cpp" />
-    <ClCompile Include="imports\import_directory_builder.cpp">
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </DeploymentContent>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="imports\import_directory_loader.cpp" />
-    <ClCompile Include="load_config\load_config_directory.cpp" />
-    <ClCompile Include="load_config\load_config_directory_loader.cpp" />
-    <ClCompile Include="packed_byte_array.cpp" />
-    <ClCompile Include="packed_byte_vector.cpp" />
-    <ClCompile Include="packed_c_string.cpp" />
-    <ClCompile Include="packed_utf16_string.cpp" />
-    <ClCompile Include="relocations\image_rebase.cpp" />
-    <ClCompile Include="relocations\relocation_entry.cpp" />
-    <ClCompile Include="relocations\relocation_directory_builder.cpp" />
-    <ClCompile Include="relocations\relocation_directory_loader.cpp" />
-    <ClCompile Include="resources\accelerator_table.cpp" />
-    <ClCompile Include="resources\accelerator_table_reader.cpp" />
-    <ClCompile Include="resources\bitmap_writer.cpp" />
-    <ClCompile Include="resources\bitmap_reader.cpp" />
-    <ClCompile Include="resources\cpid.cpp" />
-    <ClCompile Include="resources\guid.cpp" />
-    <ClCompile Include="resources\icon_cursor_reader.cpp" />
-    <ClCompile Include="resources\icon_cursor_writer.cpp" />
-    <ClCompile Include="resources\lcid.cpp" />
-    <ClCompile Include="resources\manifest.cpp" />
-    <ClCompile Include="resources\manifest_accessor_interface.cpp" />
-    <ClCompile Include="resources\message_table.cpp" />
-    <ClCompile Include="resources\message_table_reader.cpp" />
-    <ClCompile Include="resources\pugixml_manifest_accessor.cpp" />
-    <ClCompile Include="resources\resource_directory.cpp" />
-    <ClCompile Include="resources\resource_directory_loader.cpp" />
-    <ClCompile Include="resources\resource_reader.cpp" />
-    <ClCompile Include="resources\resource_reader_errc.cpp" />
-    <ClCompile Include="resources\string_table.cpp" />
-    <ClCompile Include="resources\string_table_reader.cpp" />
-    <ClCompile Include="resources\string_table_writer.cpp" />
-    <ClCompile Include="resources\version_info.cpp" />
-    <ClCompile Include="resources\version_info_reader.cpp" />
-    <ClCompile Include="rich\compid_database.cpp" />
-    <ClCompile Include="rich\rich_compid.cpp" />
-    <ClCompile Include="rich\rich_header.cpp" />
-    <ClCompile Include="rich\rich_header_builder.cpp" />
-    <ClCompile Include="rich\rich_header_loader.cpp" />
-    <ClCompile Include="section\section_data.cpp" />
-    <ClCompile Include="section\section_header.cpp" />
-    <ClCompile Include="section\section_header_validator.cpp" />
-    <ClCompile Include="section\section_search.cpp" />
-    <ClCompile Include="section\section_table.cpp" />
-    <ClCompile Include="section\section_errc.cpp" />
-    <ClCompile Include="section\section_table_validator.cpp" />
-    <ClInclude Include="tls\tls_directory-inl.h" />
-    <ClCompile Include="security\security_directory_loader.cpp" />
-    <ClCompile Include="tls\tls_directory.cpp" />
-    <ClCompile Include="tls\tls_directory_builder.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="tls\tls_directory_loader.cpp" />
+    <ClCompile Include="src\address_converter.cpp" />
+    <ClCompile Include="src\bound_import\bound_import_directory_builder.cpp" />
+    <ClCompile Include="src\bound_import\bound_import_directory_loader.cpp" />
+    <ClCompile Include="src\core\data_directories.cpp" />
+    <ClCompile Include="src\core\file_header.cpp" />
+    <ClCompile Include="src\core\image_signature.cpp" />
+    <ClCompile Include="src\core\image_signature_errc.cpp" />
+    <ClCompile Include="src\core\image_signature_validator.cpp" />
+    <ClCompile Include="src\core\optional_header.cpp" />
+    <ClCompile Include="src\core\optional_header_errc.cpp" />
+    <ClCompile Include="src\core\optional_header_validator.cpp" />
+    <ClCompile Include="src\core\overlay.cpp" />
+    <ClCompile Include="src\debug\debug_directory.cpp" />
+    <ClCompile Include="src\debug\debug_directory_loader.cpp" />
+    <ClCompile Include="src\detail\rich\rich_header_utils.cpp" />
+    <ClCompile Include="src\dos\dos_header.cpp" />
+    <ClCompile Include="src\dos\dos_header_errc.cpp" />
+    <ClCompile Include="src\dos\dos_header_validator.cpp" />
+    <ClCompile Include="src\dos\dos_stub.cpp" />
+    <ClCompile Include="src\dotnet\dotnet_directory.cpp" />
+    <ClCompile Include="src\dotnet\dotnet_directory_loader.cpp" />
+    <ClCompile Include="src\error_list.cpp" />
+    <ClCompile Include="src\exceptions\arm64\arm64_exception_directory.cpp" />
+    <ClCompile Include="src\exceptions\arm64\arm64_exception_directory_loader.cpp" />
+    <ClCompile Include="src\exceptions\arm\arm_exception_directory.cpp" />
+    <ClCompile Include="src\exceptions\arm\arm_exception_directory_loader.cpp" />
+    <ClCompile Include="src\exceptions\arm_common\arm_common_exception_directory_loader.cpp" />
+    <ClCompile Include="src\exceptions\arm_common\arm_common_unwind_info.cpp" />
+    <ClCompile Include="src\exceptions\exception_directory_loader.cpp" />
+    <ClCompile Include="src\exceptions\x64\x64_exception_directory.cpp" />
+    <ClCompile Include="src\exceptions\x64\x64_exception_directory_loader.cpp" />
+    <ClCompile Include="src\exports\exported_address.cpp" />
+    <ClCompile Include="src\exports\export_directory.cpp" />
+    <ClCompile Include="src\exports\export_directory_builder.cpp" />
+    <ClCompile Include="src\exports\export_directory_loader.cpp" />
+    <ClCompile Include="src\image\buffer_to_va.cpp" />
+    <ClCompile Include="src\image\byte_vector_from_va.cpp" />
+    <ClCompile Include="src\image\checksum.cpp" />
+    <ClCompile Include="src\image\format_detector.cpp" />
+    <ClCompile Include="src\image\image.cpp" />
+    <ClCompile Include="src\image\image_builder.cpp" />
+    <ClCompile Include="src\image\image_errc.cpp" />
+    <ClCompile Include="src\image\image_loader.cpp" />
+    <ClCompile Include="src\image\image_section_search.cpp" />
+    <ClCompile Include="src\image\rva_file_offset_converter.cpp" />
+    <ClCompile Include="src\image\section_data_from_va.cpp" />
+    <ClCompile Include="src\image\section_data_length_from_va.cpp" />
+    <ClCompile Include="src\image\shannon_entropy.cpp" />
+    <ClCompile Include="src\image\string_from_va.cpp" />
+    <ClCompile Include="src\image\string_to_va.cpp" />
+    <ClCompile Include="src\imports\import_directory_builder.cpp" />
+    <ClCompile Include="src\imports\import_directory_loader.cpp" />
+    <ClCompile Include="src\load_config\load_config_directory.cpp" />
+    <ClCompile Include="src\load_config\load_config_directory_loader.cpp" />
+    <ClCompile Include="src\packed_byte_array.cpp" />
+    <ClCompile Include="src\packed_byte_vector.cpp" />
+    <ClCompile Include="src\packed_c_string.cpp" />
+    <ClCompile Include="src\packed_utf16_string.cpp" />
+    <ClCompile Include="src\relocations\image_rebase.cpp" />
+    <ClCompile Include="src\relocations\relocation_directory_builder.cpp" />
+    <ClCompile Include="src\relocations\relocation_directory_loader.cpp" />
+    <ClCompile Include="src\relocations\relocation_entry.cpp" />
+    <ClCompile Include="src\resources\accelerator_table.cpp" />
+    <ClCompile Include="src\resources\accelerator_table_reader.cpp" />
+    <ClCompile Include="src\resources\bitmap_reader.cpp" />
+    <ClCompile Include="src\resources\bitmap_writer.cpp" />
+    <ClCompile Include="src\resources\cpid.cpp" />
+    <ClCompile Include="src\resources\guid.cpp" />
+    <ClCompile Include="src\resources\icon_cursor_reader.cpp" />
+    <ClCompile Include="src\resources\icon_cursor_writer.cpp" />
+    <ClCompile Include="src\resources\lcid.cpp" />
+    <ClCompile Include="src\resources\manifest.cpp" />
+    <ClCompile Include="src\resources\manifest_accessor_interface.cpp" />
+    <ClCompile Include="src\resources\message_table.cpp" />
+    <ClCompile Include="src\resources\message_table_reader.cpp" />
+    <ClCompile Include="src\resources\pugixml_manifest_accessor.cpp" />
+    <ClCompile Include="src\resources\resource_directory.cpp" />
+    <ClCompile Include="src\resources\resource_directory_loader.cpp" />
+    <ClCompile Include="src\resources\resource_reader.cpp" />
+    <ClCompile Include="src\resources\resource_reader_errc.cpp" />
+    <ClCompile Include="src\resources\string_table.cpp" />
+    <ClCompile Include="src\resources\string_table_reader.cpp" />
+    <ClCompile Include="src\resources\string_table_writer.cpp" />
+    <ClCompile Include="src\resources\version_info.cpp" />
+    <ClCompile Include="src\resources\version_info_reader.cpp" />
+    <ClCompile Include="src\rich\compid_database.cpp" />
+    <ClCompile Include="src\rich\rich_compid.cpp" />
+    <ClCompile Include="src\rich\rich_header.cpp" />
+    <ClCompile Include="src\rich\rich_header_builder.cpp" />
+    <ClCompile Include="src\rich\rich_header_loader.cpp" />
+    <ClCompile Include="src\section\section_data.cpp" />
+    <ClCompile Include="src\section\section_errc.cpp" />
+    <ClCompile Include="src\section\section_header.cpp" />
+    <ClCompile Include="src\section\section_header_validator.cpp" />
+    <ClCompile Include="src\section\section_search.cpp" />
+    <ClCompile Include="src\section\section_table.cpp" />
+    <ClCompile Include="src\section\section_table_validator.cpp" />
+    <ClCompile Include="src\security\security_directory_loader.cpp" />
+    <ClCompile Include="src\tls\tls_directory.cpp" />
+    <ClCompile Include="src\tls\tls_directory_builder.cpp" />
+    <ClCompile Include="src\tls\tls_directory_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\buffers\buffers.vcxproj">
@@ -399,7 +364,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -417,7 +382,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -435,7 +400,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -453,7 +418,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>

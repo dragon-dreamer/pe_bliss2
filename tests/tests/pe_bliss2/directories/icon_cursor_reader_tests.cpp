@@ -10,7 +10,7 @@
 #include "buffers/input_virtual_buffer.h"
 #include "pe_bliss2/resources/resource_directory.h"
 #include "pe_bliss2/resources/resource_writer.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss::resources;
 

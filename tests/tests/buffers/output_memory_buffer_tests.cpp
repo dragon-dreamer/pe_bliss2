@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 
 #include "buffers/output_memory_buffer.h"
-#include "tests/tests/buffers/output_buffer_helpers.h"
+#include "tests/buffers/output_buffer_helpers.h"
 
 TEST(BufferTests, OutputMemoryBufferTest)
 {

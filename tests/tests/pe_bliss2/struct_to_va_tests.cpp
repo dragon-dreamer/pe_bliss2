@@ -11,8 +11,8 @@
 #include "pe_bliss2/packed_struct.h"
 
 #include "pe_bliss2/address_converter.h"
-#include "tests/tests/pe_bliss2/image_helper.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/image_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 namespace
 {

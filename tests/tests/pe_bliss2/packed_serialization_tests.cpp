@@ -12,7 +12,7 @@
 
 #include "pe_bliss2/detail/packed_serialization.h"
 #include "pe_bliss2/detail/packed_reflection.h"
-#include "tests/tests/pe_bliss2/test_structs.h"
+#include "tests/pe_bliss2/test_structs.h"
 
 using namespace pe_bliss::detail;
 

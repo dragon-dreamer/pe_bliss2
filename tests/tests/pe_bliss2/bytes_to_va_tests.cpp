@@ -15,9 +15,9 @@
 #include "pe_bliss2/packed_byte_vector.h"
 #include "pe_bliss2/pe_types.h"
 
-#include "tests/tests/pe_bliss2/bytes_to_va_fixture_base.h"
-#include "tests/tests/pe_bliss2/image_helper.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/bytes_to_va_fixture_base.h"
+#include "tests/pe_bliss2/image_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 namespace
 {

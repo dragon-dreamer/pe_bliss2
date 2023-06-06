@@ -26,8 +26,8 @@
 #include "pe_bliss2/section/section_table.h"
 #include "pe_bliss2/section/section_table_validator.h"
 
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
-#include "tests/tests/pe_bliss2/output_buffer_mock.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/output_buffer_mock.h"
 
 using namespace pe_bliss;
 using namespace pe_bliss::core;

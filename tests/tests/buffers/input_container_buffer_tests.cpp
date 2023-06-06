@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 
 #include "buffers/input_container_buffer.h"
-#include "tests/tests/buffers/input_buffer_helpers.h"
+#include "tests/buffers/input_buffer_helpers.h"
 
 TEST(BufferTests, InputContainerBufferTest)
 {

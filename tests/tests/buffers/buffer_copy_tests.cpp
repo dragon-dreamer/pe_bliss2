@@ -10,7 +10,7 @@
 #include "buffers/input_stream_buffer.h"
 #include "buffers/input_virtual_buffer.h"
 #include "buffers/output_stream_buffer.h"
-#include "tests/tests/buffers/buffer_helpers.h"
+#include "tests/buffers/buffer_helpers.h"
 
 namespace
 {

@@ -9,7 +9,7 @@
 
 #include "buffers/input_container_buffer.h"
 #include "buffers/input_virtual_buffer.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss::dotnet;
 

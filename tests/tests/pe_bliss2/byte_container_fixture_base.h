@@ -9,7 +9,7 @@
 
 #include "pe_bliss2/image/image.h"
 
-#include "tests/tests/pe_bliss2/image_helper.h"
+#include "tests/pe_bliss2/image_helper.h"
 
 enum class function_type
 {

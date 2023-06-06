@@ -3,7 +3,7 @@
 #include "gtest/gtest.h"
 
 #include "pe_bliss2/exceptions/arm_common/arm_common_unwind_info.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 #include "utilities/generic_error.h"
 
 using namespace pe_bliss::exceptions::arm_common;

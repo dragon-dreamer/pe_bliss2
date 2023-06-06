@@ -88,7 +88,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\pe_bliss2\include;$(SolutionDir)\buffers\include;$(SolutionDir)\utilities\include;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -105,7 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\pe_bliss2\include;$(SolutionDir)\buffers\include;$(SolutionDir)\utilities\include;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -122,7 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\pe_bliss2\include;$(SolutionDir)\buffers\include;$(SolutionDir)\utilities\include;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -139,7 +139,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir);C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\pe_bliss2\include;$(SolutionDir)\buffers\include;$(SolutionDir)\utilities\include;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>

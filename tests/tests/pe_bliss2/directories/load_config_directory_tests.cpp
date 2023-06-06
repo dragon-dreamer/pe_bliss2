@@ -9,7 +9,7 @@
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/load_config/load_config_directory.h"
 #include "pe_bliss2/pe_error.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss;
 using namespace pe_bliss::load_config;

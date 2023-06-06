@@ -15,39 +15,39 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="variant_helpers.h">
+    <ClInclude Include="include\utilities\generic_error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="math.h">
+    <ClInclude Include="include\utilities\hash.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="static_class.h">
+    <ClInclude Include="include\utilities\math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="generic_error.h">
+    <ClInclude Include="include\utilities\safe_uint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="safe_uint.h">
+    <ClInclude Include="include\utilities\scoped_guard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="scoped_guard.h">
+    <ClInclude Include="include\utilities\shannon_entropy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="hash.h">
+    <ClInclude Include="include\utilities\static_class.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="string.h">
+    <ClInclude Include="include\utilities\string.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="shannon_entropy.h">
+    <ClInclude Include="include\utilities\variant_helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="generic_error.cpp">
+    <ClCompile Include="src\generic_error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="shannon_entropy.cpp">
+    <ClCompile Include="src\shannon_entropy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -17,8 +17,8 @@
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/detail/packed_serialization.h"
 
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
-#include "tests/tests/pe_bliss2/test_structs.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/test_structs.h"
 
 #include "utilities/generic_error.h"
 

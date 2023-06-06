@@ -27,88 +27,88 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="buffer_copy.h">
+    <ClInclude Include="include\buffers\buffer_copy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="buffer_interface.h">
+    <ClInclude Include="include\buffers\buffer_interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ref_buffer.h">
+    <ClInclude Include="include\buffers\ref_buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="input_buffer_interface.h">
+    <ClInclude Include="include\buffers\input_buffer_interface.h">
       <Filter>Header Files\input</Filter>
     </ClInclude>
-    <ClInclude Include="input_buffer_section.h">
+    <ClInclude Include="include\buffers\input_buffer_section.h">
       <Filter>Header Files\input</Filter>
     </ClInclude>
-    <ClInclude Include="input_memory_buffer.h">
+    <ClInclude Include="include\buffers\input_buffer_state.h">
       <Filter>Header Files\input</Filter>
     </ClInclude>
-    <ClInclude Include="input_stream_buffer.h">
+    <ClInclude Include="include\buffers\input_buffer_stateful_wrapper.h">
       <Filter>Header Files\input</Filter>
     </ClInclude>
-    <ClInclude Include="output_buffer_interface.h">
+    <ClInclude Include="include\buffers\input_container_buffer.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\buffers\input_memory_buffer.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\buffers\input_stream_buffer.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\buffers\input_virtual_buffer.h">
+      <Filter>Header Files\input</Filter>
+    </ClInclude>
+    <ClInclude Include="include\buffers\output_buffer_interface.h">
       <Filter>Header Files\output</Filter>
     </ClInclude>
-    <ClInclude Include="output_memory_buffer.h">
+    <ClInclude Include="include\buffers\output_memory_buffer.h">
       <Filter>Header Files\output</Filter>
     </ClInclude>
-    <ClInclude Include="output_memory_ref_buffer.h">
+    <ClInclude Include="include\buffers\output_memory_ref_buffer.h">
       <Filter>Header Files\output</Filter>
     </ClInclude>
-    <ClInclude Include="output_stream_buffer.h">
+    <ClInclude Include="include\buffers\output_stream_buffer.h">
       <Filter>Header Files\output</Filter>
-    </ClInclude>
-    <ClInclude Include="input_container_buffer.h">
-      <Filter>Header Files\input</Filter>
-    </ClInclude>
-    <ClInclude Include="input_buffer_state.h">
-      <Filter>Header Files\input</Filter>
-    </ClInclude>
-    <ClInclude Include="input_virtual_buffer.h">
-      <Filter>Header Files\input</Filter>
-    </ClInclude>
-    <ClInclude Include="input_buffer_stateful_wrapper.h">
-      <Filter>Header Files\input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ref_buffer.cpp">
+    <ClCompile Include="src\buffer_copy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="buffer_copy.cpp">
+    <ClCompile Include="src\ref_buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="input_buffer_section.cpp">
+    <ClCompile Include="src\input_buffer_section.cpp">
       <Filter>Source Files\input</Filter>
     </ClCompile>
-    <ClCompile Include="input_memory_buffer.cpp">
+    <ClCompile Include="src\input_buffer_state.cpp">
       <Filter>Source Files\input</Filter>
     </ClCompile>
-    <ClCompile Include="input_stream_buffer.cpp">
+    <ClCompile Include="src\input_buffer_stateful_wrapper.cpp">
       <Filter>Source Files\input</Filter>
     </ClCompile>
-    <ClCompile Include="output_memory_buffer.cpp">
+    <ClCompile Include="src\input_container_buffer.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input_memory_buffer.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input_stream_buffer.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input_virtual_buffer.cpp">
+      <Filter>Source Files\input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\output_memory_buffer.cpp">
       <Filter>Source Files\output</Filter>
     </ClCompile>
-    <ClCompile Include="output_memory_ref_buffer.cpp">
+    <ClCompile Include="src\output_memory_ref_buffer.cpp">
       <Filter>Source Files\output</Filter>
     </ClCompile>
-    <ClCompile Include="output_stream_buffer.cpp">
+    <ClCompile Include="src\output_stream_buffer.cpp">
       <Filter>Source Files\output</Filter>
-    </ClCompile>
-    <ClCompile Include="input_container_buffer.cpp">
-      <Filter>Source Files\input</Filter>
-    </ClCompile>
-    <ClCompile Include="input_buffer_state.cpp">
-      <Filter>Source Files\input</Filter>
-    </ClCompile>
-    <ClCompile Include="input_virtual_buffer.cpp">
-      <Filter>Source Files\input</Filter>
-    </ClCompile>
-    <ClCompile Include="input_buffer_stateful_wrapper.cpp">
-      <Filter>Source Files\input</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

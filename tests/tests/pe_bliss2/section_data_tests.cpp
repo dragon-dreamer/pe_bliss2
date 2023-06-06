@@ -14,8 +14,8 @@
 #include "pe_bliss2/section/section_data.h"
 #include "pe_bliss2/section/section_table.h"
 
-#include "tests/tests/pe_bliss2/input_buffer_mock.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/input_buffer_mock.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace ::testing;
 using namespace pe_bliss::section;

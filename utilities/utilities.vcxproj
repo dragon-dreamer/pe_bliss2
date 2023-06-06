@@ -18,6 +18,21 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\utilities\generic_error.h" />
+    <ClInclude Include="include\utilities\hash.h" />
+    <ClInclude Include="include\utilities\math.h" />
+    <ClInclude Include="include\utilities\safe_uint.h" />
+    <ClInclude Include="include\utilities\scoped_guard.h" />
+    <ClInclude Include="include\utilities\shannon_entropy.h" />
+    <ClInclude Include="include\utilities\static_class.h" />
+    <ClInclude Include="include\utilities\string.h" />
+    <ClInclude Include="include\utilities\variant_helpers.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\generic_error.cpp" />
+    <ClCompile Include="src\shannon_entropy.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -89,7 +104,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -107,7 +122,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -125,7 +140,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -143,7 +158,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -154,21 +169,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="generic_error.h" />
-    <ClInclude Include="hash.h" />
-    <ClInclude Include="math.h" />
-    <ClInclude Include="safe_uint.h" />
-    <ClInclude Include="scoped_guard.h" />
-    <ClInclude Include="shannon_entropy.h" />
-    <ClInclude Include="static_class.h" />
-    <ClInclude Include="string.h" />
-    <ClInclude Include="variant_helpers.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="generic_error.cpp" />
-    <ClCompile Include="shannon_entropy.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

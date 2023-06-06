@@ -9,7 +9,7 @@
 #include "pe_bliss2/packed_utf16_string.h"
 #include "pe_bliss2/resources/lcid.h"
 #include "pe_bliss2/resources/resource_reader.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss;
 using namespace pe_bliss::resources;

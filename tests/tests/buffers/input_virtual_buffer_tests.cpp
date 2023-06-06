@@ -9,7 +9,7 @@
 #include "buffers/input_memory_buffer.h"
 #include "buffers/input_virtual_buffer.h"
 #include "buffers/input_buffer_stateful_wrapper.h"
-#include "tests/tests/buffers/input_buffer_helpers.h"
+#include "tests/buffers/input_buffer_helpers.h"
 
 namespace
 {

@@ -8,7 +8,7 @@
 #include "pe_bliss2/detail/packed_serialization.h"
 #include "pe_bliss2/relocations/relocation_entry.h"
 
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss::relocations;
 

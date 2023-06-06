@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "pe_bliss2/exceptions/arm/arm_exception_directory.h"
-#include "tests/tests/pe_bliss2/directories/arm_common_exception_helpers.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/directories/arm_common_exception_helpers.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss::exceptions;
 using namespace pe_bliss::exceptions::arm;

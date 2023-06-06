@@ -108,7 +108,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)/utilities/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -126,7 +126,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)/utilities/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -144,7 +144,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)/utilities/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -162,7 +162,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(SolutionDir)/utilities/include</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -174,40 +174,40 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="buffer_copy.h" />
-    <ClInclude Include="buffer_interface.h" />
-    <ClInclude Include="input_buffer_interface.h" />
-    <ClInclude Include="input_buffer_section.h" />
-    <ClInclude Include="input_buffer_state.h" />
-    <ClInclude Include="input_buffer_stateful_wrapper.h" />
-    <ClInclude Include="input_container_buffer.h" />
-    <ClInclude Include="input_memory_buffer.h" />
-    <ClInclude Include="input_stream_buffer.h" />
-    <ClInclude Include="input_virtual_buffer.h" />
-    <ClInclude Include="output_buffer_interface.h" />
-    <ClInclude Include="output_memory_buffer.h" />
-    <ClInclude Include="output_memory_ref_buffer.h" />
-    <ClInclude Include="output_stream_buffer.h" />
-    <ClInclude Include="ref_buffer.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="buffer_copy.cpp" />
-    <ClCompile Include="input_buffer_section.cpp" />
-    <ClCompile Include="input_buffer_state.cpp" />
-    <ClCompile Include="input_buffer_stateful_wrapper.cpp" />
-    <ClCompile Include="input_container_buffer.cpp" />
-    <ClCompile Include="input_memory_buffer.cpp" />
-    <ClCompile Include="input_stream_buffer.cpp" />
-    <ClCompile Include="input_virtual_buffer.cpp" />
-    <ClCompile Include="output_memory_buffer.cpp" />
-    <ClCompile Include="output_memory_ref_buffer.cpp" />
-    <ClCompile Include="output_stream_buffer.cpp" />
-    <ClCompile Include="ref_buffer.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\utilities\utilities.vcxproj">
       <Project>{5a33c151-ea42-431c-975f-ff1825af39ed}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\buffers\buffer_copy.h" />
+    <ClInclude Include="include\buffers\buffer_interface.h" />
+    <ClInclude Include="include\buffers\input_buffer_interface.h" />
+    <ClInclude Include="include\buffers\input_buffer_section.h" />
+    <ClInclude Include="include\buffers\input_buffer_state.h" />
+    <ClInclude Include="include\buffers\input_buffer_stateful_wrapper.h" />
+    <ClInclude Include="include\buffers\input_container_buffer.h" />
+    <ClInclude Include="include\buffers\input_memory_buffer.h" />
+    <ClInclude Include="include\buffers\input_stream_buffer.h" />
+    <ClInclude Include="include\buffers\input_virtual_buffer.h" />
+    <ClInclude Include="include\buffers\output_buffer_interface.h" />
+    <ClInclude Include="include\buffers\output_memory_buffer.h" />
+    <ClInclude Include="include\buffers\output_memory_ref_buffer.h" />
+    <ClInclude Include="include\buffers\output_stream_buffer.h" />
+    <ClInclude Include="include\buffers\ref_buffer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\buffer_copy.cpp" />
+    <ClCompile Include="src\input_buffer_section.cpp" />
+    <ClCompile Include="src\input_buffer_state.cpp" />
+    <ClCompile Include="src\input_buffer_stateful_wrapper.cpp" />
+    <ClCompile Include="src\input_container_buffer.cpp" />
+    <ClCompile Include="src\input_memory_buffer.cpp" />
+    <ClCompile Include="src\input_stream_buffer.cpp" />
+    <ClCompile Include="src\input_virtual_buffer.cpp" />
+    <ClCompile Include="src\output_memory_buffer.cpp" />
+    <ClCompile Include="src\output_memory_ref_buffer.cpp" />
+    <ClCompile Include="src\output_stream_buffer.cpp" />
+    <ClCompile Include="src\ref_buffer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,7 +5,7 @@
 
 #include "buffers/input_memory_buffer.h"
 #include "pe_bliss2/resources/pugixml_manifest_accessor.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss;
 using namespace pe_bliss::resources;

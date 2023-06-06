@@ -7,7 +7,7 @@
 #include "pe_bliss2/resources/string_table.h"
 #include "pe_bliss2/resources/string_table_reader.h"
 #include "pe_bliss2/resources/string_table_writer.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss;
 using namespace pe_bliss::resources;

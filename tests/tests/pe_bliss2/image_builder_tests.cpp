@@ -16,7 +16,7 @@
 #include "pe_bliss2/image/image_builder.h"
 #include "pe_bliss2/section/section_header.h"
 
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss;
 

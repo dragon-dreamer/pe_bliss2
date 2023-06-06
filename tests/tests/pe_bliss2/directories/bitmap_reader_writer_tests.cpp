@@ -12,7 +12,7 @@
 #include "pe_bliss2/resources/bitmap_reader.h"
 #include "pe_bliss2/resources/bitmap_writer.h"
 #include "pe_bliss2/resources/resource_reader_errc.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss::resources;
 

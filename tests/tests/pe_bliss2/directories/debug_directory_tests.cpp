@@ -14,7 +14,7 @@
 #include "pe_bliss2/core/file_header.h"
 #include "pe_bliss2/detail/debug/image_debug_directory.h"
 #include "pe_bliss2/packed_c_string.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss::debug;
 

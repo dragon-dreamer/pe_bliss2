@@ -8,8 +8,8 @@
 #include "pe_bliss2/exceptions/exception_directory_loader.h"
 #include "pe_bliss2/exceptions/arm64/arm64_exception_directory_loader.h"
 #include "pe_bliss2/exceptions/arm_common/arm_common_exception_directory_loader.h"
-#include "tests/tests/pe_bliss2/directories/arm_common_exception_helpers.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/directories/arm_common_exception_helpers.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss;
 using namespace pe_bliss::exceptions::arm64;

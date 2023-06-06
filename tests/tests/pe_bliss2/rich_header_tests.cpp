@@ -19,7 +19,7 @@
 #include "pe_bliss2/rich/rich_header_builder.h"
 #include "pe_bliss2/rich/rich_header_loader.h"
 
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 using namespace pe_bliss::rich;
 using namespace pe_bliss::detail::rich;

@@ -15,7 +15,7 @@
 
 #include "pe_bliss2/packed_byte_vector.h"
 
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 #include "utilities/generic_error.h"
 

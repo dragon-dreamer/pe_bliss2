@@ -17,8 +17,8 @@
 #include "pe_bliss2/image/section_data_from_va.h"
 #include "pe_bliss2/pe_types.h"
 
-#include "tests/tests/pe_bliss2/image_helper.h"
-#include "tests/tests/pe_bliss2/pe_error_helper.h"
+#include "tests/pe_bliss2/image_helper.h"
+#include "tests/pe_bliss2/pe_error_helper.h"
 
 namespace
 {

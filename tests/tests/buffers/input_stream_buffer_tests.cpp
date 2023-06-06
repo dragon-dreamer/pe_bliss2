@@ -8,7 +8,7 @@
 #include "buffers/input_stream_buffer.h"
 #include "buffers/input_virtual_buffer.h"
 #include "buffers/input_buffer_section.h"
-#include "tests/tests/buffers/input_buffer_helpers.h"
+#include "tests/buffers/input_buffer_helpers.h"
 
 namespace
 {
