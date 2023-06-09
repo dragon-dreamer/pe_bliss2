@@ -86,7 +86,7 @@ void image_builder::build(const image& instance, buffers::output_buffer_interfac
 		std::throw_with_nested(pe_error(image_builder_errc::invalid_section_table_offset));
 	}
 
-	dos_hdr.serialize(buffer, options.write_structure_virtual_parts);
+	instance.get_dos_header().serialize(buffer, options.write_structure_virtual_parts);
 
 	instance.get_dos_stub().serialize(buffer);
 	if (buffer.wpos() - buffer_start_pos != dos_hdr->e_lfanew)

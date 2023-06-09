@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 
 namespace pe_bliss::detail
@@ -21,10 +22,10 @@ struct image_dos_header
 	std::uint16_t e_cs;
 	std::uint16_t e_lfarlc;
 	std::uint16_t e_ovno;
-	std::uint16_t e_res[4];
+	std::array<std::uint16_t, 4u> e_res;
 	std::uint16_t e_oemid;
 	std::uint16_t e_oeminfo;
-	std::uint16_t e_res2[10];
+	std::array<std::uint16_t, 10u> e_res2;
 	std::uint32_t e_lfanew;
 };
 

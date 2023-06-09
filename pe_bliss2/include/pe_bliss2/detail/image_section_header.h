@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 
 namespace pe_bliss::detail
@@ -7,7 +8,7 @@ namespace pe_bliss::detail
 
 struct image_section_header
 {
-	std::uint8_t name[8];
+	std::array<std::uint8_t, 8u> name;
 	std::uint32_t virtual_size;
 	std::uint32_t virtual_address;
 	std::uint32_t size_of_raw_data;

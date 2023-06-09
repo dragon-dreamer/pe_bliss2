@@ -48,12 +48,12 @@ rva_type section_header::rva_from_section_offset(
 
 std::string_view section_header::get_name() const noexcept
 {
-	auto begin = get_descriptor()->name;
-	auto end = begin + sizeof(detail::image_section_header::name) - 1;
+	auto begin = get_descriptor()->name.data();
+	auto end = begin + sizeof(detail::image_section_header::name) - 1u;
 	while (end >= begin && !*end)
 		--end;
 
-	return { reinterpret_cast<const char*>(get_descriptor()->name),
+	return { reinterpret_cast<const char*>(get_descriptor()->name.data()),
 		static_cast<std::size_t>(end - begin + 1) };
 }
 
@@ -64,7 +64,7 @@ section_header& section_header::set_name(std::string_view name)
 
 	std::fill(std::begin(get_descriptor()->name),
 		std::end(get_descriptor()->name), static_cast<std::uint8_t>(0u));
-	std::copy(std::begin(name), std::end(name), get_descriptor()->name);
+	std::copy(std::begin(name), std::end(name), get_descriptor()->name.data());
 	return *this;
 }
 

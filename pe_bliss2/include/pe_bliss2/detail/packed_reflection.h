@@ -13,6 +13,17 @@
 namespace pe_bliss::detail
 {
 
+namespace impl
+{
+template<typename T>
+struct is_array final : std::false_type {};
+template<typename T, std::size_t N>
+struct is_array<std::array<T, N>> final : std::true_type
+{
+	static constexpr auto count = N;
+};
+} //namespace impl
+
 class packed_reflection : utilities::static_class
 {
 private:
@@ -67,17 +78,17 @@ private:
 
 public:
 	template<standard_layout T>
-	[[nodiscard]] static consteval auto get_type_size()
+	[[nodiscard]] static consteval auto get_type_size() noexcept
 	{
 		using type = std::remove_cvref_t<T>;
-		if constexpr (std::is_class_v<type>)
+		if constexpr (impl::is_array<type>::value)
+		{
+			using base_type = typename type::value_type;
+			return get_type_size<base_type>() * impl::is_array<type>::count;
+		}
+		else if constexpr (std::is_class_v<type>)
 		{
 			return get_fields_size<type>();
-		}
-		else if constexpr (std::is_array_v<type>)
-		{
-			using base_type = std::remove_all_extents_t<type>;
-			return get_type_size<base_type>() * sizeof(type) / sizeof(base_type);
 		}
 		else
 		{
@@ -86,7 +97,7 @@ public:
 	}
 
 	template<auto FieldPtr>
-	[[nodiscard]] static consteval std::size_t get_field_offset()
+	[[nodiscard]] static consteval std::size_t get_field_offset() noexcept
 	{
 		constexpr auto result = get_field_offset_impl<FieldPtr>();
 		using class_type = typename member_type_helper<decltype(FieldPtr)>::class_type;

@@ -180,12 +180,12 @@ constexpr test_types serialized_values{
 	{
 		0x12345678u,
 		{ 0x1122u, 0x3344u, 0x5566u },
-		{ { { 0xabu, 0x12345678u, 0xaabbu, 0x1122334455667788ull },
-			{ 0xcdu, 0x23456789u, 0xccddu, 0x2233445566778899ull },
-			{ 0xdeu, 0x34567890u, 0xeeffu, 0x3344556677889900ull } },
-		  { { 0xefu, 0x45678901u, 0x1122u, 0x445566778899aabbull },
-			{ 0xf1u, 0x56789012u, 0x3344u, 0x5566778899aabbccull },
-			{ 0x12u, 0x67890123u, 0x5566u, 0x778899aabbccddeeull } }
+		{ 0xabu, 0x12345678u, 0xaabbu, 0x1122334455667788ull,
+			0xcdu, 0x23456789u, 0xccddu, 0x2233445566778899ull,
+			0xdeu, 0x34567890u, 0xeeffu, 0x3344556677889900ull,
+		  0xefu, 0x45678901u, 0x1122u, 0x445566778899aabbull,
+			0xf1u, 0x56789012u, 0x3344u, 0x5566778899aabbccull,
+			0x12u, 0x67890123u, 0x5566u, 0x778899aabbccddeeull
 		},
 		{ 0xffu, 0xeeu }
 	}
@@ -349,7 +349,7 @@ TEST(PackedSerializationTests, DeserializeUntilFieldTest2)
 			auto obj = std::get<nested_short>(serialized_values);
 			std::fill(&obj.c[0][0], &obj.c[0][0]
 				+ sizeof(obj.c) / sizeof(obj.c[0][0]), simple{});
-			std::fill(obj.d, obj.d + std::size(obj.d), 0u);
+			std::fill(obj.d.begin(), obj.d.end(), 0u);
 			test_deserialization<Deserializer>(
 				serialized_representations[6].substr(0, size_nested_until_b),
 				serialized_representations_reversed[6].substr(0, size_nested_until_b),
@@ -403,7 +403,7 @@ TEST(PackedSerializationTests, DeserializeUntilSizePartialTest)
 		+ sizeof(obj.c) / sizeof(obj.c[0][0]), simple{});
 	obj.c[0][0].a = backup.a;
 	obj.c[0][0].b = backup.b;
-	std::fill(obj.d, obj.d + std::size(obj.d), 0u);
+	std::fill(obj.d.begin(), obj.d.end(), 0u);
 	test_deserialization<deserializer_nested_b_partial>(
 		serialized_representations[6].substr(0, size_b_partial2),
 		serialized_representations_reversed[6].substr(0, size_b_partial2),

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 
 #include "pe_bliss2/detail/concepts.h"
@@ -642,8 +643,8 @@ struct image_hot_patch_base
 
 struct image_hot_patch_hashes
 {
-	std::uint8_t sha256[32];
-	std::uint8_t sha1[20];
+	std::array<std::uint8_t, 32u> sha256;
+	std::array<std::uint8_t, 20u> sha1;
 };
 
 constexpr std::uint32_t image_hot_patch_base_obligatory = 0x00000001;
@@ -762,9 +763,9 @@ struct image_enclave_config
 	//The size of each image in the array of images that the ImportList member points to.
 	std::uint32_t import_entry_size;
 	//The family identifier that the author of the enclave assigned to the enclave.
-	std::uint8_t family_id[image_enclave_short_id_length];
+	std::array<std::uint8_t, image_enclave_short_id_length> family_id;
 	//The image identifier that the author of the enclave assigned to the enclave.
-	std::uint8_t image_id[image_enclave_short_id_length];
+	std::array<std::uint8_t, image_enclave_short_id_length> image_id;
 	//The version number that the author of the enclave assigned to the enclave.
 	std::uint32_t image_version;
 	//The security version number that the author of the enclave assigned to the enclave.
@@ -796,11 +797,11 @@ struct image_enclave_import
 	std::uint32_t minimum_security_version;
 	//The unique identifier of the primary module for the enclave, if the MatchType member is
 	//IMAGE_ENCLAVE_IMPORT_MATCH_UNIQUE_ID. Otherwise, the author identifier of the primary module for the enclave.
-	std::uint8_t unique_or_author_id[image_enclave_long_id_length];
+	std::array<std::uint8_t, image_enclave_long_id_length> unique_or_author_id;
 	//The family identifier of the primary module for the enclave.
-	std::uint8_t family_id[image_enclave_short_id_length];
+	std::array<std::uint8_t, image_enclave_short_id_length> family_id;
 	//The image identifier of the primary module for the enclave.
-	std::uint8_t image_id[image_enclave_short_id_length];
+	std::array<std::uint8_t, image_enclave_short_id_length> image_id;
 	//The relative virtual address of a NULL-terminated string that contains the same value found in the import directory for the image.
 	std::uint32_t import_name;
 	//Reserved.

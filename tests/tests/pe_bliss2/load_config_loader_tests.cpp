@@ -811,9 +811,9 @@ public:
 		const auto& config = *dir.get_enclave_config();
 		EXPECT_TRUE(config.get_extra_data().value().empty());
 		const auto* image_id = reinterpret_cast<const std::byte*>(
-			config.get_descriptor()->image_id);
+			config.get_descriptor()->image_id.data());
 		EXPECT_EQ(std::vector(image_id,
-			image_id + std::size(config.get_descriptor()->image_id)),
+			image_id + config.get_descriptor()->image_id.size()),
 			std::vector(enclave_image_id.begin(), enclave_image_id.end()));
 
 		const auto& imports = config.get_imports();
@@ -823,9 +823,9 @@ public:
 		EXPECT_EQ(imports[0].get_extra_data().value(),
 			std::vector(enclave_import0_extra.begin(), enclave_import0_extra.end()));
 		const auto* family_id0 = reinterpret_cast<const std::byte*>(
-			imports[0].get_descriptor()->family_id);
+			imports[0].get_descriptor()->family_id.data());
 		EXPECT_EQ(std::vector(family_id0,
-			family_id0 + std::size(imports[0].get_descriptor()->family_id)),
+			family_id0 + imports[0].get_descriptor()->family_id.size()),
 			std::vector(enclave_family_id.begin(), enclave_family_id.end()));
 
 		if (import_count == enclave_import_count)
@@ -840,9 +840,9 @@ public:
 			EXPECT_EQ(imports[1].get_extra_data().value(),
 				std::vector(enclave_import1_extra.begin(), enclave_import1_extra.end()));
 			const auto* unique_or_author_id1 = reinterpret_cast<const std::byte*>(
-				imports[0].get_descriptor()->unique_or_author_id);
+				imports[0].get_descriptor()->unique_or_author_id.data());
 			EXPECT_EQ(std::vector(unique_or_author_id1,
-				unique_or_author_id1 + std::size(imports[0].get_descriptor()->unique_or_author_id)),
+				unique_or_author_id1 + imports[0].get_descriptor()->unique_or_author_id.size()),
 				std::vector(enclave_import1_uid.begin(), enclave_import1_uid.end()));
 		}
 		else

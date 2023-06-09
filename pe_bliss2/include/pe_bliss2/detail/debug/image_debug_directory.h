@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 
 namespace pe_bliss::detail::debug
@@ -125,7 +126,7 @@ struct image_coff_symbols_header
 
 struct coff_symbol
 {
-	std::uint8_t name[8u];
+	std::array<std::uint8_t, 8u> name;
 	//or union with:
 	//unsigned long e_zeroes;
 	//unsigned long e_offset;
@@ -226,7 +227,7 @@ struct image_debug_misc
 	std::uint32_t data_type; //type of misc data, see defines
 	std::uint32_t length; //total length of record, rounded to four byte multiple.
 	std::uint8_t unicode; //TRUE if data is unicode string
-	std::uint8_t reserved[3];
+	std::array<std::uint8_t, 3u> reserved;
 	// std::uint8_t data[1]; //actual data
 };
 
@@ -255,7 +256,7 @@ constexpr std::uint32_t debug_signature_nb11 = 0x3131424eu;
 
 struct omf_signature
 {
-	std::uint8_t signature[4]; //"NBxx"
+	std::array<std::uint8_t, 4u> signature; //"NBxx"
 	std::uint32_t filepos; //offset in file
 };
 
@@ -271,7 +272,7 @@ struct cv_info_pdb20
 struct cv_info_pdb70
 {
 	std::uint32_t cv_signature;
-	std::uint8_t signature[16]; //GUID
+	std::array<std::uint8_t, 16u> signature; //GUID
 	std::uint32_t age;
 	//std::uint8_t pdb_file_name[1];
 };

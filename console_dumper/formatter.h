@@ -37,6 +37,17 @@ struct value_info
 	bool output_value = true;
 };
 
+namespace impl
+{
+template<typename T>
+struct is_array final : std::false_type {};
+template<typename T, std::size_t N>
+struct is_array<std::array<T, N>> final : std::true_type
+{
+	static constexpr auto count = N;
+};
+} //namespace impl
+
 class formatter
 {
 public:
@@ -51,13 +62,13 @@ public:
 	template<typename Array>
 	static void format_array_extents(std::string& value)
 	{
-		if constexpr (std::is_array_v<Array>)
+		if constexpr (impl::is_array<Array>::value)
 		{
 			value += '[';
-			value += std::to_string(std::extent_v<Array, 0>);
+			value += std::to_string(impl::is_array<Array>::count);
 			value += ']';
 
-			format_array_extents<std::remove_extent_t<Array>>(value);
+			format_array_extents<typename Array::value_type>(value);
 		}
 	}
 
@@ -92,7 +103,7 @@ public:
 	}
 
 	template<typename T, std::size_t N>
-	void print_value(const value_info& info, T(&arr)[N], std::size_t left_padding = 0)
+	void print_value(const value_info& info, const std::array<T, N>& arr, std::size_t left_padding = 0)
 	{
 		if (!info.output_value)
 		{
@@ -487,7 +498,8 @@ private:
 	{
 		boost::pfr::for_each_field(obj, [this, &infos, &field_index, &formatted_names,
 			&abs_offset, &rel_offset, &obj, max_name_length, &max_field_offset] (const auto& value) {
-			if constexpr (std::is_class_v<std::remove_cvref_t<decltype(value)>>)
+			if constexpr (std::is_class_v<std::remove_cvref_t<decltype(value)>>
+				&& !impl::is_array<std::remove_cvref_t<decltype(value)>>::value)
 			{
 				print_structure_impl(value, infos, formatted_names, max_name_length,
 					max_field_offset, field_index, abs_offset, rel_offset);
@@ -534,7 +546,8 @@ private:
 	{
 		boost::pfr::for_each_field(obj, [&infos, &field_index,
 			&max_name_length, &formatted_names] (const auto& value) {
-			if constexpr (std::is_class_v<std::remove_cvref_t<decltype(value)>>)
+			if constexpr (std::is_class_v<std::remove_cvref_t<decltype(value)>>
+				&& !impl::is_array<std::remove_cvref_t<decltype(value)>>::value)
 			{
 				format_array_names(value, infos, max_name_length, formatted_names, field_index);
 			}

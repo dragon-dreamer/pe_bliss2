@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -12,53 +13,97 @@
 #include "pe_bliss2/detail/concepts.h"
 #include "pe_bliss2/detail/endian_convert.h"
 #include "pe_bliss2/detail/packed_reflection.h"
+#include "utilities/static_class.h"
 
 namespace pe_bliss::detail
 {
 
 template<boost::endian::order StructureFieldsEndianness
 	= boost::endian::order::native>
-class packed_serialization
+class packed_serialization : utilities::static_class
 {
-private:
-	template<typename Value, byte_pointer BytePointer>
-	static byte_pointer auto deserialize_value(Value& value,
-		BytePointer data) noexcept
+public:
+	template<standard_layout T, byte_pointer BytePointer>
+	static BytePointer deserialize(T& result, BytePointer data) noexcept
 	{
-		using type = std::remove_cvref_t<Value>;
-		if constexpr (std::is_class_v<type>)
+		using type = std::remove_cvref_t<T>;
+		if constexpr (impl::is_array<type>::value)
 		{
-			data = deserialize(value, data);
+			if constexpr (std::is_class_v<typename type::value_type>
+				|| StructureFieldsEndianness != boost::endian::order::native)
+			{
+				for (auto& elem : result)
+					data = deserialize(elem, data);
+			}
+			else
+			{
+				std::memcpy(result.data(), data, sizeof(type));
+				data += sizeof(type);
+			}
 		}
-		else if constexpr (std::is_array_v<type>
-			&& std::is_class_v<std::remove_all_extents_t<type>>)
+		else if constexpr (std::is_class_v<type>)
 		{
-			for (auto& elem : value)
-				data = deserialize(elem, data);
+			boost::pfr::for_each_field(result, [&data](auto& value) {
+				data = deserialize(value, data);
+			});
 		}
 		else
 		{
-			std::memcpy(&value, data, sizeof(type));
+			std::memcpy(&result, data, sizeof(type));
 			convert_endianness<StructureFieldsEndianness,
-				boost::endian::order::native>(value);
+				boost::endian::order::native>(result);
 			data += sizeof(type);
 		}
 		return data;
 	}
 
-	template<typename Value, byte_pointer BytePointer>
-	static byte_pointer auto serialize_value(const Value& value, BytePointer data) noexcept
+	template<auto FieldPtr, standard_layout T, byte_pointer BytePointer>
+	static BytePointer deserialize_until(T& result, BytePointer data) noexcept
 	{
-		using type = std::remove_cvref_t<decltype(value)>;
-		if constexpr (std::is_class_v<type>)
+		auto stop_ptr = reinterpret_cast<std::uintptr_t>(&(result.*FieldPtr));
+		boost::pfr::for_each_field(result, [&result, &data, stop_ptr] (auto& value) {
+			if (reinterpret_cast<std::uintptr_t>(&value) > stop_ptr)
+				return;
+			data = deserialize(value, data);
+		});
+		return data;
+	}
+
+	template<standard_layout T, byte_pointer BytePointer>
+	static BytePointer deserialize_until(T& result, BytePointer data, std::size_t size) noexcept
+	{
+		constexpr auto full_size = packed_reflection::get_type_size<T>();
+		std::byte full[full_size]{};
+		if (size > full_size)
+			size = full_size;
+		std::memcpy(full, data, size);
+		deserialize(result, full);
+		return data + size;
+	}
+
+	template<standard_layout T>
+	static std::byte* serialize(const T& value, std::byte* data) noexcept
+	{
+		using type = std::remove_cvref_t<T>;
+		if constexpr (impl::is_array<type>::value)
 		{
-			data = serialize(value, data);
+			if constexpr (std::is_class_v<typename type::value_type>
+				|| StructureFieldsEndianness != boost::endian::order::native)
+			{
+				for (auto& elem : value)
+					data = serialize(elem, data);
+			}
+			else
+			{
+				std::memcpy(data, value.data(), sizeof(type));
+				data += sizeof(type);
+			}
 		}
-		else if constexpr (std::is_array_v<type>
-			&& std::is_class_v<std::remove_all_extents_t<type>>)
+		else if constexpr (std::is_class_v<type>)
 		{
-			for (auto& elem : value)
-				data = serialize(elem, data);
+			boost::pfr::for_each_field(value, [&data](const auto& value) {
+				data = serialize(value, data);
+			});
 		}
 		else
 		{
@@ -79,49 +124,6 @@ private:
 		return data;
 	}
 
-public:
-	template<standard_layout T, byte_pointer BytePointer>
-	static BytePointer deserialize(T& result, BytePointer data) noexcept
-	{
-		boost::pfr::for_each_field(result, [&data] (auto& value) {
-			data = deserialize_value(value, data);
-		});
-		return data;
-	}
-
-	template<auto FieldPtr, standard_layout T, byte_pointer BytePointer>
-	static BytePointer deserialize_until(T& result, BytePointer data) noexcept
-	{
-		auto stop_ptr = reinterpret_cast<std::uintptr_t>(&(result.*FieldPtr));
-		boost::pfr::for_each_field(result, [&result, &data, stop_ptr] (auto& value) {
-			if (reinterpret_cast<std::uintptr_t>(&value) > stop_ptr)
-				return;
-			data = deserialize_value(value, data);
-		});
-		return data;
-	}
-
-	template<standard_layout T, byte_pointer BytePointer>
-	static BytePointer deserialize_until(T& result, BytePointer data, std::size_t size) noexcept
-	{
-		constexpr auto full_size = packed_reflection::get_type_size<T>();
-		std::byte full[full_size]{};
-		if (size > full_size)
-			size = full_size;
-		std::memcpy(full, data, size);
-		deserialize(result, full);
-		return data + size;
-	}
-
-	template<standard_layout T>
-	static std::byte* serialize(const T& value, std::byte* data) noexcept
-	{
-		boost::pfr::for_each_field(value, [&data] (const auto& value) {
-			data = serialize_value(value, data);
-		});
-		return data;
-	}
-
 	template<auto FieldPtr, standard_layout T>
 	static std::byte* serialize_until(const T& value, std::byte* data) noexcept
 	{
@@ -129,7 +131,7 @@ public:
 		boost::pfr::for_each_field(value, [&data, stop_ptr] (const auto& value) {
 			if (reinterpret_cast<std::uintptr_t>(&value) > stop_ptr)
 				return;
-			data = serialize_value(value, data);
+			data = serialize(value, data);
 		});
 		return data;
 	}

@@ -940,7 +940,7 @@ void dump_enclave_flags(formatter& fmt,
 struct dump_enclave_id
 {
 	template<std::size_t N>
-	void operator()(formatter& fmt, const std::uint8_t(&arr)[N], std::size_t left_padding) const
+	void operator()(formatter& fmt, const std::array<std::uint8_t, N>& arr, std::size_t left_padding) const
 	{
 		color_changer changer(fmt.get_stream(), fmt.get_color_provider(),
 			fmt.value_fg_color, fmt.value_bg_color);

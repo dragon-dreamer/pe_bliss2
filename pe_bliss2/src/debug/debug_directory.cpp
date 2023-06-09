@@ -449,8 +449,8 @@ coff_debug_directory_details parse_coff_directory(
 		else
 		{
 			auto& name = symbol.get_name().emplace<std::string>(
-				reinterpret_cast<const char*>(descriptor->name),
-				sizeof(descriptor->name));
+				reinterpret_cast<const char*>(descriptor->name.data()),
+				descriptor->name.size());
 			while (!name.empty() && name.back() == '\0')
 				name.pop_back();
 		}
