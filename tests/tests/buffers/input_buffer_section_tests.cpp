@@ -2,7 +2,7 @@
 #include <cstddef>
 #include <limits>
 #include <memory>
-#include <ranges>
+#include <span>
 #include <system_error>
 #include <vector>
 
@@ -41,13 +41,13 @@ TEST(BufferTests, InputBufferSectionTest)
 	static constexpr std::size_t size = 5u;
 	buffers::input_buffer_section section(buffer, offset, size);
 	test_input_buffer(section,
-		data | std::views::drop(offset) | std::views::take(size),
+		std::span(data.begin() + offset, data.begin() + offset + size),
 		absolute_offset + offset, relative_offset + offset);
 
 	++offset;
 	auto section2 = buffers::reduce(buffer, offset, size);
 	test_input_buffer(*section2,
-		data | std::views::drop(offset) | std::views::take(size),
+		std::span(data.begin() + offset, data.begin() + offset + size),
 		absolute_offset + offset, relative_offset + offset);
 }
 
@@ -89,8 +89,8 @@ TEST(BufferTests, InputBufferSectionReduceTest)
 	static constexpr std::size_t reduced_size = 5u;
 	auto reduced_section = section.reduce(reduced_offset, reduced_size);
 	test_input_buffer(reduced_section,
-		data | std::views::drop(reduced_offset + offset)
-		| std::views::take(reduced_size),
+		std::span(data.begin() + reduced_offset + offset,
+			data.begin() + reduced_offset + offset + reduced_size),
 		reduced_offset + offset, reduced_offset + offset);
 	EXPECT_TRUE(reduced_section.is_stateless());
 }

@@ -85,9 +85,9 @@ std::uint32_t get_aligned_thunk_offset(std::uint32_t base, std::uint32_t offset)
 	return aligned_thunk_rva.value() - thunk_rva.value();
 }
 
-template<template <detail::executable_pointer, typename Descriptor> typename ImportedLibrary,
+template<template <detail::executable_pointer, typename> typename ImportedLibrary,
 	detail::executable_pointer Va, typename Descriptor>
-built_size get_built_size_impl(const std::vector<ImportedLibrary<Va, Descriptor>>& libraries,
+built_size get_lib_built_size_impl(const std::vector<ImportedLibrary<Va, Descriptor>>& libraries,
 	const builder_options& options)
 {
 	static constexpr auto descriptor_size
@@ -120,13 +120,11 @@ built_size get_built_size_impl(const std::vector<ImportedLibrary<Va, Descriptor>
 	};
 }
 
-template<template <detail::executable_pointer, typename Descriptor> typename ImportedLibrary,
-	typename Descriptor>
-built_size get_built_size_impl(const import_directory_base<ImportedLibrary, Descriptor>& directory,
-	const builder_options& options)
+template<typename Directory>
+built_size get_built_size_impl(const Directory& directory, const builder_options& options)
 {
 	return std::visit([&options] (const auto& libraries) {
-		return get_built_size_impl(libraries, options);
+		return get_lib_built_size_impl(libraries, options);
 	}, directory.get_list());
 }
 

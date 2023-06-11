@@ -2,7 +2,12 @@
 
 #include <compare>
 #include <cstdint>
-#include <format>
+#ifdef __cpp_lib_format
+#	include <format>
+#else //__cpp_lib_format
+#	include <cstdio>
+#	include <cwchar>
+#endif //__cpp_lib_format
 #include <functional>
 #include <optional>
 #include <string>
@@ -206,6 +211,7 @@ private:
 		std::uint32_t ms, std::uint32_t ls)
 	{
 		const auto ver = version_from_components(ms, ls);
+#ifdef __cpp_lib_format
 		if constexpr (std::is_same_v<CharType, char>)
 		{
 			return std::format("{}.{}.{}.{}", ver.major,
@@ -216,6 +222,20 @@ private:
 			return std::format(L"{}.{}.{}.{}", ver.major,
 				ver.minor, ver.build, ver.revision);
 		}
+#else //__cpp_lib_format
+		CharType buf[64]{};
+		if constexpr (std::is_same_v<CharType, char>)
+		{
+			std::sprintf(buf, "%hu.%hu.%hu.%hu",
+				ver.major, ver.minor, ver.build, ver.revision);
+		}
+		else
+		{
+			std::swprintf(buf, sizeof(buf) / sizeof(CharType), L"%hu.%hu.%hu.%hu",
+				ver.major, ver.minor, ver.build, ver.revision);
+		}
+		return buf;
+#endif //__cpp_lib_format
 	}
 };
 

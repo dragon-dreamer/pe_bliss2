@@ -406,15 +406,37 @@ public:
 	//Relative offset from image_base_relocation RVA
 	[[nodiscard]]
 	std::uint32_t get_page_relative_offset() const noexcept
-		requires (!dynamic_relocation_base<RelocationType>::is_scalar);
+		requires (!dynamic_relocation_base<RelocationType>::is_scalar)
+	{
+		return get_relocation()->metadata & page_relative_offset_mask;
+	}
+
 	[[nodiscard]]
 	std::uint32_t get_page_relative_offset() const noexcept
-		requires (dynamic_relocation_base<RelocationType>::is_scalar);
+		requires (dynamic_relocation_base<RelocationType>::is_scalar)
+	{
+		return get_relocation().get() & page_relative_offset_mask;
+	}
 
 	void set_page_relative_offset(std::uint32_t offset)
-		requires (!dynamic_relocation_base<RelocationType>::is_scalar);
+		requires (!dynamic_relocation_base<RelocationType>::is_scalar)
+	{
+		if (offset > max_page_reative_offset)
+			throw pe_error(load_config_errc::invalid_page_relative_offset);
+
+		get_relocation()->metadata &= ~page_relative_offset_mask;
+		get_relocation()->metadata |= (offset & page_relative_offset_mask);
+	}
+
 	void set_page_relative_offset(std::uint32_t offset)
-		requires (dynamic_relocation_base<RelocationType>::is_scalar);
+		requires (dynamic_relocation_base<RelocationType>::is_scalar)
+	{
+		if (offset > max_page_reative_offset)
+			throw pe_error(load_config_errc::invalid_page_relative_offset);
+
+		get_relocation().get() &= ~page_relative_offset_mask;
+		get_relocation().get() |= (offset & page_relative_offset_mask);
+	}
 
 public:
 	[[nodiscard]]
@@ -1077,7 +1099,7 @@ public:
 	[[nodiscard]]
 	extra_data_type& get_extra_data() & noexcept;
 	[[nodiscard]]
-	extra_data_type& get_extra_data() && noexcept;
+	extra_data_type get_extra_data() && noexcept;
 
 public:
 	[[nodiscard]]

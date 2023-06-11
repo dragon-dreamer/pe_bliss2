@@ -5,6 +5,7 @@
 #include <memory>
 #include <system_error>
 #include <type_traits>
+#include <utility>
 #include <variant>
 
 #include "buffers/input_buffer_interface.h"
@@ -64,12 +65,28 @@ public:
 private:
 	struct buffer_ref
 	{
+		buffer_ref() noexcept = default;
+
+		explicit buffer_ref(input_buffer_ptr buffer) noexcept
+			: buffer(std::move(buffer))
+		{
+		}
+
 		input_buffer_ptr buffer;
 	};
 
 	struct copied_buffer
 	{
-		input_container_buffer* container;
+		copied_buffer() noexcept = default;
+
+		explicit copied_buffer(input_container_buffer* container,
+			input_buffer_ptr buffer) noexcept
+			: container(container)
+			, buffer(std::move(buffer))
+		{
+		}
+
+		input_container_buffer* container{};
 		input_buffer_ptr buffer;
 	};
 

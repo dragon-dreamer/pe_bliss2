@@ -133,19 +133,21 @@ void load_extended_unwind_record(
 			descriptor.copy_metadata_from(first_byte);
 			descriptor[0] = first_byte.get();
 
-			if constexpr (code.length > 1u)
+			using code_type = std::remove_cvref_t<decltype(code)>;
+
+			if constexpr (code_type::length > 1u)
 			{
 				std::size_t bytes_read{};
 				try
 				{
-					if (current_rva + (code.length - 1u) > last_opcode_rva)
+					if (current_rva + (code_type::length - 1u) > last_opcode_rva)
 						throw pe_error(utilities::generic_errc::buffer_overrun);
 
 					//Set allow_virtual_data=true, as the check is done on the next line
 					bytes_read = section_data_from_rva(instance, current_rva.value(),
 						options.include_headers, true)
-						->read(0u, code.length - 1u, &descriptor.value()[1]);
-					if (bytes_read != code.length - 1u && !options.allow_virtual_data)
+						->read(0u, code_type::length - 1u, &descriptor.value()[1]);
+					if (bytes_read != code_type::length - 1u && !options.allow_virtual_data)
 						throw pe_error(utilities::generic_errc::buffer_overrun);
 				}
 				catch (const std::system_error&)
@@ -154,8 +156,8 @@ void load_extended_unwind_record(
 					throw;
 				}
 				descriptor.set_physical_size(descriptor.physical_size() + bytes_read);
-				descriptor.set_data_size(code.length);
-				current_rva += code.length - 1u;
+				descriptor.set_data_size(code_type::length);
+				current_rva += code_type::length - 1u;
 			}
 		}, unwind_codes.back());
 		++opcode_index;
@@ -205,11 +207,11 @@ void load_runtime_function(const image::image& instance, const LoaderOptions& op
 	{
 		load_extended_unwind_record(
 			instance, options, func.get_descriptor()->unwind_data,
-			func, func.get_unwind_info().emplace<ExtendedUnwindRecord>());
+			func, func.get_unwind_info().template emplace<ExtendedUnwindRecord>());
 	}
 	else
 	{
-		func.get_unwind_info().emplace<PackedUnwindData>(
+		func.get_unwind_info().template emplace<PackedUnwindData>(
 			func.get_descriptor()->unwind_data);
 	}
 }

@@ -193,7 +193,7 @@ void arm64x_dynamic_relocation_sized_base::set_size(std::uint8_t size)
 }
 
 template<typename... Bases>
-arm64x_dynamic_relocation_add_delta_base<Bases...>::multiplier
+typename arm64x_dynamic_relocation_add_delta_base<Bases...>::multiplier
 	arm64x_dynamic_relocation_add_delta_base<Bases...>::get_multiplier() const noexcept
 {
 	return (get_relocation()->metadata & 0x8000u)
@@ -201,7 +201,7 @@ arm64x_dynamic_relocation_add_delta_base<Bases...>::multiplier
 }
 
 template<typename... Bases>
-arm64x_dynamic_relocation_add_delta_base<Bases...>::sign
+typename arm64x_dynamic_relocation_add_delta_base<Bases...>::sign
 	arm64x_dynamic_relocation_add_delta_base<Bases...>::get_sign() const noexcept
 {
 	return (get_relocation()->metadata & 0x4000u) ? sign::minus : sign::plus;

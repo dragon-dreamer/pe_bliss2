@@ -3,10 +3,13 @@
 namespace utilities
 {
 
-template<typename... Ts>
-struct [[nodiscard]] overloaded : Ts...
+template<typename... T>
+struct [[nodiscard]] overloaded : T...
 {
-	using Ts::operator()...;
+	using T::operator()...;
 };
+
+template<typename... T>
+overloaded(T...) -> overloaded<T...>;
 
 } //namespace utilities

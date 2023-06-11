@@ -7,7 +7,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <optional>
-#include <ranges>
 #include <string>
 #include <string_view>
 #include <system_error>
@@ -169,6 +168,23 @@ const manifest_category manifest_category_instance;
 using guid_version_type = std::pair<std::string_view,
 	pe_bliss::resources::assembly_supported_os>;
 
+//We use this helper instead of std::views::split
+//to support older versions of gcc
+template<typename Func>
+void for_each_part(std::string_view str, std::string_view delim, const Func& func)
+{
+	if (str.empty())
+		return;
+	for (std::string_view::size_type off{}, next{}; off != std::string_view::npos; off = next)
+	{
+		next = str.find(delim, off);
+		if (!func(str.substr(off, next - off)))
+			break;
+		if (next != std::string_view::npos)
+			next += delim.size();
+	}
+}
+
 template<std::size_t Parts>
 auto parse_version_impl(std::string_view version_string)
 {
@@ -177,11 +193,10 @@ auto parse_version_impl(std::string_view version_string)
 	std::array<std::uint16_t, Parts> version_numbers{};
 	static constexpr std::string_view delim{ "." };
 	std::size_t number_index{};
-	for (const auto& word : std::views::split(version_string, delim)) {
+	for_each_part(version_string, delim, [&](std::string_view number_str) {
 		if (number_index >= version_numbers.size())
 			throw pe_error(manifest_errc::invalid_version_string);
 
-		std::string_view number_str(word.begin(), word.end());
 		auto res = std::from_chars(number_str.data(),
 			number_str.data() + number_str.size(),
 			version_numbers[number_index++]);
@@ -190,7 +205,8 @@ auto parse_version_impl(std::string_view version_string)
 		{
 			throw pe_error(manifest_errc::invalid_version_string);
 		}
-	}
+		return true;
+	});
 	if (number_index != version_numbers.size())
 		throw pe_error(manifest_errc::invalid_version_string);
 
@@ -402,21 +418,25 @@ dpi_awareness_value dpi_awareness::get_dpi_awareness_value() const noexcept
 		return dpi_awareness_value::absent;
 
 	static constexpr std::string_view delim{ "," };
-	for (const auto& word : std::views::split(*dpi_awareness_, delim)) {
-		std::string_view elem(word.begin(), word.end());
+	dpi_awareness_value value = dpi_awareness_value::unrecognized;
+	for_each_part(*dpi_awareness_, delim, [&](std::string_view elem) {
 		utilities::trim(elem);
 
 		if (utilities::iequal(elem, "system"))
-			return dpi_awareness_value::dpi_aware_system;
-		if (utilities::iequal(elem, "permonitor"))
-			return dpi_awareness_value::dpi_aware_per_monitor;
-		if (utilities::iequal(elem, "permonitorv2"))
-			return dpi_awareness_value::dpi_aware_per_monitor_v2;
-		if (utilities::iequal(elem, "unaware"))
-			return dpi_awareness_value::dpi_unaware;
-	}
+			value = dpi_awareness_value::dpi_aware_system;
+		else if (utilities::iequal(elem, "permonitor"))
+			value = dpi_awareness_value::dpi_aware_per_monitor;
+		else if (utilities::iequal(elem, "permonitorv2"))
+			value = dpi_awareness_value::dpi_aware_per_monitor_v2;
+		else if (utilities::iequal(elem, "unaware"))
+			value = dpi_awareness_value::dpi_unaware;
+		else
+			return true;
 
-	return dpi_awareness_value::unrecognized;
+		return false;
+	});
+
+	return value;
 }
 
 heap_type_value heap_type::get_heap_type() const noexcept
@@ -552,8 +572,7 @@ ole_misc::value misc_status_string_to_value(const std::optional<std::string>& st
 
 	std::uint32_t result{};
 	static constexpr std::string_view delim{ "," };
-	for (const auto& word : std::views::split(*str, delim)) {
-		std::string_view elem(word.begin(), word.end());
+	for_each_part(*str, delim, [&](std::string_view elem) {
 		utilities::trim(elem);
 		std::string elem_copy(elem);
 		utilities::to_lower_inplace(elem_copy);
@@ -562,7 +581,8 @@ ole_misc::value misc_status_string_to_value(const std::optional<std::string>& st
 			result |= it->second;
 		else
 			result |= ole_misc::unknown;
-	}
+		return true;
+	});
 
 	return static_cast<ole_misc::value>(result);
 }
@@ -632,27 +652,28 @@ bool com_progid::is_valid() const noexcept
 com_progid com_progid::parse(std::string_view str)
 {
 	static constexpr std::string_view delim{ "." };
-	auto view = std::views::split(str, delim);
-	auto it = view.begin();
-	auto end = view.end();
 	com_progid result;
-	if (it != end)
-	{
-		result.get_program().assign((*it).begin(), (*it).end());
-		if (++it != end) {
-			result.get_component().assign((*it).begin(), (*it).end());
-			if (++it != end) {
-				result.get_version().emplace(it.base(), str.end());
-			}
-
-			if (!result.is_valid())
-				throw pe_error(manifest_errc::invalid_com_progid);
-
-			return result;
+	std::size_t index = 0;
+	for_each_part(str, delim, [&] (std::string_view part) {
+		switch (index)
+		{
+		case 0u:
+			result.get_program().assign(part);
+			break;
+		case 1u:
+			result.get_component().assign(part);
+			break;
+		case 2u:
+			result.get_version().emplace(part.data(),
+				str.size() - (part.data() - str.data()));
+			return false;
 		}
-	}
-
-	throw pe_error(manifest_errc::invalid_com_progid);
+		++index;
+		return true;
+	});
+	if (!result.is_valid())
+		throw pe_error(manifest_errc::invalid_com_progid);
+	return result;
 }
 
 template<typename... Bases>
@@ -690,8 +711,7 @@ std::optional<com_typelib_flags::value> com_typelib_base<Bases...>::get_flags() 
 
 	std::uint32_t result{};
 	static constexpr std::string_view delim{ "," };
-	for (const auto& word : std::views::split(*flags_, delim)) {
-		std::string_view elem(word.begin(), word.end());
+	for_each_part(*flags_, delim, [&](std::string_view elem) {
 		utilities::trim(elem);
 		if (utilities::iequal(elem, "RESTRICTED"))
 			result |= com_typelib_flags::restricted;
@@ -703,7 +723,8 @@ std::optional<com_typelib_flags::value> com_typelib_base<Bases...>::get_flags() 
 			result |= com_typelib_flags::has_disk_image;
 		else
 			result |= com_typelib_flags::unknown;
-	}
+		return true;
+	});
 
 	return static_cast<com_typelib_flags::value>(result);
 }
@@ -1448,21 +1469,21 @@ native_manifest_details parse_manifest(const manifest_accessor_interface& access
 	return result;
 }
 
-template assembly_identity_base<>;
-template assembly_identity_base<error_list>;
-template assembly_supported_os_list_base<>;
-template assembly_supported_os_list_base<error_list>;
-template assembly_file_base<>;
-template assembly_file_base<error_list>;
-template com_class_base<>;
-template com_class_base<error_list>;
-template com_typelib_base<>;
-template com_typelib_base<error_list>;
-template com_interface_external_proxy_stub_base<>;
-template com_interface_external_proxy_stub_base<error_list>;
-template com_interface_proxy_stub_base<>;
-template com_interface_proxy_stub_base<error_list>;
-template window_class_base<>;
-template window_class_base<error_list>;
+template class assembly_identity_base<>;
+template class assembly_identity_base<error_list>;
+template class assembly_supported_os_list_base<>;
+template class assembly_supported_os_list_base<error_list>;
+template class assembly_file_base<>;
+template class assembly_file_base<error_list>;
+template class com_class_base<>;
+template class com_class_base<error_list>;
+template class com_typelib_base<>;
+template class com_typelib_base<error_list>;
+template class com_interface_external_proxy_stub_base<>;
+template class com_interface_external_proxy_stub_base<error_list>;
+template class com_interface_proxy_stub_base<>;
+template class com_interface_proxy_stub_base<error_list>;
+template class window_class_base<>;
+template class window_class_base<error_list>;
 
 } //namespace pe_bliss::resources

@@ -163,8 +163,8 @@ TEST(PackedUtf16StringTests, SerializeTest1)
 		buffers::output_memory_ref_buffer buffer(serialized2.data(),
 			str.data_size());
 		ASSERT_EQ(str.serialize(buffer, true), str.data_size());
-		EXPECT_EQ(serialized2[0], std::byte{ str.virtual_string_length() & 0xff });
-		EXPECT_EQ(serialized2[1], std::byte{ (str.virtual_string_length() >> CHAR_BIT) & 0xff });
+		EXPECT_EQ(serialized2[0], std::byte(str.virtual_string_length() & 0xff));
+		EXPECT_EQ(serialized2[1], std::byte((str.virtual_string_length() >> CHAR_BIT) & 0xff));
 		EXPECT_TRUE(std::equal(serialized_view.cbegin()
 			+ sizeof(std::byte) + sizeof(std::uint16_t),
 			serialized_view.cbegin() + str.physical_size(),
@@ -204,8 +204,8 @@ TEST(PackedUtf16StringTests, SerializeTest2)
 	EXPECT_EQ(serialized[0], std::byte{ 1 });
 	ASSERT_EQ(str.serialize(serialized.data(), str.data_size(), true),
 		str.data_size());
-	EXPECT_EQ(serialized[0], std::byte{ str.virtual_string_length() & 0xff });
-	EXPECT_EQ(serialized[1], std::byte{ (str.virtual_string_length() >> CHAR_BIT) & 0xff });
+	EXPECT_EQ(serialized[0], std::byte(str.virtual_string_length() & 0xff));
+	EXPECT_EQ(serialized[1], std::byte((str.virtual_string_length() >> CHAR_BIT) & 0xff));
 	EXPECT_TRUE(std::equal(serialized_view.cbegin()
 		+ sizeof(std::byte) + sizeof(std::uint16_t),
 		serialized_view.cbegin() + str.physical_size(),

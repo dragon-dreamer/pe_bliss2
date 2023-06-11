@@ -382,10 +382,10 @@ public:
 	{
 		auto guard_flags_offset = detail::packed_reflection::get_field_offset<
 			GuardFlagsPtr>();
-		dir[guard_flags_offset++] = std::byte{ flags & 0xffu };
-		dir[guard_flags_offset++] = std::byte{ (flags >> 8u) & 0xffu };
-		dir[guard_flags_offset++] = std::byte{ (flags >> 16u) & 0xffu };
-		dir[guard_flags_offset] = std::byte{ (flags >> 24u) & 0xffu };
+		dir[guard_flags_offset++] = std::byte(flags & 0xffu);
+		dir[guard_flags_offset++] = std::byte((flags >> 8u) & 0xffu);
+		dir[guard_flags_offset++] = std::byte((flags >> 16u) & 0xffu);
+		dir[guard_flags_offset] = std::byte((flags >> 24u) & 0xffu);
 	}
 
 	auto override_guard_flags(std::uint32_t flags)
@@ -951,9 +951,9 @@ public:
 	static constexpr std::array guard_cf_stride_data0{
 		std::byte{1}, std::byte{2}, std::byte{3} };
 	static constexpr std::array guard_cf_stride_data1{
-		std::byte{load_config::gfids_flags::fid_xfg}, std::byte{5}, std::byte{6} };
+		std::byte(load_config::gfids_flags::fid_xfg), std::byte{5}, std::byte{6} };
 	static constexpr std::array guard_cf_stride_data2{
-		std::byte{load_config::gfids_flags::fid_xfg | 1u}, std::byte{5}, std::byte{6} };
+		std::byte(load_config::gfids_flags::fid_xfg | 1u), std::byte{5}, std::byte{6} };
 	static constexpr std::uint64_t guard_cf_export_suppression_table_va
 		= section_rva + image_base + 0x280u;
 	static constexpr std::uint64_t guard_cf_longjump_table_va
@@ -982,26 +982,26 @@ public:
 		std::byte{2}, std::byte{1}, //major_version
 		std::byte{5}, std::byte{4}, //minor_version
 		//global_flags_clear
-		std::byte{global_flags_clear & 0xffu}, std::byte{(global_flags_clear >> 8u) & 0xffu},
-		std::byte{(global_flags_clear >> 16u) & 0xffu}, std::byte{(global_flags_clear >> 24u) & 0xffu},
+		std::byte(global_flags_clear & 0xffu), std::byte((global_flags_clear >> 8u) & 0xffu),
+		std::byte((global_flags_clear >> 16u) & 0xffu), std::byte((global_flags_clear >> 24u) & 0xffu),
 		//global_flags_set
-		std::byte{global_flags_set & 0xffu}, std::byte{(global_flags_set >> 8u) & 0xffu},
-		std::byte{(global_flags_set >> 16u) & 0xffu}, std::byte{(global_flags_set >> 24u) & 0xffu},
+		std::byte(global_flags_set & 0xffu), std::byte((global_flags_set >> 8u) & 0xffu),
+		std::byte((global_flags_set >> 16u) & 0xffu), std::byte((global_flags_set >> 24u) & 0xffu),
 		std::byte{7}, std::byte{8}, std::byte{9}, std::byte{0xau}, //critical_section_default_timeout
 		std::byte{9}, std::byte{8}, std::byte{7}, std::byte{6}, //de_commit_free_block_threshold
 		std::byte{5}, std::byte{4}, std::byte{3}, std::byte{2}, //de_commit_total_free_threshold
 		//lock_prefix_table
-		std::byte{lock_prefix_table_va & 0xffu}, std::byte{(lock_prefix_table_va >> 8u) & 0xffu},
-		std::byte{(lock_prefix_table_va >> 16u) & 0xffu}, std::byte{(lock_prefix_table_va >> 24u) & 0xffu},
+		std::byte(lock_prefix_table_va & 0xffu), std::byte((lock_prefix_table_va >> 8u) & 0xffu),
+		std::byte((lock_prefix_table_va >> 16u) & 0xffu), std::byte((lock_prefix_table_va >> 24u) & 0xffu),
 		std::byte{0}, std::byte{1}, std::byte{2}, std::byte{3}, //maximum_allocation_size
 		std::byte{1}, std::byte{2}, std::byte{3}, std::byte{4}, //virtual_memory_threshold
 		//process_heap_flags
-		std::byte{process_heap_flags & 0xffu}, std::byte{(process_heap_flags >> 8u) & 0xffu},
-		std::byte{(process_heap_flags >> 16u) & 0xffu}, std::byte{(process_heap_flags >> 24u) & 0xffu},
+		std::byte(process_heap_flags & 0xffu), std::byte((process_heap_flags >> 8u) & 0xffu),
+		std::byte((process_heap_flags >> 16u) & 0xffu), std::byte((process_heap_flags >> 24u) & 0xffu),
 		std::byte{2}, std::byte{3}, std::byte{4}, std::byte{5}, //process_affinity_mask
 		std::byte{6}, std::byte{7}, //csd_version
 		//dependent_load_flags
-		std::byte{dependent_load_flags & 0xffu}, std::byte{(dependent_load_flags >> 8u) & 0xffu},
+		std::byte(dependent_load_flags & 0xffu), std::byte((dependent_load_flags >> 8u) & 0xffu),
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //edit_list
 		std::byte{}, std::byte{}, std::byte{}, std::byte{0xff}, //security_cookie
 	};
@@ -1011,21 +1011,21 @@ public:
 		std::byte{2}, std::byte{1}, //major_version
 		std::byte{5}, std::byte{4}, //minor_version
 		//global_flags_clear
-		std::byte{global_flags_clear & 0xffu}, std::byte{(global_flags_clear >> 8u) & 0xffu},
-		std::byte{(global_flags_clear >> 16u) & 0xffu}, std::byte{(global_flags_clear >> 24u) & 0xffu},
+		std::byte(global_flags_clear & 0xffu), std::byte((global_flags_clear >> 8u) & 0xffu),
+		std::byte((global_flags_clear >> 16u) & 0xffu), std::byte((global_flags_clear >> 24u) & 0xffu),
 		//global_flags_set
-		std::byte{global_flags_set & 0xffu}, std::byte{(global_flags_set >> 8u) & 0xffu},
-		std::byte{(global_flags_set >> 16u) & 0xffu}, std::byte{(global_flags_set >> 24u) & 0xffu},
+		std::byte(global_flags_set & 0xffu), std::byte((global_flags_set >> 8u) & 0xffu),
+		std::byte((global_flags_set >> 16u) & 0xffu), std::byte((global_flags_set >> 24u) & 0xffu),
 		std::byte{7}, std::byte{8}, std::byte{9}, std::byte{0xau}, //critical_section_default_timeout
 		std::byte{9}, std::byte{8}, std::byte{7}, std::byte{6}, //de_commit_free_block_threshold
 		std::byte{9}, std::byte{8}, std::byte{7}, std::byte{6},
 		std::byte{5}, std::byte{4}, std::byte{3}, std::byte{2}, //de_commit_total_free_threshold
 		std::byte{5}, std::byte{4}, std::byte{3}, std::byte{2},
 		//lock_prefix_table
-		std::byte{lock_prefix_table_va & 0xffu}, std::byte{(lock_prefix_table_va >> 8u) & 0xffu},
-		std::byte{(lock_prefix_table_va >> 16u) & 0xffu}, std::byte{(lock_prefix_table_va >> 24u) & 0xffu},
-		std::byte{(lock_prefix_table_va >> 32u) & 0xffu}, std::byte{(lock_prefix_table_va >> 40u) & 0xffu},
-		std::byte{(lock_prefix_table_va >> 48u) & 0xffu}, std::byte{(lock_prefix_table_va >> 56u) & 0xffu},
+		std::byte(lock_prefix_table_va & 0xffu), std::byte((lock_prefix_table_va >> 8u) & 0xffu),
+		std::byte((lock_prefix_table_va >> 16u) & 0xffu), std::byte((lock_prefix_table_va >> 24u) & 0xffu),
+		std::byte((lock_prefix_table_va >> 32u) & 0xffu), std::byte((lock_prefix_table_va >> 40u) & 0xffu),
+		std::byte((lock_prefix_table_va >> 48u) & 0xffu), std::byte((lock_prefix_table_va >> 56u) & 0xffu),
 		std::byte{0}, std::byte{1}, std::byte{2}, std::byte{3}, //maximum_allocation_size
 		std::byte{0}, std::byte{1}, std::byte{2}, std::byte{3},
 		std::byte{1}, std::byte{2}, std::byte{3}, std::byte{4}, //virtual_memory_threshold
@@ -1033,11 +1033,11 @@ public:
 		std::byte{2}, std::byte{3}, std::byte{4}, std::byte{5}, //process_affinity_mask
 		std::byte{2}, std::byte{3}, std::byte{4}, std::byte{5},
 		//process_heap_flags
-		std::byte{process_heap_flags & 0xffu}, std::byte{(process_heap_flags >> 8u) & 0xffu},
-		std::byte{(process_heap_flags >> 16u) & 0xffu}, std::byte{(process_heap_flags >> 24u) & 0xffu},
+		std::byte(process_heap_flags & 0xffu), std::byte((process_heap_flags >> 8u) & 0xffu),
+		std::byte((process_heap_flags >> 16u) & 0xffu), std::byte((process_heap_flags >> 24u) & 0xffu),
 		std::byte{6}, std::byte{7}, //csd_version
 		//dependent_load_flags
-		std::byte{dependent_load_flags & 0xffu}, std::byte{(dependent_load_flags >> 8u) & 0xffu},
+		std::byte(dependent_load_flags & 0xffu), std::byte((dependent_load_flags >> 8u) & 0xffu),
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //edit_list
 		std::byte{}, std::byte{}, std::byte{}, std::byte{},
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //security_cookie
@@ -1048,20 +1048,20 @@ public:
 
 	static constexpr std::array se_handler_table32{
 		//se_handler_table
-		std::byte{se_handler_table_va & 0xffu}, std::byte{(se_handler_table_va >> 8u) & 0xffu},
-		std::byte{(se_handler_table_va >> 16u) & 0xffu}, std::byte{(se_handler_table_va >> 24u) & 0xffu},
+		std::byte(se_handler_table_va & 0xffu), std::byte((se_handler_table_va >> 8u) & 0xffu),
+		std::byte((se_handler_table_va >> 16u) & 0xffu), std::byte((se_handler_table_va >> 24u) & 0xffu),
 		//se_handler_count
-		std::byte{se_handler_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte(se_handler_count), std::byte{}, std::byte{}, std::byte{},
 	};
 
 	static constexpr std::array se_handler_table64{
 		//se_handler_table
-		std::byte{se_handler_table_va & 0xffu}, std::byte{(se_handler_table_va >> 8u) & 0xffu},
-		std::byte{(se_handler_table_va >> 16u) & 0xffu}, std::byte{(se_handler_table_va >> 24u) & 0xffu},
-		std::byte{(se_handler_table_va >> 32u) & 0xffu}, std::byte{(se_handler_table_va >> 40u) & 0xffu},
-		std::byte{(se_handler_table_va >> 48u) & 0xffu}, std::byte{(se_handler_table_va >> 56u) & 0xffu},
+		std::byte(se_handler_table_va & 0xffu), std::byte((se_handler_table_va >> 8u) & 0xffu),
+		std::byte((se_handler_table_va >> 16u) & 0xffu), std::byte((se_handler_table_va >> 24u) & 0xffu),
+		std::byte((se_handler_table_va >> 32u) & 0xffu), std::byte((se_handler_table_va >> 40u) & 0xffu),
+		std::byte((se_handler_table_va >> 48u) & 0xffu), std::byte((se_handler_table_va >> 56u) & 0xffu),
 		//se_handler_count
-		std::byte{se_handler_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte(se_handler_count), std::byte{}, std::byte{}, std::byte{},
 		std::byte{}, std::byte{}, std::byte{}, std::byte{},
 	};
 
@@ -1073,15 +1073,15 @@ public:
 		//guard_cf_dispatch_function_pointer
 		std::byte{2}, std::byte{2}, std::byte{2}, std::byte{2},
 		//guard_cf_function_table
-		std::byte{guard_cf_function_table_va & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 8u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 16u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 24u) & 0xffu},
+		std::byte(guard_cf_function_table_va & 0xffu),
+		std::byte((guard_cf_function_table_va >> 8u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 16u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 24u) & 0xffu),
 		//guard_cf_function_count
-		std::byte{guard_cf_function_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte(guard_cf_function_count), std::byte{}, std::byte{}, std::byte{},
 		//guard_flags
-		std::byte{guard_flags & 0xffu}, std::byte{(guard_flags >> 8u) & 0xffu},
-		std::byte{(guard_flags >> 16u) & 0xffu}, std::byte{(guard_flags >> 24u) & 0xffu},
+		std::byte(guard_flags & 0xffu), std::byte((guard_flags >> 8u) & 0xffu),
+		std::byte((guard_flags >> 16u) & 0xffu), std::byte((guard_flags >> 24u) & 0xffu),
 	};
 
 	static constexpr std::array cf_guard64{
@@ -1092,86 +1092,86 @@ public:
 		std::byte{2}, std::byte{2}, std::byte{2}, std::byte{2},
 		std::byte{2}, std::byte{2}, std::byte{2}, std::byte{2},
 		//guard_cf_function_table
-		std::byte{guard_cf_function_table_va & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 8u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 16u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 24u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 32u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 40u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 48u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 56u) & 0xffu},
+		std::byte(guard_cf_function_table_va & 0xffu),
+		std::byte((guard_cf_function_table_va >> 8u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 16u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 24u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 32u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 40u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 48u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 56u) & 0xffu),
 		//guard_cf_function_count
-		std::byte{guard_cf_function_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte(guard_cf_function_count), std::byte{}, std::byte{}, std::byte{},
 		std::byte{}, std::byte{}, std::byte{}, std::byte{},
 		//guard_flags
-		std::byte{guard_flags & 0xffu}, std::byte{(guard_flags >> 8u) & 0xffu},
-		std::byte{(guard_flags >> 16u) & 0xffu}, std::byte{(guard_flags >> 24u) & 0xffu},
+		std::byte(guard_flags & 0xffu), std::byte((guard_flags >> 8u) & 0xffu),
+		std::byte((guard_flags >> 16u) & 0xffu), std::byte((guard_flags >> 24u) & 0xffu),
 	};
 
 	static constexpr std::array cf_guard_ex32{
 		//guard_address_taken_iat_entry_table
-		std::byte{guard_cf_function_table_va & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 8u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 16u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 24u) & 0xffu},
+		std::byte(guard_cf_function_table_va & 0xffu),
+		std::byte((guard_cf_function_table_va >> 8u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 16u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 24u) & 0xffu),
 		//guard_address_taken_iat_entry_count
-		std::byte{guard_cf_function_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte(guard_cf_function_count), std::byte{}, std::byte{}, std::byte{},
 		//guard_long_jump_target_table
-		std::byte{guard_cf_function_table_va & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 8u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 16u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 24u) & 0xffu},
+		std::byte(guard_cf_function_table_va & 0xffu),
+		std::byte((guard_cf_function_table_va >> 8u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 16u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 24u) & 0xffu),
 		//guard_long_jump_target_count
-		std::byte{guard_cf_function_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte(guard_cf_function_count), std::byte{}, std::byte{}, std::byte{},
 	};
 
 	static constexpr std::array cf_guard_ex64{
 		//guard_address_taken_iat_entry_table
-		std::byte{guard_cf_function_table_va & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 8u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 16u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 24u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 32u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 40u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 48u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 56u) & 0xffu},
+		std::byte(guard_cf_function_table_va & 0xffu),
+		std::byte((guard_cf_function_table_va >> 8u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 16u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 24u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 32u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 40u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 48u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 56u) & 0xffu),
 		//guard_address_taken_iat_entry_count
-		std::byte{guard_cf_function_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte(guard_cf_function_count), std::byte{}, std::byte{}, std::byte{},
 		std::byte{}, std::byte{}, std::byte{}, std::byte{},
 		//guard_long_jump_target_table
-		std::byte{guard_cf_function_table_va & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 8u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 16u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 24u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 32u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 40u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 48u) & 0xffu},
-		std::byte{(guard_cf_function_table_va >> 56u) & 0xffu},
+		std::byte(guard_cf_function_table_va & 0xffu),
+		std::byte((guard_cf_function_table_va >> 8u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 16u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 24u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 32u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 40u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 48u) & 0xffu),
+		std::byte((guard_cf_function_table_va >> 56u) & 0xffu),
 		//guard_long_jump_target_count
-		std::byte{guard_cf_function_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte(guard_cf_function_count), std::byte{}, std::byte{}, std::byte{},
 		std::byte{}, std::byte{}, std::byte{}, std::byte{},
 	};
 
 	static constexpr std::array cf_guard_function_table{
 		//rva0
-		std::byte{guard_cf_function_table_rva0 & 0xffu},
-		std::byte{(guard_cf_function_table_rva0 >> 8u) & 0xffu},
-		std::byte{(guard_cf_function_table_rva0 >> 16u) & 0xffu},
-		std::byte{(guard_cf_function_table_rva0 >> 24u) & 0xffu},
+		std::byte(guard_cf_function_table_rva0 & 0xffu),
+		std::byte((guard_cf_function_table_rva0 >> 8u) & 0xffu),
+		std::byte((guard_cf_function_table_rva0 >> 16u) & 0xffu),
+		std::byte((guard_cf_function_table_rva0 >> 24u) & 0xffu),
 		//stride
 		guard_cf_stride_data0[0], guard_cf_stride_data0[1], guard_cf_stride_data0[2],
 		//rva1
-		std::byte{guard_cf_function_table_rva1 & 0xffu},
-		std::byte{(guard_cf_function_table_rva1 >> 8u) & 0xffu},
-		std::byte{(guard_cf_function_table_rva1 >> 16u) & 0xffu},
-		std::byte{(guard_cf_function_table_rva1 >> 24u) & 0xffu},
+		std::byte(guard_cf_function_table_rva1 & 0xffu),
+		std::byte((guard_cf_function_table_rva1 >> 8u) & 0xffu),
+		std::byte((guard_cf_function_table_rva1 >> 16u) & 0xffu),
+		std::byte((guard_cf_function_table_rva1 >> 24u) & 0xffu),
 		//stride
 		guard_cf_stride_data1[0], guard_cf_stride_data1[1], guard_cf_stride_data1[2],
 		//rva2
-		std::byte{guard_cf_function_table_rva2 & 0xffu},
-		std::byte{(guard_cf_function_table_rva2 >> 8u) & 0xffu},
-		std::byte{(guard_cf_function_table_rva2 >> 16u) & 0xffu},
-		std::byte{(guard_cf_function_table_rva2 >> 24u) & 0xffu},
+		std::byte(guard_cf_function_table_rva2 & 0xffu),
+		std::byte((guard_cf_function_table_rva2 >> 8u) & 0xffu),
+		std::byte((guard_cf_function_table_rva2 >> 16u) & 0xffu),
+		std::byte((guard_cf_function_table_rva2 >> 24u) & 0xffu),
 		//stride
 		guard_cf_stride_data2[0], guard_cf_stride_data2[1], guard_cf_stride_data2[2],
 	};
@@ -1196,24 +1196,24 @@ public:
 	static constexpr std::array hybrid_pe32{
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //dynamic_value_reloc_table
 		//chpe_metadata_pointer
-		std::byte{chpe_metadata_va & 0xffu},
-		std::byte{(chpe_metadata_va >> 8u) & 0xffu},
-		std::byte{(chpe_metadata_va >> 16u) & 0xffu},
-		std::byte{(chpe_metadata_va >> 24u) & 0xffu},
+		std::byte(chpe_metadata_va & 0xffu),
+		std::byte((chpe_metadata_va >> 8u) & 0xffu),
+		std::byte((chpe_metadata_va >> 16u) & 0xffu),
+		std::byte((chpe_metadata_va >> 24u) & 0xffu),
 	};
 
 	static constexpr std::array hybrid_pe64{
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //dynamic_value_reloc_table
 		std::byte{}, std::byte{}, std::byte{}, std::byte{},
 		//chpe_metadata_pointer
-		std::byte{chpe_metadata_va & 0xffu},
-		std::byte{(chpe_metadata_va >> 8u) & 0xffu},
-		std::byte{(chpe_metadata_va >> 16u) & 0xffu},
-		std::byte{(chpe_metadata_va >> 24u) & 0xffu},
-		std::byte{(chpe_metadata_va >> 32u) & 0xffu},
-		std::byte{(chpe_metadata_va >> 40u) & 0xffu},
-		std::byte{(chpe_metadata_va >> 48u) & 0xffu},
-		std::byte{(chpe_metadata_va >> 56u) & 0xffu},
+		std::byte(chpe_metadata_va & 0xffu),
+		std::byte((chpe_metadata_va >> 8u) & 0xffu),
+		std::byte((chpe_metadata_va >> 16u) & 0xffu),
+		std::byte((chpe_metadata_va >> 24u) & 0xffu),
+		std::byte((chpe_metadata_va >> 32u) & 0xffu),
+		std::byte((chpe_metadata_va >> 40u) & 0xffu),
+		std::byte((chpe_metadata_va >> 48u) & 0xffu),
+		std::byte((chpe_metadata_va >> 56u) & 0xffu),
 	};
 
 	static constexpr std::uint32_t cphe_code_address_range_count = 3u;
@@ -1223,12 +1223,12 @@ public:
 	static constexpr std::array chpe_descriptor_arm64{
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //version
 		//cphe_code_address_range_offset
-		std::byte{cphe_code_address_range_rva & 0xffu},
-		std::byte{(cphe_code_address_range_rva >> 8u) & 0xffu},
-		std::byte{(cphe_code_address_range_rva >> 16u) & 0xffu},
-		std::byte{(cphe_code_address_range_rva >> 24u) & 0xffu},
+		std::byte(cphe_code_address_range_rva & 0xffu),
+		std::byte((cphe_code_address_range_rva >> 8u) & 0xffu),
+		std::byte((cphe_code_address_range_rva >> 16u) & 0xffu),
+		std::byte((cphe_code_address_range_rva >> 24u) & 0xffu),
 		//cphe_code_address_range_count
-		std::byte{cphe_code_address_range_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte(cphe_code_address_range_count), std::byte{}, std::byte{}, std::byte{},
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //x64_code_ranges_to_entry_points_table
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //arm64x_redirection_metadata_table
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //dispatch_call_function_pointer_no_redirection
@@ -1242,8 +1242,8 @@ public:
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //arm64x_redirection_metadata_table_entry_count
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //unknown_rva2
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //unknown_rva3
-		std::byte{extra_rfe_table}, std::byte{}, std::byte{}, std::byte{}, //extra_rfe_table
-		std::byte{extra_rfe_table_size}, std::byte{}, std::byte{}, std::byte{}, //extra_rfe_table_size
+		std::byte(extra_rfe_table), std::byte{}, std::byte{}, std::byte{}, //extra_rfe_table
+		std::byte(extra_rfe_table_size), std::byte{}, std::byte{}, std::byte{}, //extra_rfe_table_size
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //dispatch_function_pointer
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //copy_of_auxiliary_import_address_table
 	};
@@ -1265,34 +1265,34 @@ public:
 	};
 	static constexpr std::array chpe_range_entries_arm64{
 		//rva
-		std::byte{chpe_range_flags_arm64[0] | (chpe_range[0] & 0xffu)},
-		std::byte{(chpe_range[0] >> 8u) & 0xffu},
-		std::byte{(chpe_range[0] >> 16u) & 0xffu},
-		std::byte{(chpe_range[0] >> 24u) & 0xffu},
+		std::byte(chpe_range_flags_arm64[0] | (chpe_range[0] & 0xffu)),
+		std::byte((chpe_range[0] >> 8u) & 0xffu),
+		std::byte((chpe_range[0] >> 16u) & 0xffu),
+		std::byte((chpe_range[0] >> 24u) & 0xffu),
 		std::byte{5}, std::byte{}, std::byte{}, std::byte{}, //length
 		//rva
-		std::byte{chpe_range_flags_arm64[1] | (chpe_range[1] & 0xffu)},
-		std::byte{(chpe_range[1] >> 8u) & 0xffu},
-		std::byte{(chpe_range[1] >> 16u) & 0xffu},
-		std::byte{(chpe_range[1] >> 24u) & 0xffu},
+		std::byte(chpe_range_flags_arm64[1] | (chpe_range[1] & 0xffu)),
+		std::byte((chpe_range[1] >> 8u) & 0xffu),
+		std::byte((chpe_range[1] >> 16u) & 0xffu),
+		std::byte((chpe_range[1] >> 24u) & 0xffu),
 		std::byte{6}, std::byte{}, std::byte{}, std::byte{}, //length
 		//rva
-		std::byte{chpe_range_flags_arm64[2] | (chpe_range[2] & 0xffu)},
-		std::byte{(chpe_range[2] >> 8u) & 0xffu},
-		std::byte{(chpe_range[2] >> 16u) & 0xffu},
-		std::byte{(chpe_range[2] >> 24u) & 0xffu},
+		std::byte(chpe_range_flags_arm64[2] | (chpe_range[2] & 0xffu)),
+		std::byte((chpe_range[2] >> 8u) & 0xffu),
+		std::byte((chpe_range[2] >> 16u) & 0xffu),
+		std::byte((chpe_range[2] >> 24u) & 0xffu),
 		std::byte{7}, std::byte{}, std::byte{}, std::byte{0xfu}, //length
 	};
 
 	static constexpr std::array chpe_descriptor_x86{
 		std::byte{2}, std::byte{}, std::byte{}, std::byte{}, //version
 		//cphe_code_address_range_offset
-		std::byte{cphe_code_address_range_rva & 0xffu},
-		std::byte{(cphe_code_address_range_rva >> 8u) & 0xffu},
-		std::byte{(cphe_code_address_range_rva >> 16u) & 0xffu},
-		std::byte{(cphe_code_address_range_rva >> 24u) & 0xffu},
+		std::byte(cphe_code_address_range_rva & 0xffu),
+		std::byte((cphe_code_address_range_rva >> 8u) & 0xffu),
+		std::byte((cphe_code_address_range_rva >> 16u) & 0xffu),
+		std::byte((cphe_code_address_range_rva >> 24u) & 0xffu),
 		//cphe_code_address_range_count
-		std::byte{cphe_code_address_range_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte(cphe_code_address_range_count), std::byte{}, std::byte{}, std::byte{},
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //wow_a64_exception_handler_function_pointer
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //wow_a64_dispatch_call_function_pointer
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //wow_a64_dispatch_indirect_call_function_pointer
@@ -1305,22 +1305,22 @@ public:
 
 	static constexpr std::array chpe_range_entries_x86{
 		//rva
-		std::byte{chpe_range_flags_x86[0] | (chpe_range[0] & 0xffu)},
-		std::byte{(chpe_range[0] >> 8u) & 0xffu},
-		std::byte{(chpe_range[0] >> 16u) & 0xffu},
-		std::byte{(chpe_range[0] >> 24u) & 0xffu},
+		std::byte(chpe_range_flags_x86[0] | (chpe_range[0] & 0xffu)),
+		std::byte((chpe_range[0] >> 8u) & 0xffu),
+		std::byte((chpe_range[0] >> 16u) & 0xffu),
+		std::byte((chpe_range[0] >> 24u) & 0xffu),
 		std::byte{5}, std::byte{}, std::byte{}, std::byte{}, //length
 		//rva
-		std::byte{chpe_range_flags_x86[1] | (chpe_range[1] & 0xffu)},
-		std::byte{(chpe_range[1] >> 8u) & 0xffu},
-		std::byte{(chpe_range[1] >> 16u) & 0xffu},
-		std::byte{(chpe_range[1] >> 24u) & 0xffu},
+		std::byte(chpe_range_flags_x86[1] | (chpe_range[1] & 0xffu)),
+		std::byte((chpe_range[1] >> 8u) & 0xffu),
+		std::byte((chpe_range[1] >> 16u) & 0xffu),
+		std::byte((chpe_range[1] >> 24u) & 0xffu),
 		std::byte{6}, std::byte{}, std::byte{}, std::byte{}, //length
 		//rva
-		std::byte{chpe_range_flags_x86[2] | (chpe_range[2] & 0xffu)},
-		std::byte{(chpe_range[2] >> 8u) & 0xffu},
-		std::byte{(chpe_range[2] >> 16u) & 0xffu},
-		std::byte{(chpe_range[2] >> 24u) & 0xffu},
+		std::byte(chpe_range_flags_x86[2] | (chpe_range[2] & 0xffu)),
+		std::byte((chpe_range[2] >> 8u) & 0xffu),
+		std::byte((chpe_range[2] >> 16u) & 0xffu),
+		std::byte((chpe_range[2] >> 24u) & 0xffu),
 		std::byte{7}, std::byte{}, std::byte{}, std::byte{0xfu}, //length
 	};
 
@@ -1335,10 +1335,10 @@ public:
 		std::byte{}, std::byte{}, std::byte{}, std::byte{},
 		std::byte{}, std::byte{}, std::byte{}, std::byte{},
 		//dynamic_value_reloc_table_offset
-		std::byte{dvrt_offset & 0xffu},
-		std::byte{(dvrt_offset >> 8u) & 0xffu},
-		std::byte{(dvrt_offset >> 16u) & 0xffu},
-		std::byte{(dvrt_offset >> 24u) & 0xffu},
+		std::byte(dvrt_offset & 0xffu),
+		std::byte((dvrt_offset >> 8u) & 0xffu),
+		std::byte((dvrt_offset >> 16u) & 0xffu),
+		std::byte((dvrt_offset >> 24u) & 0xffu),
 		//dynamic_value_reloc_table_section
 		std::byte{1}, std::byte{},
 		//reserved2
@@ -1384,7 +1384,7 @@ public:
 
 		//prologue
 		std::byte{2}, //prologue_byte_count
-		std::byte{dvrt2_v2_prologue_data[0]}, std::byte{dvrt2_v2_prologue_data[1]}, //prologue
+		std::byte(dvrt2_v2_prologue_data[0]), std::byte(dvrt2_v2_prologue_data[1]), //prologue
 
 		//base relocations 0
 		std::byte{0x00}, std::byte{0x11}, std::byte{}, std::byte{}, //virtual_address
@@ -1409,12 +1409,12 @@ public:
 		std::byte{}, //epilogue_byte_count
 		std::byte{3}, //branch_descriptor_element_size
 		std::byte{3}, std::byte{}, //branch_descriptor_count
-		std::byte{dvrt2_v2_branch_descriptor0 & 0xffu},
-		std::byte{(dvrt2_v2_branch_descriptor0 >> 8u) & 0xffu}, //branch descriptor 0
-		std::byte{dvrt2_v2_branch_descriptor1 & 0xffu},
-		std::byte{(dvrt2_v2_branch_descriptor1 >> 8u) & 0xffu}, //branch descriptor 1
-		std::byte{dvrt2_v2_branch_descriptor2 & 0xffu},
-		std::byte{(dvrt2_v2_branch_descriptor2 >> 8u) & 0xffu}, //branch descriptor 2
+		std::byte(dvrt2_v2_branch_descriptor0 & 0xffu),
+		std::byte((dvrt2_v2_branch_descriptor0 >> 8u) & 0xffu), //branch descriptor 0
+		std::byte(dvrt2_v2_branch_descriptor1 & 0xffu),
+		std::byte((dvrt2_v2_branch_descriptor1 >> 8u) & 0xffu), //branch descriptor 1
+		std::byte(dvrt2_v2_branch_descriptor2 & 0xffu),
+		std::byte((dvrt2_v2_branch_descriptor2 >> 8u) & 0xffu), //branch descriptor 2
 		//extra branch descriptor data
 		dvrt2_v2_branch_descriptor_data0,
 		dvrt2_v2_branch_descriptor_data1,
@@ -1431,10 +1431,10 @@ public:
 	static constexpr std::array dvrt_header_v2{
 		std::byte{2}, std::byte{}, std::byte{}, std::byte{}, //version
 		//size
-		std::byte{dvrt_v2_size & 0xffu},
-		std::byte{(dvrt_v2_size >> 8u) & 0xffu},
-		std::byte{(dvrt_v2_size >> 16u) & 0xffu},
-		std::byte{(dvrt_v2_size >> 24u) & 0xffu},
+		std::byte(dvrt_v2_size & 0xffu),
+		std::byte((dvrt_v2_size >> 8u) & 0xffu),
+		std::byte((dvrt_v2_size >> 16u) & 0xffu),
+		std::byte((dvrt_v2_size >> 24u) & 0xffu),
 	};
 	
 	static constexpr std::size_t dvrt_v1_relocation_count = 6u;
@@ -1496,18 +1496,18 @@ public:
 		std::byte{0x00}, std::byte{0x15}, std::byte{}, std::byte{}, //virtual_address
 		std::byte{20}, std::byte{}, std::byte{}, std::byte{}, //size_of_block
 		//dvrt 1 metadata
-		std::byte{dvrt1_v1_base_reloc1_metadata1_0 & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc1_metadata1_0 >> 8u) & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc1_metadata1_0 >> 16u) & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc1_metadata1_0 >> 24u) & 0xffu},
-		std::byte{dvrt1_v1_base_reloc1_metadata1_1 & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc1_metadata1_1 >> 8u) & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc1_metadata1_1 >> 16u) & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc1_metadata1_1 >> 24u) & 0xffu},
-		std::byte{dvrt1_v1_base_reloc1_metadata1_2 & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc1_metadata1_2 >> 8u) & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc1_metadata1_2 >> 16u) & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc1_metadata1_2 >> 24u) & 0xffu},
+		std::byte(dvrt1_v1_base_reloc1_metadata1_0 & 0xffu),
+		std::byte((dvrt1_v1_base_reloc1_metadata1_0 >> 8u) & 0xffu),
+		std::byte((dvrt1_v1_base_reloc1_metadata1_0 >> 16u) & 0xffu),
+		std::byte((dvrt1_v1_base_reloc1_metadata1_0 >> 24u) & 0xffu),
+		std::byte(dvrt1_v1_base_reloc1_metadata1_1 & 0xffu),
+		std::byte((dvrt1_v1_base_reloc1_metadata1_1 >> 8u) & 0xffu),
+		std::byte((dvrt1_v1_base_reloc1_metadata1_1 >> 16u) & 0xffu),
+		std::byte((dvrt1_v1_base_reloc1_metadata1_1 >> 24u) & 0xffu),
+		std::byte(dvrt1_v1_base_reloc1_metadata1_2 & 0xffu),
+		std::byte((dvrt1_v1_base_reloc1_metadata1_2 >> 8u) & 0xffu),
+		std::byte((dvrt1_v1_base_reloc1_metadata1_2 >> 16u) & 0xffu),
+		std::byte((dvrt1_v1_base_reloc1_metadata1_2 >> 24u) & 0xffu),
 
 		//dvrt 2
 		std::byte{4}, std::byte{}, std::byte{}, std::byte{}, //symbol
@@ -1518,10 +1518,10 @@ public:
 		std::byte{0x00}, std::byte{0x16}, std::byte{}, std::byte{}, //virtual_address
 		std::byte{12}, std::byte{}, std::byte{}, std::byte{}, //size_of_block
 		//dvrt 2 metadata
-		std::byte{dvrt1_v1_base_reloc2_metadata2_0 & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc2_metadata2_0 >> 8u) & 0xffu},
-		std::byte{dvrt1_v1_base_reloc2_metadata2_1 & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc2_metadata2_1 >> 8u) & 0xffu},
+		std::byte(dvrt1_v1_base_reloc2_metadata2_0 & 0xffu),
+		std::byte((dvrt1_v1_base_reloc2_metadata2_0 >> 8u) & 0xffu),
+		std::byte(dvrt1_v1_base_reloc2_metadata2_1 & 0xffu),
+		std::byte((dvrt1_v1_base_reloc2_metadata2_1 >> 8u) & 0xffu),
 
 		//dvrt 3
 		std::byte{5}, std::byte{}, std::byte{}, std::byte{}, //symbol
@@ -1532,15 +1532,15 @@ public:
 		std::byte{0x00}, std::byte{0x10}, std::byte{}, std::byte{}, //virtual_address
 		std::byte{10}, std::byte{}, std::byte{}, std::byte{}, //size_of_block
 		//dvrt 3a metadata
-		std::byte{dvrt1_v1_base_reloc3_metadata3a & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc3_metadata3a >> 8u) & 0xffu},
+		std::byte(dvrt1_v1_base_reloc3_metadata3a & 0xffu),
+		std::byte((dvrt1_v1_base_reloc3_metadata3a >> 8u) & 0xffu),
 
 		//base relocation 3b
 		std::byte{0x00}, std::byte{0x20}, std::byte{}, std::byte{}, //virtual_address
 		std::byte{10}, std::byte{}, std::byte{}, std::byte{}, //size_of_block
 		//dvrt 3b metadata
-		std::byte{dvrt1_v1_base_reloc3_metadata3b & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc3_metadata3b >> 8u) & 0xffu},
+		std::byte(dvrt1_v1_base_reloc3_metadata3b & 0xffu),
+		std::byte((dvrt1_v1_base_reloc3_metadata3b >> 8u) & 0xffu),
 
 		//dvrt 4
 		std::byte{6}, std::byte{}, std::byte{}, std::byte{}, //symbol
@@ -1552,20 +1552,20 @@ public:
 		std::byte{20}, std::byte{}, std::byte{}, std::byte{}, //size_of_block
 		//dvrt 4 metadata
 		//metadata 0
-		std::byte{dvrt1_v1_base_reloc4_metadata4_0 & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc4_metadata4_0 >> 8u) & 0xffu},
+		std::byte(dvrt1_v1_base_reloc4_metadata4_0 & 0xffu),
+		std::byte((dvrt1_v1_base_reloc4_metadata4_0 >> 8u) & 0xffu),
 		//metadata 1
-		std::byte{dvrt1_v1_base_reloc4_metadata4_1 & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc4_metadata4_1 >> 8u) & 0xffu},
+		std::byte(dvrt1_v1_base_reloc4_metadata4_1 & 0xffu),
+		std::byte((dvrt1_v1_base_reloc4_metadata4_1 >> 8u) & 0xffu),
 		dvrt1_v1_base_reloc4_metadata4_1_extra[0],
 		dvrt1_v1_base_reloc4_metadata4_1_extra[1],
 		dvrt1_v1_base_reloc4_metadata4_1_extra[2],
 		dvrt1_v1_base_reloc4_metadata4_1_extra[3],
 		//metadata 2
-		std::byte{dvrt1_v1_base_reloc4_metadata4_2 & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc4_metadata4_2 >> 8u) & 0xffu},
-		std::byte{dvrt1_v1_base_reloc4_metadata4_2_value & 0xffu},
-		std::byte{(dvrt1_v1_base_reloc4_metadata4_2_value >> 8u) & 0xffu},
+		std::byte(dvrt1_v1_base_reloc4_metadata4_2 & 0xffu),
+		std::byte((dvrt1_v1_base_reloc4_metadata4_2 >> 8u) & 0xffu),
+		std::byte(dvrt1_v1_base_reloc4_metadata4_2_value & 0xffu),
+		std::byte((dvrt1_v1_base_reloc4_metadata4_2_value >> 8u) & 0xffu),
 
 		//dvrt 5
 		std::byte{7}, std::byte{}, std::byte{}, std::byte{}, //symbol
@@ -1574,10 +1574,10 @@ public:
 
 		//base relocation 5
 		//virtual_address
-		std::byte{dvrt1_v1_fixups5_0_rva & 0xffu},
-		std::byte{(dvrt1_v1_fixups5_0_rva >> 8u) & 0xffu},
-		std::byte{(dvrt1_v1_fixups5_0_rva >> 16u) & 0xffu},
-		std::byte{(dvrt1_v1_fixups5_0_rva >> 24u) & 0xffu},
+		std::byte(dvrt1_v1_fixups5_0_rva & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_rva >> 8u) & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_rva >> 16u) & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_rva >> 24u) & 0xffu),
 		std::byte{97}, std::byte{}, std::byte{}, std::byte{}, //size_of_block
 
 		//dvrt 5 metadata
@@ -1588,32 +1588,32 @@ public:
 		std::byte{8}, std::byte{}, std::byte{}, std::byte{}, //rva_size
 		std::byte{20}, std::byte{}, std::byte{}, std::byte{}, //base_reloc_size
 		//rva 0
-		std::byte{ dvrt1_v1_fixups5_0_override_0_rva0 & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override_0_rva0 >> 8u) & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override_0_rva0 >> 16u) & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override_0_rva0 >> 24u) & 0xffu },
+		std::byte(dvrt1_v1_fixups5_0_override_0_rva0 & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override_0_rva0 >> 8u) & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override_0_rva0 >> 16u) & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override_0_rva0 >> 24u) & 0xffu),
 		//rva 1
-		std::byte{ dvrt1_v1_fixups5_0_override_0_rva1 & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override_0_rva1 >> 8u) & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override_0_rva1 >> 16u) & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override_0_rva1 >> 24u) & 0xffu },
+		std::byte(dvrt1_v1_fixups5_0_override_0_rva1 & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override_0_rva1 >> 8u) & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override_0_rva1 >> 16u) & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override_0_rva1 >> 24u) & 0xffu),
 		//base reloc virtual_address
-		std::byte{ dvrt1_v1_fixups5_0_override0_0_reloc0_rva & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override0_0_reloc0_rva >> 8u) & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override0_0_reloc0_rva >> 16u) & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override0_0_reloc0_rva >> 24u) & 0xffu },
+		std::byte(dvrt1_v1_fixups5_0_override0_0_reloc0_rva & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override0_0_reloc0_rva >> 8u) & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override0_0_reloc0_rva >> 16u) & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override0_0_reloc0_rva >> 24u) & 0xffu),
 		std::byte{12}, std::byte{}, std::byte{}, std::byte{}, //base reloc size_of_block
 		//fixup 0
-		std::byte{ dvrt1_v1_fixups5_0_override0_0_reloc0_fixup0 & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override0_0_reloc0_fixup0 >> 8u) & 0xffu },
+		std::byte(dvrt1_v1_fixups5_0_override0_0_reloc0_fixup0 & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override0_0_reloc0_fixup0 >> 8u) & 0xffu),
 		//fixup 1
-		std::byte{ dvrt1_v1_fixups5_0_override0_0_reloc0_fixup1 & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override0_0_reloc0_fixup1 >> 8u) & 0xffu },
+		std::byte(dvrt1_v1_fixups5_0_override0_0_reloc0_fixup1 & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override0_0_reloc0_fixup1 >> 8u) & 0xffu),
 		//base reloc virtual_address
-		std::byte{ dvrt1_v1_fixups5_0_override0_0_reloc1_rva & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override0_0_reloc1_rva >> 8u) & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override0_0_reloc1_rva >> 16u) & 0xffu },
-		std::byte{ (dvrt1_v1_fixups5_0_override0_0_reloc1_rva >> 24u) & 0xffu },
+		std::byte(dvrt1_v1_fixups5_0_override0_0_reloc1_rva & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override0_0_reloc1_rva >> 8u) & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override0_0_reloc1_rva >> 16u) & 0xffu),
+		std::byte((dvrt1_v1_fixups5_0_override0_0_reloc1_rva >> 24u) & 0xffu),
 		std::byte{8}, std::byte{}, std::byte{}, std::byte{}, //base reloc size_of_block
 		//func 1
 		std::byte{}, std::byte{0x2}, std::byte{}, std::byte{}, //original_rva
@@ -1621,17 +1621,17 @@ public:
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //rva_size
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //base_reloc_size
 		//bdd info
-		std::byte{0xffu}, //dummy byte
+		std::byte(0xffu), //dummy byte
 		std::byte{1}, std::byte{}, std::byte{}, std::byte{}, //bdd version
 		std::byte{16}, std::byte{}, std::byte{}, std::byte{}, //bdd size
 		//bdd info reloc 0
-		std::byte{ 3 }, std::byte{ 4 },
-		std::byte{ bdd_info0_0_right & 0xffu },
-		std::byte{ (bdd_info0_0_right >> 8u) & 0xffu },
+		std::byte{3}, std::byte{4},
+		std::byte(bdd_info0_0_right & 0xffu),
+		std::byte((bdd_info0_0_right >> 8u) & 0xffu),
 		std::byte{5}, std::byte{6}, std::byte{7}, std::byte{8},
 		//bdd info reloc 1
-		std::byte{ bdd_info0_1_left & 0xffu },
-		std::byte{ (bdd_info0_1_left >> 8u) & 0xffu },
+		std::byte(bdd_info0_1_left & 0xffu),
+		std::byte((bdd_info0_1_left >> 8u) & 0xffu),
 		std::byte{10}, std::byte{11},
 		std::byte{14}, std::byte{15}, std::byte{16}, std::byte{17},
 	};
@@ -1640,19 +1640,19 @@ public:
 	static constexpr std::array dvrt_header_v1{
 		std::byte{1}, std::byte{}, std::byte{}, std::byte{}, //version
 		//size
-		std::byte{dvrt_v1_size & 0xffu},
-		std::byte{(dvrt_v1_size >> 8u) & 0xffu},
-		std::byte{(dvrt_v1_size >> 16u) & 0xffu},
-		std::byte{(dvrt_v1_size >> 24u) & 0xffu},
+		std::byte(dvrt_v1_size & 0xffu),
+		std::byte((dvrt_v1_size >> 8u) & 0xffu),
+		std::byte((dvrt_v1_size >> 16u) & 0xffu),
+		std::byte((dvrt_v1_size >> 24u) & 0xffu),
 	};
 
 	static constexpr std::array dvrt_header_v0{
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //version - unsupported
 		//size
-		std::byte{dvrt_v1_size & 0xffu},
-		std::byte{(dvrt_v1_size >> 8u) & 0xffu},
-		std::byte{(dvrt_v1_size >> 16u) & 0xffu},
-		std::byte{(dvrt_v1_size >> 24u) & 0xffu},
+		std::byte(dvrt_v1_size & 0xffu),
+		std::byte((dvrt_v1_size >> 8u) & 0xffu),
+		std::byte((dvrt_v1_size >> 16u) & 0xffu),
+		std::byte((dvrt_v1_size >> 24u) & 0xffu),
 	};
 
 	//Loader should ignore rf guard set for x86 PE version, as RF guard is not
@@ -1677,22 +1677,22 @@ public:
 	static constexpr std::array enclave32{
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //reserved
 		//enclave_configuration_pointer
-		std::byte{enclave_va & 0xffu},
-		std::byte{(enclave_va >> 8u) & 0xffu},
-		std::byte{(enclave_va >> 16u) & 0xffu},
-		std::byte{(enclave_va >> 24u) & 0xffu},
+		std::byte(enclave_va & 0xffu),
+		std::byte((enclave_va >> 8u) & 0xffu),
+		std::byte((enclave_va >> 16u) & 0xffu),
+		std::byte((enclave_va >> 24u) & 0xffu),
 	};
 	static constexpr std::array enclave64{
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //reserved
 		//enclave_configuration_pointer
-		std::byte{enclave_va & 0xffu},
-		std::byte{(enclave_va >> 8u) & 0xffu},
-		std::byte{(enclave_va >> 16u) & 0xffu},
-		std::byte{(enclave_va >> 24u) & 0xffu},
-		std::byte{(enclave_va >> 32u) & 0xffu},
-		std::byte{(enclave_va >> 40u) & 0xffu},
-		std::byte{(enclave_va >> 48u) & 0xffu},
-		std::byte{(enclave_va >> 56u) & 0xffu},
+		std::byte(enclave_va & 0xffu),
+		std::byte((enclave_va >> 8u) & 0xffu),
+		std::byte((enclave_va >> 16u) & 0xffu),
+		std::byte((enclave_va >> 24u) & 0xffu),
+		std::byte((enclave_va >> 32u) & 0xffu),
+		std::byte((enclave_va >> 40u) & 0xffu),
+		std::byte((enclave_va >> 48u) & 0xffu),
+		std::byte((enclave_va >> 56u) & 0xffu),
 	};
 
 	static constexpr std::array enclave_family_id{
@@ -1718,10 +1718,10 @@ public:
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //policy_flags
 		std::byte{2}, std::byte{}, std::byte{}, std::byte{}, //number_of_imports
 		//import_list
-		std::byte{import_list_rva & 0xffu},
-		std::byte{(import_list_rva >> 8u) & 0xffu},
-		std::byte{(import_list_rva >> 16u) & 0xffu},
-		std::byte{(import_list_rva >> 24u) & 0xffu},
+		std::byte(import_list_rva & 0xffu),
+		std::byte((import_list_rva >> 8u) & 0xffu),
+		std::byte((import_list_rva >> 16u) & 0xffu),
+		std::byte((import_list_rva >> 24u) & 0xffu),
 		std::byte{82}, std::byte{}, std::byte{}, std::byte{}, //import_entry_size (2 extra bytes)
 		//family id
 		enclave_family_id[0], enclave_family_id[1],
@@ -1853,10 +1853,10 @@ public:
 		enclave_image_id[12], enclave_image_id[13],
 		enclave_image_id[14], enclave_image_id[15],
 		//import_name
-		std::byte{import_name1_rva & 0xffu},
-		std::byte{(import_name1_rva >> 8u) & 0xffu},
-		std::byte{(import_name1_rva >> 16u) & 0xffu},
-		std::byte{(import_name1_rva >> 24u) & 0xffu},
+		std::byte(import_name1_rva & 0xffu),
+		std::byte((import_name1_rva >> 8u) & 0xffu),
+		std::byte((import_name1_rva >> 16u) & 0xffu),
+		std::byte((import_name1_rva >> 24u) & 0xffu),
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //reserved
 		enclave_import1_extra[0], enclave_import1_extra[1], //extra data
 	};
@@ -1871,21 +1871,21 @@ public:
 	static constexpr std::uint64_t volatile_metadata_va = section_rva + image_base + 0xc00u;
 	static constexpr std::array volatile_metadata32{
 		//volatile_metadata_pointer
-		std::byte{volatile_metadata_va & 0xffu},
-		std::byte{(volatile_metadata_va >> 8u) & 0xffu},
-		std::byte{(volatile_metadata_va >> 16u) & 0xffu},
-		std::byte{(volatile_metadata_va >> 24u) & 0xffu},
+		std::byte(volatile_metadata_va & 0xffu),
+		std::byte((volatile_metadata_va >> 8u) & 0xffu),
+		std::byte((volatile_metadata_va >> 16u) & 0xffu),
+		std::byte((volatile_metadata_va >> 24u) & 0xffu),
 	};
 	static constexpr std::array volatile_metadata64{
 		//volatile_metadata_pointer
-		std::byte{volatile_metadata_va & 0xffu},
-		std::byte{(volatile_metadata_va >> 8u) & 0xffu},
-		std::byte{(volatile_metadata_va >> 16u) & 0xffu},
-		std::byte{(volatile_metadata_va >> 24u) & 0xffu},
-		std::byte{(volatile_metadata_va >> 32u) & 0xffu},
-		std::byte{(volatile_metadata_va >> 40u) & 0xffu},
-		std::byte{(volatile_metadata_va >> 48u) & 0xffu},
-		std::byte{(volatile_metadata_va >> 56u) & 0xffu},
+		std::byte(volatile_metadata_va & 0xffu),
+		std::byte((volatile_metadata_va >> 8u) & 0xffu),
+		std::byte((volatile_metadata_va >> 16u) & 0xffu),
+		std::byte((volatile_metadata_va >> 24u) & 0xffu),
+		std::byte((volatile_metadata_va >> 32u) & 0xffu),
+		std::byte((volatile_metadata_va >> 40u) & 0xffu),
+		std::byte((volatile_metadata_va >> 48u) & 0xffu),
+		std::byte((volatile_metadata_va >> 56u) & 0xffu),
 	};
 
 	static constexpr std::uint64_t volatile_access_table_rva = section_rva + 0xc50u;
@@ -1894,16 +1894,16 @@ public:
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //size
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}, //version
 		//volatile_access_table_rva
-		std::byte{volatile_access_table_rva & 0xffu},
-		std::byte{(volatile_access_table_rva >> 8u) & 0xffu},
-		std::byte{(volatile_access_table_rva >> 16u) & 0xffu},
-		std::byte{(volatile_access_table_rva >> 24u) & 0xffu},
+		std::byte(volatile_access_table_rva & 0xffu),
+		std::byte((volatile_access_table_rva >> 8u) & 0xffu),
+		std::byte((volatile_access_table_rva >> 16u) & 0xffu),
+		std::byte((volatile_access_table_rva >> 24u) & 0xffu),
 		std::byte{8}, std::byte{}, std::byte{}, std::byte{}, //volatile_access_table
 		//volatile_info_range_table
-		std::byte{volatile_info_range_table_rva & 0xffu},
-		std::byte{(volatile_info_range_table_rva >> 8u) & 0xffu},
-		std::byte{(volatile_info_range_table_rva >> 16u) & 0xffu},
-		std::byte{(volatile_info_range_table_rva >> 24u) & 0xffu},
+		std::byte(volatile_info_range_table_rva & 0xffu),
+		std::byte((volatile_info_range_table_rva >> 8u) & 0xffu),
+		std::byte((volatile_info_range_table_rva >> 16u) & 0xffu),
+		std::byte((volatile_info_range_table_rva >> 24u) & 0xffu),
 		std::byte{9}, std::byte{}, std::byte{}, std::byte{}, //volatile_info_range_table_size
 	};
 	static constexpr std::uint64_t volatile_access_table_rva0 = 0x12345678u;
@@ -1913,22 +1913,22 @@ public:
 	static constexpr std::size_t volatile_metadata_range_table_size = 1u;
 	static constexpr std::array volatile_access_table{
 		//rva 0
-		std::byte{volatile_access_table_rva0 & 0xffu},
-		std::byte{(volatile_access_table_rva0 >> 8u) & 0xffu},
-		std::byte{(volatile_access_table_rva0 >> 16u) & 0xffu},
-		std::byte{(volatile_access_table_rva0 >> 24u) & 0xffu},
+		std::byte(volatile_access_table_rva0 & 0xffu),
+		std::byte((volatile_access_table_rva0 >> 8u) & 0xffu),
+		std::byte((volatile_access_table_rva0 >> 16u) & 0xffu),
+		std::byte((volatile_access_table_rva0 >> 24u) & 0xffu),
 		//rva 1
-		std::byte{volatile_access_table_rva1 & 0xffu},
-		std::byte{(volatile_access_table_rva1 >> 8u) & 0xffu},
-		std::byte{(volatile_access_table_rva1 >> 16u) & 0xffu},
-		std::byte{(volatile_access_table_rva1 >> 24u) & 0xffu},
+		std::byte(volatile_access_table_rva1 & 0xffu),
+		std::byte((volatile_access_table_rva1 >> 8u) & 0xffu),
+		std::byte((volatile_access_table_rva1 >> 16u) & 0xffu),
+		std::byte((volatile_access_table_rva1 >> 24u) & 0xffu),
 	};
 	static constexpr std::array volatile_info_range_table{
 		//rva 2
-		std::byte{volatile_access_table_rva2 & 0xffu},
-		std::byte{(volatile_access_table_rva2 >> 8u) & 0xffu},
-		std::byte{(volatile_access_table_rva2 >> 16u) & 0xffu},
-		std::byte{(volatile_access_table_rva2 >> 24u) & 0xffu},
+		std::byte(volatile_access_table_rva2 & 0xffu),
+		std::byte((volatile_access_table_rva2 >> 8u) & 0xffu),
+		std::byte((volatile_access_table_rva2 >> 16u) & 0xffu),
+		std::byte((volatile_access_table_rva2 >> 24u) & 0xffu),
 		std::byte{1}, std::byte{2}, std::byte{3}, std::byte{4}, //size 2
 	};
 
@@ -1939,25 +1939,25 @@ public:
 	static constexpr std::uint32_t guard_eh_continuation_count = 2u;
 	static constexpr std::array ehcont_targets32{
 		//guard_eh_continuation_table
-		std::byte{guard_eh_continuation_table_va & 0xffu},
-		std::byte{(guard_eh_continuation_table_va >> 8u) & 0xffu},
-		std::byte{(guard_eh_continuation_table_va >> 16u) & 0xffu},
-		std::byte{(guard_eh_continuation_table_va >> 24u) & 0xffu},
+		std::byte(guard_eh_continuation_table_va & 0xffu),
+		std::byte((guard_eh_continuation_table_va >> 8u) & 0xffu),
+		std::byte((guard_eh_continuation_table_va >> 16u) & 0xffu),
+		std::byte((guard_eh_continuation_table_va >> 24u) & 0xffu),
 		//guard_eh_continuation_count
-		std::byte{guard_eh_continuation_count}, std::byte{}, std::byte{}, std::byte{}
+		std::byte(guard_eh_continuation_count), std::byte{}, std::byte{}, std::byte{}
 	};
 	static constexpr std::array ehcont_targets64{
 		//guard_eh_continuation_table
-		std::byte{guard_eh_continuation_table_va & 0xffu},
-		std::byte{(guard_eh_continuation_table_va >> 8u) & 0xffu},
-		std::byte{(guard_eh_continuation_table_va >> 16u) & 0xffu},
-		std::byte{(guard_eh_continuation_table_va >> 24u) & 0xffu},
-		std::byte{(guard_eh_continuation_table_va >> 32u) & 0xffu},
-		std::byte{(guard_eh_continuation_table_va >> 40u) & 0xffu},
-		std::byte{(guard_eh_continuation_table_va >> 48u) & 0xffu},
-		std::byte{(guard_eh_continuation_table_va >> 56u) & 0xffu},
+		std::byte(guard_eh_continuation_table_va & 0xffu),
+		std::byte((guard_eh_continuation_table_va >> 8u) & 0xffu),
+		std::byte((guard_eh_continuation_table_va >> 16u) & 0xffu),
+		std::byte((guard_eh_continuation_table_va >> 24u) & 0xffu),
+		std::byte((guard_eh_continuation_table_va >> 32u) & 0xffu),
+		std::byte((guard_eh_continuation_table_va >> 40u) & 0xffu),
+		std::byte((guard_eh_continuation_table_va >> 48u) & 0xffu),
+		std::byte((guard_eh_continuation_table_va >> 56u) & 0xffu),
 		//guard_eh_continuation_count
-		std::byte{guard_eh_continuation_count}, std::byte{}, std::byte{}, std::byte{},
+		std::byte(guard_eh_continuation_count), std::byte{}, std::byte{}, std::byte{},
 		std::byte{}, std::byte{}, std::byte{}, std::byte{}
 	};
 
@@ -1965,15 +1965,15 @@ public:
 	static constexpr std::uint32_t ehcont_rva1 = 0xab83d0abu;
 	static constexpr std::array ehcont_rvas{
 		//rva 0
-		std::byte{ehcont_rva0 & 0xffu},
-		std::byte{(ehcont_rva0 >> 8u) & 0xffu},
-		std::byte{(ehcont_rva0 >> 16u) & 0xffu},
-		std::byte{(ehcont_rva0 >> 24u) & 0xffu},
+		std::byte(ehcont_rva0 & 0xffu),
+		std::byte((ehcont_rva0 >> 8u) & 0xffu),
+		std::byte((ehcont_rva0 >> 16u) & 0xffu),
+		std::byte((ehcont_rva0 >> 24u) & 0xffu),
 		//rva 1
-		std::byte{ehcont_rva1 & 0xffu},
-		std::byte{(ehcont_rva1 >> 8u) & 0xffu},
-		std::byte{(ehcont_rva1 >> 16u) & 0xffu},
-		std::byte{(ehcont_rva1 >> 24u) & 0xffu},
+		std::byte(ehcont_rva1 & 0xffu),
+		std::byte((ehcont_rva1 >> 8u) & 0xffu),
+		std::byte((ehcont_rva1 >> 16u) & 0xffu),
+		std::byte((ehcont_rva1 >> 24u) & 0xffu),
 	};
 
 	static constexpr std::pair ehcont_targets{ ehcont_targets32, ehcont_targets64 };

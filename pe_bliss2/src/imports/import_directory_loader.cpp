@@ -342,13 +342,15 @@ std::optional<Directory> load_generic(const image::image& instance,
 	if (instance.is_64bit())
 	{
 		load_impl(instance, options, imports_rva,
-			directory.get_list().emplace<std::vector<typename Directory::imported_library64_type>>(),
+			directory.get_list().template emplace<
+				std::vector<typename Directory::imported_library64_type>>(),
 			directory);
 	}
 	else
 	{
 		load_impl(instance, options, imports_rva,
-			directory.get_list().emplace<std::vector<typename Directory::imported_library32_type>>(),
+			directory.get_list().template emplace<
+				std::vector<typename Directory::imported_library32_type>>(),
 			directory);
 	}
 

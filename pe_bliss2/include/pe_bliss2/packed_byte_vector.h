@@ -39,34 +39,34 @@ public:
 		return value_;
 	}
 
-	[[nodiscard]] constexpr vector_type value() && noexcept
+	[[nodiscard]] vector_type value() && noexcept
 	{
 		return std::move(value_);
 	}
 
-	[[nodiscard]] constexpr decltype(auto) operator[](
+	[[nodiscard]] decltype(auto) operator[](
 		std::size_t index) const noexcept
 	{
 		return value_[index];
 	}
 
-	[[nodiscard]] constexpr decltype(auto) operator[](
+	[[nodiscard]] decltype(auto) operator[](
 		std::size_t index) noexcept
 	{
 		return value_[index];
 	}
 
-	[[nodiscard]] constexpr std::size_t data_size() const noexcept
+	[[nodiscard]] std::size_t data_size() const noexcept
 	{
 		return (std::max)(virtual_size_, physical_size());
 	}
 
-	[[nodiscard]] constexpr std::size_t physical_size() const noexcept
+	[[nodiscard]] std::size_t physical_size() const noexcept
 	{
 		return value_.size();
 	}
 
-	[[nodiscard]] constexpr bool is_virtual() const noexcept
+	[[nodiscard]] bool is_virtual() const noexcept
 	{
 		return value_.size() < virtual_size_;
 	}

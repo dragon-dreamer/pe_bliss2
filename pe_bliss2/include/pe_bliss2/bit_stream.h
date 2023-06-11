@@ -7,6 +7,7 @@
 #include <climits>
 #include <type_traits>
 #include <system_error>
+#include <utility>
 
 #include "utilities/generic_error.h"
 
@@ -83,7 +84,7 @@ private:
 	template<typename LongerType, typename T>
 	void get_remaining_value_bits(T& result,
 		std::size_t& count, std::size_t initial_count)
-		noexcept(noexcept(container_[0]))
+		noexcept(noexcept(std::declval<Container&>()[0]))
 	{
 		if (!count)
 			return;

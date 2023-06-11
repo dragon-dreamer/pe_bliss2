@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <memory>
-#include <ranges>
+#include <span>
 #include <sstream>
 #include <system_error>
 #include <vector>
@@ -40,8 +40,8 @@ void test_serialize(const std::vector<std::byte>& src,
 	buffers::output_memory_buffer out_buf(data);
 	ASSERT_EQ(buf.serialize_until(out_buf, pos, length), length);
 	ASSERT_EQ(data.size(), length);
-	EXPECT_TRUE(std::ranges::equal(src | std::views::drop(pos)
-		| std::views::take(length), data));
+	EXPECT_TRUE(std::ranges::equal(
+		std::span(src.begin() + pos, src.begin() + pos + length), data));
 }
 
 void move_tests(

@@ -2,7 +2,11 @@
 
 #include <cstddef>
 #include <charconv>
-#include <format>
+#ifdef __cpp_lib_format
+#	include <format>
+#else
+#	include <cstdio>
+#endif //__cpp_lib_format
 #include <string>
 #include <system_error>
 
@@ -92,6 +96,11 @@ struct guid_formatter
 	{
 		return "{:08X}-{:04X}-{:04X}-{:02X}{:02X}-{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}";
 	}
+
+	static constexpr const char* get_legacy()
+	{
+		return "%08X-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX";
+	}
 };
 
 struct guid_bracket_formatter
@@ -100,11 +109,17 @@ struct guid_bracket_formatter
 	{
 		return "{{{:08X}-{:04X}-{:04X}-{:02X}{:02X}-{:02X}{:02X}{:02X}{:02X}{:02X}{:02X}}}";
 	}
+
+	static constexpr const char* get_legacy()
+	{
+		return "{%08X-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}";
+	}
 };
 
 template<typename Formatter>
 std::string to_string(const guid& value)
 {
+#ifdef __cpp_lib_format
 	return std::format(
 		Formatter::get(),
 		value.data1, value.data2, value.data3,
@@ -112,6 +127,18 @@ std::string to_string(const guid& value)
 		value.data4[2], value.data4[3],
 		value.data4[4], value.data4[5],
 		value.data4[6], value.data4[7]);
+#else //__cpp_lib_format
+	char buf[64]{};
+	std::sprintf(
+		buf,
+		Formatter::get_legacy(),
+		value.data1, value.data2, value.data3,
+		value.data4[0], value.data4[1],
+		value.data4[2], value.data4[3],
+		value.data4[4], value.data4[5],
+		value.data4[6], value.data4[7]);
+	return buf;
+#endif //__cpp_lib_format
 }
 } //namespace
 

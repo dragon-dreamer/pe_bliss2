@@ -1,6 +1,7 @@
 #include "buffers/input_container_buffer.h"
 
 #include <algorithm>
+#include <cstring>
 
 #include "utilities/generic_error.h"
 #include "utilities/math.h"

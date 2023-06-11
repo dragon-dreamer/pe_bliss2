@@ -396,8 +396,8 @@ full_version file_version_info::get_product_version() const noexcept
 		get_descriptor()->product_version_ls);
 }
 
-template version_info_base<>;
-template version_info_base<error_list>;
+template class version_info_base<>;
+template class version_info_base<error_list>;
 template version_info_details get_version_info<>(const version_info_block_base<>& root,
 	const version_info_load_options<>& options);
 template version_info_details get_version_info<error_list>(

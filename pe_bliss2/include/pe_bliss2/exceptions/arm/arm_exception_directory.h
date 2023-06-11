@@ -186,9 +186,9 @@ public:
 	[[nodiscard]]
 	int_registers::value get_saved_registers() const noexcept
 	{
-		std::uint32_t max_register = this->get_value<6, 7>() + Delta;
+		std::uint32_t max_register = this->template get_value<6u, 7u>() + Delta;
 		auto register_mask = ((1u << (max_register + 1u)) - 1u) & 0x1ff0u;
-		if (this->get_value<5, 5>())
+		if (this->template get_value<5u, 5u>())
 			register_mask |= int_registers::lr;
 		return static_cast<int_registers::value>(register_mask);
 	}
@@ -214,7 +214,7 @@ public:
 		if (max_register)
 			opcode_value |= (max_register - Delta - 1u);
 
-		this->set_value<5, 7>(opcode_value);
+		this->template set_value<5u, 7u>(opcode_value);
 	}
 };
 
@@ -300,8 +300,8 @@ public:
 	[[nodiscard]]
 	std::pair<fp_register, fp_register> get_saved_registers_range() const noexcept
 	{
-		return { static_cast<fp_register>(this->get_value<8, 11>() + Delta),
-			static_cast<fp_register>(this->get_value<12, 15>() + Delta) };
+		return { static_cast<fp_register>(this->template get_value<8u, 11u>() + Delta),
+			static_cast<fp_register>(this->template get_value<12u, 15u>() + Delta) };
 	}
 
 	void set_saved_registers_range(const std::pair<fp_register, fp_register>& value)
@@ -318,8 +318,10 @@ public:
 		if (s > e || s > 0b1111u || e > 0b1111u)
 			throw pe_error(exception_directory_errc::invalid_registers);
 
-		this->set_scaled_value<0u, 8, 11, exception_directory_errc::invalid_registers>(s);
-		this->set_scaled_value<0u, 12, 15, exception_directory_errc::invalid_registers>(e);
+		this->template set_scaled_value<0u, 8, 11,
+			exception_directory_errc::invalid_registers>(s);
+		this->template set_scaled_value<0u, 12, 15,
+			exception_directory_errc::invalid_registers>(e);
 	}
 };
 
@@ -345,12 +347,12 @@ public:
 	[[nodiscard]]
 	std::uint32_t get_allocation_size() const noexcept
 	{
-		return static_cast<std::uint32_t>(this->get_value<8, 23>()) * 4u;
+		return static_cast<std::uint32_t>(this->template get_value<8u, 23u>()) * 4u;
 	}
 
 	void set_allocation_size(std::uint32_t size)
 	{
-		this->set_scaled_value<4u, 8, 23,
+		this->template set_scaled_value<4u, 8, 23,
 			exception_directory_errc::invalid_allocation_size>(size);
 	}
 };
@@ -363,12 +365,12 @@ public:
 	[[nodiscard]]
 	std::uint32_t get_allocation_size() const noexcept
 	{
-		return static_cast<std::uint32_t>(this->get_value<8, 31>()) * 4u;
+		return static_cast<std::uint32_t>(this->template get_value<8u, 31u>()) * 4u;
 	}
 
 	void set_allocation_size(std::uint32_t size)
 	{
-		this->set_scaled_value<4u, 8, 31,
+		this->template set_scaled_value<4u, 8, 31,
 			exception_directory_errc::invalid_allocation_size>(size);
 	}
 };

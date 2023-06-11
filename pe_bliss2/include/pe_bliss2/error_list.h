@@ -32,6 +32,17 @@ public:
 
 	struct error_context
 	{
+		error_context(std::error_code code)
+			: code(code)
+		{
+		}
+
+		error_context(std::error_code code, context_type context)
+			: code(code)
+			, context(std::move(context))
+		{
+		}
+
 		std::error_code code;
 		context_type context;
 
@@ -55,6 +66,12 @@ public:
 
 	struct error_info
 	{
+		error_info() noexcept = default;
+		explicit error_info(std::exception_ptr error) noexcept
+			: error(std::move(error))
+		{
+		}
+
 		std::exception_ptr error;
 
 		[[nodiscard]]

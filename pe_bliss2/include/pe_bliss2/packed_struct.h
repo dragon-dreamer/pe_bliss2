@@ -47,6 +47,12 @@ public:
 		return *this;
 	}
 
+	void reset() noexcept
+	{
+		state_ = {};
+		value_ = {};
+	}
+
 	void deserialize(buffers::input_buffer_stateful_wrapper_ref& buf, bool allow_virtual_data)
 	{
 		buffers::serialized_data_state state(buf);
@@ -55,7 +61,7 @@ public:
 		if (!allow_virtual_data && physical_size != packed_size)
 			throw pe_error(utilities::generic_errc::buffer_overrun);
 
-		typename detail::packed_serialization<Endianness>
+		detail::packed_serialization<Endianness>
 			::deserialize(value_, data.data());
 
 		physical_size_ = physical_size;
@@ -72,7 +78,7 @@ public:
 		if (!allow_virtual_data && physical_size != size)
 			throw pe_error(utilities::generic_errc::buffer_overrun);
 
-		typename detail::packed_serialization<Endianness>
+		detail::packed_serialization<Endianness>
 			::deserialize_until(value_, data.data(), size);
 
 		physical_size_ = physical_size;
@@ -112,7 +118,7 @@ public:
 	std::array<std::byte, packed_size> serialize() const noexcept
 	{
 		std::array<std::byte, packed_size> data{};
-		typename detail::packed_serialization<Endianness>
+		detail::packed_serialization<Endianness>
 			::serialize(value_, data.data());
 		return data;
 	}

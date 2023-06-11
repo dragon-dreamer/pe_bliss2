@@ -1,6 +1,7 @@
 #include "pe_bliss2/relocations/relocation_entry.h"
 
 #include <cassert>
+#include <limits>
 #include <string>
 #include <system_error>
 

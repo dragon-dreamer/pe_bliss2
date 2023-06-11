@@ -20,7 +20,7 @@ class [[nodiscard]] export_directory_base
 {
 public:
 	using export_list_type = ExportedAddressList;
-	using exported_address_type = export_list_type::value_type;
+	using exported_address_type = typename export_list_type::value_type;
 
 public:
 	[[nodiscard]]
@@ -68,13 +68,13 @@ public:
 	
 public:
 	[[nodiscard]]
-	export_list_type::const_iterator symbol_by_ordinal(ordinal_type rva_ordinal) const noexcept;
+	typename export_list_type::const_iterator symbol_by_ordinal(ordinal_type rva_ordinal) const noexcept;
 	[[nodiscard]]
-	export_list_type::iterator symbol_by_ordinal(ordinal_type rva_ordinal) noexcept;
+	typename export_list_type::iterator symbol_by_ordinal(ordinal_type rva_ordinal) noexcept;
 	[[nodiscard]]
-	export_list_type::const_iterator symbol_by_name(std::string_view name) const noexcept;
+	typename export_list_type::const_iterator symbol_by_name(std::string_view name) const noexcept;
 	[[nodiscard]]
-	export_list_type::iterator symbol_by_name(std::string_view name) noexcept;
+	typename export_list_type::iterator symbol_by_name(std::string_view name) noexcept;
 
 public:
 	exported_address_type& add(ordinal_type rva_ordinal,

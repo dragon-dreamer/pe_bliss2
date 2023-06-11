@@ -375,10 +375,13 @@ coff_debug_directory_details parse_coff_directory(
 
 	try
 	{
-		if (number_of_symbols > std::numeric_limits<std::size_t>::max()
-			/ coff_symbol::descriptor_type::packed_size)
+		if constexpr (sizeof(std::size_t) <= sizeof(number_of_symbols))
 		{
-			throw pe_error(utilities::generic_errc::integer_overflow);
+			if (number_of_symbols > std::numeric_limits<std::size_t>::max()
+				/ coff_symbol::descriptor_type::packed_size)
+			{
+				throw pe_error(utilities::generic_errc::integer_overflow);
+			}
 		}
 
 		utilities::safe_uint string_table_pos = result.get_descriptor()->lva_to_first_symbol;
@@ -600,7 +603,7 @@ typename debug_directory_base<Bases...>::underlying_directory_type
 	throw pe_error(debug_directory_errc::unsupported_type);
 }
 
-template debug_directory_base<>;
-template debug_directory_base<error_list>;
+template class debug_directory_base<>;
+template class debug_directory_base<error_list>;
 
 } //namespace pe_bliss::debug

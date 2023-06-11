@@ -83,13 +83,13 @@ public:
 	entry_type* try_entry_by_name(std::u16string_view name) noexcept;
 
 	[[nodiscard]]
-	entry_list_type::const_iterator entry_iterator_by_id(resource_id_type id) const noexcept;
+	typename entry_list_type::const_iterator entry_iterator_by_id(resource_id_type id) const noexcept;
 	[[nodiscard]]
-	entry_list_type::iterator entry_iterator_by_id(resource_id_type id) noexcept;
+	typename entry_list_type::iterator entry_iterator_by_id(resource_id_type id) noexcept;
 	[[nodiscard]]
-	entry_list_type::const_iterator entry_iterator_by_name(std::u16string_view name) const noexcept;
+	typename entry_list_type::const_iterator entry_iterator_by_name(std::u16string_view name) const noexcept;
 	[[nodiscard]]
-	entry_list_type::iterator entry_iterator_by_name(std::u16string_view name) noexcept;
+	typename entry_list_type::iterator entry_iterator_by_name(std::u16string_view name) noexcept;
 
 	entry_type& try_emplace_entry_by_id(resource_id_type id,
 		directory_entry_contents contents);

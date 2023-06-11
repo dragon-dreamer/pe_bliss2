@@ -1,6 +1,7 @@
 #include "pe_bliss2/packed_byte_vector.h"
 
 #include <cstddef>
+#include <cstring>
 #include <vector>
 
 #include "buffers/input_buffer_stateful_wrapper.h"

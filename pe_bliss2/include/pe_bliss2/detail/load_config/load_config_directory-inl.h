@@ -277,46 +277,6 @@ const typename chpe_x86_metadata_base<Bases...>::metadata_type&
 }
 
 template<typename RelocationType>
-std::uint32_t dynamic_relocation_base<RelocationType>
-	::get_page_relative_offset() const noexcept
-	requires (!dynamic_relocation_base<RelocationType>::is_scalar)
-{
-	return get_relocation()->metadata & page_relative_offset_mask;
-}
-
-template<typename RelocationType>
-std::uint32_t dynamic_relocation_base<RelocationType>
-	::get_page_relative_offset() const noexcept
-	requires (dynamic_relocation_base<RelocationType>::is_scalar)
-{
-	return get_relocation().get() & page_relative_offset_mask;
-}
-
-template<typename RelocationType>
-void dynamic_relocation_base<RelocationType>
-	::set_page_relative_offset(std::uint32_t offset)
-	requires (!dynamic_relocation_base<RelocationType>::is_scalar)
-{
-	if (offset > max_page_reative_offset)
-		throw pe_error(load_config_errc::invalid_page_relative_offset);
-
-	get_relocation()->metadata &= ~page_relative_offset_mask;
-	get_relocation()->metadata |= (offset & page_relative_offset_mask);
-}
-
-template<typename RelocationType>
-void dynamic_relocation_base<RelocationType>
-	::set_page_relative_offset(std::uint32_t offset)
-	requires (dynamic_relocation_base<RelocationType>::is_scalar)
-{
-	if (offset > max_page_reative_offset)
-		throw pe_error(load_config_errc::invalid_page_relative_offset);
-
-	get_relocation().get() &= ~page_relative_offset_mask;
-	get_relocation().get() |= (offset & page_relative_offset_mask);
-}
-
-template<typename RelocationType>
 typename dynamic_relocation_base<RelocationType>::relocation_type&
 	dynamic_relocation_base<RelocationType>::get_relocation() noexcept
 {
@@ -943,7 +903,7 @@ typename enclave_import_base<Bases...>::extra_data_type
 }
 
 template<typename... Bases>
-typename enclave_import_match enclave_import_base<Bases...>::get_match() const noexcept
+enclave_import_match enclave_import_base<Bases...>::get_match() const noexcept
 {
 	return static_cast<enclave_import_match>(this->descriptor_->match_type);
 }
@@ -990,7 +950,7 @@ typename enclave_config_base<Va, Bases...>::extra_data_type&
 }
 
 template<detail::executable_pointer Va, typename... Bases>
-typename enclave_config_base<Va, Bases...>::extra_data_type&
+typename enclave_config_base<Va, Bases...>::extra_data_type
 	enclave_config_base<Va, Bases...>::get_extra_data() && noexcept
 {
 	return std::move(extra_data_);

@@ -112,7 +112,7 @@ public:
 	void remove_directory(directory_type type) noexcept
 	{
 		if (has_nonempty_directory(type))
-			get_directory(type) = {};
+			get_directory(type).reset();
 	}
 
 public:

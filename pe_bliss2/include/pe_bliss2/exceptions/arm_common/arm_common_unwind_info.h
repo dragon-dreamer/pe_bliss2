@@ -124,7 +124,6 @@ public:
 	auto get_value() const noexcept;
 
 	template<std::size_t FromBit, std::size_t ToBit, typename Value>
-	[[nodiscard]]
 	void set_value(Value value);
 
 	template<std::size_t Multiple, std::size_t StartBit,
@@ -307,7 +306,10 @@ public:
 	//that all prologue processing should be ignored.
 	[[nodiscard]]
 	bool is_function_fragment() const noexcept
-		requires (extended_unwind_record<EpilogInfo, UnwindRecordOptions>::has_f_bit);
+		requires (extended_unwind_record<EpilogInfo, UnwindRecordOptions>::has_f_bit)
+	{
+		return (main_header_.get() & 0x400000u) != 0u;
+	}
 
 	//Has two meanings, depending on the state of E bit (single_epilog_info_packed):
 	//If E is 0, it specifies the count of the total number of epilog scopes.
@@ -331,7 +333,13 @@ public:
 	void set_function_length(std::uint32_t length);
 
 	void set_is_function_fragment(bool is_fragment) noexcept
-		requires (extended_unwind_record<EpilogInfo, UnwindRecordOptions>::has_f_bit);
+		requires (extended_unwind_record<EpilogInfo, UnwindRecordOptions>::has_f_bit)
+	{
+		if (is_fragment)
+			main_header_.get() |= 0x400000u;
+		else
+			main_header_.get() &= ~0x400000u;
+	}
 
 private:
 	[[nodiscard]]

@@ -136,7 +136,7 @@ build_result get_built_size_impl(const Directory& directory, const builder_optio
 
 	return {
 		.full_size = full_size.value(),
-		.directory_size = descriptor.packed_size
+		.directory_size = static_cast<std::uint32_t>(descriptor.packed_size)
 	};
 }
 
@@ -204,7 +204,7 @@ build_result build_new_impl(buffers::output_buffer_interface& buf, Directory& di
 
 	return {
 		.full_size = static_cast<std::uint32_t>(last_pos - base_pos),
-		.directory_size = descriptor.packed_size
+		.directory_size = static_cast<std::uint32_t>(descriptor.packed_size)
 	};
 }
 

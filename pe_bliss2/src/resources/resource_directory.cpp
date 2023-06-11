@@ -199,9 +199,6 @@ resource_directory_base<Bases...>::try_entry_by_name(std::u16string_view name) n
 	return it == entries_.end() ? nullptr : &*it;
 }
 
-template resource_directory_base<>;
-template resource_directory_base<error_list>;
-
 template<typename... Bases>
 resource_directory_base<Bases...>& resource_directory_entry_base<Bases...>::get_directory()
 {
@@ -317,9 +314,9 @@ typename resource_directory_base<Bases...>::entry_type& try_emplace_entry(
 	if (std::holds_alternative<std::monostate>(data_or_directory))
 	{
 		if (contents == directory_entry_contents::data)
-			data_or_directory.emplace<resource_data_entry_base<Bases...>>();
+			data_or_directory.template emplace<resource_data_entry_base<Bases...>>();
 		else
-			data_or_directory.emplace<resource_directory_base<Bases...>>();
+			data_or_directory.template emplace<resource_directory_base<Bases...>>();
 	}
 	else
 	{
@@ -369,7 +366,9 @@ typename resource_directory_base<Bases...>::entry_type& resource_directory_base<
 	return try_emplace_entry(std::move(name), contents, *this);
 }
 
-template resource_directory_entry_base<>;
-template resource_directory_entry_base<error_list>;
+template class resource_directory_entry_base<>;
+template class resource_directory_entry_base<error_list>;
+template class resource_directory_base<>;
+template class resource_directory_base<error_list>;
 
 } //namespace pe_bliss::resources

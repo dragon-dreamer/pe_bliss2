@@ -14,7 +14,7 @@ concept has_offset_setters = requires(Buffer buffer)
 };
 
 template<typename Buffer, typename SourceData>
-void test_input_buffer(Buffer& buffer, const SourceData& data,
+void test_input_buffer(Buffer& buffer, SourceData&& data,
 	std::size_t initial_absolute_offset = 0u,
 	std::size_t initial_relative_offset = 0u)
 {

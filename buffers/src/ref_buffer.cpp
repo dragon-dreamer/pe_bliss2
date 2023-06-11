@@ -52,10 +52,10 @@ std::error_code make_error_code(ref_buffer_errc e) noexcept
 }
 
 ref_buffer::ref_buffer()
-	: buffer_(std::in_place_type<copied_buffer>)
 {
 	auto container = std::make_shared<input_container_buffer>();
-	std::get<copied_buffer>(buffer_) = { container.get(), std::move(container) };
+	auto buf_ptr = container.get();
+	buffer_.emplace<copied_buffer>(buf_ptr, std::move(container));
 }
 
 ref_buffer::ref_buffer(const ref_buffer& other)
@@ -156,16 +156,16 @@ void ref_buffer::read_buffer(input_buffer_interface& buf)
 			throw std::system_error(ref_buffer_errc::unable_to_read_data);
 	}
 
+	auto buf_ptr = copied_buf.get();
 	if (buf.virtual_size())
 	{
-		auto buf_ptr = copied_buf.get();
 		auto virtual_buf = std::make_shared<input_virtual_buffer>(
 			std::move(copied_buf), buf.virtual_size());
 		buffer_ = copied_buffer(buf_ptr, std::move(virtual_buf));
 	}
 	else
 	{
-		buffer_ = copied_buffer(copied_buf.get(), std::move(copied_buf));
+		buffer_ = copied_buffer(buf_ptr, std::move(copied_buf));
 	}
 }
 

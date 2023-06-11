@@ -4,6 +4,7 @@
 #include <cassert>
 #include <iterator>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "buffers/output_buffer_interface.h"
@@ -38,6 +39,11 @@ void update_data_directory(image::image& instance,
 template<typename ExportedNamePtr>
 struct symbol_ref
 {
+	explicit symbol_ref(ExportedNamePtr name) noexcept
+		: name(name)
+	{
+	}
+
 	ExportedNamePtr name;
 	friend bool operator<(const symbol_ref& left, const symbol_ref& right) noexcept
 	{

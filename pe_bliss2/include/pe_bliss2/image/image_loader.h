@@ -45,7 +45,7 @@ struct [[nodiscard]] image_load_options
 
 struct [[nodiscard]] image_load_result
 {
-	image image;
+	pe_bliss::image::image image;
 	error_list warnings;
 	std::exception_ptr fatal_error;
 
@@ -64,7 +64,6 @@ public:
 		const buffers::input_buffer_ptr& buffer,
 		const image_load_options& options = {});
 
-	[[nodiscard]]
 	static void load(
 		image& instance,
 		error_list& warnings,

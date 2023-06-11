@@ -35,11 +35,11 @@ public:
 	{
 	}
 
-	template<std::convertible_to<string_type> String>
-	packed_c_string_base& operator=(String&& str)
-		noexcept(noexcept(value_ = std::forward<String>(str)))
+	template<std::convertible_to<string_type> Other>
+	packed_c_string_base& operator=(Other&& str)
+		noexcept(noexcept(std::declval<string_type&>() = std::forward<Other>(str)))
 	{
-		value_ = std::forward<String>(str);
+		value_ = std::forward<Other>(str);
 		state_ = {};
 		virtual_nullbyte_ = false;
 		return *this;

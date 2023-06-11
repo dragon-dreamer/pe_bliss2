@@ -34,12 +34,12 @@ public:
 
 	packed_utf16_string() = default;
 
-	template<typename String>
-		requires(std::convertible_to<String, string_type> )
-	packed_utf16_string& operator=(String&& str)
-		noexcept(noexcept(value_ = std::forward<String>(str)))
+	template<typename Other>
+		requires(std::convertible_to<Other, string_type> )
+	packed_utf16_string& operator=(Other&& str)
+		noexcept(noexcept(std::declval<string_type&>() = std::forward<Other>(str)))
 	{
-		value_ = std::forward<String>(str);
+		value_ = std::forward<Other>(str);
 		state_ = {};
 		physical_size_ = value_.size() + sizeof(std::uint16_t);
 		virtual_size_ = physical_size_;
@@ -63,18 +63,18 @@ public:
 		return value_;
 	}
 
-	[[nodiscard]] constexpr string_type value() && noexcept
+	[[nodiscard]] string_type value() && noexcept
 	{
 		return std::move(value_);
 	}
 
-	[[nodiscard]] constexpr decltype(auto) operator[](
+	[[nodiscard]] decltype(auto) operator[](
 		std::size_t index) const noexcept
 	{
 		return value_[index];
 	}
 
-	[[nodiscard]] constexpr decltype(auto) operator[](
+	[[nodiscard]] decltype(auto) operator[](
 		std::size_t index) noexcept
 	{
 		return value_[index];

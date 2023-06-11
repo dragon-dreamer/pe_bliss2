@@ -33,6 +33,12 @@ class [[nodiscard]] tls_callback_details
 	: public packed_struct<Va>
 	, public error_list
 {
+public:
+	tls_callback_details() = default;
+	tls_callback_details(packed_struct<Va> other)
+		: packed_struct<Va>(other)
+	{
+	}
 };
 
 template<typename Directory, typename TlsCallback>

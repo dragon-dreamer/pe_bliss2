@@ -3,6 +3,7 @@
 #include <array>
 #include <cstddef>
 #include <ranges>
+#include <span>
 
 #include "gtest/gtest.h"
 
@@ -102,9 +103,9 @@ TEST(IconCursorWriterTests, CursorToFileFormat)
 		= pe_bliss::detail::packed_reflection::get_type_size<
 		pe_bliss::detail::resources::cursor_hotspots>();
 	EXPECT_TRUE(std::ranges::equal(file_group.get_data_list()[0].copied_data(),
-		data1 | std::views::drop(hotspot_size)));
+		std::span(data1.begin() + hotspot_size, data1.end())));
 	EXPECT_TRUE(std::ranges::equal(file_group.get_data_list()[1].copied_data(),
-		data2 | std::views::drop(hotspot_size)));
+		std::span(data2.begin() + hotspot_size, data2.end())));
 
 	ASSERT_EQ(file_group.get_resource_group_headers().size(), 2u);
 	EXPECT_EQ(file_group.get_resource_group_headers()[0]->height,

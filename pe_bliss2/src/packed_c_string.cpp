@@ -90,7 +90,7 @@ std::size_t packed_c_string_base<String>::serialize(std::byte* buf,
 	return size;
 }
 
-template packed_c_string_base<std::string>;
-template packed_c_string_base<std::u16string>;
+template class packed_c_string_base<std::string>;
+template class packed_c_string_base<std::u16string>;
 
 } //namespace pe_bliss

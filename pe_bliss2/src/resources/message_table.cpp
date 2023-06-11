@@ -15,7 +15,7 @@ void message_block_base<Bases...>::set_start_id(id_type start_id) noexcept
 	this->descriptor_->high_id = end_id.value();
 }
 
-template message_block_base<>;
-template message_block_base<error_list>;
+template class message_block_base<>;
+template class message_block_base<error_list>;
 
 } //namespace pe_bliss::resources
