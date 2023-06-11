@@ -4,7 +4,13 @@
 
 The [Portable executable](https://en.wikipedia.org/wiki/Portable_Executable) is a popular executable file format, which is extensively used in Windows family operating systems. It is as well utilized by the X-Box, EFI and some other environments. The **PE Bliss 2** library is a successor of the old and unsupported [PE Bliss](https://code.google.com/archive/p/portable-executable-library/) library.
 
-The library is aimed at being able to provide as much information about the PE file as possible, while being robust and keeping track of possible parsing or format errors and irregularities. Currently, the library is compiled using the MSVC compiler, but the code itself is cross-platform.
+The library is aimed at being able to provide as much information about the PE file as possible, while being robust and keeping track of possible parsing or format errors and irregularities.
+
+## Compatibility
+The library compiles and passes tests with the following compilers:
+- MSVC 2022
+- Clang 14.0.0
+- GCC 11.3.0
 
 ## Features
 - Reading PE/PE+ binaries (unit-tested)
@@ -151,5 +157,5 @@ The library is aimed at being able to provide as much information about the PE f
 
 ## Library requirements
 - C++20 or newer.
-- [Boost](https://www.boost.org/) libraries (header-only): **endian**, **pfr**
+- [Boost](https://www.boost.org/) libraries (1.78.0 or newer, header-only): **endian**, **pfr**
 - Two external libraries are embedded (`external` directory): **googletest**, **pugixml**
