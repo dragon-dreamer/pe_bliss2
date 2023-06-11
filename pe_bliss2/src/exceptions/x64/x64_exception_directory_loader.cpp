@@ -56,7 +56,7 @@ struct x64_exception_directory_loader_error_category : std::error_category
 		case invalid_chained_runtime_function_entry:
 			return "Invalid chained runtime function entry";
 		case both_set_fpreg_types_used:
-			"Both SET_FPREG and SET_FPREG_LARGE are used";
+			return "Both SET_FPREG and SET_FPREG_LARGE are used";
 		case invalid_directory_size:
 			return "Invalid exception directory size";
 		case invalid_c_specific_handler_record_count:

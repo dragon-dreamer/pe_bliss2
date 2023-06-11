@@ -1690,7 +1690,7 @@ void load_volatile_metadata(const image::image& instance, const loader_options& 
 	try
 	{
 		struct_from_va(instance, volatile_metadata_va, config_descriptor,
-			options.include_headers, options.allow_virtual_data).packed_size;
+			options.include_headers, options.allow_virtual_data);
 	}
 	catch (const std::system_error&)
 	{
