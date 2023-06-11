@@ -364,7 +364,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external\pugixml;C:\Libs\boost_1_82_0</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -382,7 +382,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external\pugixml;C:\Libs\boost_1_82_0</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -400,7 +400,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external\pugixml;C:\Libs\boost_1_82_0</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -418,7 +418,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external;C:\Libs\boost_1_78_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\utilities\include;$(SolutionDir)\buffers\include;include;$(SolutionDir)\external\pugixml;C:\Libs\boost_1_82_0</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
