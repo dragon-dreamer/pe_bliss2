@@ -1,0 +1,31 @@
+cmake_minimum_required(VERSION 3.13)
+
+project(utilities
+	VERSION 1.0.0.0
+	LANGUAGES CXX)
+
+add_library(utilities)
+
+target_include_directories(utilities PUBLIC include)
+
+target_compile_features(utilities PRIVATE cxx_std_20)
+
+target_sources(utilities
+	PUBLIC
+		include/utilities/generic_error.h
+		include/utilities/hash.h
+		include/utilities/math.h
+		include/utilities/safe_uint.h
+		include/utilities/scoped_guard.h
+		include/utilities/shannon_entropy.h
+		include/utilities/static_class.h
+		include/utilities/string.h
+		include/utilities/variant_helpers.h
+	PRIVATE
+		src/generic_error.cpp
+		src/shannon_entropy.cpp
+)
+
+if(MSVC)
+	target_compile_options(utilities PRIVATE "/MP")
+endif()
