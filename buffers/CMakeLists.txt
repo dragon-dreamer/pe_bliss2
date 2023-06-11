@@ -1,10 +1,15 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.15)
 
 project(buffers
 	VERSION 1.0.0.0
 	LANGUAGES CXX)
 
-add_library(buffers)
+include(../cmake/library_options.cmake)
+
+add_library(buffers ${BUFFERS_BUILD_TYPE})
+
+include(../cmake/output_options.cmake)
+set_output_dirs(buffers)
 
 target_include_directories(buffers PUBLIC include)
 

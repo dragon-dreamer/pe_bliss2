@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.15)
 
 project(tests
 	VERSION 1.0.0.0
@@ -6,9 +6,16 @@ project(tests
 
 add_executable(tests)
 
+include(../cmake/output_options.cmake)
+set_output_dirs(tests)
+
 target_compile_features(tests PRIVATE cxx_std_20)
 
 target_include_directories(tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+
+if (BUILD_SHARED_LIBS)
+	target_compile_definitions(tests PRIVATE GTEST_LINKED_AS_SHARED_LIBRARY)
+endif()
 
 target_sources(tests
 	PRIVATE

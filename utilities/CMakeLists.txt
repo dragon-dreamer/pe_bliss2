@@ -1,10 +1,15 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.15)
 
 project(utilities
 	VERSION 1.0.0.0
 	LANGUAGES CXX)
 
-add_library(utilities)
+include(../cmake/library_options.cmake)
+
+add_library(utilities ${UTILITIES_BUILD_TYPE})
+
+include(../cmake/output_options.cmake)
+set_output_dirs(utilities)
 
 target_include_directories(utilities PUBLIC include)
 

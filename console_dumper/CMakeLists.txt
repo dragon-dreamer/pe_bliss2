@@ -1,10 +1,13 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.15)
 
 project(console_dumper
 	VERSION 1.0.0.0
 	LANGUAGES CXX)
 
 add_executable(console_dumper)
+
+include(../cmake/output_options.cmake)
+set_output_dirs(console_dumper)
 
 target_compile_features(console_dumper PRIVATE cxx_std_20)
 

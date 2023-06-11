@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.15)
 
 project(pe_bliss2
 	VERSION 1.0.0.0
@@ -6,7 +6,12 @@ project(pe_bliss2
 
 find_package(Boost 1.78 REQUIRED)
 
-add_library(pe_bliss2)
+include(../cmake/library_options.cmake)
+
+add_library(pe_bliss2 ${PE_BLISS2_BUILD_TYPE})
+
+include(../cmake/output_options.cmake)
+set_output_dirs(pe_bliss2)
 
 target_include_directories(pe_bliss2
 	PUBLIC include "${Boost_INCLUDE_DIRS}")
