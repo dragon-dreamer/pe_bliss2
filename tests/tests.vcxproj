@@ -59,15 +59,19 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\common.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -89,7 +93,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)\buffers\include;$(SolutionDir)\utilities\include;$(SolutionDir)\pe_bliss2\include;$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
@@ -109,7 +113,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)\buffers\include;$(SolutionDir)\utilities\include;$(SolutionDir)\pe_bliss2\include;$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -128,7 +132,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)\buffers\include;$(SolutionDir)\utilities\include;$(SolutionDir)\pe_bliss2\include;$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ControlFlowGuard>
       </ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -148,7 +152,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)\buffers\include;$(SolutionDir)\utilities\include;$(SolutionDir)\pe_bliss2\include;$(SolutionDir)external\googletest\googletest\include;$(SolutionDir)external\googletest\googlemock\include;$(SolutionDir)external\googletest\googletest;$(SolutionDir)external\googletest\googlemock;C:\Libs\boost_1_78_0;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
