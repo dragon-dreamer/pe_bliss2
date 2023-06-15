@@ -8,6 +8,7 @@ add_executable(console_dumper)
 
 include(../cmake/output_options.cmake)
 set_output_dirs(console_dumper)
+set_msvc_runtime_library(console_dumper "${PE_BLISS_MSVC_RUNTIME_LIBRARY}")
 
 target_compile_features(console_dumper PRIVATE cxx_std_20)
 

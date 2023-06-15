@@ -12,7 +12,7 @@ add_library(pe_bliss2 ${PE_BLISS2_BUILD_TYPE})
 
 include(../cmake/output_options.cmake)
 set_output_dirs(pe_bliss2)
-set_msvc_runtime_library(pe_bliss2)
+set_msvc_runtime_library(pe_bliss2 "${PE_BLISS_MSVC_RUNTIME_LIBRARY}")
 
 target_include_directories(pe_bliss2
 	PUBLIC include "${Boost_INCLUDE_DIRS}")

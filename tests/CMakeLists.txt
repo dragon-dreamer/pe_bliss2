@@ -8,7 +8,7 @@ add_executable(tests)
 
 include(../cmake/output_options.cmake)
 set_output_dirs(tests)
-set_msvc_runtime_library(tests)
+set_msvc_runtime_library(tests "${PE_BLISS_MSVC_RUNTIME_LIBRARY}")
 
 target_compile_features(tests PRIVATE cxx_std_20)
 

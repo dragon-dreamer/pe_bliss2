@@ -8,7 +8,7 @@ macro(set_output_dirs target_name)
 		COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 endmacro()
 
-macro(set_msvc_runtime_library target_name)
+macro(set_msvc_runtime_library target_name runtime_library_type)
 	set_property(TARGET "${target_name}" PROPERTY
-		MSVC_RUNTIME_LIBRARY "${PE_BLISS_MSVC_RUNTIME_LIBRARY}")
+		MSVC_RUNTIME_LIBRARY "${runtime_library_type}")
 endmacro()

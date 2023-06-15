@@ -10,7 +10,7 @@ add_library(utilities ${UTILITIES_BUILD_TYPE})
 
 include(../cmake/output_options.cmake)
 set_output_dirs(utilities)
-set_msvc_runtime_library(utilities)
+set_msvc_runtime_library(utilities "${PE_BLISS_MSVC_RUNTIME_LIBRARY}")
 
 target_include_directories(utilities PUBLIC include)
 
