@@ -10,6 +10,7 @@ add_library(buffers ${BUFFERS_BUILD_TYPE})
 
 include(../cmake/output_options.cmake)
 set_output_dirs(buffers)
+set_msvc_runtime_library(buffers)
 
 target_include_directories(buffers PUBLIC include)
 

@@ -11,7 +11,9 @@ option(PE_BLISS_ENABLE_TESTING "Enable pe_bliss2 and supporting libraries tests"
 if (MSVC)
 	option(PE_BLISS_STATIC_MSVC_RUNTIME "Link all binaries with MSVC runtime statically" OFF)
 	if (PE_BLISS_STATIC_MSVC_RUNTIME)
-		set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+		set(PE_BLISS_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+	else()
+		set(PE_BLISS_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 	endif()
 endif()
 
