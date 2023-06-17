@@ -147,7 +147,6 @@ public:
 	static constexpr std::uint32_t third_rva = 0x800u + section_rva;
 	static constexpr std::uint32_t name1_offset = 0x900u;
 	static constexpr std::uint32_t name2_offset = 0x906u;
-	static constexpr std::uint32_t invalid_name0_rva = 0x53412u;
 	static constexpr std::uint32_t fwd_name0_offset = 0x200u;
 	static constexpr std::uint32_t fwd_name0_rva = fwd_name0_offset + section_rva;
 	static constexpr std::uint32_t fwd_name1_rva = 0x300u + section_rva;

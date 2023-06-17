@@ -413,11 +413,11 @@ public:
 			instance.get_optional_header().set_raw_dll_characteristics(
 				core::optional_header::dll_characteristics::guard_cf);
 		}
-		with_load_config([this, &cf_guard_copy, flags, &func](const auto& dir) {
-			validate_base(dir);
-			validate_safeseh(dir);
+		with_load_config([this, &cf_guard_copy, &func](const auto& dir) {
+			this->validate_base(dir);
+			this->validate_safeseh(dir);
 			EXPECT_FALSE(dir.get_guard_cf_function_table());
-			validate_size_and_version(dir, load_config::version::cf_guard,
+			this->validate_size_and_version(dir, load_config::version::cf_guard,
 				load_config_base, se_handler_table, cf_guard_copy);
 			if constexpr (std::is_invocable_v<decltype(func), decltype(dir)>)
 				func(dir);
@@ -443,15 +443,15 @@ public:
 			core::optional_header::dll_characteristics::guard_cf);
 		with_load_config([this, &cf_guard_copy, &func,
 			table_error](const auto& dir) {
-			validate_base(dir);
-			validate_safeseh(dir);
+			this->validate_base(dir);
+			this->validate_safeseh(dir);
 			EXPECT_FALSE(dir.get_guard_cf_function_table());
 			expect_contains_errors(dir,
 				load_config::load_config_directory_loader_errc::invalid_security_cookie_va,
 				load_config::load_config_directory_loader_errc::invalid_guard_cf_check_function_va,
 				load_config::load_config_directory_loader_errc::invalid_guard_cf_dispatch_function_va,
 				table_error);
-			validate_size_and_version(dir, load_config::version::cf_guard_ex,
+			this->validate_size_and_version(dir, load_config::version::cf_guard_ex,
 				load_config_base, se_handler_table, cf_guard_copy, code_integrity, cf_guard_ex);
 			func(dir);
 		}, options);
@@ -531,8 +531,8 @@ public:
 						load_config::load_config_directory_loader_errc::invalid_chpe_range_entry_count);
 				}
 				ASSERT_EQ(chpe.get_range_entries().size(), entry_count);
-				validate_chpe_entries_base(chpe.get_range_entries(), entry_count);
-				validate_chpe_entries(chpe.get_range_entries(), entry_count);
+				this->validate_chpe_entries_base(chpe.get_range_entries(), entry_count);
+				this->validate_chpe_entries(chpe.get_range_entries(), entry_count);
 			}
 
 			if constexpr (std::is_same_v<type,
@@ -954,10 +954,6 @@ public:
 		std::byte(load_config::gfids_flags::fid_xfg), std::byte{5}, std::byte{6} };
 	static constexpr std::array guard_cf_stride_data2{
 		std::byte(load_config::gfids_flags::fid_xfg | 1u), std::byte{5}, std::byte{6} };
-	static constexpr std::uint64_t guard_cf_export_suppression_table_va
-		= section_rva + image_base + 0x280u;
-	static constexpr std::uint64_t guard_cf_longjump_table_va
-		= section_rva + image_base + 0x2a0u;
 	static constexpr std::uint64_t chpe_metadata_va = section_rva + image_base + 0x320u;
 	
 	static constexpr std::array lock_prefixes32{
@@ -2087,7 +2083,7 @@ TEST_P(LoadConfigLoaderTestFixture, LoadBaseLoadConfigDirectoryInvalidLockPrefix
 			- 1u] = std::byte{ 0xffu };
 	}
 	add_directory_parts(load_config_base_copy);
-	with_load_config([this](const auto& dir) {
+	with_load_config([](const auto& dir) {
 		expect_contains_errors(dir,
 			load_config::load_config_directory_loader_errc::invalid_security_cookie_va,
 			load_config::load_config_directory_loader_errc::invalid_lock_prefix_table);
@@ -2441,7 +2437,7 @@ TEST_P(LoadConfigLoaderTestFixture, LoadCHPELoadConfigDirectorySkip)
 		instance.get_file_header().set_machine_type(core::file_header::machine_type::amd64);
 	else
 		instance.get_file_header().set_machine_type(core::file_header::machine_type::chpe_x86);
-	with_load_config([this](const auto& dir) {
+	with_load_config([](const auto& dir) {
 		EXPECT_TRUE(std::holds_alternative<std::monostate>(dir.get_chpe_metadata()));
 	}, { .load_chpe_metadata = false });
 }

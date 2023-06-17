@@ -145,7 +145,6 @@ public:
 	static constexpr std::uint32_t image_base = 0x40000;
 	static constexpr std::uint32_t raw_data_start_offset = 0x100u;
 	static constexpr std::uint32_t raw_data_end_offset = 0x110u;
-	static constexpr std::uint32_t index_offset = 0x120u;
 	static constexpr std::uint32_t callbacks_offset = 0x130u;
 	static constexpr std::uint32_t callback1_offset = 0x50u;
 	static constexpr std::uint32_t callback2_offset = 0x1150u;

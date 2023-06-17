@@ -104,7 +104,7 @@ file_cursor_group to_cursor_file_format_impl(Group&& group,
 	const icon_cursor_write_options& options)
 {
 	return to_file_format_impl<file_cursor_group>(std::forward<Group>(group), options,
-	[&options](const auto& res_header, auto& file_header, auto& data) {
+	[](const auto& res_header, auto& file_header, auto& data) {
 		packed_struct<detail::resources::cursor_hotspots> hotspots;
 		{
 			buffers::input_buffer_stateful_wrapper_ref ref(*data.data());

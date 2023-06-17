@@ -61,7 +61,7 @@ public:
 	static BytePointer deserialize_until(T& result, BytePointer data) noexcept
 	{
 		auto stop_ptr = reinterpret_cast<std::uintptr_t>(&(result.*FieldPtr));
-		boost::pfr::for_each_field(result, [&result, &data, stop_ptr] (auto& value) {
+		boost::pfr::for_each_field(result, [&data, stop_ptr] (auto& value) {
 			if (reinterpret_cast<std::uintptr_t>(&value) > stop_ptr)
 				return;
 			data = deserialize(value, data);

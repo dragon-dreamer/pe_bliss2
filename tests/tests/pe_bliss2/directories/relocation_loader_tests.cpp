@@ -102,13 +102,6 @@ public:
 			sizeof(std::uint16_t) * (1u + block2_elem_types.size())
 			+ sizeof(std::uint32_t) * 2u);
 
-	static constexpr auto block2_elem1_type = relocations::relocation_type::highlow;
-	static constexpr std::uint16_t block2_elem1_addr = 0xabcu;
-	static constexpr auto block2_elem2_type = relocations::relocation_type::dir64;
-	static constexpr std::uint16_t block2_elem2_addr = 0xdefu;
-	static constexpr auto block2_elem3_type = relocations::relocation_type::high;
-	static constexpr std::uint16_t block2_elem3_addr = 0xdefu;
-
 	static constexpr std::array relocs{
 		//Block 1
 		std::byte{1}, std::byte{2}, std::byte{3}, std::byte{4}, //virtual_address

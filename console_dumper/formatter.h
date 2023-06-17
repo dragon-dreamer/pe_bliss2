@@ -497,7 +497,7 @@ private:
 		std::size_t& field_index, std::size_t& abs_offset, std::size_t& rel_offset)
 	{
 		boost::pfr::for_each_field(obj, [this, &infos, &field_index, &formatted_names,
-			&abs_offset, &rel_offset, &obj, max_name_length, &max_field_offset] (const auto& value) {
+			&abs_offset, &rel_offset, max_name_length, &max_field_offset] (const auto& value) {
 			if constexpr (std::is_class_v<std::remove_cvref_t<decltype(value)>>
 				&& !impl::is_array<std::remove_cvref_t<decltype(value)>>::value)
 			{

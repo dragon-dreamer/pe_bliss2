@@ -188,7 +188,7 @@ TEST(StringToVaTests, StringToSectionVirtualDataTest)
 	StringToVaFixture<char16_t> fixture;
 	auto str = fixture.create_string(fixture.section_str);
 	str.set_data_size(str.physical_size() + 2u);
-	fixture.test_each_overload([this, &str, &fixture](function_type func_type) {
+	fixture.test_each_overload([&str, &fixture](function_type func_type) {
 		EXPECT_THROW((void)fixture.string_to_address(func_type,
 			fixture.section_arr_rva, str, false, true), std::system_error);
 	});

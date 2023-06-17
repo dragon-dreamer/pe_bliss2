@@ -128,7 +128,7 @@ void ref_buffer::serialize(output_buffer_interface& buffer,
 	bool write_virtual_data) const
 {
 	std::visit(
-		[this, &buffer, write_virtual_data](const auto& buf) {
+		[&buffer, write_virtual_data](const auto& buf) {
 			auto size = buf.buffer->size();
 			if (!write_virtual_data)
 				size -= buf.buffer->virtual_size();
@@ -182,7 +182,7 @@ void ref_buffer::copy_referenced_buffer()
 
 input_buffer_ptr ref_buffer::data() const
 {
-	return std::visit([this](const auto& buf)
+	return std::visit([](const auto& buf)
 		-> input_buffer_ptr { return buf.buffer; }, buffer_);
 }
 
@@ -202,17 +202,17 @@ const ref_buffer::container_type& ref_buffer::copied_data() const
 
 std::size_t ref_buffer::size() const
 {
-	return std::visit([this] (const auto& buf) { return buf.buffer->size(); }, buffer_);
+	return std::visit([] (const auto& buf) { return buf.buffer->size(); }, buffer_);
 }
 
 std::size_t ref_buffer::virtual_size() const noexcept
 {
-	return std::visit([this](const auto& buf) { return buf.buffer->virtual_size(); }, buffer_);
+	return std::visit([](const auto& buf) { return buf.buffer->virtual_size(); }, buffer_);
 }
 
 bool ref_buffer::is_stateless() const noexcept
 {
-	return std::visit([this](const auto& buf) { return buf.buffer->is_stateless(); }, buffer_);
+	return std::visit([](const auto& buf) { return buf.buffer->is_stateless(); }, buffer_);
 }
 
 std::size_t ref_buffer::physical_size() const
