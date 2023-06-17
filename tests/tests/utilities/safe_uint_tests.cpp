@@ -167,7 +167,6 @@ TEST(SafeUintTests, SubDifferentTypesTest)
 	EXPECT_TRUE((std::is_same_v<decltype(diff1)::value_type, std::uint16_t>));
 	ASSERT_EQ(diff1.value(), 1u);
 
-	auto sum2 = b + a;
 	EXPECT_THROW((void)(a - b), std::system_error);
 
 	ASSERT_EQ((b -= a).value(), 1u);

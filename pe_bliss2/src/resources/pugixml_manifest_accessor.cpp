@@ -194,8 +194,8 @@ public:
 	}
 
 private:
-	std::string_view name_;
 	std::string_view ns_;
+	std::string_view name_;
 	pugi::xml_attribute attr_;
 };
 

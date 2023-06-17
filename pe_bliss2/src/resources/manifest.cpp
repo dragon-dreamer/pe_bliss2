@@ -526,9 +526,9 @@ namespace
 bool is_valid_progid_char(char c) noexcept
 {
 	static_assert('F' == 70 && 'Z' == 90 && 'f' == 102 && 'z' == 122);
-	return (c >= 'a' && c <= 'z'
-		|| c >= 'A' && c <= 'Z'
-		|| c >= '0' && c <= '9');
+	return ((c >= 'a' && c <= 'z')
+		|| (c >= 'A' && c <= 'Z')
+		|| (c >= '0' && c <= '9'));
 }
 
 bool has_invalid_progid_characters(std::string_view s) noexcept
@@ -822,7 +822,7 @@ std::optional<std::vector<std::byte>>
 			throw pe_error(manifest_errc::invalid_hex_string);
 		result.emplace_back(std::byte{ value });
 	}
-	return std::move(result);
+	return result;
 }
 
 template<typename... Bases>

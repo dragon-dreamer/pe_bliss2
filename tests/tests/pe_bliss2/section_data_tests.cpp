@@ -201,7 +201,6 @@ TEST(SectionDataTests, DeserializeIntOverflowTest)
 		55u, absolute_offset, relative_offset);
 
 	buffers::input_buffer_stateful_wrapper wrapper(buffer_mock);
-	auto header = create_section_header();
 	section_data data;
 	expect_throw_pe_error([&]() {
 		data.deserialize(create_section_header(), wrapper, {

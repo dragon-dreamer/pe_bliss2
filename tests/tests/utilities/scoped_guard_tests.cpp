@@ -38,8 +38,6 @@ void guard_throw()
 
 TEST(ScopedGuardTests, ScopedGuardThrowTest)
 {
-	auto lambda = [] { throw std::runtime_error(""); };
-
 	EXPECT_THROW(guard_throw(), std::runtime_error);
 }
 

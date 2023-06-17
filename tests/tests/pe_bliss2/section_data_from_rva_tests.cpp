@@ -192,7 +192,7 @@ TEST_P(SectionDataFromRvaFullFixture, SectionVirtualDataFromRvaTestConst1)
 	auto& full_headers_buf = instance.get_full_headers_buffer();
 	auto buf = std::make_shared<buffers::input_container_buffer>();
 	buf->get_container().resize(100u);
-	for (int i = 0; i != buf->get_container().size(); ++i)
+	for (std::size_t i = 0; i != buf->get_container().size(); ++i)
 		buf->get_container()[i] = static_cast<std::byte>(i);
 	auto virtual_buf = std::make_shared<buffers::input_virtual_buffer>(buf, 10u);
 	full_headers_buf.deserialize(virtual_buf, false);

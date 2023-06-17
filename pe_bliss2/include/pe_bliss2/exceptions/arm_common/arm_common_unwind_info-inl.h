@@ -65,7 +65,6 @@ void unwind_code_common<Length, Matcher, MatcherMask>::set_value(Value value)
 	constexpr std::size_t byte_count
 		= (ToBit - FromBit + CHAR_BIT) / CHAR_BIT;
 	static_assert(byte_count && byte_count <= sizeof(std::uint32_t));
-	using result_type = required_uint_type<byte_count>;
 	using source_type = required_uint_type<Length>;
 
 	constexpr auto max_value = create_bit_mask<FromBit, ToBit, sizeof(source_type)>()
