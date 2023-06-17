@@ -6,6 +6,12 @@ macro(set_output_dirs target_name)
 		ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<CONFIG>"
 		PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/$<CONFIG>"
 		COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<CONFIG>")
+	
+	if (MSVC)
+		target_compile_options("${target_name}" PRIVATE /W4)
+	else()
+		target_compile_options("${target_name}" PRIVATE -Wall -Wextra -Wpedantic -Wno-missing-field-initializers -Wno-missing-braces)
+	endif()
 endmacro()
 
 macro(set_msvc_runtime_library target_name runtime_library_type)
