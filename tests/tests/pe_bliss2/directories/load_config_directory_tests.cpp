@@ -226,7 +226,7 @@ TEST(LoadConfigDirectoryTests, Arm64xDynamicRelocationAddDelta)
 {
 	arm64x_dynamic_relocation_add_delta_base<> reloc;
 	EXPECT_EQ(reloc.get_value().get(), 0u);
-	EXPECT_EQ(reloc.get_delta(), 0u);
+	EXPECT_EQ(reloc.get_delta(), 0);
 	EXPECT_EQ(reloc.get_multiplier(),
 		arm64x_dynamic_relocation_add_delta_base<>::multiplier::multiplier_4);
 	EXPECT_EQ(reloc.get_sign(),

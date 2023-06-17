@@ -18,7 +18,7 @@ TEST(AcceleratorTableTests, VirtualKeyCodeToString)
 TEST(AcceleratorTableTests, GetKeyModifiers)
 {
 	accelerator accel;
-	EXPECT_EQ(accel.get_key_modifiers(), 0u);
+	EXPECT_EQ(accel.get_key_modifiers(), 0);
 
 	accel.get_descriptor()->modifier = pe_bliss::detail::resources::modifier_alt
 		| pe_bliss::detail::resources::modifier_control

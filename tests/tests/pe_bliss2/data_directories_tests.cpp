@@ -144,7 +144,8 @@ TEST(DataDirectoriesTests, DeserializeSerializeTest)
 		EXPECT_TRUE(std::equal(std::cbegin(outdata), std::cend(outdata) - 3u,
 			reinterpret_cast<const std::byte*>(data)));
 		EXPECT_EQ(std::count(std::cbegin(outdata) + std::size(data) - 1u,
-			std::cend(outdata), std::byte{}), virtual_byte_count);
+			std::cend(outdata), std::byte{}),
+			static_cast<std::ptrdiff_t>(virtual_byte_count));
 	}
 	
 	EXPECT_FALSE(dirs.get_directories().empty());

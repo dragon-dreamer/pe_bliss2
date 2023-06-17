@@ -50,12 +50,12 @@ void move_tests(
 {
 	buffers::ref_buffer moved_buf;
 	moved_buf = std::move(buf);
-	EXPECT_EQ(input_buf.use_count(), is_buffer_copied ? 1u : 2u);
+	EXPECT_EQ(input_buf.use_count(), is_buffer_copied ? 1 : 2);
 	EXPECT_EQ(moved_buf.size(), input_buf->size());
 	EXPECT_EQ(moved_buf.data()->size(), input_buf->size());
 
 	auto moved_buf2(std::move(moved_buf));
-	EXPECT_EQ(input_buf.use_count(), is_buffer_copied ? 1u : 2u);
+	EXPECT_EQ(input_buf.use_count(), is_buffer_copied ? 1 : 2);
 	EXPECT_EQ(moved_buf2.size(), input_buf->size());
 	EXPECT_EQ(moved_buf2.data()->size(), input_buf->size());
 
@@ -71,14 +71,14 @@ void copy_tests(
 {
 	buffers::ref_buffer copied_buf;
 	copied_buf = buf;
-	EXPECT_EQ(input_buf.use_count(), is_buffer_copied ? 1u : 3u);
+	EXPECT_EQ(input_buf.use_count(), is_buffer_copied ? 1 : 3);
 	EXPECT_EQ(copied_buf.size(), input_buf->size());
 	EXPECT_EQ(copied_buf.data()->size(), input_buf->size());
 	EXPECT_EQ(buf.size(), input_buf->size());
 	EXPECT_EQ(buf.data()->size(), input_buf->size());
 
 	auto copied_buf2(copied_buf);
-	EXPECT_EQ(input_buf.use_count(), is_buffer_copied ? 1u : 4u);
+	EXPECT_EQ(input_buf.use_count(), is_buffer_copied ? 1 : 4);
 	EXPECT_EQ(copied_buf2.size(), input_buf->size());
 	EXPECT_EQ(copied_buf2.data()->size(), input_buf->size());
 	EXPECT_EQ(copied_buf.size(), input_buf->size());
@@ -126,7 +126,7 @@ TEST(BufferTests, CopiedRefBufferTest)
 	for (std::size_t i = 0; i != 2; ++i) //loop to test ref_buffer reuse
 	{
 		ASSERT_NO_THROW(buf.deserialize(input_buf, true));
-		EXPECT_EQ(input_buf.use_count(), 1u);
+		EXPECT_EQ(input_buf.use_count(), 1);
 
 		EXPECT_EQ(buf.size(), input_buf->size());
 		EXPECT_EQ(buf.data()->size(), input_buf->size());
@@ -159,14 +159,14 @@ TEST(BufferTests, ReferencedRefBufferTest)
 	for (std::size_t i = 0; i != 2; ++i) //loop to test ref_buffer reuse
 	{
 		ASSERT_NO_THROW(buf.deserialize(input_buf, false));
-		EXPECT_EQ(input_buf.use_count(), 2u);
+		EXPECT_EQ(input_buf.use_count(), 2);
 
 		EXPECT_EQ(buf.size(), input_buf->size());
 		EXPECT_EQ(buf.data()->size(), input_buf->size());
 
 		test_serialize(input_buf->get_container(), buf, 0u, 10u);
 		test_serialize(input_buf->get_container(), buf, 1u, 20u);
-		EXPECT_EQ(input_buf.use_count(), 2u);
+		EXPECT_EQ(input_buf.use_count(), 2);
 		EXPECT_THROW((void)std::as_const(buf).copied_data(),
 			std::system_error);
 

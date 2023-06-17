@@ -41,22 +41,22 @@ TEST(BitStreamTests, Uint8Test)
 	const std::vector<std::uint8_t> bytes{ 0b11001100, 0b10011100, 0b00011010 };
 
 	pe_bliss::bit_stream stream(bytes);
-	EXPECT_EQ(stream.read(24), 0b00011010'10011100'11001100);
+	EXPECT_EQ(stream.read(24), 0b00011010'10011100'11001100u);
 
 	ASSERT_NO_THROW(stream.set_pos(0u));
-	for (int expected : { 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1,
+	for (std::uint32_t expected : { 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1,
 		0, 1, 0, 1, 1, 0, 0, 0 }) {
 		EXPECT_EQ(stream.read(1), expected);
 	}
 
 	ASSERT_NO_THROW(stream.set_pos(0u));
-	for (int expected : { 0b100, 0b001, 0b011, 0b110, 0b001,
+	for (std::uint32_t expected : { 0b100, 0b001, 0b011, 0b110, 0b001,
 		0b101, 0b110, 0b000 }) {
 		EXPECT_EQ(stream.read(3), expected);
 	}
 
 	ASSERT_NO_THROW(stream.set_pos(0u));
-	for (int expected : { 0b1001100, 0b0111001, 0b1101010 }) {
+	for (std::uint32_t expected : { 0b1001100, 0b0111001, 0b1101010 }) {
 		EXPECT_EQ(stream.read(7), expected);
 	}
 
@@ -98,19 +98,19 @@ TEST(BitStreamTests, Uint16Test)
 	EXPECT_EQ(stream.read(32), 0b1001110000111001'1100110011110110);
 
 	ASSERT_NO_THROW(stream.set_pos(0u));
-	for (int expected : { 0, 1, 1, 0, 1, 1, 1, 1, 0, 0,
+	for (std::uint32_t expected : { 0, 1, 1, 0, 1, 1, 1, 1, 0, 0,
 		1, 1, 0, 0, 1, 1, 1, 0, 0 }) {
 		EXPECT_EQ(stream.read(1), expected);
 	}
 
 	ASSERT_NO_THROW(stream.set_pos(0u));
-	for (int expected : { 0b110, 0b110, 0b011, 0b110, 0b100, 0b011,
+	for (std::uint32_t expected : { 0b110, 0b110, 0b011, 0b110, 0b100, 0b011,
 		0b110 }) {
 		EXPECT_EQ(stream.read(3), expected);
 	}
 
 	ASSERT_NO_THROW(stream.set_pos(0u));
-	for (int expected : { 0b1110110, 0b0011001, 0b1100111,
+	for (std::uint32_t expected : { 0b1110110, 0b0011001, 0b1100111,
 		0b1100001 }) {
 		EXPECT_EQ(stream.read(7), expected);
 	}
@@ -126,17 +126,17 @@ TEST(BitStreamTests, Uint64Test)
 	EXPECT_EQ(stream.read(32), 0b10100111'00011010'10011100'11001111);
 
 	ASSERT_NO_THROW(stream.set_pos(0u));
-	for (int expected : { 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0 }) {
+	for (std::uint32_t expected : { 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 1, 0, 0, 1, 0 }) {
 		EXPECT_EQ(stream.read(1), expected);
 	}
 
 	ASSERT_NO_THROW(stream.set_pos(54u));
-	for (int expected : { 0b010, 0b110, 0b111, 0b101 }) {
+	for (std::uint32_t expected : { 0b010, 0b110, 0b111, 0b101 }) {
 		EXPECT_EQ(stream.read(3), expected);
 	}
 
 	ASSERT_NO_THROW(stream.set_pos(0u));
-	for (int expected : { 0b1001111, 0b0111001, 0b1101010 }) {
+	for (std::uint32_t expected : { 0b1001111, 0b0111001, 0b1101010 }) {
 		EXPECT_EQ(stream.read(7), expected);
 	}
 

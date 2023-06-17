@@ -349,7 +349,7 @@ TEST(PackedSerializationTests, DeserializeUntilFieldTest2)
 			auto obj = std::get<nested_short>(serialized_values);
 			std::fill(&obj.c[0][0], &obj.c[0][0]
 				+ sizeof(obj.c) / sizeof(obj.c[0][0]), simple{});
-			std::fill(obj.d.begin(), obj.d.end(), 0u);
+			std::fill(obj.d.begin(), obj.d.end(), static_cast<std::uint8_t>(0u));
 			test_deserialization<Deserializer>(
 				serialized_representations[6].substr(0, size_nested_until_b),
 				serialized_representations_reversed[6].substr(0, size_nested_until_b),
@@ -403,7 +403,7 @@ TEST(PackedSerializationTests, DeserializeUntilSizePartialTest)
 		+ sizeof(obj.c) / sizeof(obj.c[0][0]), simple{});
 	obj.c[0][0].a = backup.a;
 	obj.c[0][0].b = backup.b;
-	std::fill(obj.d.begin(), obj.d.end(), 0u);
+	std::fill(obj.d.begin(), obj.d.end(), static_cast<std::uint8_t>(0u));
 	test_deserialization<deserializer_nested_b_partial>(
 		serialized_representations[6].substr(0, size_b_partial2),
 		serialized_representations_reversed[6].substr(0, size_b_partial2),
