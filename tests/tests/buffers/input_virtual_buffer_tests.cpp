@@ -25,7 +25,7 @@ constexpr std::size_t extra_data_size = 3u;
 
 TEST(BufferTests, InputVirtualBufferTest1)
 {
-	static constexpr std::array data{
+	static constexpr std::array arr{
 		std::byte{1},
 		std::byte{2},
 		std::byte{3},
@@ -34,9 +34,9 @@ TEST(BufferTests, InputVirtualBufferTest1)
 	};
 
 	auto buffer = std::make_shared<buffers::input_memory_buffer>(
-		data.data(), data.size());
+		arr.data(), arr.size());
 	buffers::input_virtual_buffer virtual_buffer(buffer, 0u);
-	test_input_buffer(virtual_buffer, data);
+	test_input_buffer(virtual_buffer, arr);
 	EXPECT_TRUE(virtual_buffer.is_stateless());
 	EXPECT_EQ(virtual_buffer.virtual_size(), 0u);
 }

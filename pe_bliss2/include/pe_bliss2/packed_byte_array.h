@@ -89,9 +89,9 @@ public:
 	}
 
 	std::size_t serialize(std::byte* buf,
-		std::size_t max_size, bool write_virtual_part) const
+		std::size_t custom_max_size, bool write_virtual_part) const
 	{
-		return serialize_impl(buf, max_size, value_.data(), write_virtual_part);
+		return serialize_impl(buf, custom_max_size, value_.data(), write_virtual_part);
 	}
 
 	[[nodiscard]] constexpr const array_type& value() const noexcept

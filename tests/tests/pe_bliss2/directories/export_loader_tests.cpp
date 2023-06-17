@@ -283,22 +283,22 @@ TEST_F(ExportLoaderTestFixture, GetExportsDirectoryNamesEmpty)
 		exports::export_directory_loader_errc::invalid_rva);
 	expect_contains_errors(dir->get_export_list()[1]);
 	
-	const auto& names = dir->get_export_list()[0].get_names();
-	ASSERT_EQ(names.size(), number_of_names);
+	const auto& exported_names = dir->get_export_list()[0].get_names();
+	ASSERT_EQ(exported_names.size(), number_of_names);
 	for (std::uint32_t i = 0; i != number_of_names; ++i)
 	{
-		EXPECT_FALSE(names[i].get_name().has_value());
-		EXPECT_EQ(names[i].get_name_ordinal().get(), 0u);
-		EXPECT_EQ(names[i].get_name_rva().get(), 0u);
+		EXPECT_FALSE(exported_names[i].get_name().has_value());
+		EXPECT_EQ(exported_names[i].get_name_ordinal().get(), 0u);
+		EXPECT_EQ(exported_names[i].get_name_rva().get(), 0u);
 
-		EXPECT_EQ(names[i].get_name_ordinal().get_state().absolute_offset(),
+		EXPECT_EQ(exported_names[i].get_name_ordinal().get_state().absolute_offset(),
 			absolute_offset + name_ordinals_offset + i * sizeof(exports::ordinal_type));
-		EXPECT_EQ(names[i].get_name_ordinal().get_state().relative_offset(),
+		EXPECT_EQ(exported_names[i].get_name_ordinal().get_state().relative_offset(),
 			name_ordinals_offset + i * sizeof(exports::ordinal_type));
 
-		EXPECT_EQ(names[i].get_name_rva().get_state().absolute_offset(),
+		EXPECT_EQ(exported_names[i].get_name_rva().get_state().absolute_offset(),
 			absolute_offset + names_offset + i * sizeof(rva_type));
-		EXPECT_EQ(names[i].get_name_rva().get_state().relative_offset(),
+		EXPECT_EQ(exported_names[i].get_name_rva().get_state().relative_offset(),
 			names_offset + i * sizeof(rva_type));
 	}
 

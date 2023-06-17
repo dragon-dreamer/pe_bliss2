@@ -88,7 +88,7 @@ public:
 		for (auto func_type : { function_type::rva,
 			function_type::va32, function_type::va64 })
 		{
-			std::forward<Func>(func)(function_type::rva);
+			std::forward<Func>(func)(func_type);
 			auto& header_range = instance.get_full_headers_buffer().copied_data();
 			std::fill(header_range.begin(), header_range.end(), std::byte{});
 			auto& section_range = instance.get_section_data_list()[1].copied_data();

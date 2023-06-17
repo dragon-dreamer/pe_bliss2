@@ -53,12 +53,12 @@ TEST(BufferTests, InputBufferSectionTest)
 
 TEST(BufferTests, InputBufferSectionConstructorTest)
 {
-	const std::vector<std::byte> data{
+	const std::vector<std::byte> vec{
 		std::byte(1)
 	};
 
 	auto buffer = std::make_shared<buffers::input_memory_buffer>(
-		data.data(), data.size());
+		vec.data(), vec.size());
 
 	EXPECT_NO_THROW((void)buffers::input_buffer_section(buffer, 0u, 1u));
 	EXPECT_NO_THROW((void)buffers::input_buffer_section(buffer, 1u, 0u));

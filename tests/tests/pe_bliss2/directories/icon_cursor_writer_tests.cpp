@@ -37,7 +37,7 @@ TEST(IconCursorWriterTests, IconToFileFormat)
 	auto& header1 = group.get_resource_group_headers().emplace_back();
 	header1->height = 1u;
 	auto& header2 = group.get_resource_group_headers().emplace_back();
-	header1->height = 2u;
+	header2->height = 2u;
 	
 	auto& buf1 = group.get_data_list().emplace_back();
 	buf1.copied_data().assign(data1.begin(), data1.end());
@@ -88,7 +88,7 @@ TEST(IconCursorWriterTests, CursorToFileFormat)
 	auto& header1 = group.get_resource_group_headers().emplace_back();
 	header1->height = 2u;
 	auto& header2 = group.get_resource_group_headers().emplace_back();
-	header1->height = 4u;
+	header2->height = 4u;
 
 	auto& buf1 = group.get_data_list().emplace_back();
 	buf1.copied_data().assign(data1.begin(), data1.end());
@@ -175,8 +175,8 @@ buffers::output_memory_buffer::buffer_type get_expected_serialized_data(
 	group.get_header().serialize(buf, write_virtual_data);
 	for (const auto& entry_header : group.get_resource_group_headers())
 		entry_header.native().serialize(buf, write_virtual_data);
-	for (const auto& data : group.get_data_list())
-		data.serialize(buf, write_virtual_data);
+	for (const auto& item : group.get_data_list())
+		item.serialize(buf, write_virtual_data);
 	return data;
 }
 } //namespace

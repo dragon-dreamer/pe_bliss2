@@ -21,11 +21,11 @@
 
 namespace
 {
-static constexpr std::size_t size = 10u;
+static constexpr std::size_t test_arr_size = 10u;
 auto create_test_array()
 {
-	pe_bliss::packed_byte_array<size> arr;
-	arr.set_physical_size(size - 2u);
+	pe_bliss::packed_byte_array<test_arr_size> arr;
+	arr.set_physical_size(test_arr_size - 2u);
 	arr[0] = std::byte{ 123 };
 	arr[5] = std::byte{ 100 };
 	arr[7] = std::byte{ 5 };
@@ -35,27 +35,27 @@ auto create_test_array()
 
 TEST(PackedByteArrayTests, ConstructionAndMetadataTest)
 {
-	pe_bliss::packed_byte_array<size> arr;
-	EXPECT_EQ(arr.max_size, size);
-	EXPECT_EQ(arr.value(), (std::array<std::byte, size>{}));
+	pe_bliss::packed_byte_array<test_arr_size> arr;
+	EXPECT_EQ(arr.max_size, test_arr_size);
+	EXPECT_EQ(arr.value(), (std::array<std::byte, test_arr_size>{}));
 	EXPECT_EQ(arr.get_state(), buffers::serialized_data_state{});
 	EXPECT_EQ(arr.physical_size(), 0u);
 	EXPECT_EQ(arr.data_size(), 0u);
 	EXPECT_FALSE(arr.is_virtual());
 
-	arr.set_physical_size(size + 10u);
-	EXPECT_EQ(arr.physical_size(), size);
-	EXPECT_EQ(arr.data_size(), size);
+	arr.set_physical_size(test_arr_size + 10u);
+	EXPECT_EQ(arr.physical_size(), test_arr_size);
+	EXPECT_EQ(arr.data_size(), test_arr_size);
 	EXPECT_FALSE(arr.is_virtual());
 
-	arr.set_physical_size(size - 1u);
-	EXPECT_EQ(arr.physical_size(), size - 1u);
-	EXPECT_EQ(arr.data_size(), size);
+	arr.set_physical_size(test_arr_size - 1u);
+	EXPECT_EQ(arr.physical_size(), test_arr_size - 1u);
+	EXPECT_EQ(arr.data_size(), test_arr_size);
 	EXPECT_TRUE(arr.is_virtual());
 
-	arr.set_data_size(size - 2u);
-	EXPECT_EQ(arr.physical_size(), size - 1u);
-	EXPECT_EQ(arr.data_size(), size - 1u);
+	arr.set_data_size(test_arr_size - 2u);
+	EXPECT_EQ(arr.physical_size(), test_arr_size - 1u);
+	EXPECT_EQ(arr.data_size(), test_arr_size - 1u);
 
 	buffers::serialized_data_state state;
 	state.set_absolute_offset(1u);
@@ -79,7 +79,7 @@ TEST(PackedByteArrayTests, ConstructionAndMetadataTest)
 	EXPECT_EQ(copy2[1], std::byte{ 123 });
 	EXPECT_EQ(std::as_const(copy2)[1], std::byte{ 123 });
 
-	pe_bliss::packed_byte_array<size + 10u> arr2;
+	pe_bliss::packed_byte_array<test_arr_size + 10u> arr2;
 	arr2.copy_metadata_from(arr);
 	EXPECT_EQ(arr2.get_state(), arr.get_state());
 	EXPECT_EQ(arr2.physical_size(), arr.physical_size());
@@ -90,14 +90,14 @@ TEST(PackedByteArrayTests, SerializeTest1)
 {
 	auto arr = create_test_array();
 
-	std::array<std::byte, size> serialized{};
-	buffers::output_memory_ref_buffer buffer(serialized.data(), size);
+	std::array<std::byte, test_arr_size> serialized{};
+	buffers::output_memory_ref_buffer buffer(serialized.data(), test_arr_size);
 	ASSERT_EQ(arr.serialize(buffer, false), arr.physical_size());
 	EXPECT_EQ(arr.value(), serialized);
 	
 	serialized = {};
 	buffer.set_wpos(0u);
-	arr.set_physical_size(size - 4u);
+	arr.set_physical_size(test_arr_size - 4u);
 	ASSERT_EQ(arr.serialize(buffer, false), arr.physical_size());
 	EXPECT_EQ(std::memcmp(serialized.data(), arr.value().data(),
 		arr.physical_size()), 0);
@@ -105,7 +105,7 @@ TEST(PackedByteArrayTests, SerializeTest1)
 
 	serialized = {};
 	buffer.set_wpos(0u);
-	EXPECT_EQ(arr.data_size(), size - 2u);
+	EXPECT_EQ(arr.data_size(), test_arr_size - 2u);
 	EXPECT_EQ(arr.serialize(buffer, true), arr.data_size());
 	EXPECT_EQ(arr.value(), serialized);
 }
@@ -114,7 +114,7 @@ TEST(PackedByteArrayTests, SerializeTest2)
 {
 	auto arr = create_test_array();
 
-	std::array<std::byte, size> serialized{};
+	std::array<std::byte, test_arr_size> serialized{};
 
 	expect_throw_pe_error([&] {
 		arr.serialize(serialized.data(), arr.physical_size() - 1u, false); },
@@ -124,7 +124,7 @@ TEST(PackedByteArrayTests, SerializeTest2)
 	EXPECT_EQ(arr.value(), serialized);
 
 	serialized = {};
-	arr.set_physical_size(size - 4u);
+	arr.set_physical_size(test_arr_size - 4u);
 	ASSERT_EQ(arr.serialize(serialized.data(), arr.physical_size(), false),
 		arr.physical_size());
 	EXPECT_EQ(std::memcmp(serialized.data(), arr.value().data(),
@@ -141,13 +141,13 @@ TEST(PackedByteArrayTests, SerializeTest2)
 
 TEST(PackedByteArrayTests, DeserializeTest)
 {
-	pe_bliss::packed_byte_array<size> arr;
+	pe_bliss::packed_byte_array<test_arr_size> arr;
 
 	static constexpr std::size_t absolute_offset = 1u;
 	static constexpr std::size_t relative_offset = 2u;
 	static constexpr std::size_t buffer_pos = 3u;
 
-	static constexpr std::array<std::byte, size + buffer_pos> test_array{
+	static constexpr std::array<std::byte, test_arr_size + buffer_pos> test_array{
 		std::byte{}, std::byte{}, std::byte{},
 		std::byte{1}, std::byte{2}, std::byte{3},
 		std::byte{10}, std::byte{20}, std::byte{30},
@@ -157,7 +157,7 @@ TEST(PackedByteArrayTests, DeserializeTest)
 
 	auto buffer = std::make_shared<buffers::input_memory_buffer>(
 		test_array.data(), test_array.size());
-	static constexpr std::size_t extra_virtual_bytes = size;
+	static constexpr std::size_t extra_virtual_bytes = test_arr_size;
 	buffers::input_virtual_buffer virtual_buffer(buffer, extra_virtual_bytes);
 	buffers::input_buffer_stateful_wrapper_ref ref(virtual_buffer);
 
@@ -167,10 +167,10 @@ TEST(PackedByteArrayTests, DeserializeTest)
 		virtual_buffer.set_relative_offset(relative_offset);
 
 		expect_throw_pe_error([&] {
-			arr.deserialize(ref, size + 1, false); },
+			arr.deserialize(ref, test_arr_size + 1, false); },
 			utilities::generic_errc::buffer_overrun);
 
-		ref.set_rpos(size);
+		ref.set_rpos(test_arr_size);
 		expect_throw_pe_error([&] {
 			arr.deserialize(ref, extra_virtual_bytes, false); },
 			utilities::generic_errc::buffer_overrun);
@@ -179,14 +179,14 @@ TEST(PackedByteArrayTests, DeserializeTest)
 		EXPECT_THROW(arr.deserialize(ref, 1u, false), std::system_error);
 
 		ref.set_rpos(buffer_pos);
-		ASSERT_NO_THROW(arr.deserialize(ref, size, false));
+		ASSERT_NO_THROW(arr.deserialize(ref, test_arr_size, false));
 
 		EXPECT_EQ(arr.get_state().absolute_offset(), absolute_offset + buffer_pos);
 		EXPECT_EQ(arr.get_state().relative_offset(), relative_offset + buffer_pos);
 		EXPECT_EQ(arr.get_state().buffer_pos(), buffer_pos);
 		EXPECT_FALSE(arr.is_virtual());
-		EXPECT_EQ(arr.physical_size(), size);
-		EXPECT_EQ(arr.data_size(), size);
+		EXPECT_EQ(arr.physical_size(), test_arr_size);
+		EXPECT_EQ(arr.data_size(), test_arr_size);
 		EXPECT_TRUE(std::equal(arr.value().cbegin(),
 			arr.value().cbegin() + arr.physical_size(),
 			test_array.cbegin() + buffer_pos));
@@ -195,16 +195,16 @@ TEST(PackedByteArrayTests, DeserializeTest)
 	{
 		virtual_buffer.set_absolute_offset(0u);
 		virtual_buffer.set_relative_offset(0u);
-		ref.set_rpos(size);
+		ref.set_rpos(test_arr_size);
 		ASSERT_NO_THROW(arr.deserialize(ref, extra_virtual_bytes, true));
-		EXPECT_EQ(arr.get_state().absolute_offset(), size);
-		EXPECT_EQ(arr.get_state().relative_offset(), size);
-		EXPECT_EQ(arr.get_state().buffer_pos(), size);
+		EXPECT_EQ(arr.get_state().absolute_offset(), test_arr_size);
+		EXPECT_EQ(arr.get_state().relative_offset(), test_arr_size);
+		EXPECT_EQ(arr.get_state().buffer_pos(), test_arr_size);
 		EXPECT_TRUE(arr.is_virtual());
 		EXPECT_EQ(arr.physical_size(), buffer_pos);
-		EXPECT_EQ(arr.data_size(), size);
+		EXPECT_EQ(arr.data_size(), test_arr_size);
 		EXPECT_TRUE(std::equal(arr.value().cbegin(),
 			arr.value().cbegin() + arr.physical_size(),
-			test_array.cbegin() + size));
+			test_array.cbegin() + test_arr_size));
 	}
 }

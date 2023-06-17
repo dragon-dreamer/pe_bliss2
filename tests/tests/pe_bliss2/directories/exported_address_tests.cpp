@@ -14,7 +14,8 @@ TEST(ExportedAddressTests, EmptyExportedName)
 
 TEST(ExportedAddressTests, ExportedName)
 {
-	exports::exported_name name("test", 1u, 2u);
+	exports::exported_name name("test", 1u,
+		static_cast<pe_bliss::exports::ordinal_type>(2u));
 	ASSERT_TRUE(name.get_name().has_value());
 	EXPECT_EQ(name.get_name()->value(), "test");
 	EXPECT_EQ(name.get_name_rva().get(), 1u);

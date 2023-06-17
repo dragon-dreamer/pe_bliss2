@@ -245,7 +245,6 @@ TEST_P(SectionDataFromRvaFullFixture, SectionVirtualDataFromRvaTestConst2)
 
 TEST_P(SectionDataFromRvaFullFixture, SectionDataFromRvaTestSectionEnd)
 {
-	const auto& section = instance.get_section_data_list()[2];
 	for (bool allow_virtual_data : {true, false})
 	{
 		EXPECT_TRUE(buffers_equal(section_data_from_address(
@@ -399,7 +398,6 @@ TEST_P(SectionDataFromRvaWithSizeFixture, SectionDataFromRvaTestConst3)
 	auto virtual_buf = std::make_shared<buffers::input_virtual_buffer>(
 		empty_buf, virtual_size);
 
-	const auto& section = instance.get_section_data_list()[1];
 	EXPECT_TRUE(buffers_equal(section_data_from_address(
 		std::as_const(instance), 0x3010u, virtual_size, true, true),
 		virtual_buf));

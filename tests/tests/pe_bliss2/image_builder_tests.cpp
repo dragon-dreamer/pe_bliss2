@@ -46,7 +46,7 @@ public:
 		instance.get_file_header().set_machine_type(
 			core::file_header::machine_type::i386);
 		instance.get_file_header().get_descriptor()->size_of_optional_header
-			= static_cast<std::uint32_t>(instance.get_optional_header().get_size_of_structure()
+			= static_cast<std::uint16_t>(instance.get_optional_header().get_size_of_structure()
 				+ number_of_data_directories * core::data_directories::directory_packed_size);
 
 		instance.get_optional_header().set_raw_number_of_rva_and_sizes(

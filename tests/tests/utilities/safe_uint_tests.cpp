@@ -13,10 +13,19 @@ template<typename T>
 class SafeUintTests : public testing::Test
 {
 public:
-	template<typename... Value>
-	[[nodiscard]] auto create(Value... value) noexcept
+	[[nodiscard]] auto create(T value) noexcept
 	{
-		return utilities::safe_uint<T>(value...);
+		return utilities::safe_uint<T>(value);
+	}
+	
+	[[nodiscard]] auto create() noexcept
+	{
+		return utilities::safe_uint<T>();
+	}
+	
+	[[nodiscard]] auto create(utilities::safe_uint<T> value) noexcept
+	{
+		return utilities::safe_uint<T>(value);
 	}
 
 	static constexpr const auto max_value = (std::numeric_limits<T>::max)();

@@ -69,10 +69,10 @@ public:
 	pe_bliss::exceptions::exception_directory_details load_dir(
 		const loader_options& options = {}) const
 	{
-		pe_bliss::exceptions::exception_directory_details dir;
+		pe_bliss::exceptions::exception_directory_details loaded;
 		EXPECT_NO_THROW(pe_bliss::exceptions::x64::load(
-			instance, options, dir));
-		return dir;
+			instance, options, loaded));
+		return loaded;
 	}
 
 	const exception_directory_details* get_x64_dir()
@@ -247,18 +247,18 @@ public:
 
 TEST_F(X64ExceptionLoaderTestFixture, AbsentDirectory)
 {
-	auto dir = load_dir();
-	expect_contains_errors(dir);
-	EXPECT_TRUE(dir.get_directories().empty());
+	auto loaded = load_dir();
+	expect_contains_errors(loaded);
+	EXPECT_TRUE(loaded.get_directories().empty());
 }
 
 TEST_F(X64ExceptionLoaderTestFixture, EmptyDirectory)
 {
 	add_exception_dir();
-	const auto* dir = load_and_get_x64_dir();
-	ASSERT_NE(dir, nullptr);
-	expect_contains_errors(*dir);
-	EXPECT_TRUE(dir->get_runtime_function_list().empty());
+	const auto* loaded = load_and_get_x64_dir();
+	ASSERT_NE(loaded, nullptr);
+	expect_contains_errors(*loaded);
+	EXPECT_TRUE(loaded->get_runtime_function_list().empty());
 }
 
 TEST_F(X64ExceptionLoaderTestFixture, ValidDirectory)
@@ -271,13 +271,13 @@ TEST_F(X64ExceptionLoaderTestFixture, ValidDirectory)
 TEST_F(X64ExceptionLoaderTestFixture, HeaderDirectoryError)
 {
 	add_exception_dir_to_headers();
-	const auto* dir = load_and_get_x64_dir({ .include_headers = false });
-	ASSERT_NE(dir, nullptr);
-	expect_contains_errors(*dir,
+	const auto* loaded = load_and_get_x64_dir({ .include_headers = false });
+	ASSERT_NE(loaded, nullptr);
+	expect_contains_errors(*loaded,
 		exception_directory_loader_errc::unmatched_directory_size);
 
-	ASSERT_EQ(dir->get_runtime_function_list().size(), 1u);
-	const auto& function0 = dir->get_runtime_function_list()[0];
+	ASSERT_EQ(loaded->get_runtime_function_list().size(), 1u);
+	const auto& function0 = loaded->get_runtime_function_list()[0];
 	expect_contains_errors(function0,
 		exception_directory_loader_errc::invalid_runtime_function_entry);
 }
@@ -285,12 +285,12 @@ TEST_F(X64ExceptionLoaderTestFixture, HeaderDirectoryError)
 TEST_F(X64ExceptionLoaderTestFixture, HeaderDirectory)
 {
 	add_exception_dir_to_headers();
-	const auto* dir = load_and_get_x64_dir();
-	ASSERT_NE(dir, nullptr);
-	expect_contains_errors(*dir,
+	const auto* loaded = load_and_get_x64_dir();
+	ASSERT_NE(loaded, nullptr);
+	expect_contains_errors(*loaded,
 		exception_directory_loader_errc::unmatched_directory_size);
 	
-	ASSERT_TRUE(dir->get_runtime_function_list().empty());
+	ASSERT_TRUE(loaded->get_runtime_function_list().empty());
 }
 
 TEST_F(X64ExceptionLoaderTestFixture, ExceptionLoaderValidDirectory)

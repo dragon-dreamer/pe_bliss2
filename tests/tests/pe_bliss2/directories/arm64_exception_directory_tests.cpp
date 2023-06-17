@@ -258,7 +258,8 @@ void test_save_reg(std::uint8_t reg_delta, std::uint8_t max_reg,
 	test_save_regp_register_pair(code, reg_delta, max_reg);
 
 	auto max_offset = (1u << offset_bit_count) - 1u;
-	auto max_offset_scaled = max_offset * 8u + offset_delta;
+	auto max_offset_scaled = static_cast<std::uint16_t>(
+		max_offset * 8u + offset_delta);
 
 	EXPECT_EQ(code.get_offset(), offset_delta);
 	EXPECT_NO_THROW(code.set_offset(max_offset_scaled));

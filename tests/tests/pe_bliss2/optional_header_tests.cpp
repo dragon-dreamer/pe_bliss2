@@ -154,7 +154,7 @@ struct getter_setter
 {
 	static void test(optional_header& header)
 	{
-		static std::uint32_t value = 1u;
+		static std::uint8_t value = 1u;
 		EXPECT_EQ((header.*Getter)(), 0u);
 		EXPECT_EQ(header.access(Lambda), 0u);
 		(header.*Setter)(value);
@@ -672,14 +672,16 @@ TEST(OptionalHeaderTests, ValidateSizeOfOptionalHeaderTest)
 	EXPECT_EQ(validate_size_of_optional_header(0u, header),
 		optional_header_errc::invalid_size_of_optional_header);
 
-	EXPECT_EQ(validate_size_of_optional_header(header.get_size_of_structure() - 1,
+	EXPECT_EQ(validate_size_of_optional_header(
+		static_cast<std::uint16_t>(header.get_size_of_structure() - 1u),
 		header), optional_header_errc::invalid_size_of_optional_header);
 
 	EXPECT_NO_THROW(validate_size_of_optional_header(
-		header.get_size_of_structure(), header).throw_on_error());
+		static_cast<std::uint16_t>(header.get_size_of_structure()), header).throw_on_error());
 
 	header.set_raw_number_of_rva_and_sizes(3u);
-	EXPECT_EQ(validate_size_of_optional_header(header.get_size_of_structure(), header),
+	EXPECT_EQ(validate_size_of_optional_header(
+		static_cast<std::uint16_t>(header.get_size_of_structure()), header),
 		optional_header_errc::invalid_size_of_optional_header);
 
 	static constexpr auto data_dir_size = detail::packed_reflection

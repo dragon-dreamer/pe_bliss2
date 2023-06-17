@@ -109,7 +109,7 @@ TEST(SectionHeaderTests, SectionHeaderNameTest1)
 TEST(SectionHeaderTests, SectionHeaderNameTest2)
 {
 	section_header header;
-	static constexpr const char name[] = "123\0456";
+	static constexpr const char name[] = "123\0xyz";
 	EXPECT_EQ(&header.set_name({ std::begin(name), std::size(name) - 1 }),
 		&header);
 	EXPECT_EQ(header.get_name(), std::string(std::begin(name),
