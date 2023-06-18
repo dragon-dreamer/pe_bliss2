@@ -8,7 +8,7 @@ macro(set_output_dirs target_name)
 		COMPILE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib/$<CONFIG>")
 	
 	if (MSVC)
-		target_compile_options("${target_name}" PRIVATE /W4)
+		target_compile_options("${target_name}" PRIVATE /W4 /sdl)
 	else()
 		target_compile_options("${target_name}" PRIVATE -Wall -Wextra -Wpedantic -Wno-missing-field-initializers -Wno-missing-braces)
 	endif()
