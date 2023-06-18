@@ -159,3 +159,42 @@ The library compiles and passes tests with the following compilers:
 - C++20 or newer.
 - [Boost](https://www.boost.org/) libraries (1.78.0 or newer, header-only): **endian**, **pfr**
 - Two external libraries are embedded (`external` directory): **googletest**, **pugixml**
+
+## Building
+### Windows Solution
+Use the supplied `pe_bliss.sln` Visual Studio 2022 solution to build the project. You will need to edit the `common.props` file and set the right path to the [Boost](https://www.boost.org/) library.
+
+### Windows CMake
+Alternatively, [CMake](https://cmake.org/) build is also supported. Example build:
+```bat
+:: Set path to your boost library
+set BOOST_INCLUDEDIR=C:\Libs\boost_1_82_0
+mkdir build
+cd build
+cmake ../
+cmake --build .
+:: Alternatively, build release
+cmake --build . --config Release
+:: Optionally, run tests
+ctest
+```
+
+### Linux CMake
+Linux [CMake](https://cmake.org/) build is supported. Example build:
+```sh
+mkdir build
+cd build
+cmake ../
+# Alternatively, build release
+cmake ../ -DCMAKE_BUILD_TYPE=Release
+
+cmake --build .
+# Optionally, run tests
+ctest
+```
+
+### CMake options
+* `PE_BLISS_ENABLE_TESTING`: build and enable tests. `ON` by default.
+* `PE_BLISS_BUILD_CONSOLE_DUMPER`: build portable executable console dumper. `ON` by default.
+* `PE_BLISS_STATIC_MSVC_RUNTIME`: build all libraries with statically linked MSVC runtime. `OFF` by default, MSVC-specific.
+* `BUILD_SHARED_LIBS`: build all libraries as shared (`dll` or `so`). `OFF` by default.
