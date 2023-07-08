@@ -95,6 +95,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(BoostDir);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,6 +113,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(BoostDir);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,6 +131,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(BoostDir);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -146,6 +149,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(BoostDir);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
