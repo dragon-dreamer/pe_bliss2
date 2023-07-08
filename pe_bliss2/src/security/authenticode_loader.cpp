@@ -51,8 +51,6 @@ template<typename RangeType>
 authenticode_pkcs7<RangeType> load_authenticode_signature(
 	buffers::input_buffer_interface& buffer)
 {
-	using underlying_type = typename authenticode_pkcs7<RangeType>::content_info_type;
-
 	authenticode_pkcs7<RangeType> result;
 	const auto size = buffer.size();
 	const auto* data = buffer.get_raw_data(0, size);
