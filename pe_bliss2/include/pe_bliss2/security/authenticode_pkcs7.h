@@ -13,6 +13,8 @@
 
 #include "simple_asn1/crypto/pkcs7/authenticode/types.h"
 
+#include "pe_bliss2/security/authenticode_digest_algorithm.h"
+
 #include "utilities/hash.h"
 
 namespace pe_bliss::security
@@ -29,14 +31,6 @@ std::error_code make_error_code(authenticode_pkcs7_errc) noexcept;
 
 using authenticode_span_range_type = std::span<const std::byte>;
 using authenticode_vector_range_type = std::vector<std::byte>;
-
-enum class authenticode_digest_alrogithm
-{
-	md5,
-	sha1,
-	sha256,
-	unknown
-};
 
 enum class authenticode_digest_encryption_algorithm
 {
@@ -126,7 +120,7 @@ public:
 
 public:
 	[[nodiscard]]
-	authenticode_digest_alrogithm get_digest_algorithm() const noexcept;
+	authenticode_digest_algorithm get_digest_algorithm() const noexcept;
 	[[nodiscard]]
 	authenticode_digest_encryption_algorithm get_digest_encryption_algorithm() const noexcept;
 	[[nodiscard]]

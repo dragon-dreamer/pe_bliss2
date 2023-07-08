@@ -171,9 +171,11 @@
     <ClInclude Include="include\pe_bliss2\section\section_search.h" />
     <ClInclude Include="include\pe_bliss2\section\section_table.h" />
     <ClInclude Include="include\pe_bliss2\section\section_table_validator.h" />
+    <ClInclude Include="include\pe_bliss2\security\authenticode_digest_algorithm.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_format_validator.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_loader.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_pkcs7.h" />
+    <ClInclude Include="include\pe_bliss2\security\image_hash.h" />
     <ClInclude Include="include\pe_bliss2\security\security_directory.h" />
     <ClInclude Include="include\pe_bliss2\security\security_directory_loader.h" />
     <ClInclude Include="include\pe_bliss2\tls\tls_directory-inl.h" />
@@ -282,6 +284,7 @@
     <ClCompile Include="src\security\authenticode_loader.cpp" />
     <ClCompile Include="src\security\authenticode_format_validator.cpp" />
     <ClCompile Include="src\security\authenticode_pkcs7.cpp" />
+    <ClCompile Include="src\security\image_hash.cpp" />
     <ClCompile Include="src\security\security_directory_loader.cpp" />
     <ClCompile Include="src\tls\tls_directory.cpp" />
     <ClCompile Include="src\tls\tls_directory_builder.cpp" />

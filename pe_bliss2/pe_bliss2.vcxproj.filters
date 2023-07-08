@@ -672,6 +672,12 @@
     <ClInclude Include="include\pe_bliss2\security\authenticode_format_validator.h">
       <Filter>Header Files\security</Filter>
     </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\image_hash.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\authenticode_digest_algorithm.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\address_converter.cpp">
@@ -984,6 +990,9 @@
       <Filter>Source Files\security</Filter>
     </ClCompile>
     <ClCompile Include="src\security\authenticode_pkcs7.cpp">
+      <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\image_hash.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
   </ItemGroup>

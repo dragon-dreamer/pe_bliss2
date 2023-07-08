@@ -76,23 +76,23 @@ std::error_code make_error_code(authenticode_pkcs7_errc e) noexcept
 }
 
 template<typename RangeType>
-authenticode_digest_alrogithm authenticode_pkcs7<RangeType>
+authenticode_digest_algorithm authenticode_pkcs7<RangeType>
 	::get_digest_algorithm() const noexcept
 {
 	if (content_info_.data.signer_infos.empty())
-		return authenticode_digest_alrogithm::unknown;
+		return authenticode_digest_algorithm::unknown;
 
 	const auto& algorithm = content_info_.data.signer_infos[0]
 		.digest_algorithm.algorithm.container;
 
 	if (std::ranges::equal(algorithm, sha256_oid))
-		return authenticode_digest_alrogithm::sha256;
+		return authenticode_digest_algorithm::sha256;
 	if (std::ranges::equal(algorithm, sha1_oid))
-		return authenticode_digest_alrogithm::sha1;
+		return authenticode_digest_algorithm::sha1;
 	if (std::ranges::equal(algorithm, md5_oid))
-		return authenticode_digest_alrogithm::md5;
+		return authenticode_digest_algorithm::md5;
 
-	return authenticode_digest_alrogithm::unknown;
+	return authenticode_digest_algorithm::unknown;
 }
 
 template<typename RangeType>
