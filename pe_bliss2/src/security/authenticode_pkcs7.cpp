@@ -139,7 +139,7 @@ authenticode_attribute_map<RangeType> authenticode_pkcs7<RangeType>
 template<typename RangeType>
 authenticode_span_range_type authenticode_pkcs7<RangeType>::get_image_hash() const noexcept
 {
-	return content_info_.data.content_info.content.digest.digest;
+	return content_info_.data.content_info.value.content.digest.digest;
 }
 
 template<typename RangeType>

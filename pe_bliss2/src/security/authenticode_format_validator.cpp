@@ -140,7 +140,7 @@ void validate(const authenticode_pkcs7<RangeType>& signature,
 		errors.add_error(authenticode_format_validator_errc::non_matching_digest_algorithm);
 	}
 
-	const auto& signed_data_content_info = content_info.data.content_info;
+	const auto& signed_data_content_info = content_info.data.content_info.value;
 	if (!std::ranges::equal(signed_data_content_info.content_type.container, spc_indirect_data_objid))
 		errors.add_error(authenticode_format_validator_errc::invalid_content_info_oid);
 
