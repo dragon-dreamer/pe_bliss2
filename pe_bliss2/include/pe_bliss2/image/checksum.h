@@ -22,6 +22,8 @@ using image_checksum_type = std::uint32_t;
 
 [[nodiscard]]
 image_checksum_type calculate_checksum(const image& instance);
+[[nodiscard]]
+std::uint32_t get_checksum_offset(const image& instance);
 
 } //namespace pe_bliss::image
 

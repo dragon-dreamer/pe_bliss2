@@ -91,7 +91,7 @@ std::error_code make_error_code(checksum_errc e) noexcept
 	return { static_cast<int>(e), checksum_error_category_instance };
 }
 
-image_checksum_type calculate_checksum(const image& instance)
+std::uint32_t get_checksum_offset(const image& instance)
 {
 	static constexpr auto optional_header_checksum_offset = detail::packed_reflection
 		::get_field_offset<&detail::image_optional_header_32::checksum>();
@@ -118,15 +118,22 @@ image_checksum_type calculate_checksum(const image& instance)
 		throw pe_error(checksum_errc::unaligned_checksum);
 	}
 
+	return checksum_offset.value();
+}
+
+image_checksum_type calculate_checksum(const image& instance)
+{
+	const auto checksum_offset = get_checksum_offset(instance);
+
 	std::uint64_t file_size = instance.get_full_headers_buffer().physical_size();
 
 	buffers::input_buffer_ptr before_checksum, after_checksum;
 	try
 	{
 		auto headers_buffer = instance.get_full_headers_buffer().data();
-		before_checksum = buffers::reduce(headers_buffer, 0u, checksum_offset.value());
+		before_checksum = buffers::reduce(headers_buffer, 0u, checksum_offset);
 		after_checksum = buffers::reduce(headers_buffer,
-			checksum_offset.value() + sizeof(image_checksum_type));
+			checksum_offset + sizeof(image_checksum_type));
 	}
 	catch (const std::system_error&)
 	{
