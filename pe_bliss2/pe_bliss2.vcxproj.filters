@@ -663,6 +663,15 @@
     <ClInclude Include="include\pe_bliss2\tls\tls_directory-inl.h">
       <Filter>Header Files\tls</Filter>
     </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\authenticode_loader.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\authenticode_pkcs7.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\authenticode_format_validator.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\address_converter.cpp">
@@ -967,6 +976,15 @@
     </ClCompile>
     <ClCompile Include="src\tls\tls_directory_loader.cpp">
       <Filter>Source Files\tls</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\authenticode_loader.cpp">
+      <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\authenticode_format_validator.cpp">
+      <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\authenticode_pkcs7.cpp">
+      <Filter>Source Files\security</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
