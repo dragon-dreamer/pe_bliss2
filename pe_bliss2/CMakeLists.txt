@@ -173,6 +173,11 @@ target_sources(pe_bliss2
 		include/pe_bliss2/section/section_search.h
 		include/pe_bliss2/section/section_table.h
 		include/pe_bliss2/section/section_table_validator.h
+		include/pe_bliss2/security/authenticode_digest_algorithm.h
+		include/pe_bliss2/security/authenticode_format_validator.h
+		include/pe_bliss2/security/authenticode_loader.h
+		include/pe_bliss2/security/authenticode_pkcs7.h
+		include/pe_bliss2/security/image_hash.h
 		include/pe_bliss2/security/security_directory.h
 		include/pe_bliss2/security/security_directory_loader.h
 		include/pe_bliss2/tls/tls_directory-inl.h
@@ -277,13 +282,17 @@ target_sources(pe_bliss2
 		src/section/section_search.cpp
 		src/section/section_table.cpp
 		src/section/section_table_validator.cpp
+		src/security/authenticode_format_validator.cpp
+		src/security/authenticode_loader.cpp
+		src/security/authenticode_pkcs7.cpp
+		src/security/image_hash.cpp
 		src/security/security_directory_loader.cpp
 		src/tls/tls_directory.cpp
 		src/tls/tls_directory_builder.cpp
 		src/tls/tls_directory_loader.cpp
 )
 
-target_link_libraries(pe_bliss2 buffers utilities pugixml)
+target_link_libraries(pe_bliss2 PUBLIC buffers utilities pugixml SimpleAsn1Lib cryptopp)
 
 if(MSVC)
 	target_compile_options(pe_bliss2 PRIVATE "/MP")
