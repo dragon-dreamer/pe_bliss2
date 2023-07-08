@@ -20,6 +20,8 @@ public:
 
 	[[nodiscard]]
 	virtual std::size_t size() override;
+	[[nodiscard]]
+	virtual const std::byte* get_raw_data(std::size_t pos, std::size_t count) const override;
 
 	virtual std::size_t read(std::size_t pos,
 		std::size_t count, std::byte* data) override;

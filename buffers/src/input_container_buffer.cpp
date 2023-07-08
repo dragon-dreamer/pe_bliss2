@@ -27,14 +27,19 @@ std::size_t input_container_buffer::read(std::size_t pos,
 	if (!count)
 		return 0u;
 
+	std::memcpy(data, get_raw_data(pos, count), count);
+	return count;
+}
+
+const std::byte* input_container_buffer::get_raw_data(std::size_t pos, std::size_t count) const
+{
 	if (!utilities::math::is_sum_safe(pos, count)
 		|| pos + count > container_.size())
 	{
 		throw std::system_error(utilities::generic_errc::buffer_overrun);
 	}
 
-	std::memcpy(data, container_.data() + pos, count);
-	return count;
+	return container_.data() + pos;
 }
 
 } //namespace buffers

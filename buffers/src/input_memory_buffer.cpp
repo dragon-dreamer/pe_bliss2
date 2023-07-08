@@ -29,10 +29,7 @@ std::size_t input_memory_buffer::read(std::size_t pos,
 	if (!count)
 		return 0u;
 
-	if (!utilities::math::is_sum_safe(pos, count) || pos + count > size_)
-		throw std::system_error(utilities::generic_errc::buffer_overrun);
-
-	std::memcpy(data, memory_ + pos, count);
+	std::memcpy(data, get_raw_data(pos, count), count);
 	return count;
 }
 
