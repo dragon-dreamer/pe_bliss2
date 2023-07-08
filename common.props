@@ -4,6 +4,7 @@
 	<PropertyGroup Label="UserMacros">
 		<BoostDir>C:\Libs\boost_1_82_0</BoostDir>
 		<SimpleAsn1Dir>$(ProjectDir)\..\external\simple_asn1</SimpleAsn1Dir>
+		<CryptoPPDir>$(ProjectDir)\..\external\cryptopp-8_8_0</CryptoPPDir>
 	</PropertyGroup>
 	<PropertyGroup />
 	<ItemDefinitionGroup>

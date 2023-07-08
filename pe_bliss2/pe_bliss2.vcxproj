@@ -291,6 +291,9 @@
     <ProjectReference Include="..\buffers\buffers.vcxproj">
       <Project>{5337cf3f-d0af-434f-9702-cc5e8a86251b}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\external\cryptopp-8_8_0\cryptopp\cryptlib.vcxproj">
+      <Project>{c39f4b46-6e89-4074-902e-ca57073044d2}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\utilities\utilities.vcxproj">
       <Project>{5a33c151-ea42-431c-975f-ff1825af39ed}</Project>
     </ProjectReference>
@@ -374,7 +377,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\buffers\include;include;$(ProjectDir)\..\external\pugixml;$(BoostDir);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\buffers\include;include;$(ProjectDir)\..\external\pugixml;$(BoostDir);$(SimpleAsn1Dir);$(CryptoPPDir)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -393,7 +396,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\buffers\include;include;$(ProjectDir)\..\external\pugixml;$(BoostDir);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\buffers\include;include;$(ProjectDir)\..\external\pugixml;$(BoostDir);$(SimpleAsn1Dir);$(CryptoPPDir)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -412,7 +415,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\buffers\include;include;$(ProjectDir)\..\external\pugixml;$(BoostDir);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\buffers\include;include;$(ProjectDir)\..\external\pugixml;$(BoostDir);$(SimpleAsn1Dir);$(CryptoPPDir)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -431,7 +434,7 @@
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\buffers\include;include;$(ProjectDir)\..\external\pugixml;$(BoostDir);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\buffers\include;include;$(ProjectDir)\..\external\pugixml;$(BoostDir);$(SimpleAsn1Dir);$(CryptoPPDir)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
