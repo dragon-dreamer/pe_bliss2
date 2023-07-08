@@ -14,6 +14,13 @@ public:
 	[[nodiscard]]
 	virtual bool is_stateless() const noexcept { return true; }
 
+	// Only valid for stateless and contiguous buffers
+	[[nodiscard]]
+	virtual const std::byte* get_raw_data(std::size_t /* pos */, std::size_t /* count */) const
+	{
+		return nullptr;
+	}
+
 	[[nodiscard]]
 	virtual std::size_t virtual_size() const noexcept { return 0u; }
 

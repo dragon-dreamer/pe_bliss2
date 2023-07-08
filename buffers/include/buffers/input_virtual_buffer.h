@@ -17,6 +17,8 @@ public:
 	[[nodiscard]]
 	virtual bool is_stateless() const noexcept override;
 	[[nodiscard]]
+	virtual const std::byte* get_raw_data(std::size_t pos, std::size_t count) const override;
+	[[nodiscard]]
 	virtual std::size_t virtual_size() const noexcept override;
 
 	virtual std::size_t read(std::size_t pos,

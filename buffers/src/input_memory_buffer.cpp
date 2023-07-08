@@ -35,4 +35,12 @@ std::size_t input_memory_buffer::read(std::size_t pos,
 	std::memcpy(data, memory_ + pos, count);
 	return count;
 }
+
+const std::byte* input_memory_buffer::get_raw_data(std::size_t pos, std::size_t count) const
+{
+	if (!utilities::math::is_sum_safe(pos, count) || pos + count > size_)
+		throw std::system_error(utilities::generic_errc::buffer_overrun);
+
+	return memory_ + pos;
+}
 } //namespace buffers

@@ -54,6 +54,11 @@ std::size_t input_virtual_buffer::read(std::size_t pos,
 	return real_physical_bytes;
 }
 
+const std::byte* input_virtual_buffer::get_raw_data(std::size_t pos, std::size_t count) const
+{
+	return buf_->get_raw_data(pos, count);
+}
+
 std::size_t input_virtual_buffer::size()
 {
 	return buf_->size() + additional_virtual_size_;

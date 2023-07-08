@@ -71,6 +71,14 @@ std::size_t input_buffer_section::read(std::size_t pos,
 	return buf_->read(pos + offset_, count, data);
 }
 
+const std::byte* input_buffer_section::get_raw_data(std::size_t pos, std::size_t count) const
+{
+	if (!utilities::math::is_sum_safe(pos, count) || pos + count > size_)
+		throw std::system_error(utilities::generic_errc::buffer_overrun);
+
+	return buf_->get_raw_data(pos + offset_, count);
+}
+
 std::size_t input_buffer_section::size()
 {
 	return size_;
