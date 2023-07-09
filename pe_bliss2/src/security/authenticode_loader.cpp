@@ -56,7 +56,7 @@ authenticode_pkcs7<RangeType> load_authenticode_signature(
 	const auto* data = buffer.get_raw_data(0, size);
 	try
 	{
-		if constexpr (std::is_same_v<RangeType, authenticode_span_range_type>)
+		if constexpr (std::is_same_v<RangeType, pkcs7::span_range_type>)
 		{
 			if (!data)
 				throw pe_error(authenticode_loader_errc::buffer_is_not_contiguous);
@@ -101,15 +101,15 @@ authenticode_pkcs7<RangeType> load_authenticode_signature(
 	return load_authenticode_signature<RangeType>(buffer);
 }
 
-template authenticode_pkcs7<authenticode_span_range_type> load_authenticode_signature(
+template authenticode_pkcs7<pkcs7::span_range_type> load_authenticode_signature(
 	buffers::input_buffer_interface& buffer);
-template authenticode_pkcs7<authenticode_vector_range_type> load_authenticode_signature(
+template authenticode_pkcs7<pkcs7::vector_range_type> load_authenticode_signature(
 	buffers::input_buffer_interface& buffer);
 
-template authenticode_pkcs7<authenticode_span_range_type> load_authenticode_signature(
+template authenticode_pkcs7<pkcs7::span_range_type> load_authenticode_signature(
 	buffers::input_buffer_interface& buffer,
 	const detail::security::win_certificate& certificate_info);
-template authenticode_pkcs7<authenticode_vector_range_type> load_authenticode_signature(
+template authenticode_pkcs7<pkcs7::vector_range_type> load_authenticode_signature(
 	buffers::input_buffer_interface& buffer,
 	const detail::security::win_certificate& certificate_info);
 

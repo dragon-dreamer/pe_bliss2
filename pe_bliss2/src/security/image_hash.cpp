@@ -49,6 +49,8 @@ struct hash_calculator_error_category : std::error_category
 			return "Unable to read image data";
 		case unsupported_hash_algorithm:
 			return "Unsupported hash algorithm";
+		case no_signers:
+			return "No PKCS7 signers";
 		default:
 			return {};
 		}
@@ -202,20 +204,20 @@ void calculate_hash_impl(const image::image& instance, std::vector<std::byte>& r
 }
 } //namespace
 
-std::vector<std::byte> calculate_hash(authenticode_digest_algorithm algorithm,
+std::vector<std::byte> calculate_hash(pkcs7::digest_algorithm algorithm,
 	const pe_bliss::image::image& instance)
 {
 	std::vector<std::byte> result;
 
 	switch (algorithm)
 	{
-	case authenticode_digest_algorithm::md5:
+	case pkcs7::digest_algorithm::md5:
 		calculate_hash_impl<CryptoPP::Weak::MD5>(instance, result);
 		break;
-	case authenticode_digest_algorithm::sha1:
+	case pkcs7::digest_algorithm::sha1:
 		calculate_hash_impl<CryptoPP::SHA1>(instance, result);
 		break;
-	case authenticode_digest_algorithm::sha256:
+	case pkcs7::digest_algorithm::sha256:
 		calculate_hash_impl<CryptoPP::SHA256>(instance, result);
 		break;
 	default:
@@ -226,19 +228,22 @@ std::vector<std::byte> calculate_hash(authenticode_digest_algorithm algorithm,
 }
 
 template<typename RangeType>
-bool is_hash_valid(const authenticode_pkcs7<RangeType>& pkcs7,
+bool is_hash_valid(const authenticode_pkcs7<RangeType>& signature,
 	const pe_bliss::image::image& instance)
 {
+	if (!signature.get_signer_count())
+		throw pe_error(hash_calculator_errc::no_signers);
+
 	return std::ranges::equal(
-		calculate_hash(pkcs7.get_digest_algorithm(), instance),
-		pkcs7.get_image_hash());
+		calculate_hash(signature.get_signer(0u).get_digest_algorithm(), instance),
+		signature.get_image_hash());
 }
 
-template bool is_hash_valid<authenticode_span_range_type>(
-	const authenticode_pkcs7<authenticode_span_range_type>& pkcs7,
+template bool is_hash_valid<pkcs7::span_range_type>(
+	const authenticode_pkcs7<pkcs7::span_range_type>& pkcs7,
 	const pe_bliss::image::image& instance);
-template bool is_hash_valid<authenticode_vector_range_type>(
-	const authenticode_pkcs7<authenticode_vector_range_type>& pkcs7,
+template bool is_hash_valid<pkcs7::vector_range_type>(
+	const authenticode_pkcs7<pkcs7::vector_range_type>& pkcs7,
 	const pe_bliss::image::image& instance);
 
 } //namespace pe_bliss::security

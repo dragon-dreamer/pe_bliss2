@@ -187,6 +187,12 @@
     <Filter Include="Header Files\delay_import">
       <UniqueIdentifier>{d7cffbdd-8ca0-445b-b0bc-d0d535898769}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\security\pkcs7">
+      <UniqueIdentifier>{fb999440-fc01-4c0d-b99c-39fe2d2e8874}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\security\pkcs7">
+      <UniqueIdentifier>{4f56d228-65d4-4abd-ae40-493b822aee0a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pe_bliss2\address_converter.h">
@@ -675,8 +681,14 @@
     <ClInclude Include="include\pe_bliss2\security\image_hash.h">
       <Filter>Header Files\security</Filter>
     </ClInclude>
-    <ClInclude Include="include\pe_bliss2\security\authenticode_digest_algorithm.h">
-      <Filter>Header Files\security</Filter>
+    <ClInclude Include="include\pe_bliss2\security\pkcs7\pkcs7.h">
+      <Filter>Header Files\security\pkcs7</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\pkcs7\pkcs7_algorithms.h">
+      <Filter>Header Files\security\pkcs7</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\pkcs7\pkcs7_format_validator.h">
+      <Filter>Header Files\security\pkcs7</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -994,6 +1006,12 @@
     </ClCompile>
     <ClCompile Include="src\security\image_hash.cpp">
       <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\pkcs7\pkcs7.cpp">
+      <Filter>Source Files\security\pkcs7</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\pkcs7\pkcs7_format_validator.cpp">
+      <Filter>Source Files\security\pkcs7</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
