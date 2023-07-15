@@ -42,6 +42,9 @@
     <ClInclude Include="include\utilities\variant_helpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\utilities\range_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\generic_error.cpp">

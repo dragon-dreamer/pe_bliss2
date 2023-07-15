@@ -22,6 +22,7 @@
     <ClInclude Include="include\utilities\generic_error.h" />
     <ClInclude Include="include\utilities\hash.h" />
     <ClInclude Include="include\utilities\math.h" />
+    <ClInclude Include="include\utilities\range_helpers.h" />
     <ClInclude Include="include\utilities\safe_uint.h" />
     <ClInclude Include="include\utilities\scoped_guard.h" />
     <ClInclude Include="include\utilities\shannon_entropy.h" />
