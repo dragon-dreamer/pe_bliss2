@@ -9,6 +9,7 @@
 
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/pe_error.h"
+#include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/pkcs7/pkcs7.h"
 
 namespace pe_bliss::security::pkcs7
@@ -37,12 +38,6 @@ constexpr std::array signed_data_oid {
 
 constexpr std::uint32_t signed_data_version = 1u;
 constexpr std::uint32_t signer_info_version = 1u;
-
-bool algorithm_id_equals(const asn1::crypto::algorithm_identifier<vector_range_type>& l,
-	const asn1::crypto::algorithm_identifier<vector_range_type>& r);
-
-bool algorithm_id_equals(const asn1::crypto::algorithm_identifier<span_range_type>& l,
-	const asn1::crypto::algorithm_identifier<span_range_type>& r);
 } //namespace impl
 
 template<typename RangeType, typename ContextType>
@@ -66,7 +61,7 @@ void validate(const pe_bliss::security::pkcs7::pkcs7<RangeType, ContextType>& si
 		for (std::size_t i = 0; i != content_info.data.signer_infos.size(); ++i)
 		{
 			const auto& signer_info = content_info.data.signer_infos[i];
-			if (!impl::algorithm_id_equals(content_info.data.digest_algorithms[i],
+			if (!algorithm_id_equals(content_info.data.digest_algorithms[i],
 				signer_info.digest_algorithm))
 			{
 				errors.add_error(pkcs7_format_validator_errc::non_matching_digest_algorithm);

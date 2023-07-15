@@ -1,16 +1,22 @@
 #include "pe_bliss2/security/authenticode_loader.h"
 
+#include <array>
 #include <exception>
 #include <string>
 #include <vector>
 
-#include "pe_bliss2/pe_error.h"
+#include "buffers/input_memory_buffer.h"
 
+#include "pe_bliss2/pe_error.h"
+#include "pe_bliss2/security/byte_range_types.h"
+
+#include "simple_asn1/crypto/pkcs7/authenticode/oids.h"
 #include "simple_asn1/crypto/pkcs7/authenticode/spec.h"
 #include "simple_asn1/der_decode.h"
 
 namespace
 {
+
 struct authenticode_directory_loader_error_category : std::error_category
 {
 	const char* name() const noexcept override
@@ -48,6 +54,23 @@ std::error_code make_error_code(authenticode_loader_errc e) noexcept
 }
 
 template<typename RangeType>
+std::optional<authenticode_pkcs7<span_range_type>> load_nested_signature(
+	const pkcs7::attribute_map<RangeType>& unauthenticated_attributes)
+{
+	std::optional<authenticode_pkcs7<span_range_type>> result;
+
+	const auto nested_signature = unauthenticated_attributes.get_attribute(
+		asn1::crypto::pkcs7::authenticode::oid_nested_signature_attribute);
+	if (nested_signature)
+	{
+		buffers::input_memory_buffer buf(nested_signature->data(), nested_signature->size());
+		result.emplace(load_authenticode_signature<span_range_type>(buf));
+	}
+
+	return result;
+}
+
+template<typename RangeType>
 authenticode_pkcs7<RangeType> load_authenticode_signature(
 	buffers::input_buffer_interface& buffer)
 {
@@ -56,11 +79,12 @@ authenticode_pkcs7<RangeType> load_authenticode_signature(
 	const auto* data = buffer.get_raw_data(0, size);
 	try
 	{
-		if constexpr (std::is_same_v<RangeType, pkcs7::span_range_type>)
+		if constexpr (std::is_same_v<RangeType, span_range_type>)
 		{
 			if (!data)
 				throw pe_error(authenticode_loader_errc::buffer_is_not_contiguous);
 
+			//TODO: check for trailing garbage (nullbytes in the end are allowed)
 			asn1::der::decode<asn1::spec::crypto::pkcs7::authenticode::content_info>(
 				data, data + size, result.get_content_info());
 		}
@@ -68,6 +92,7 @@ authenticode_pkcs7<RangeType> load_authenticode_signature(
 		{
 			if (data)
 			{
+				//TODO: check for trailing garbage
 				asn1::der::decode<asn1::spec::crypto::pkcs7::authenticode::content_info>(
 					data, data + size, result.get_content_info());
 			}
@@ -76,6 +101,7 @@ authenticode_pkcs7<RangeType> load_authenticode_signature(
 				std::vector<std::byte> copied_data;
 				copied_data.resize(size);
 				buffer.read(0, size, copied_data.data());
+				//TODO: check for trailing garbage
 				asn1::der::decode<asn1::spec::crypto::pkcs7::authenticode::content_info>(
 					copied_data.cbegin(), copied_data.cend(), result.get_content_info());
 			}
@@ -101,16 +127,21 @@ authenticode_pkcs7<RangeType> load_authenticode_signature(
 	return load_authenticode_signature<RangeType>(buffer);
 }
 
-template authenticode_pkcs7<pkcs7::span_range_type> load_authenticode_signature(
+template authenticode_pkcs7<span_range_type> load_authenticode_signature(
 	buffers::input_buffer_interface& buffer);
-template authenticode_pkcs7<pkcs7::vector_range_type> load_authenticode_signature(
+template authenticode_pkcs7<vector_range_type> load_authenticode_signature(
 	buffers::input_buffer_interface& buffer);
 
-template authenticode_pkcs7<pkcs7::span_range_type> load_authenticode_signature(
+template authenticode_pkcs7<span_range_type> load_authenticode_signature(
 	buffers::input_buffer_interface& buffer,
 	const detail::security::win_certificate& certificate_info);
-template authenticode_pkcs7<pkcs7::vector_range_type> load_authenticode_signature(
+template authenticode_pkcs7<vector_range_type> load_authenticode_signature(
 	buffers::input_buffer_interface& buffer,
 	const detail::security::win_certificate& certificate_info);
+
+template std::optional<authenticode_pkcs7<span_range_type>> load_nested_signature<span_range_type>(
+	const pkcs7::attribute_map<span_range_type>& unauthenticated_attributes);
+template std::optional<authenticode_pkcs7<span_range_type>> load_nested_signature<vector_range_type>(
+	const pkcs7::attribute_map<vector_range_type>& unauthenticated_attributes);
 
 } //namespace pe_bliss::security

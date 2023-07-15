@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <system_error>
 #include <type_traits>
 
@@ -32,6 +33,12 @@ template<typename RangeType>
 authenticode_pkcs7<RangeType> load_authenticode_signature(
 	buffers::input_buffer_interface& buffer,
 	const detail::security::win_certificate& certificate_info);
+
+// Double-signing support
+template<typename RangeType>
+[[nodiscard]]
+std::optional<authenticode_pkcs7<span_range_type>> load_nested_signature(
+	const pkcs7::attribute_map<RangeType>& unauthenticated_attributes);
 
 } //namespace pe_bliss::security
 

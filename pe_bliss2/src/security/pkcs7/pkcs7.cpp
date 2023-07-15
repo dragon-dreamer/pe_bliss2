@@ -5,7 +5,16 @@
 #include <string>
 #include <system_error>
 
+#include "buffers/input_memory_buffer.h"
+
 #include "pe_bliss2/pe_error.h"
+#include "pe_bliss2/security/buffer_hash.h"
+
+#include "simple_asn1/der_decode.h"
+#include "simple_asn1/spec.h"
+
+#include "simple_asn1/crypto/pkcs7/oids.h"
+#include "simple_asn1/crypto/pkcs7/spec.h"
 
 namespace
 {
@@ -27,6 +36,8 @@ struct pkcs7_error_category : std::error_category
 			return "Absent attribute value";
 		case multiple_attribute_values:
 			return "Multiple attribute values";
+		case absent_authenticated_attributes:
+			return "Absent authenticated attributes";
 		default:
 			return {};
 		}
@@ -35,37 +46,54 @@ struct pkcs7_error_category : std::error_category
 
 const pkcs7_error_category pkcs7_error_category_instance;
 
-constexpr std::array sha1_oid {
-	1u, 3u, 14u, 3u, 2u, 26u
-};
-
-constexpr std::array sha256_oid {
-	2u, 16u, 840u, 1u, 101u, 3u, 4u, 2u, 1u
-};
-
-constexpr std::array md5_oid {
-	1u, 2u, 840u, 113549u, 2u, 5u
-};
-
-constexpr std::array rsa_oid {
-	1u, 2u, 840u, 113549u, 1u, 1u, 1u
-};
-
-constexpr std::array dsa_oid {
-	1u, 2u, 840u, 10040u, 4u, 1u
-};
-
-constexpr std::array message_digest_oid {
-	1u, 2u, 840u, 113549u, 1u, 9u, 4u
-};
-
-constexpr std::array content_type_oid {
-	1u, 2u, 840u, 113549u, 1u, 9u, 3u
-};
 } //namespace
 
 namespace pe_bliss::security::pkcs7
 {
+
+namespace
+{
+template<typename RangeType>
+const auto& attributes_value(const std::optional<asn1::with_raw_data<RangeType,
+	asn1::crypto::pkcs7::attributes_type<RangeType>>>& attributes)
+{
+	return attributes->value;
+}
+
+template<typename RangeType>
+const auto& attributes_value(const std::optional<
+	asn1::crypto::pkcs7::attributes_type<RangeType>>& attributes)
+{
+	return *attributes;
+}
+
+template<typename RangeType, typename Attributes>
+attribute_map<RangeType> get_attributes(const Attributes& attributes)
+{
+	attribute_map<RangeType> result;
+
+	if (!attributes)
+		return result;
+
+	result.get_map().reserve(attributes_value(attributes).size());
+	for (const auto& attribute : attributes_value(attributes))
+	{
+		if (!result.get_map().emplace(attribute.type.container, attribute.values).second)
+			throw pe_error(pkcs7_errc::duplicate_attribute_oid);
+	}
+
+	return result;
+}
+} //namespace
+
+namespace impl
+{
+span_range_type decode_octet_string(span_range_type source)
+{
+	return asn1::der::decode<span_range_type, asn1::spec::octet_string<>>(
+		source.begin(), source.end());
+}
+} //namespace impl
 
 std::error_code make_error_code(pkcs7_errc e) noexcept
 {
@@ -73,53 +101,39 @@ std::error_code make_error_code(pkcs7_errc e) noexcept
 }
 
 template<typename RangeType>
-digest_algorithm signer_info<RangeType>::get_digest_algorithm() const noexcept
+attribute_map<RangeType> signer_info_ref<RangeType>::get_authenticated_attributes() const
 {
-	const auto& algorithm = signer_info_ref_
-		.digest_algorithm.algorithm.container;
-
-	if (std::ranges::equal(algorithm, sha256_oid))
-		return digest_algorithm::sha256;
-	if (std::ranges::equal(algorithm, sha1_oid))
-		return digest_algorithm::sha1;
-	if (std::ranges::equal(algorithm, md5_oid))
-		return digest_algorithm::md5;
-
-	return digest_algorithm::unknown;
+	return get_attributes<RangeType>(signer_info_ref_.authenticated_attributes);
 }
 
 template<typename RangeType>
-digest_encryption_algorithm signer_info<RangeType>
-	::get_digest_encryption_algorithm() const noexcept
+attribute_map<RangeType> signer_info_ref<RangeType>::get_unauthenticated_attributes() const
 {
-	const auto& algorithm = signer_info_ref_
-		.digest_encryption_algorithm.algorithm.container;
-
-	if (std::ranges::equal(algorithm, rsa_oid))
-		return digest_encryption_algorithm::rsa;
-	if (std::ranges::equal(algorithm, dsa_oid))
-		return digest_encryption_algorithm::dsa;
-
-	return digest_encryption_algorithm::unknown;
+	return get_attributes<RangeType>(signer_info_ref_.unauthenticated_attributes);
 }
 
 template<typename RangeType>
-attribute_map<RangeType> signer_info<RangeType>::get_authenticated_attributes() const
+std::vector<std::byte> signer_info_ref<RangeType>::calculate_message_digest(
+	std::span<const span_range_type> raw_signed_content) const
 {
-	attribute_map<RangeType> result;
+	return calculate_hash(get_digest_algorithm(), raw_signed_content);
+}
 
-	const auto& attributes = signer_info_ref_.authenticated_attributes;
-	if (!attributes)
-		return result;
+template<typename RangeType>
+std::vector<std::byte> signer_info_ref<RangeType>::calculate_authenticated_attributes_digest() const
+{
+	if (!signer_info_ref_.authenticated_attributes)
+		throw pe_error(pkcs7_errc::absent_authenticated_attributes);
 
-	result.get_map().reserve(attributes->size());
-	for (const auto& attribute : *attributes)
-	{
-		if (!result.get_map().emplace(attribute.type.container, attribute.values).second)
-			throw pe_error(pkcs7_errc::duplicate_attribute_oid);
-	}
+	span_range_type raw_attributes = signer_info_ref_.authenticated_attributes->raw;
 
-	return result;
+	// Replace ASN.1 IMPLICIT TAGGED tag with SET_OF
+	const std::array<std::byte, 1u> replaced_byte{
+		static_cast<std::byte>(asn1::spec::crypto::pkcs7::unauthenticated_attributes::tag())
+	};
+
+	return calculate_hash(get_digest_algorithm(),
+		std::array<span_range_type, 2u>{ replaced_byte, raw_attributes.subspan(1u) });
 }
 
 template<typename RangeType>
@@ -145,17 +159,17 @@ std::optional<span_range_type> attribute_map<RangeType>::get_attribute(
 template<typename RangeType>
 std::optional<span_range_type> attribute_map<RangeType>::get_message_digest() const
 {
-	return get_attribute(message_digest_oid);
+	return get_attribute(asn1::crypto::pkcs7::oid_message_digest);
 }
 
 template<typename RangeType>
 std::optional<span_range_type> attribute_map<RangeType>::get_content_type() const
 {
-	return get_attribute(content_type_oid);
+	return get_attribute(asn1::crypto::pkcs7::oid_content_type);
 }
 
-template class signer_info<span_range_type>;
-template class signer_info<vector_range_type>;
+template class signer_info_ref<span_range_type>;
+template class signer_info_ref<vector_range_type>;
 template class attribute_map<span_range_type>;
 template class attribute_map<vector_range_type>;
 

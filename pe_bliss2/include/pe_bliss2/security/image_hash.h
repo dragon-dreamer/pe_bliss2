@@ -1,11 +1,13 @@
 #pragma once
 
 #include <cstddef>
+#include <optional>
 #include <system_error>
 #include <type_traits>
 #include <vector>
 
-#include "pe_bliss2/security/authenticode_pkcs7.h"
+#include "pe_bliss2/security/byte_range_types.h"
+#include "pe_bliss2/security/crypto_algorithms.h"
 
 namespace pe_bliss::image { class image; }
 
@@ -16,21 +18,30 @@ enum class hash_calculator_errc
 {
 	invalid_security_directory_offset,
 	invalid_section_data,
-	unable_to_read_image_data,
-	unsupported_hash_algorithm,
-	no_signers
+	invalid_section_alignment,
+	too_big_page_hash_buffer
 };
 
 std::error_code make_error_code(hash_calculator_errc) noexcept;
 
-[[nodiscard]]
-std::vector<std::byte> calculate_hash(pkcs7::digest_algorithm algorithm,
-	const pe_bliss::image::image& instance);
+struct [[nodiscard]] image_hash_result
+{
+	std::vector<std::byte> image_hash;
+	std::vector<std::byte> page_hashes;
+	std::error_code page_hash_errc{};
+};
 
-template<typename RangeType>
+struct [[nodiscard]] page_hash_options final
+{
+	digest_algorithm algorithm{ digest_algorithm::unknown };
+	std::size_t max_page_hashes_size { 10u * 1024u * 1024u }; //10 Mb
+	std::size_t max_section_alignment { 4u * 1024u * 1024u }; //4 Mb
+};
+
 [[nodiscard]]
-bool is_hash_valid(const authenticode_pkcs7<RangeType>& signature,
-	const pe_bliss::image::image& instance);
+image_hash_result calculate_hash(digest_algorithm algorithm,
+	const pe_bliss::image::image& instance,
+	const page_hash_options* page_hash_opts = nullptr);
 
 } //namespace pe_bliss::security
 

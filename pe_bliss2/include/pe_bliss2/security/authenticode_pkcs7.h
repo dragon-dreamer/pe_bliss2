@@ -2,6 +2,7 @@
 
 #include "simple_asn1/crypto/pkcs7/authenticode/types.h"
 
+#include "pe_bliss2/security/byte_range_types.h"
 #include "pe_bliss2/security/pkcs7/pkcs7.h"
 
 namespace pe_bliss::security
@@ -13,7 +14,7 @@ class [[nodiscard]] authenticode_pkcs7 : public pkcs7::pkcs7<RangeType,
 {
 public:
 	[[nodiscard]]
-	pkcs7::span_range_type get_image_hash() const noexcept;
+	span_range_type get_image_hash() const noexcept;
 };
 
 } //namespace pe_bliss::security

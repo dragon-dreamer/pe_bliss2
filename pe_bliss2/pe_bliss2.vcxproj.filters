@@ -193,6 +193,12 @@
     <Filter Include="Source Files\security\pkcs7">
       <UniqueIdentifier>{4f56d228-65d4-4abd-ae40-493b822aee0a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\security\x509">
+      <UniqueIdentifier>{e95ebe8a-edb2-4c75-bb29-c5924e43e653}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\security\x509">
+      <UniqueIdentifier>{a76da73b-a199-4ee2-b4d5-aaad0e3e64bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pe_bliss2\address_converter.h">
@@ -684,11 +690,35 @@
     <ClInclude Include="include\pe_bliss2\security\pkcs7\pkcs7.h">
       <Filter>Header Files\security\pkcs7</Filter>
     </ClInclude>
-    <ClInclude Include="include\pe_bliss2\security\pkcs7\pkcs7_algorithms.h">
-      <Filter>Header Files\security\pkcs7</Filter>
-    </ClInclude>
     <ClInclude Include="include\pe_bliss2\security\pkcs7\pkcs7_format_validator.h">
       <Filter>Header Files\security\pkcs7</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\hash_helpers.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\buffer_hash.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\pkcs7\pkcs7_signature.h">
+      <Filter>Header Files\security\pkcs7</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\x509\x509_certificate.h">
+      <Filter>Header Files\security\x509</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\crypto_algorithms.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\byte_range_types.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\x509\x509_certificate_store.h">
+      <Filter>Header Files\security\x509</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\authenticode_verifier.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\authenticode_page_hashes.h">
+      <Filter>Header Files\security</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1012,6 +1042,24 @@
     </ClCompile>
     <ClCompile Include="src\security\pkcs7\pkcs7_format_validator.cpp">
       <Filter>Source Files\security\pkcs7</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\hash_helpers.cpp">
+      <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\pkcs7\buffer_hash.cpp">
+      <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\pkcs7\pkcs7_signature.cpp">
+      <Filter>Source Files\security\pkcs7</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\crypto_algorithms.cpp">
+      <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\authenticode_verifier.cpp">
+      <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\authenticode_page_hashes.cpp">
+      <Filter>Source Files\security</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -8,21 +8,17 @@
 #include <tuple>
 
 #include "pe_bliss2/pe_error.h"
+#include "pe_bliss2/security/byte_range_types.h"
+#include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/pkcs7/pkcs7_format_validator.h"
 
 #include "simple_asn1/crypto/crypto_common_types.h"
+#include "simple_asn1/crypto/pkcs7/authenticode/oids.h"
 #include "simple_asn1/der_decode.h"
 #include "simple_asn1/spec.h"
 
 namespace
 {
-constexpr std::array spc_indirect_data_objid {
-	1u, 3u, 6u, 1u, 4u, 1u, 311u, 2u, 1u, 4u
-};
-
-constexpr std::array spc_pe_image_dataobj {
-	1u, 3u, 6u, 1u, 4u, 1u, 311u, 2u, 1u, 15u
-};
 
 //TODO
 //1.3.6.1.4.1.311.3.3.1 - Timestamping signature(Ms-CounterSign)
@@ -83,18 +79,26 @@ void validate(const authenticode_pkcs7<RangeType>& signature,
 		return;
 	}
 
-	const auto& signed_data_content_info = content_info.data.content_info.value;
-	if (!std::ranges::equal(signed_data_content_info.content_type.container, spc_indirect_data_objid))
+	const auto& signed_data_content_info = content_info.data.content_info;
+	if (!std::ranges::equal(signed_data_content_info.content_type.container,
+		asn1::crypto::pkcs7::authenticode::oid_spc_indirect_data_content))
+	{
 		errors.add_error(authenticode_format_validator_errc::invalid_content_info_oid);
+	}
 
-	const auto& type_value = signed_data_content_info.content.type_value;
-	if (!std::ranges::equal(type_value.type.container, spc_pe_image_dataobj))
+	const auto& type_value = signed_data_content_info.content.type_value.value;
+	if (!std::ranges::equal(type_value.type.container,
+		asn1::crypto::pkcs7::authenticode::oid_spc_pe_image_data))
+	{
 		errors.add_error(authenticode_format_validator_errc::invalid_type_value_type);
+	}
 
-	if (!pkcs7::impl::algorithm_id_equals(signed_data_content_info.content.digest.digest_algorithm,
+	if (!algorithm_id_equals(
+		signed_data_content_info.content.digest.value.digest_algorithm,
 		content_info.data.signer_infos[0].digest_algorithm))
 	{
-		errors.add_error(authenticode_format_validator_errc::non_matching_type_value_digest_algorithm);
+		errors.add_error(
+			authenticode_format_validator_errc::non_matching_type_value_digest_algorithm);
 	}
 }
 
@@ -110,8 +114,11 @@ void validate(const pkcs7::attribute_map<RangeType>& authenticated_attributes,
 		{
 			auto decoded_content_type = asn1::der::decode<asn1::crypto::object_identifier_type,
 				asn1::spec::object_identifier<>>(content_type->begin(), content_type->end());
-			if (!std::ranges::equal(decoded_content_type.container, spc_indirect_data_objid))
+			if (!std::ranges::equal(decoded_content_type.container,
+				asn1::crypto::pkcs7::authenticode::oid_spc_indirect_data_content))
+			{
 				errors.add_error(pkcs7::pkcs7_format_validator_errc::invalid_content_type);
+			}
 		}
 	}
 	catch (const pe_error&)
@@ -124,18 +131,18 @@ void validate(const pkcs7::attribute_map<RangeType>& authenticated_attributes,
 	}
 }
 
-template void validate<pkcs7::span_range_type>(
-	const authenticode_pkcs7<pkcs7::span_range_type>& signature,
+template void validate<span_range_type>(
+	const authenticode_pkcs7<span_range_type>& signature,
 	error_list& errors);
-template void validate<pkcs7::vector_range_type>(
-	const authenticode_pkcs7<pkcs7::vector_range_type>& signature,
+template void validate<vector_range_type>(
+	const authenticode_pkcs7<vector_range_type>& signature,
 	error_list& errors);
 
-template void validate<pkcs7::span_range_type>(
-	const pkcs7::attribute_map<pkcs7::span_range_type>& authenticated_attributes,
+template void validate<span_range_type>(
+	const pkcs7::attribute_map<span_range_type>& authenticated_attributes,
 	error_list& errors);
-template void validate<pkcs7::vector_range_type>(
-	const pkcs7::attribute_map<pkcs7::vector_range_type>& authenticated_attributes,
+template void validate<vector_range_type>(
+	const pkcs7::attribute_map<vector_range_type>& authenticated_attributes,
 	error_list& errors);
 
 } //namespace pe_bliss::security

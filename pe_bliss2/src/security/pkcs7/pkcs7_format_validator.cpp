@@ -54,31 +54,4 @@ std::error_code make_error_code(pkcs7_format_validator_errc e) noexcept
 	return { static_cast<int>(e), pkcs7_format_validator_error_category_instance };
 }
 
-namespace impl
-{
-
-bool algorithm_id_equals(const asn1::crypto::algorithm_identifier<vector_range_type>& l,
-	const asn1::crypto::algorithm_identifier<vector_range_type>& r)
-{
-	return l.algorithm == r.algorithm
-		&& l.parameters == r.parameters;
-}
-
-bool algorithm_id_equals(const asn1::crypto::algorithm_identifier<span_range_type>& l,
-	const asn1::crypto::algorithm_identifier<span_range_type>& r)
-{
-	if (l.algorithm != r.algorithm)
-		return false;
-
-	if (l.parameters.has_value() != r.parameters.has_value())
-		return false;
-
-	if (l.parameters.has_value())
-		return std::ranges::equal(*l.parameters, *r.parameters);
-
-	return true;
-}
-
-} //namespace impl
-
 } //namespace pe_bliss::security::pkcs7

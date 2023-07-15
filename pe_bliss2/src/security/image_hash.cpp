@@ -2,15 +2,22 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
+#include <optional>
 #include <string>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include "buffers/input_buffer_interface.h"
 #include "buffers/input_buffer_stateful_wrapper.h"
+
+#define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
+#include "cryptopp/md5.h"
+#include "cryptopp/sha.h"
 
 #include "pe_bliss2/core/data_directories.h"
 #include "pe_bliss2/core/file_header.h"
@@ -19,13 +26,13 @@
 #include "pe_bliss2/detail/packed_reflection.h"
 #include "pe_bliss2/image/checksum.h"
 #include "pe_bliss2/image/image.h"
-
-#define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
-#include "cryptopp/md5.h"
-#include "cryptopp/sha.h"
+#include "pe_bliss2/security/buffer_hash.h"
+#include "pe_bliss2/security/byte_range_types.h"
+#include "pe_bliss2/security/hash_helpers.h"
 
 #include "utilities/math.h"
 #include "utilities/safe_uint.h"
+#include "utilities/variant_helpers.h"
 
 namespace
 {
@@ -45,12 +52,10 @@ struct hash_calculator_error_category : std::error_category
 			return "Invalid security directory offset";
 		case invalid_section_data:
 			return "Invalid section data";
-		case unable_to_read_image_data:
-			return "Unable to read image data";
-		case unsupported_hash_algorithm:
-			return "Unsupported hash algorithm";
-		case no_signers:
-			return "No PKCS7 signers";
+		case invalid_section_alignment:
+			return "Invalid section alignment";
+		case too_big_page_hash_buffer:
+			return "Too big page hash buffer";
 		default:
 			return {};
 		}
@@ -70,39 +75,6 @@ std::error_code make_error_code(hash_calculator_errc e) noexcept
 
 namespace
 {
-void update_hash(buffers::input_buffer_interface& buf, std::size_t from, std::size_t to,
-	CryptoPP::HashTransformation& hash)
-{
-	if (from > to)
-		throw pe_error(hash_calculator_errc::unable_to_read_image_data);
-
-	try
-	{
-		auto physical_size = to - from;
-		if (const auto* data = buf.get_raw_data(from, physical_size); data)
-		{
-			hash.Update(reinterpret_cast<const CryptoPP::byte*>(data), physical_size);
-			return;
-		}
-
-		buffers::input_buffer_stateful_wrapper_ref ref(buf);
-		ref.set_rpos(from);
-		static constexpr std::size_t temp_buffer_size = 512u;
-		std::array<std::byte, temp_buffer_size> temp;
-		while (physical_size)
-		{
-			auto read_bytes = std::min(physical_size, temp_buffer_size);
-			physical_size -= read_bytes;
-			ref.read(read_bytes, temp.data());
-			hash.Update(reinterpret_cast<const CryptoPP::byte*>(temp.data()), read_bytes);
-		}
-	}
-	catch (const pe_error&)
-	{
-		std::throw_with_nested(pe_error(hash_calculator_errc::unable_to_read_image_data));
-	}
-}
-
 std::uint32_t get_cert_table_entry_offset(const image::image& instance)
 {
 	utilities::safe_uint cert_table_entry_offset
@@ -123,10 +95,54 @@ std::uint32_t get_cert_table_entry_offset(const image::image& instance)
 	return cert_table_entry_offset.value();
 }
 
-void calculate_hash_impl(const image::image& instance,
-	CryptoPP::HashTransformation& hash, std::vector<std::byte>& result)
+void try_init_page_hash_state(
+	const image::image& instance,
+	const page_hash_options& options,
+	CryptoPP::HashTransformation& page_hash,
+	image_hash_result& result,
+	std::optional<page_hash_state>& state)
 {
-	result.resize(hash.DigestSize());
+	const auto section_alignment = instance
+		.get_optional_header().get_raw_section_alignment();
+	if (!std::has_single_bit(section_alignment) || section_alignment == 1u
+		|| section_alignment > options.max_section_alignment)
+	{
+		result.page_hash_errc = hash_calculator_errc::invalid_section_alignment;
+		return;
+	}
+
+	std::size_t page_count = 1u + (instance.get_full_headers_buffer().physical_size()
+		+ section_alignment - 1u) / section_alignment;
+	for (const auto& data : instance.get_section_data_list())
+	{
+		page_count += (data.physical_size() + section_alignment - 1u)
+			/ section_alignment;
+	}
+
+	const std::size_t single_page_hash_size = page_hash.DigestSize() + sizeof(std::uint32_t);
+	const std::size_t total_page_hashes_size = page_count * single_page_hash_size;
+	if (total_page_hashes_size > options.max_page_hashes_size
+		|| total_page_hashes_size / page_count != single_page_hash_size)
+	{
+		result.page_hash_errc = hash_calculator_errc::too_big_page_hash_buffer;
+		return;
+	}
+
+	state.emplace(page_hash, section_alignment)
+		.reserve(total_page_hashes_size);
+}
+
+void calculate_hash_impl(const image::image& instance,
+	CryptoPP::HashTransformation& hash, image_hash_result& result,
+	const page_hash_options* page_hashes,
+	CryptoPP::HashTransformation* page_hash)
+{
+	std::optional<page_hash_state> state;
+	if (page_hash && page_hashes)
+	{
+		try_init_page_hash_state(instance,
+			*page_hashes, *page_hash, result, state);
+	}
 
 	const auto checksum_offset = image::get_checksum_offset(instance);
 	const auto cert_table_entry_offset = get_cert_table_entry_offset(instance);
@@ -139,13 +155,22 @@ void calculate_hash_impl(const image::image& instance,
 		throw pe_error(hash_calculator_errc::invalid_security_directory_offset);
 	}
 
-	update_hash(*headers_buffer, 0u, checksum_offset, hash);
+	update_hash(*headers_buffer, 0u, checksum_offset, hash, state);
+	if (state)
+		state->add_skipped_bytes(sizeof(std::uint32_t)); //sizeof checksum
+
 	update_hash(*headers_buffer,
 		checksum_offset + sizeof(image::image_checksum_type),
-		cert_table_entry_offset, hash);
+		cert_table_entry_offset, hash, state);
+	if (state)
+		state->add_skipped_bytes(core::data_directories::directory_packed_size);
+
 	update_hash(*headers_buffer,
 		cert_table_entry_offset + core::data_directories::directory_packed_size,
-		headers_buffer->physical_size(), hash);
+		headers_buffer->physical_size(), hash, state);
+
+	if (state)
+		state->next_page();
 
 	using section_ref = std::pair<
 		std::reference_wrapper<const section::section_header>,
@@ -173,18 +198,20 @@ void calculate_hash_impl(const image::image& instance,
 	for (const auto& sect : sections_to_hash)
 	{
 		auto section_buf = sect.second.get().data();
-		update_hash(*section_buf, 0u, section_buf->physical_size(), hash);
+		update_hash(*section_buf, 0u, section_buf->physical_size(), hash, state);
+		if (state)
+			state->next_page();
 	}
 
 	std::size_t remaining_size = instance.get_overlay().physical_size();
 
 	if (!instance.get_data_directories().has_security())
-		throw pe_error(hash_calculator_errc::unable_to_read_image_data);
+		throw pe_error(hash_helpers_errc::unable_to_read_data);
 
 	const auto security_dir_size = instance.get_data_directories()
 		.get_directory(core::data_directories::directory_type::security)->size;
 	if (security_dir_size > remaining_size)
-		throw pe_error(hash_calculator_errc::unable_to_read_image_data);
+		throw pe_error(hash_helpers_errc::unable_to_read_data);
 
 	remaining_size -= security_dir_size;
 	if (remaining_size)
@@ -193,57 +220,66 @@ void calculate_hash_impl(const image::image& instance,
 		update_hash(*overlay_buf, 0u, remaining_size, hash);
 	}
 
-	hash.Final(reinterpret_cast<CryptoPP::byte*>(result.data()));
+	result.image_hash.resize(hash.DigestSize());
+	hash.Final(reinterpret_cast<CryptoPP::byte*>(result.image_hash.data()));
+
+	if (page_hashes && state)
+		result.page_hashes = std::move(*state).get_page_hashes();
 }
 
-template<typename Hash>
-void calculate_hash_impl(const image::image& instance, std::vector<std::byte>& result)
+using hash_variant_type = std::variant<std::monostate, CryptoPP::Weak::MD5, CryptoPP::SHA1, CryptoPP::SHA256>;
+void init_hash(hash_variant_type& hash, digest_algorithm algorithm)
 {
-	Hash hash;
-	calculate_hash_impl(instance, hash, result);
+	switch (algorithm)
+	{
+	case digest_algorithm::md5:
+		hash.emplace<CryptoPP::Weak::MD5>();
+		break;
+	case digest_algorithm::sha1:
+		hash.emplace<CryptoPP::SHA1>();
+		break;
+	case digest_algorithm::sha256:
+		hash.emplace<CryptoPP::SHA256>();
+		break;
+	default:
+		throw pe_error(buffer_hash_errc::unsupported_hash_algorithm);
+	}
+}
+
+CryptoPP::HashTransformation* get_hash(hash_variant_type& hash)
+{
+	return std::visit(utilities::overloaded{
+		[](auto& obj) -> CryptoPP::HashTransformation* { return &obj; },
+		[](std::monostate) -> CryptoPP::HashTransformation* { return nullptr; }
+	}, hash);
 }
 } //namespace
 
-std::vector<std::byte> calculate_hash(pkcs7::digest_algorithm algorithm,
-	const pe_bliss::image::image& instance)
+image_hash_result calculate_hash(digest_algorithm algorithm,
+	const pe_bliss::image::image& instance,
+	const page_hash_options* page_hash_opts)
 {
-	std::vector<std::byte> result;
+	image_hash_result result;
 
-	switch (algorithm)
+	hash_variant_type image_hash;
+	hash_variant_type page_hash;
+	init_hash(image_hash, algorithm);
+	if (page_hash_opts)
 	{
-	case pkcs7::digest_algorithm::md5:
-		calculate_hash_impl<CryptoPP::Weak::MD5>(instance, result);
-		break;
-	case pkcs7::digest_algorithm::sha1:
-		calculate_hash_impl<CryptoPP::SHA1>(instance, result);
-		break;
-	case pkcs7::digest_algorithm::sha256:
-		calculate_hash_impl<CryptoPP::SHA256>(instance, result);
-		break;
-	default:
-		throw pe_error(hash_calculator_errc::unsupported_hash_algorithm);
+		try
+		{
+			init_hash(page_hash, page_hash_opts->algorithm);
+		}
+		catch (const pe_error& e)
+		{
+			result.page_hash_errc = e.code();
+			page_hash_opts = nullptr;
+		}
 	}
 
+	calculate_hash_impl(instance, *get_hash(image_hash),
+		result, page_hash_opts, get_hash(page_hash));
 	return result;
 }
-
-template<typename RangeType>
-bool is_hash_valid(const authenticode_pkcs7<RangeType>& signature,
-	const pe_bliss::image::image& instance)
-{
-	if (!signature.get_signer_count())
-		throw pe_error(hash_calculator_errc::no_signers);
-
-	return std::ranges::equal(
-		calculate_hash(signature.get_signer(0u).get_digest_algorithm(), instance),
-		signature.get_image_hash());
-}
-
-template bool is_hash_valid<pkcs7::span_range_type>(
-	const authenticode_pkcs7<pkcs7::span_range_type>& pkcs7,
-	const pe_bliss::image::image& instance);
-template bool is_hash_valid<pkcs7::vector_range_type>(
-	const authenticode_pkcs7<pkcs7::vector_range_type>& pkcs7,
-	const pe_bliss::image::image& instance);
 
 } //namespace pe_bliss::security
