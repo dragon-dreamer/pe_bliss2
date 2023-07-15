@@ -92,7 +92,7 @@ bool verify_message_digest(const authenticode_pkcs7<RangeType>& authenticode,
 template<typename RangeType>
 x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
 	const authenticode_pkcs7<RangeType>& authenticode,
-	error_list* errors)
+	error_list* warnings)
 {
 	x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> store;
 
@@ -100,9 +100,9 @@ x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certif
 	const auto& certificates = content_info_data.certificates;
 	if (!certificates || certificates->empty())
 	{
-		if (errors)
+		if (warnings)
 		{
-			errors->add_error(
+			warnings->add_error(
 				authenticode_verifier_errc::absent_certificates);
 		}
 		return store;
@@ -111,21 +111,16 @@ x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certif
 	store.reserve(certificates->size());
 	for (const auto& cert : *certificates)
 	{
-		const bool added = std::visit([&store, errors](const auto& contained_cert) {
+		std::visit([&store, warnings](const auto& contained_cert) {
 			if (!store.add_certificate(contained_cert))
 			{
-				if (errors)
+				if (warnings)
 				{
-					errors->add_error(
+					warnings->add_error(
 						authenticode_verifier_errc::duplicate_certificates);
 				}
-				return false;
 			}
-			return true;
 		}, cert);
-
-		if (!added)
-			break;
 	}
 
 	return store;
@@ -212,7 +207,7 @@ void verify_valid_format_authenticode(
 	}
 
 	const auto cert_store = build_certificate_store(
-		authenticode, &result.authenticode_format_errors);
+		authenticode, &result.certificate_store_warnings);
 
 	const auto* signing_cert = cert_store.find_certificate(
 		signer.get_signer_certificate_serial_number(),
@@ -292,9 +287,10 @@ authenticode_check_status verify_authenticode_full(const authenticode_pkcs7<Rang
 		return result;
 	}
 
-	auto nested = load_nested_signature(unauthenticated_attributes);
-	if (nested)
-		verify_authenticode(*nested, instance, opts, result.nested.emplace());
+	const auto nested_signatures = load_nested_signatures(unauthenticated_attributes);
+	result.nested.reserve(nested_signatures.size());
+	for (const auto& nested_signature : nested_signatures)
+		verify_authenticode(nested_signature, instance, opts, result.nested.emplace_back());
 
 	return result;
 }

@@ -38,6 +38,7 @@ std::error_code make_error_code(authenticode_verifier_errc) noexcept;
 struct [[nodiscard]] authenticode_check_status_base
 {
 	error_list authenticode_format_errors;
+	error_list certificate_store_warnings;
 	std::exception_ptr authenticode_processing_error;
 	std::optional<bool> image_hash_valid;
 	std::optional<bool> page_hashes_valid;
@@ -68,12 +69,13 @@ struct [[nodiscard]] authenticode_check_status
 {
 	authenticode_check_status_base root;
 	// Double-signing support
-	std::optional<authenticode_check_status_base> nested;
+	std::vector<authenticode_check_status_base> nested;
 
 	[[nodiscard]]
 	explicit operator bool() const noexcept
 	{
-		return root && (!nested || *nested);
+		return root
+			&& std::ranges::all_of(nested, [](const auto& v) { return !!v; });
 	}
 };
 

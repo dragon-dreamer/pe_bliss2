@@ -157,6 +157,26 @@ std::optional<span_range_type> attribute_map<RangeType>::get_attribute(
 }
 
 template<typename RangeType>
+std::vector<span_range_type> attribute_map<RangeType>::get_attributes(
+	std::span<const std::uint32_t> oid) const
+{
+	std::vector<span_range_type> result;
+
+	auto it = map_.find(oid);
+	if (it != map_.cend())
+	{
+		if (it->second.get().empty())
+			throw pe_error(pkcs7_errc::absent_attribute_value);
+
+		result.reserve(it->second.get().size());
+		for (const auto& value : it->second.get())
+			result.emplace_back(value);
+	}
+
+	return result;
+}
+
+template<typename RangeType>
 std::optional<span_range_type> attribute_map<RangeType>::get_message_digest() const
 {
 	return get_attribute(asn1::crypto::pkcs7::oid_message_digest);

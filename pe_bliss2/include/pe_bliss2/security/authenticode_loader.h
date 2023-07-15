@@ -3,6 +3,7 @@
 #include <optional>
 #include <system_error>
 #include <type_traits>
+#include <vector>
 
 #include "buffers/input_buffer_interface.h"
 
@@ -37,7 +38,7 @@ authenticode_pkcs7<RangeType> load_authenticode_signature(
 // Double-signing support
 template<typename RangeType>
 [[nodiscard]]
-std::optional<authenticode_pkcs7<span_range_type>> load_nested_signature(
+std::vector<authenticode_pkcs7<span_range_type>> load_nested_signatures(
 	const pkcs7::attribute_map<RangeType>& unauthenticated_attributes);
 
 } //namespace pe_bliss::security

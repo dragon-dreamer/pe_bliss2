@@ -53,6 +53,10 @@ public:
 		std::span<const std::uint32_t> oid) const;
 
 	[[nodiscard]]
+	std::vector<span_range_type> get_attributes(
+		std::span<const std::uint32_t> oid) const;
+
+	[[nodiscard]]
 	std::optional<span_range_type> get_message_digest() const;
 	[[nodiscard]]
 	std::optional<span_range_type> get_content_type() const;
