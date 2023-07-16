@@ -99,6 +99,15 @@ void update_hash(buffers::input_buffer_interface& buf, std::size_t from, std::si
 }
 
 void update_hash(buffers::input_buffer_interface& buf, std::size_t from, std::size_t to,
+	page_hash_state& state)
+{
+	update_hash_impl(buf, from, to, [&state](
+		const CryptoPP::byte* data, std::size_t size, std::size_t offset) {
+		state.update(data, offset, size);
+	});
+}
+
+void update_hash(buffers::input_buffer_interface& buf, std::size_t from, std::size_t to,
 	CryptoPP::HashTransformation& hash, std::optional<page_hash_state>& state)
 {
 	update_hash_impl(buf, from, to, [&state, &hash](

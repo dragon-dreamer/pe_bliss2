@@ -53,6 +53,9 @@ void update_hash(buffers::input_buffer_interface& buf, std::size_t from, std::si
 	CryptoPP::HashTransformation& hash);
 
 void update_hash(buffers::input_buffer_interface& buf, std::size_t from, std::size_t to,
+	page_hash_state& state);
+
+void update_hash(buffers::input_buffer_interface& buf, std::size_t from, std::size_t to,
 	CryptoPP::HashTransformation& hash, std::optional<page_hash_state>& state);
 
 } //namespace pe_bliss::security
