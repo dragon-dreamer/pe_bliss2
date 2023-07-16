@@ -59,6 +59,10 @@ public:
 	[[nodiscard]] inline const buffers::ref_buffer& get_full_headers_buffer() const& noexcept;
 	[[nodiscard]] inline buffers::ref_buffer get_full_headers_buffer() && noexcept;
 
+	[[nodiscard]] inline buffers::ref_buffer& get_full_sections_buffer() & noexcept;
+	[[nodiscard]] inline const buffers::ref_buffer& get_full_sections_buffer() const& noexcept;
+	[[nodiscard]] inline buffers::ref_buffer get_full_sections_buffer() && noexcept;
+
 public:
 	[[nodiscard]] bool is_64bit() const noexcept;
 	[[nodiscard]] bool has_relocations() const noexcept;
@@ -93,6 +97,7 @@ private:
 	section::section_data_list section_list_;
 	core::overlay overlay_;
 	buffers::ref_buffer full_headers_buffer_;
+	buffers::ref_buffer full_sections_buffer_;
 };
 
 } //namespace pe_bliss::image

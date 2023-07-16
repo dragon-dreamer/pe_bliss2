@@ -153,4 +153,19 @@ buffers::ref_buffer image::get_full_headers_buffer() && noexcept
 	return std::move(full_headers_buffer_);
 }
 
+buffers::ref_buffer& image::get_full_sections_buffer() & noexcept
+{
+	return full_sections_buffer_;
+}
+
+const buffers::ref_buffer& image::get_full_sections_buffer() const& noexcept
+{
+	return full_sections_buffer_;
+}
+
+buffers::ref_buffer image::get_full_sections_buffer() && noexcept
+{
+	return std::move(full_sections_buffer_);
+}
+
 } //namespace pe_bliss::image
