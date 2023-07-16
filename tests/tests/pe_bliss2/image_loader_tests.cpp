@@ -380,6 +380,8 @@ struct check_options
 	bool sections_copied = false;
 	bool dos_stub_copied = false;
 	bool full_headers_copied = false;
+	bool full_section_data_copied = false;
+	bool load_full_sections_buffer = true;
 };
 
 void test_full_image(const buffers::input_buffer_ptr& buf,
@@ -388,7 +390,9 @@ void test_full_image(const buffers::input_buffer_ptr& buf,
 	auto result = image_loader::load(buf,
 		{ .eager_section_data_copy = options.sections_copied,
 		.eager_dos_stub_data_copy = options.dos_stub_copied,
-		.eager_full_headers_buffer_copy = options.full_headers_copied });
+		.eager_full_headers_buffer_copy = options.full_headers_copied,
+		.load_full_sections_buffer = options.load_full_sections_buffer,
+		.eager_full_sections_buffer_copy = options.full_section_data_copied });
 	EXPECT_FALSE(result.fatal_error);
 	expect_contains_errors(result.warnings);
 
@@ -435,6 +439,18 @@ void test_full_image(const buffers::input_buffer_ptr& buf,
 	// size of headers = 0x400 = 1024, aligned up to 0x1000
 	// (because there is a gap between the first section header and the end of headers)
 	EXPECT_EQ(result.image.get_full_headers_buffer().size(), 4096u);
+
+	if (options.load_full_sections_buffer)
+	{
+		EXPECT_EQ(result.image.get_full_sections_buffer().is_copied(),
+			options.full_section_data_copied);
+		EXPECT_EQ(result.image.get_full_sections_buffer().size(), second_section_raw_size);
+		EXPECT_EQ(result.image.get_full_sections_buffer().copied_data()[0], std::byte{ 0xab });
+	}
+	else
+	{
+		EXPECT_EQ(result.image.get_full_sections_buffer().data()->size(), 0u);
+	}
 }
 } //namespace
 
@@ -453,6 +469,8 @@ TEST(ImageLoaderTests, LoadFullImage)
 	test_full_image(buf, { .sections_copied = true });
 	test_full_image(buf, { .dos_stub_copied = true });
 	test_full_image(buf, { .full_headers_copied = true });
+	test_full_image(buf, { .full_section_data_copied = true });
+	test_full_image(buf, { .load_full_sections_buffer = false });
 }
 
 namespace
