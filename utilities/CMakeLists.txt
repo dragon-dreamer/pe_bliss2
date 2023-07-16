@@ -22,6 +22,7 @@ target_sources(utilities
 		include/utilities/hash.h
 		include/utilities/math.h
 		include/utilities/safe_uint.h
+		include/utilities/range_helpers.h
 		include/utilities/scoped_guard.h
 		include/utilities/shannon_entropy.h
 		include/utilities/static_class.h
