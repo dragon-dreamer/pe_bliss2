@@ -1,15 +1,18 @@
 #include "pe_bliss2/image/image_loader.h"
 
 #include <algorithm>
+#include <bit>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <iterator>
+#include <limits>
 #include <string>
 #include <system_error>
 
 #include "buffers/input_buffer_section.h"
 #include "buffers/input_buffer_stateful_wrapper.h"
+
 #include "pe_bliss2/dos/dos_header.h"
 #include "pe_bliss2/dos/dos_header_errc.h"
 #include "pe_bliss2/dos/dos_header_validator.h"
@@ -19,6 +22,7 @@
 #include "pe_bliss2/section/section_data.h"
 #include "pe_bliss2/section/section_errc.h"
 #include "pe_bliss2/section/section_table_validator.h"
+
 #include "utilities/math.h"
 
 namespace
@@ -38,6 +42,8 @@ struct image_loader_error_category : std::error_category
 		{
 		case unable_to_load_full_headers_buffer:
 			return "Unable to load full headers buffer";
+		case unable_to_load_full_section_buffer:
+			return "Unable to load full section buffer";
 		default:
 			return {};
 		}
@@ -167,6 +173,40 @@ void image_loader::load(
 			}
 		}
 
+		std::size_t first_section_data_offset = (std::numeric_limits<std::size_t>::max)();
+		std::size_t last_section_data_offset = 0u;
+		if (options.load_full_sections_buffer || options.load_full_headers_buffer)
+		{
+			const auto section_alignment = optional_hdr.get_raw_section_alignment();
+			for (const auto& header : section_headers)
+			{
+				if (!header.get_pointer_to_raw_data())
+					continue;
+
+				first_section_data_offset = (std::min<std::size_t>)(first_section_data_offset,
+					header.get_pointer_to_raw_data());
+				last_section_data_offset = (std::max)(last_section_data_offset,
+					static_cast<std::size_t>(header.get_pointer_to_raw_data())
+					+ header.get_raw_size(section_alignment));
+			}
+		}
+
+		if (options.load_full_sections_buffer && last_section_data_offset)
+		{
+			try
+			{
+				auto full_sections_buffer = buffers::reduce(buffer,
+					first_section_data_offset, last_section_data_offset - first_section_data_offset);
+				instance.get_full_sections_buffer().deserialize(std::move(full_sections_buffer),
+					options.eager_full_sections_buffer_copy);
+			}
+			catch (...)
+			{
+				warnings.add_error(
+					image_loader_errc::unable_to_load_full_section_buffer);
+			}
+		}
+
 		if (options.load_overlay && !options.image_loaded_to_memory)
 		{
 			std::uint64_t section_data_end_offset = section_tbl.get_raw_data_end_offset(
@@ -194,6 +234,14 @@ void image_loader::load(
 		if (options.load_full_headers_buffer)
 		{
 			std::size_t size = optional_hdr.get_raw_size_of_headers();
+			if (last_section_data_offset)
+			{
+				const auto section_alignment = optional_hdr.get_raw_section_alignment();
+				if (section_alignment && std::has_single_bit(section_alignment))
+					(void)utilities::math::align_up_if_safe(size, section_alignment);
+				size = std::min(size, first_section_data_offset);
+			}
+
 			size = std::min(size, buffer_size);
 			try
 			{

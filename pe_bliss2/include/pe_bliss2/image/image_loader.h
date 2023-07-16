@@ -20,7 +20,8 @@ namespace pe_bliss::image
 
 enum class image_loader_errc
 {
-	unable_to_load_full_headers_buffer = 1
+	unable_to_load_full_headers_buffer = 1,
+	unable_to_load_full_section_buffer
 };
 
 struct [[nodiscard]] image_load_options
@@ -39,6 +40,8 @@ struct [[nodiscard]] image_load_options
 	bool load_full_headers_buffer = true;
 	bool eager_full_headers_buffer_copy = false;
 	bool validate_image_signature = true;
+	bool load_full_sections_buffer = true;
+	bool eager_full_sections_buffer_copy = false;
 	dos::dos_header_validation_options dos_header_validation{};
 	core::optional_header_validation_options optional_header_validation{};
 };

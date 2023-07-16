@@ -355,9 +355,11 @@ TEST(ImageLoaderTests, LoadSectionTableNoSectionData)
 	EXPECT_FALSE(result.fatal_error);
 
 	ASSERT_TRUE(result.warnings.has_errors());
-	ASSERT_EQ(result.warnings.get_errors()->size(), 1u);
+	ASSERT_EQ(result.warnings.get_errors()->size(), 2u);
 	EXPECT_TRUE(result.warnings.has_error(
 		section::section_errc::unable_to_read_section_data, 1u));
+	EXPECT_TRUE(result.warnings.has_error(
+		image_loader_errc::unable_to_load_full_section_buffer));
 }
 
 TEST(ImageLoaderTests, LoadSectionTableIgnoreSectionData)
@@ -366,7 +368,7 @@ TEST(ImageLoaderTests, LoadSectionTableIgnoreSectionData)
 		buffer_for(dos_header_data, dos_stub_data,
 			pe_signature, file_header_2_sections, optional_header,
 			data_directories, section_table_2_sections),
-		{ .load_section_data = false });
+		{ .load_section_data = false, .load_full_sections_buffer = false });
 	EXPECT_FALSE(result.fatal_error);
 	expect_contains_errors(result.warnings);
 }
@@ -430,8 +432,9 @@ void test_full_image(const buffers::input_buffer_ptr& buf,
 
 	EXPECT_EQ(result.image.get_full_headers_buffer().is_copied(),
 		options.full_headers_copied);
-	// size of headers = 0x400 = 1024
-	EXPECT_EQ(result.image.get_full_headers_buffer().size(), 1024u);
+	// size of headers = 0x400 = 1024, aligned up to 0x1000
+	// (because there is a gap between the first section header and the end of headers)
+	EXPECT_EQ(result.image.get_full_headers_buffer().size(), 4096u);
 }
 } //namespace
 
@@ -475,7 +478,8 @@ TEST(ImageLoaderTests, LoadInvalidSectionTable)
 		section::section_errc::invalid_section_virtual_address_alignment,
 		section::section_errc::virtual_gap_between_sections,
 		core::optional_header_errc::invalid_size_of_image,
-		section::section_errc::unable_to_read_section_data);
+		section::section_errc::unable_to_read_section_data,
+		image_loader_errc::unable_to_load_full_section_buffer);
 
 	EXPECT_TRUE(result.warnings.has_error(
 		section::section_errc::invalid_section_virtual_address_alignment, 1u));
@@ -494,7 +498,8 @@ TEST(ImageLoaderTests, LoadInvalidSectionTableIgnoreSectionErrors)
 
 	expect_contains_errors(result.warnings,
 		core::optional_header_errc::invalid_size_of_image,
-		section::section_errc::unable_to_read_section_data);
+		section::section_errc::unable_to_read_section_data,
+		image_loader_errc::unable_to_load_full_section_buffer);
 }
 
 TEST(ImageLoaderTests, LoadInvalidSectionTableIgnoreSectionAndImageSizeErrors)
@@ -507,7 +512,8 @@ TEST(ImageLoaderTests, LoadInvalidSectionTableIgnoreSectionAndImageSizeErrors)
 	EXPECT_FALSE(result.fatal_error);
 
 	expect_contains_errors(result.warnings,
-		section::section_errc::unable_to_read_section_data);
+		section::section_errc::unable_to_read_section_data,
+		image_loader_errc::unable_to_load_full_section_buffer);
 }
 
 TEST(ImageLoaderTests, LoadSectionTableNoFullHeadersBuffer)
