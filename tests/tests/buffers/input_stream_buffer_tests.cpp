@@ -36,6 +36,7 @@ TEST(BufferTests, InputStreamBufferTest)
 	test_input_buffer(buffer, data);
 	EXPECT_FALSE(buffer.is_stateless());
 	EXPECT_EQ(buffer.virtual_size(), 0u);
+	EXPECT_EQ(buffer.get_raw_data(0u, 1u), nullptr);
 }
 
 TEST(BufferTests, InputVirtualStreamBufferTest)

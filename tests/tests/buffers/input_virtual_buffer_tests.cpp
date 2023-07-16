@@ -97,3 +97,19 @@ TEST(BufferTests, InputVirtualBufferNestedTest)
 	EXPECT_TRUE(std::all_of(vec.begin() + data.size(), vec.end(),
 		[](auto val) { return val == std::byte{}; }));
 }
+
+TEST(BufferTests, InputVirtualBufferGetRawDataTest)
+{
+	auto buffer = std::make_shared<buffers::input_memory_buffer>(
+		data.data(), data.size());
+	auto virtual_buffer = std::make_shared<buffers::input_virtual_buffer>(
+		buffer, extra_data_size);
+
+	const std::byte* ptr{};
+	ASSERT_NO_THROW((ptr = virtual_buffer->get_raw_data(1u, 2u)));
+	ASSERT_NE(ptr, nullptr);
+	EXPECT_EQ(ptr[0], data[1]);
+	EXPECT_EQ(ptr[1], data[2]);
+
+	EXPECT_THROW((ptr = virtual_buffer->get_raw_data(1, 5u)), std::system_error);
+}

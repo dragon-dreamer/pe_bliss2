@@ -134,3 +134,22 @@ TEST(BufferTests, InputBufferSectionEmptyTest)
 	EXPECT_EQ(section.virtual_size(), 0u);
 	EXPECT_EQ(section.physical_size(), 0u);
 }
+
+TEST(BufferTests, InputBufferGetRawDataTest)
+{
+	auto buffer = std::make_shared<buffers::input_memory_buffer>(
+		data.data(), data.size());
+
+	buffers::input_buffer_section section(buffer, 1u, 3u);
+	const std::byte* ptr{};
+	ASSERT_NO_THROW((ptr = section.get_raw_data(0u, 2u)));
+	ASSERT_NE(ptr, nullptr);
+	EXPECT_EQ(ptr[0], data[1]);
+	EXPECT_EQ(ptr[1], data[2]);
+
+	ASSERT_NO_THROW((ptr = section.get_raw_data(1u, 2u)));
+	ASSERT_NE(ptr, nullptr);
+	EXPECT_EQ(ptr[0], data[2]);
+
+	EXPECT_THROW((ptr = section.get_raw_data(1, 3u)), std::system_error);
+}
