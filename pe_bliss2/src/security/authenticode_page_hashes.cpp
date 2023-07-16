@@ -50,6 +50,10 @@ std::size_t get_hash_digest_size(digest_algorithm algorithm) noexcept
 		return 20u;
 	case digest_algorithm::sha256:
 		return 32u;
+	case digest_algorithm::sha384:
+		return 48u;
+	case digest_algorithm::sha512:
+		return 64u;
 	default:
 		return 0u;
 	}

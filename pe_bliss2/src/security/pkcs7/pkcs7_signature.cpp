@@ -48,6 +48,8 @@ private:
 	std::array<char, DIGESTSIZE> digest;
 };
 
+using IdentitySHA512 = IdentityHash<CryptoPP::SHA512>;
+using IdentitySHA384 = IdentityHash<CryptoPP::SHA384>;
 using IdentitySHA256 = IdentityHash<CryptoPP::SHA256>;
 using IdentitySHA1 = IdentityHash<CryptoPP::SHA1>;
 using IdentityMD5 = IdentityHash<CryptoPP::Weak::MD5>;
@@ -99,6 +101,16 @@ bool verify_rsa_pkcs1v15_signature(const CryptoPP::RSA::PublicKey& public_key,
 
 } //namespace
 
+template<> const CryptoPP::byte CryptoPP::PKCS_DigestDecoration<IdentitySHA512>::decoration[]{
+	0x30,0x51,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x03,0x05,0x00,0x04,0x40 };
+template<> const unsigned int CryptoPP::PKCS_DigestDecoration<IdentitySHA512>::length
+	= sizeof(PKCS_DigestDecoration<IdentitySHA512>::decoration);
+
+template<> const CryptoPP::byte CryptoPP::PKCS_DigestDecoration<IdentitySHA384>::decoration[]{
+	0x30,0x41,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x02,0x05,0x00,0x04,0x30 };
+template<> const unsigned int CryptoPP::PKCS_DigestDecoration<IdentitySHA384>::length
+	= sizeof(PKCS_DigestDecoration<IdentitySHA384>::decoration);
+
 template<> const CryptoPP::byte CryptoPP::PKCS_DigestDecoration<IdentitySHA256>::decoration[]{
 	0x30,0x31,0x30,0x0d,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x01,0x05,0x00,0x04,0x20 };
 template<> const unsigned int CryptoPP::PKCS_DigestDecoration<IdentitySHA256>::length
@@ -140,6 +152,12 @@ bool verify_signature(std::span<const std::byte> raw_public_key,
 			public_key.BERDecodePublicKey(key_bytes, false, 0u);
 			switch (digest_alg)
 			{
+			case digest_algorithm::sha512:
+				return verify_rsa_pkcs1v15_signature<IdentitySHA512>(public_key,
+					message_digest, encrypted_digest);
+			case digest_algorithm::sha384:
+				return verify_rsa_pkcs1v15_signature<IdentitySHA384>(public_key,
+					message_digest, encrypted_digest);
 			case digest_algorithm::sha256:
 				return verify_rsa_pkcs1v15_signature<IdentitySHA256>(public_key,
 					message_digest, encrypted_digest);

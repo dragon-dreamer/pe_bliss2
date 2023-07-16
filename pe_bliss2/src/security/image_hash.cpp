@@ -228,6 +228,9 @@ void calculate_hash_impl(const image::image& instance,
 }
 
 using hash_variant_type = std::variant<std::monostate, CryptoPP::Weak::MD5, CryptoPP::SHA1, CryptoPP::SHA256>;
+using hash_variant_type = std::variant<std::monostate,
+	CryptoPP::Weak::MD5, CryptoPP::SHA1, CryptoPP::SHA256,
+	CryptoPP::SHA384, CryptoPP::SHA512>;
 void init_hash(hash_variant_type& hash, digest_algorithm algorithm)
 {
 	switch (algorithm)
@@ -240,6 +243,12 @@ void init_hash(hash_variant_type& hash, digest_algorithm algorithm)
 		break;
 	case digest_algorithm::sha256:
 		hash.emplace<CryptoPP::SHA256>();
+		break;
+	case digest_algorithm::sha384:
+		hash.emplace<CryptoPP::SHA384>();
+		break;
+	case digest_algorithm::sha512:
+		hash.emplace<CryptoPP::SHA512>();
 		break;
 	default:
 		throw pe_error(buffer_hash_errc::unsupported_hash_algorithm);

@@ -15,6 +15,8 @@ enum class digest_algorithm
 	md5,
 	sha1,
 	sha256,
+	sha384,
+	sha512,
 	unknown
 };
 

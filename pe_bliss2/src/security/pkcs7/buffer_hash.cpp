@@ -82,6 +82,10 @@ std::vector<std::byte> calculate_hash_impl(digest_algorithm algorithm,
 		return calculate_hash_impl<CryptoPP::SHA1>(buffer);
 	case digest_algorithm::sha256:
 		return calculate_hash_impl<CryptoPP::SHA256>(buffer);
+	case digest_algorithm::sha384:
+		return calculate_hash_impl<CryptoPP::SHA384>(buffer);
+	case digest_algorithm::sha512:
+		return calculate_hash_impl<CryptoPP::SHA512>(buffer);
 	default:
 		throw pe_error(buffer_hash_errc::unsupported_hash_algorithm);
 	}

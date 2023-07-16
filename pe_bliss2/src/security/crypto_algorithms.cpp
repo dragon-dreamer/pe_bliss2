@@ -12,6 +12,10 @@ digest_algorithm get_digest_algorithm(std::span<const std::uint32_t> range) noex
 {
 	if (std::ranges::equal(range, asn1::crypto::hash::id_sha256))
 		return digest_algorithm::sha256;
+	if (std::ranges::equal(range, asn1::crypto::hash::id_sha384))
+		return digest_algorithm::sha384;
+	if (std::ranges::equal(range, asn1::crypto::hash::id_sha512))
+		return digest_algorithm::sha512;
 	if (std::ranges::equal(range, asn1::crypto::hash::id_sha1))
 		return digest_algorithm::sha1;
 	if (std::ranges::equal(range, asn1::crypto::hash::id_md5))
