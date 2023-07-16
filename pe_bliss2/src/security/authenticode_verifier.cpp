@@ -35,8 +35,6 @@ struct authenticode_verifier_error_category : std::error_category
 			return "Signing certificate is absent";
 		case invalid_page_hash_format:
 			return "Invalid page hash format";
-		case unsupported_page_hash_digest_algorithm:
-			return "Unsupported page hash alrogithm";
 		default:
 			return {};
 		}
@@ -157,27 +155,18 @@ void verify_valid_format_authenticode(
 		pe_bliss::security::span_range_type>(authenticode);
 	std::optional<page_hash_options> page_hash_opts;
 	std::optional<span_range_type> raw_page_hashes;
-	if (page_hashes)
+	while (page_hashes)
 	{
-		if (!page_hashes->is_valid())
+		if (!page_hashes->is_valid(digest_alg))
 		{
-			result.authenticode_format_errors.add_error(
-				authenticode_verifier_errc::invalid_page_hash_format);
-			return;
+			result.page_hashes_check_errc
+				= authenticode_verifier_errc::invalid_page_hash_format;
+			break;
 		}
 
-		const auto page_hash_alg = page_hashes->get_page_hash_digest_algorithm();
-		if (page_hash_alg == digest_algorithm::unknown)
-		{
-			result.authenticode_format_errors.add_error(
-				authenticode_verifier_errc::unsupported_page_hash_digest_algorithm);
-			return;
-		}
-
-		page_hash_opts.emplace(opts.page_hash_opts).algorithm = page_hash_alg;
-		result.page_hash_alg = page_hash_alg;
-
+		page_hash_opts.emplace(opts.page_hash_opts).algorithm = digest_alg;
 		raw_page_hashes = page_hashes->get_raw_page_hashes();
+		break;
 	}
 
 	try
@@ -187,7 +176,8 @@ void verify_valid_format_authenticode(
 			raw_page_hashes, page_hash_opts);
 		result.image_hash_valid = hash_result.image_hash_valid;
 		result.page_hashes_valid = hash_result.page_hashes_valid;
-		result.page_hashes_check_errc = hash_result.page_hashes_check_errc;
+		if (!result.page_hashes_check_errc)
+			result.page_hashes_check_errc = hash_result.page_hashes_check_errc;
 		result.message_digest_valid = verify_message_digest(authenticode,
 			signer, authenticated_attributes);
 	}

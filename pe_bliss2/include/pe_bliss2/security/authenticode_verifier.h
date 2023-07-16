@@ -29,8 +29,7 @@ enum class authenticode_verifier_errc
 	absent_certificates,
 	duplicate_certificates,
 	absent_signing_cert,
-	invalid_page_hash_format,
-	unsupported_page_hash_digest_algorithm
+	invalid_page_hash_format
 };
 
 std::error_code make_error_code(authenticode_verifier_errc) noexcept;
@@ -46,7 +45,6 @@ struct [[nodiscard]] authenticode_check_status_base
 	std::optional<bool> message_digest_valid;
 	std::optional<bool> signature_valid;
 	std::optional<digest_algorithm> image_digest_alg;
-	std::optional<digest_algorithm> page_hash_alg;
 	std::optional<digest_encryption_algorithm> digest_encryption_alg;
 
 	[[nodiscard]]

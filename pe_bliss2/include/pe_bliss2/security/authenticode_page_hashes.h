@@ -20,12 +20,6 @@ public:
 
 public:
 	[[nodiscard]]
-	digest_algorithm get_page_hash_digest_algorithm() const noexcept
-	{
-		return algorithm_;
-	}
-
-	[[nodiscard]]
 	std::optional<span_range_type> get_raw_page_hashes() const noexcept;
 
 	[[nodiscard]]
@@ -41,17 +35,10 @@ public:
 	}
 
 	[[nodiscard]]
-	bool is_valid() const noexcept;
-
-public:
-	void set_page_hash_digest_algorithm(digest_algorithm algorithm) noexcept
-	{
-		algorithm_ = algorithm;
-	}
+	bool is_valid(digest_algorithm alg) const noexcept;
 
 private:
 	packed_page_hashes_type page_hashes_;
-	digest_algorithm algorithm_{ digest_algorithm::unknown };
 };
 
 template<typename TargetRangeType, typename RangeType>
