@@ -114,14 +114,12 @@ authenticode_check_status verify_authenticode_full(const authenticode_pkcs7<Rang
 	const authenticode_verification_options& opts = {});
 
 template<typename RangeType>
-[[nodiscard]]
 void verify_authenticode(const authenticode_pkcs7<RangeType>& authenticode,
 	const image::image& instance,
 	const authenticode_verification_options& opts,
 	authenticode_check_status_base& result);
 
 template<typename RangeType>
-[[nodiscard]]
 void verify_valid_format_authenticode(
 	const authenticode_pkcs7<RangeType>& authenticode,
 	const pkcs7::signer_info_ref<RangeType>& signer,

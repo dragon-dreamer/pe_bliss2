@@ -26,13 +26,13 @@ class IdentityHash final : public CryptoPP::HashTransformation
 public:
 	static constexpr std::size_t DIGESTSIZE = Hash::DIGESTSIZE;
 
-	void Update(const CryptoPP::byte* src, size_t size) final
+	void Update(const CryptoPP::byte* src, [[maybe_unused]] size_t size) final
 	{
 		assert(size == DIGESTSIZE);
 		std::memcpy(digest.data(), src, DIGESTSIZE);
 	}
 
-	void TruncatedFinal(CryptoPP::byte* result, size_t size) final
+	void TruncatedFinal(CryptoPP::byte* result, [[maybe_unused]] size_t size) final
 	{
 		assert(size == DIGESTSIZE);
 		std::memcpy(result, digest.data(), DIGESTSIZE);
