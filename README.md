@@ -117,7 +117,14 @@ The library compiles and passes tests with the following compilers:
   - .NET
     - Basic headers support (read-only, unit-tested)
   - Security directory (Authenticode)
-    - Very basic support only, raw descriptors and certificate data (read-only, unit-tested)
+    - Raw descriptors and certificate data (read-only, unit-tested)
+    - Authenticode signature (not unit-tested)
+      - Loading the signature
+      - Image hash verification
+      - Message digest verification
+      - RSA signature verification
+      - Double-signing support
+      - Image page hashes verification
 - Address conversions (RVA/VA/file offsets, unit-tested)
 - Overlay at the end of file parsing (unit-tested)
 - Simple console dumper of PE/PE+ files (no extended configuration yet)
@@ -125,8 +132,9 @@ The library compiles and passes tests with the following compilers:
 ## Approximate roadmap
 - High priority
   - MUI resource support
-  - Security directory support (authenticode)
-    - Image signature verification/calculation
+  - Full security directory support (authenticode)
+    - X.509 chain verification
+    - Timestamp countersignature verification
     - Special signers
   - Import redirects (apisetschema.dll)
 - Medium priority
@@ -157,8 +165,8 @@ The library compiles and passes tests with the following compilers:
 
 ## Library requirements
 - C++20 or newer.
-- [Boost](https://www.boost.org/) libraries (1.78.0 or newer, header-only): **endian**, **pfr**
-- Two external libraries are embedded (`external` directory): **googletest**, **pugixml**
+- [Boost](https://www.boost.org/) libraries (1.78.0 or newer, header-only): **endian**, **pfr**.
+- Several external libraries are embedded (`external` directory): **googletest**, **pugixml**, **CryptoPP**, **simple_asn1**.
 
 ## Building
 ### Windows Solution
