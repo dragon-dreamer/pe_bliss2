@@ -227,7 +227,6 @@ void calculate_hash_impl(const image::image& instance,
 		result.page_hashes = std::move(*state).get_page_hashes();
 }
 
-using hash_variant_type = std::variant<std::monostate, CryptoPP::Weak::MD5, CryptoPP::SHA1, CryptoPP::SHA256>;
 using hash_variant_type = std::variant<std::monostate,
 	CryptoPP::Weak::MD5, CryptoPP::SHA1, CryptoPP::SHA256,
 	CryptoPP::SHA384, CryptoPP::SHA512>;
