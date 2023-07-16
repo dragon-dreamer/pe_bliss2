@@ -130,6 +130,7 @@ target_sources(tests
 		tests/pe_bliss2/directories/x64_exception_directory_tests.cpp
 		tests/pe_bliss2/directories/arm_common_exception_helpers.h
 		tests/utilities/math_tests.cpp
+		tests/utilities/range_helpers_tests.cpp
 		tests/utilities/safe_uint_tests.cpp
 		tests/utilities/scoped_guard_tests.cpp
 		tests/utilities/shannon_entropy_tests.cpp
