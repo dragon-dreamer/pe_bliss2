@@ -142,10 +142,20 @@ image_checksum_type calculate_checksum(const image& instance)
 
 	auto checksum = calculate_checksum_impl(0ull, *before_checksum);
 	checksum = calculate_checksum_impl(checksum, *after_checksum);
-	for (const auto& section : instance.get_section_data_list())
+
+	auto full_section_buf = instance.get_full_sections_buffer().data();
+	if (full_section_buf->size())
 	{
-		checksum = calculate_checksum_impl(checksum, *section.data());
-		file_size += section.physical_size();
+		checksum = calculate_checksum_impl(checksum, *full_section_buf);
+		file_size += full_section_buf->physical_size();
+	}
+	else
+	{
+		for (const auto& section : instance.get_section_data_list())
+		{
+			checksum = calculate_checksum_impl(checksum, *section.data());
+			file_size += section.physical_size();
+		}
 	}
 
 	checksum = calculate_checksum_impl(checksum, *instance.get_overlay().data());
