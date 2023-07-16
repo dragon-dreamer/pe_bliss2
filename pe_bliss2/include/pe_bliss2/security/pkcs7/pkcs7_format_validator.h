@@ -29,7 +29,16 @@ enum class pkcs7_format_validator_errc
 };
 
 std::error_code make_error_code(pkcs7_format_validator_errc) noexcept;
+} //namespace pe_bliss::security::pkcs7
 
+namespace std
+{
+template<>
+struct is_error_code_enum<pe_bliss::security::pkcs7::pkcs7_format_validator_errc> : true_type {};
+} //namespace std
+
+namespace pe_bliss::security::pkcs7
+{
 namespace impl
 {
 constexpr std::array signed_data_oid {
@@ -101,9 +110,3 @@ void validate_authenticated_attributes(
 }
 
 } //namespace pe_bliss::security
-
-namespace std
-{
-template<>
-struct is_error_code_enum<pe_bliss::security::pkcs7::pkcs7_format_validator_errc> : true_type {};
-} //namespace std
