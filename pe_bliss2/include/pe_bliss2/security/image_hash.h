@@ -18,7 +18,6 @@ enum class hash_calculator_errc
 {
 	invalid_security_directory_offset,
 	invalid_section_data,
-	invalid_section_alignment,
 	too_big_page_hash_buffer
 };
 
@@ -35,7 +34,6 @@ struct [[nodiscard]] page_hash_options final
 {
 	digest_algorithm algorithm{ digest_algorithm::unknown };
 	std::size_t max_page_hashes_size { 10u * 1024u * 1024u }; //10 Mb
-	std::size_t max_section_alignment { 4u * 1024u * 1024u }; //4 Mb
 };
 
 [[nodiscard]]

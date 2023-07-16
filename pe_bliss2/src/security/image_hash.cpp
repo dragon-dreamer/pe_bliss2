@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <bit>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -52,8 +51,6 @@ struct hash_calculator_error_category : std::error_category
 			return "Invalid security directory offset";
 		case invalid_section_data:
 			return "Invalid section data";
-		case invalid_section_alignment:
-			return "Invalid section alignment";
 		case too_big_page_hash_buffer:
 			return "Too big page hash buffer";
 		default:
@@ -102,21 +99,14 @@ void try_init_page_hash_state(
 	image_hash_result& result,
 	std::optional<page_hash_state>& state)
 {
-	const auto section_alignment = instance
-		.get_optional_header().get_raw_section_alignment();
-	if (!std::has_single_bit(section_alignment) || section_alignment == 1u
-		|| section_alignment > options.max_section_alignment)
-	{
-		result.page_hash_errc = hash_calculator_errc::invalid_section_alignment;
-		return;
-	}
+	static constexpr std::size_t memory_page_size = 0x1000u;
 
 	std::size_t page_count = 1u + (instance.get_full_headers_buffer().physical_size()
-		+ section_alignment - 1u) / section_alignment;
+		+ memory_page_size - 1u) / memory_page_size;
 	for (const auto& data : instance.get_section_data_list())
 	{
-		page_count += (data.physical_size() + section_alignment - 1u)
-			/ section_alignment;
+		page_count += (data.physical_size() + memory_page_size - 1u)
+			/ memory_page_size;
 	}
 
 	const std::size_t single_page_hash_size = page_hash.DigestSize() + sizeof(std::uint32_t);
@@ -128,7 +118,7 @@ void try_init_page_hash_state(
 		return;
 	}
 
-	state.emplace(page_hash, section_alignment)
+	state.emplace(page_hash, memory_page_size)
 		.reserve(total_page_hashes_size);
 }
 
@@ -169,38 +159,57 @@ void calculate_hash_impl(const image::image& instance,
 		cert_table_entry_offset + core::data_directories::directory_packed_size,
 		headers_buffer->physical_size(), hash, state);
 
-	if (state)
-		state->next_page();
-
-	using section_ref = std::pair<
-		std::reference_wrapper<const section::section_header>,
-		std::reference_wrapper<const section::section_data>>;
-	std::vector<section_ref> sections_to_hash;
-	const auto& section_headers = instance.get_section_table().get_section_headers();
-	const auto& section_data = instance.get_section_data_list();
-	if (section_data.size() != section_headers.size())
-		throw pe_error(hash_calculator_errc::invalid_section_data);
-
-	for (std::size_t i = 0; i != section_headers.size(); ++i)
+	auto full_sections_buffer = instance.get_full_sections_buffer().data();
+	const bool has_full_sections_data = full_sections_buffer->size() != 0u;
+	if (state || !has_full_sections_data)
 	{
-		if (!section_headers[i].get_descriptor()->size_of_raw_data)
-			continue;
+		using section_ref = std::pair<
+			std::reference_wrapper<const section::section_header>,
+			std::reference_wrapper<const section::section_data>>;
+		std::vector<section_ref> sections_to_hash;
+		const auto& section_headers = instance.get_section_table().get_section_headers();
+		const auto& section_data = instance.get_section_data_list();
+		if (section_data.size() != section_headers.size())
+			throw pe_error(hash_calculator_errc::invalid_section_data);
 
-		sections_to_hash.emplace_back(section_headers[i], section_data[i]);
-	}
+		for (std::size_t i = 0; i != section_headers.size(); ++i)
+		{
+			if (!section_headers[i].get_descriptor()->size_of_raw_data)
+				continue;
 
-	std::sort(sections_to_hash.begin(), sections_to_hash.end(),
-		[](const section_ref& ref_l, const section_ref& ref_r) {
-		return ref_l.first.get().get_pointer_to_raw_data()
-			< ref_r.first.get().get_pointer_to_raw_data();
-	});
+			sections_to_hash.emplace_back(section_headers[i], section_data[i]);
+		}
 
-	for (const auto& sect : sections_to_hash)
-	{
-		auto section_buf = sect.second.get().data();
-		update_hash(*section_buf, 0u, section_buf->physical_size(), hash, state);
+		std::sort(sections_to_hash.begin(), sections_to_hash.end(),
+			[](const section_ref& ref_l, const section_ref& ref_r) {
+			return ref_l.first.get().get_pointer_to_raw_data()
+				< ref_r.first.get().get_pointer_to_raw_data();
+		});
+
 		if (state)
 			state->next_page();
+		for (const auto& sect : sections_to_hash)
+		{
+			auto section_buf = sect.second.get().data();
+			if (state)
+			{
+				if (has_full_sections_data)
+					update_hash(*section_buf, 0u, section_buf->physical_size(), *state);
+				else
+					update_hash(*section_buf, 0u, section_buf->physical_size(), hash, state);
+				state->next_page();
+			}
+			else
+			{
+				update_hash(*section_buf, 0u, section_buf->physical_size(), hash);
+			}
+		}
+	}
+
+	if (has_full_sections_data)
+	{
+		update_hash(*full_sections_buffer, 0u,
+			full_sections_buffer->physical_size(), hash);
 	}
 
 	std::size_t remaining_size = instance.get_overlay().physical_size();
@@ -217,7 +226,7 @@ void calculate_hash_impl(const image::image& instance,
 	if (remaining_size)
 	{
 		auto overlay_buf = instance.get_overlay().data();
-		update_hash(*overlay_buf, 0u, remaining_size, hash);
+		update_hash(*overlay_buf, 0, remaining_size, hash);
 	}
 
 	result.image_hash.resize(hash.DigestSize());
