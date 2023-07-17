@@ -117,7 +117,8 @@ public:
 	attribute_map<RangeType> get_unauthenticated_attributes() const;
 
 	[[nodiscard]]
-	std::vector<std::byte> calculate_message_digest(std::span<const span_range_type> raw_signed_content) const;
+	std::vector<std::byte> calculate_message_digest(
+		std::span<const span_range_type> raw_signed_content) const;
 
 	[[nodiscard]]
 	std::vector<std::byte> calculate_authenticated_attributes_digest() const;
