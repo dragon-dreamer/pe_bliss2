@@ -188,6 +188,12 @@ std::optional<span_range_type> attribute_map<RangeType>::get_content_type() cons
 	return get_attribute(asn1::crypto::pkcs7::oid_content_type);
 }
 
+template<typename RangeType>
+std::optional<span_range_type> attribute_map<RangeType>::get_signing_time() const
+{
+	return get_attribute(asn1::crypto::pkcs7::oid_signing_time);
+}
+
 template class signer_info_ref<span_range_type>;
 template class signer_info_ref<vector_range_type>;
 template class attribute_map<span_range_type>;

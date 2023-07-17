@@ -17,6 +17,8 @@
 #include "pe_bliss2/security/x509/x509_certificate.h"
 #include "pe_bliss2/security/x509/x509_certificate_store.h"
 
+#include "simple_asn1/types.h"
+
 namespace pe_bliss::image { class image; }
 
 namespace pe_bliss::security
@@ -46,6 +48,7 @@ struct [[nodiscard]] authenticode_check_status_base
 	std::optional<bool> signature_valid;
 	std::optional<digest_algorithm> image_digest_alg;
 	std::optional<digest_encryption_algorithm> digest_encryption_alg;
+	std::optional<asn1::utc_time> signing_time;
 
 	[[nodiscard]]
 	explicit operator bool() const noexcept

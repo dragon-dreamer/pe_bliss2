@@ -60,6 +60,8 @@ public:
 	std::optional<span_range_type> get_message_digest() const;
 	[[nodiscard]]
 	std::optional<span_range_type> get_content_type() const;
+	[[nodiscard]]
+	std::optional<span_range_type> get_signing_time() const;
 
 public:
 	[[nodiscard]]

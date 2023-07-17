@@ -25,7 +25,8 @@ enum class pkcs7_format_validator_errc
 	absent_message_digest,
 	invalid_message_digest,
 	absent_content_type,
-	invalid_content_type
+	invalid_content_type,
+	invalid_signing_time
 };
 
 std::error_code make_error_code(pkcs7_format_validator_errc) noexcept;
@@ -106,6 +107,15 @@ void validate_authenticated_attributes(
 	catch (const pe_error&)
 	{
 		errors.add_error(pkcs7_format_validator_errc::invalid_content_type);
+	}
+
+	try
+	{
+		(void)authenticated_attributes.get_signing_time();
+	}
+	catch (const pe_error&)
+	{
+		errors.add_error(pkcs7_format_validator_errc::invalid_signing_time);
 	}
 }
 

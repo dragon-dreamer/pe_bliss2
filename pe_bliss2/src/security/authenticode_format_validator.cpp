@@ -104,9 +104,26 @@ void validate(const authenticode_pkcs7<RangeType>& signature,
 
 template<typename RangeType>
 void validate(const pkcs7::attribute_map<RangeType>& authenticated_attributes,
-	error_list& errors)
+	std::optional<asn1::utc_time>& signing_time, error_list& errors)
 {
 	pkcs7::validate_authenticated_attributes(authenticated_attributes, errors);
+
+	try
+	{
+		if (auto signing_time_attr = authenticated_attributes.get_signing_time(); signing_time_attr)
+		{
+			signing_time = asn1::der::decode<asn1::utc_time, asn1::spec::utc_time<>>(
+				signing_time_attr->begin(), signing_time_attr->end());
+		}
+	}
+	catch (const pe_error&)
+	{
+		errors.add_error(pkcs7::pkcs7_format_validator_errc::invalid_signing_time);
+	}
+	catch (const asn1::parse_error&)
+	{
+		errors.add_error(pkcs7::pkcs7_format_validator_errc::invalid_signing_time);
+	}
 
 	try
 	{
@@ -140,9 +157,9 @@ template void validate<vector_range_type>(
 
 template void validate<span_range_type>(
 	const pkcs7::attribute_map<span_range_type>& authenticated_attributes,
-	error_list& errors);
+	std::optional<asn1::utc_time>& signing_time, error_list& errors);
 template void validate<vector_range_type>(
 	const pkcs7::attribute_map<vector_range_type>& authenticated_attributes,
-	error_list& errors);
+	std::optional<asn1::utc_time>& signing_time, error_list& errors);
 
 } //namespace pe_bliss::security

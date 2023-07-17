@@ -247,7 +247,7 @@ void verify_authenticode(const authenticode_pkcs7<RangeType>& authenticode,
 		return;
 	}
 
-	validate(authenticated_attributes, result.authenticode_format_errors);
+	validate(authenticated_attributes, result.signing_time, result.authenticode_format_errors);
 	if (result.authenticode_format_errors.has_errors())
 		return;
 

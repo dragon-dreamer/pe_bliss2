@@ -36,6 +36,8 @@ struct pkcs7_format_validator_error_category : std::error_category
 			return "Absent content type attribute";
 		case invalid_content_type:
 			return "Invalid content type attribute value";
+		case invalid_signing_time:
+			return "Invalid signing time";
 		default:
 			return {};
 		}

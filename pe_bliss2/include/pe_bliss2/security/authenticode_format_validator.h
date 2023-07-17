@@ -6,6 +6,8 @@
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/security/authenticode_pkcs7.h"
 
+#include "simple_asn1/types.h"
+
 namespace pe_bliss::security
 {
 
@@ -24,7 +26,7 @@ void validate(const authenticode_pkcs7<RangeType>& signature,
 
 template<typename RangeType>
 void validate(const pkcs7::attribute_map<RangeType>& authenticated_attributes,
-	error_list& errors);
+	std::optional<asn1::utc_time>& signing_time, error_list& errors);
 
 } //namespace pe_bliss::security
 
