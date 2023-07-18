@@ -146,6 +146,7 @@ The library compiles and passes tests with the following compilers:
   - .NET resources support (read-only)
   - .NET strong name signatures (read-only)
   - Trustlets
+  - App Manifest tokens verification
 - Low proirity
   - Unit tests for exports modification code
   - Unit tests for imports modification code
