@@ -92,6 +92,20 @@ std::uint32_t get_cert_table_entry_offset(const image::image& instance)
 	return cert_table_entry_offset.value();
 }
 
+std::size_t get_memory_page_size(const image::image& instance)
+{
+	using enum core::file_header::machine_type;
+	switch (instance.get_file_header().get_machine_type())
+	{
+	case ia64:
+	case alpha_axp:
+	case aplha64:
+		return 0x2000u; //8K size on these architectures
+	default:
+		return 0x1000u; //4K on all other
+	}
+}
+
 void try_init_page_hash_state(
 	const image::image& instance,
 	const page_hash_options& options,
@@ -99,7 +113,7 @@ void try_init_page_hash_state(
 	image_hash_result& result,
 	std::optional<page_hash_state>& state)
 {
-	static constexpr std::size_t memory_page_size = 0x1000u;
+	const std::size_t memory_page_size = get_memory_page_size(instance);
 
 	std::size_t page_count = 1u + (instance.get_full_headers_buffer().physical_size()
 		+ memory_page_size - 1u) / memory_page_size;
