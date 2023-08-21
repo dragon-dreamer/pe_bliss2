@@ -196,9 +196,6 @@
     <Filter Include="Header Files\security\x509">
       <UniqueIdentifier>{e95ebe8a-edb2-4c75-bb29-c5924e43e653}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\security\x509">
-      <UniqueIdentifier>{a76da73b-a199-4ee2-b4d5-aaad0e3e64bf}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pe_bliss2\address_converter.h">

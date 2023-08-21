@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <utility>
 
 #include "pe_bliss2/security/crypto_algorithms.h"
 
@@ -53,9 +54,9 @@ public:
 	}
 
 	[[nodiscard]]
-	digest_encryption_algorithm get_public_key_algorithm() const noexcept
+	encryption_and_hash_algorithm get_public_key_algorithm() const noexcept
 	{
-		return get_digest_encryption_algorithm(data_.tbs_cert.pki.algorithm.container);
+		return get_digest_encryption_algorithm(data_.tbs_cert.pki.algorithm.algorithm.container);
 	}
 
 public:
