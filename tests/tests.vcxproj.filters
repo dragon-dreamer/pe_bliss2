@@ -28,6 +28,9 @@
     <Filter Include="Source Files\tests\pe_bliss2\directories">
       <UniqueIdentifier>{e34f309e-3d1e-4178-bd26-cca9afef4023}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\pe_bliss2\directories\security">
+      <UniqueIdentifier>{4efe418a-1b42-4128-aa17-c0186c4ac1fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -350,6 +353,9 @@
     </ClCompile>
     <ClCompile Include="tests\utilities\range_helpers_tests.cpp">
       <Filter>Source Files\tests\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\security\x509_certificate_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories\security</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
