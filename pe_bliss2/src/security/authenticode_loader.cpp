@@ -54,10 +54,10 @@ std::error_code make_error_code(authenticode_loader_errc e) noexcept
 }
 
 template<typename RangeType>
-std::vector<authenticode_pkcs7<span_range_type>> load_nested_signatures(
+std::vector<authenticode_pkcs7<RangeType>> load_nested_signatures(
 	const pkcs7::attribute_map<RangeType>& unauthenticated_attributes)
 {
-	std::vector<authenticode_pkcs7<span_range_type>> result;
+	std::vector<authenticode_pkcs7<RangeType>> result;
 
 	const auto nested_signatures = unauthenticated_attributes.get_attributes(
 		asn1::crypto::pkcs7::authenticode::oid_nested_signature_attribute);
@@ -65,7 +65,7 @@ std::vector<authenticode_pkcs7<span_range_type>> load_nested_signatures(
 	for (const auto& nested_signature : nested_signatures)
 	{
 		buffers::input_memory_buffer buf(nested_signature.data(), nested_signature.size());
-		result.emplace_back(load_authenticode_signature<span_range_type>(buf));
+		result.emplace_back(load_authenticode_signature<RangeType>(buf));
 	}
 
 	return result;
@@ -142,7 +142,7 @@ template authenticode_pkcs7<vector_range_type> load_authenticode_signature(
 
 template std::vector<authenticode_pkcs7<span_range_type>> load_nested_signatures<span_range_type>(
 	const pkcs7::attribute_map<span_range_type>& unauthenticated_attributes);
-template std::vector<authenticode_pkcs7<span_range_type>> load_nested_signatures<vector_range_type>(
+template std::vector<authenticode_pkcs7<vector_range_type>> load_nested_signatures<vector_range_type>(
 	const pkcs7::attribute_map<vector_range_type>& unauthenticated_attributes);
 
 } //namespace pe_bliss::security

@@ -12,6 +12,10 @@
 #include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/pkcs7/pkcs7.h"
 
+#include "simple_asn1/crypto/pkcs7/oids.h"
+#include "simple_asn1/crypto/crypto_common_types.h"
+#include "simple_asn1/types.h"
+
 namespace pe_bliss::security::pkcs7
 {
 
@@ -40,25 +44,22 @@ struct is_error_code_enum<pe_bliss::security::pkcs7::pkcs7_format_validator_errc
 
 namespace pe_bliss::security::pkcs7
 {
+constexpr std::int32_t signed_data_version = 1u;
+
 namespace impl
 {
-constexpr std::array signed_data_oid {
-	1u, 2u, 840u, 113549u, 1u, 7u, 2u
-};
-
-constexpr std::uint32_t signed_data_version = 1u;
-constexpr std::uint32_t signer_info_version = 1u;
+constexpr std::int32_t signer_info_version = 1u;
 } //namespace impl
 
 template<typename RangeType, typename ContextType>
 void validate(const pe_bliss::security::pkcs7::pkcs7<RangeType, ContextType>& signature,
-	error_list& errors)
+	error_list& errors, std::int32_t signed_data_ver = signed_data_version)
 {
 	const auto& content_info = signature.get_content_info();
-	if (!std::ranges::equal(content_info.content_type.container, impl::signed_data_oid))
+	if (!std::ranges::equal(content_info.content_type.container, asn1::crypto::pkcs7::oid_signed_data))
 		errors.add_error(pkcs7_format_validator_errc::invalid_signed_data_oid);
 
-	if (content_info.data.version != impl::signed_data_version)
+	if (content_info.data.version != signed_data_ver)
 		errors.add_error(pkcs7_format_validator_errc::invalid_signed_data_version);
 
 	if (content_info.data.digest_algorithms.size()
@@ -86,37 +87,8 @@ void validate(const pe_bliss::security::pkcs7::pkcs7<RangeType, ContextType>& si
 template<typename RangeType>
 void validate_authenticated_attributes(
 	const pe_bliss::security::pkcs7::attribute_map<RangeType>& authenticated_attributes,
-	error_list& errors)
-{
-	try
-	{
-		if (!authenticated_attributes.get_message_digest())
-			errors.add_error(pkcs7_format_validator_errc::absent_message_digest);
-	}
-	catch (const pe_error&)
-	{
-		errors.add_error(pkcs7_format_validator_errc::invalid_message_digest);
-	}
-
-	try
-	{
-		auto content_type = authenticated_attributes.get_content_type();
-		if (!content_type)
-			errors.add_error(pkcs7_format_validator_errc::absent_content_type);
-	}
-	catch (const pe_error&)
-	{
-		errors.add_error(pkcs7_format_validator_errc::invalid_content_type);
-	}
-
-	try
-	{
-		(void)authenticated_attributes.get_signing_time();
-	}
-	catch (const pe_error&)
-	{
-		errors.add_error(pkcs7_format_validator_errc::invalid_signing_time);
-	}
-}
+	std::optional<asn1::utc_time>& signing_time,
+	std::optional<asn1::crypto::object_identifier_type>& content_type,
+	error_list& errors);
 
 } //namespace pe_bliss::security

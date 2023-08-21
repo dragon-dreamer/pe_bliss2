@@ -4,6 +4,7 @@
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <concepts>
 #include <optional>
 #include <span>
 #include <system_error>
@@ -16,6 +17,7 @@
 #include "pe_bliss2/security/crypto_algorithms.h"
 
 #include "simple_asn1/crypto/pkcs7/types.h"
+#include "simple_asn1/crypto/pkcs7/cms/types.h"
 
 #include "utilities/range_helpers.h"
 
@@ -86,13 +88,13 @@ private:
 	attribute_map_type<RangeType> map_;
 };
 
-template<typename RangeType>
-class [[nodiscard]] signer_info_ref
+template<typename RangeType, typename SignerInfoType>
+class [[nodiscard]] signer_info_ref_base
 {
 public:
-	using signer_info_type = asn1::crypto::pkcs7::signer_info<RangeType>;
+	using signer_info_type = SignerInfoType;
 
-	constexpr signer_info_ref(const signer_info_type& signer_info_ref) noexcept
+	constexpr signer_info_ref_base(const signer_info_type& signer_info_ref) noexcept
 		: signer_info_ref_(signer_info_ref)
 	{
 	}
@@ -106,7 +108,7 @@ public:
 	}
 
 	[[nodiscard]]
-	digest_encryption_algorithm get_digest_encryption_algorithm() const noexcept
+	encryption_and_hash_algorithm get_digest_encryption_algorithm() const noexcept
 	{
 		return pe_bliss::security::get_digest_encryption_algorithm(signer_info_ref_
 			.digest_encryption_algorithm.algorithm.container);
@@ -126,25 +128,73 @@ public:
 	std::vector<std::byte> calculate_authenticated_attributes_digest() const;
 
 	[[nodiscard]]
-	const RangeType& get_signer_certificate_serial_number() const noexcept
-	{
-		return signer_info_ref_.issuer_and_sn.serial_number;
-	}
-
-	[[nodiscard]]
-	const RangeType& get_signer_certificate_raw_issuer() const noexcept
-	{
-		return signer_info_ref_.issuer_and_sn.issuer.raw;
-	}
-
-	[[nodiscard]]
 	const RangeType& get_encrypted_digest() const noexcept
 	{
 		return signer_info_ref_.encrypted_digest;
 	}
 
+public:
+	[[nodiscard]]
+	const signer_info_type& get_underlying() const noexcept
+	{
+		return signer_info_ref_;
+	}
+
 private:
 	const signer_info_type& signer_info_ref_;
+};
+
+template<typename RangeType>
+struct cert_issuer_and_serial_number
+{
+	const RangeType* issuer;
+	const RangeType* serial_number;
+};
+
+template<typename RangeType>
+class [[nodiscard]] signer_info_ref_pkcs7 : public signer_info_ref_base<
+	RangeType, asn1::crypto::pkcs7::signer_info<RangeType>>
+{
+public:
+	using signer_info_ref_base<RangeType,
+		asn1::crypto::pkcs7::signer_info<RangeType>>::signer_info_ref_base;
+
+public:
+	[[nodiscard]]
+	cert_issuer_and_serial_number<RangeType>
+		get_signer_certificate_issuer_and_serial_number() const noexcept
+	{
+		return {
+			.issuer = &this->get_underlying().issuer_and_sn.issuer.raw,
+			.serial_number = &this->get_underlying().issuer_and_sn.serial_number
+		};
+	}
+};
+
+template<typename RangeType>
+class [[nodiscard]] signer_info_ref_cms : public signer_info_ref_base<
+	RangeType, asn1::crypto::pkcs7::cms::signer_info<RangeType>>
+{
+public:
+	using signer_info_ref_base<RangeType,
+		asn1::crypto::pkcs7::cms::signer_info<RangeType>>::signer_info_ref_base;
+
+public:
+	[[nodiscard]]
+	cert_issuer_and_serial_number<RangeType>
+		get_signer_certificate_issuer_and_serial_number() const noexcept
+	{
+		const auto* issuer_and_sn = std::get_if<
+			asn1::crypto::pkcs7::issuer_and_serial_number<RangeType>>(
+				&this->get_underlying().sid);
+		if (!issuer_and_sn)
+			return {};
+
+		return {
+			.issuer = &issuer_and_sn->issuer.raw,
+			.serial_number = &issuer_and_sn->serial_number
+		};
+	}
 };
 
 template<typename RangeType, typename ContentInfo>
@@ -152,6 +202,12 @@ class [[nodiscard]] pkcs7
 {
 public:
 	using content_info_type = ContentInfo;
+	static constexpr bool contains_pkcs7_signer_info
+		= std::convertible_to<decltype(std::declval<content_info_type>()
+			.data.signer_infos)::value_type, signer_info_ref_pkcs7<RangeType>>;
+	static constexpr bool contains_cms_signer_info
+		= std::convertible_to<decltype(std::declval<content_info_type>()
+			.data.signer_infos)::value_type, signer_info_ref_cms<RangeType>>;
 
 public:
 	[[nodiscard]]
@@ -161,18 +217,52 @@ public:
 	}
 
 	[[nodiscard]]
-	signer_info_ref<RangeType> get_signer(std::size_t index) const
+	signer_info_ref_pkcs7<RangeType> get_signer(std::size_t index) const
+		requires(contains_pkcs7_signer_info)
+	{
+		return content_info_.data.signer_infos.at(index);
+	}
+
+	[[nodiscard]]
+	signer_info_ref_cms<RangeType> get_signer(std::size_t index) const
+		requires(contains_cms_signer_info)
 	{
 		return content_info_.data.signer_infos.at(index);
 	}
 
 	[[nodiscard]]
 	std::array<span_range_type, 2u> get_raw_signed_content() const noexcept
+		requires(contains_pkcs7_signer_info)
 	{
 		return {
 			content_info_.data.content_info.content.type_value.raw,
 			content_info_.data.content_info.content.digest.raw
 		};
+	}
+
+	[[nodiscard]]
+	std::array<span_range_type, 1u> get_raw_signed_content() const noexcept
+		requires(contains_cms_signer_info)
+	{
+		//content_info_.data.content_info.info.raw includes TAGGED and
+		//octet_string_with data, which
+		//needs to be skipped. Assumes that content_info_.data.content_info.info
+		//is a valid ASN.1 DER.
+		const auto& raw = content_info_.data.content_info.info.raw;
+		std::uint8_t skip_bytes = 2u; //1 tag byte + 1 length byte for TAGGED
+		if (std::to_integer<std::uint8_t>(raw[1]) > 0x80u)
+			skip_bytes += std::to_integer<std::uint8_t>(raw[1]) & 0x7fu;
+
+		skip_bytes += 1u; //1 tag byte for octet_string_with
+		if (std::to_integer<std::uint8_t>(raw[skip_bytes]) > 0x80u)
+			skip_bytes += std::to_integer<std::uint8_t>(raw[skip_bytes]) & 0x7fu;
+		skip_bytes += 1u; //1 length byte for octet_string_with
+
+		span_range_type range{
+			content_info_.data.content_info.info.raw.begin() + skip_bytes,
+			content_info_.data.content_info.info.raw.end()
+		};
+		return { range };
 	}
 
 public:
@@ -192,10 +282,11 @@ private:
 	content_info_type content_info_;
 };
 
-template<typename RangeType, typename ContentInfo>
+template<typename RangeType, typename ContentInfo, typename Signer>
 [[nodiscard]]
-std::vector<std::byte> calculate_message_digest(const pkcs7<RangeType, ContentInfo>& signature,
-	const signer_info_ref<RangeType>& signer)
+std::vector<std::byte> calculate_message_digest(
+	const pkcs7<RangeType, ContentInfo>& signature,
+	const Signer& signer)
 {
 	return signer.calculate_message_digest(signature.get_raw_signed_content());
 }

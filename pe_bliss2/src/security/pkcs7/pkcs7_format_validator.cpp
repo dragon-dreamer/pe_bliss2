@@ -3,6 +3,10 @@
 #include <string>
 #include <system_error>
 
+#include "simple_asn1/crypto/crypto_common_spec.h"
+#include "simple_asn1/der_decode.h"
+#include "simple_asn1/spec.h"
+
 namespace
 {
 
@@ -55,5 +59,74 @@ std::error_code make_error_code(pkcs7_format_validator_errc e) noexcept
 {
 	return { static_cast<int>(e), pkcs7_format_validator_error_category_instance };
 }
+
+template<typename RangeType>
+void validate_authenticated_attributes(
+	const pe_bliss::security::pkcs7::attribute_map<RangeType>& authenticated_attributes,
+	std::optional<asn1::utc_time>& signing_time,
+	std::optional<asn1::crypto::object_identifier_type>& content_type,
+	error_list& errors)
+{
+	try
+	{
+		if (!authenticated_attributes.get_message_digest())
+			errors.add_error(pkcs7_format_validator_errc::absent_message_digest);
+	}
+	catch (const pe_error&)
+	{
+		errors.add_error(pkcs7_format_validator_errc::invalid_message_digest);
+	}
+
+	try
+	{
+		auto content_type_attr = authenticated_attributes.get_content_type();
+		if (!content_type_attr)
+		{
+			errors.add_error(pkcs7_format_validator_errc::absent_content_type);
+		}
+		else
+		{
+			content_type = asn1::der::decode<asn1::crypto::object_identifier_type,
+				asn1::spec::object_identifier<>>(
+					content_type_attr->begin(), content_type_attr->end());
+		}
+	}
+	catch (const pe_error&)
+	{
+		errors.add_error(pkcs7_format_validator_errc::invalid_content_type);
+	}
+	catch (const asn1::parse_error&)
+	{
+		errors.add_error(pkcs7_format_validator_errc::invalid_content_type);
+	}
+
+	try
+	{
+		if (auto signing_time_attr = authenticated_attributes.get_signing_time(); signing_time_attr)
+		{
+			signing_time = asn1::der::decode<asn1::utc_time, asn1::spec::utc_time<>>(
+				signing_time_attr->begin(), signing_time_attr->end());
+		}
+	}
+	catch (const pe_error&)
+	{
+		errors.add_error(pkcs7_format_validator_errc::invalid_signing_time);
+	}
+	catch (const asn1::parse_error&)
+	{
+		errors.add_error(pkcs7_format_validator_errc::invalid_signing_time);
+	}
+}
+
+template void validate_authenticated_attributes<span_range_type>(
+	const pe_bliss::security::pkcs7::attribute_map<span_range_type>& authenticated_attributes,
+	std::optional<asn1::utc_time>& signing_time,
+	std::optional<asn1::crypto::object_identifier_type>& content_type,
+	error_list& errors);
+template void validate_authenticated_attributes<vector_range_type>(
+	const pe_bliss::security::pkcs7::attribute_map<vector_range_type>& authenticated_attributes,
+	std::optional<asn1::utc_time>& signing_time,
+	std::optional<asn1::crypto::object_identifier_type>& content_type,
+	error_list& errors);
 
 } //namespace pe_bliss::security::pkcs7

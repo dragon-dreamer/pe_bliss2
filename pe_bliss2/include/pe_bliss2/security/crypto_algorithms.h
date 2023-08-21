@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <span>
 
 #include "pe_bliss2/security/byte_range_types.h"
@@ -28,11 +29,18 @@ enum class digest_encryption_algorithm
 	unknown
 };
 
+struct encryption_and_hash_algorithm
+{
+	digest_encryption_algorithm encryption_alg{ digest_encryption_algorithm::unknown };
+	std::optional<digest_algorithm> hash_alg;
+};
+
 [[nodiscard]]
 digest_algorithm get_digest_algorithm(std::span<const std::uint32_t> range) noexcept;
 
 [[nodiscard]]
-digest_encryption_algorithm get_digest_encryption_algorithm(std::span<const std::uint32_t> range) noexcept;
+encryption_and_hash_algorithm get_digest_encryption_algorithm(
+	std::span<const std::uint32_t> range) noexcept;
 
 bool algorithm_id_equals(const asn1::crypto::algorithm_identifier<vector_range_type>& l,
 	const asn1::crypto::algorithm_identifier<vector_range_type>& r);

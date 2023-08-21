@@ -100,27 +100,30 @@ std::error_code make_error_code(pkcs7_errc e) noexcept
 	return { static_cast<int>(e), pkcs7_error_category_instance };
 }
 
-template<typename RangeType>
-attribute_map<RangeType> signer_info_ref<RangeType>::get_authenticated_attributes() const
+template<typename RangeType, typename SignerInfoType>
+attribute_map<RangeType> signer_info_ref_base<RangeType, SignerInfoType>
+	::get_authenticated_attributes() const
 {
 	return get_attributes<RangeType>(signer_info_ref_.authenticated_attributes);
 }
 
-template<typename RangeType>
-attribute_map<RangeType> signer_info_ref<RangeType>::get_unauthenticated_attributes() const
+template<typename RangeType, typename SignerInfoType>
+attribute_map<RangeType> signer_info_ref_base<RangeType, SignerInfoType>
+	::get_unauthenticated_attributes() const
 {
 	return get_attributes<RangeType>(signer_info_ref_.unauthenticated_attributes);
 }
 
-template<typename RangeType>
-std::vector<std::byte> signer_info_ref<RangeType>::calculate_message_digest(
-	std::span<const span_range_type> raw_signed_content) const
+template<typename RangeType, typename SignerInfoType>
+std::vector<std::byte> signer_info_ref_base<RangeType, SignerInfoType>
+	::calculate_message_digest(std::span<const span_range_type> raw_signed_content) const
 {
 	return calculate_hash(get_digest_algorithm(), raw_signed_content);
 }
 
-template<typename RangeType>
-std::vector<std::byte> signer_info_ref<RangeType>::calculate_authenticated_attributes_digest() const
+template<typename RangeType, typename SignerInfoType>
+std::vector<std::byte> signer_info_ref_base<RangeType, SignerInfoType>
+	::calculate_authenticated_attributes_digest() const
 {
 	if (!signer_info_ref_.authenticated_attributes)
 		throw pe_error(pkcs7_errc::absent_authenticated_attributes);
@@ -194,8 +197,14 @@ std::optional<span_range_type> attribute_map<RangeType>::get_signing_time() cons
 	return get_attribute(asn1::crypto::pkcs7::oid_signing_time);
 }
 
-template class signer_info_ref<span_range_type>;
-template class signer_info_ref<vector_range_type>;
+template class signer_info_ref_base<span_range_type,
+	asn1::crypto::pkcs7::signer_info<span_range_type>>;
+template class signer_info_ref_base<vector_range_type,
+	asn1::crypto::pkcs7::signer_info<vector_range_type>>;
+template class signer_info_ref_base<span_range_type,
+	asn1::crypto::pkcs7::cms::signer_info<span_range_type>>;
+template class signer_info_ref_base<vector_range_type,
+	asn1::crypto::pkcs7::cms::signer_info<vector_range_type>>;
 template class attribute_map<span_range_type>;
 template class attribute_map<vector_range_type>;
 

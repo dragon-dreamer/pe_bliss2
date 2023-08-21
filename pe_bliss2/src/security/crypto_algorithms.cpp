@@ -24,16 +24,27 @@ digest_algorithm get_digest_algorithm(std::span<const std::uint32_t> range) noex
 	return digest_algorithm::unknown;
 }
 
-digest_encryption_algorithm get_digest_encryption_algorithm(std::span<const std::uint32_t> range) noexcept
+encryption_and_hash_algorithm get_digest_encryption_algorithm(std::span<const std::uint32_t> range) noexcept
 {
 	if (std::ranges::equal(range, asn1::crypto::pki::id_rsa))
-		return digest_encryption_algorithm::rsa;
+		return { digest_encryption_algorithm::rsa };
 	if (std::ranges::equal(range, asn1::crypto::pki::id_dsa))
-		return digest_encryption_algorithm::dsa;
+		return { digest_encryption_algorithm::dsa };
 	if (std::ranges::equal(range, asn1::crypto::pki::id_ec_public_key))
-		return digest_encryption_algorithm::ecdsa;
+		return { digest_encryption_algorithm::ecdsa };
 
-	return digest_encryption_algorithm::unknown;
+	if (std::ranges::equal(range, asn1::crypto::pki::id_sha256_with_rsa))
+		return { digest_encryption_algorithm::rsa, digest_algorithm::sha256 };
+	if (std::ranges::equal(range, asn1::crypto::pki::id_md5_with_rsa))
+		return { digest_encryption_algorithm::rsa, digest_algorithm::md5 };
+	if (std::ranges::equal(range, asn1::crypto::pki::id_sha1_with_rsa))
+		return { digest_encryption_algorithm::rsa, digest_algorithm::sha1 };
+	if (std::ranges::equal(range, asn1::crypto::pki::id_sha384_with_rsa))
+		return { digest_encryption_algorithm::rsa, digest_algorithm::sha384 };
+	if (std::ranges::equal(range, asn1::crypto::pki::id_sha512_with_rsa))
+		return { digest_encryption_algorithm::rsa, digest_algorithm::sha512 };
+
+	return { digest_encryption_algorithm::unknown };
 }
 
 bool algorithm_id_equals(const asn1::crypto::algorithm_identifier<vector_range_type>& l,

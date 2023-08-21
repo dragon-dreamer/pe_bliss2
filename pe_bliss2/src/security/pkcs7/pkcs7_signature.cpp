@@ -9,7 +9,10 @@
 #include <system_error>
 
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
+#include "cryptopp/asn.h"
 #include "cryptopp/cryptlib.h"
+#include "cryptopp/dsa.h"
+#include "cryptopp/eccrypto.h"
 #include "cryptopp/filters.h"
 #include "cryptopp/md5.h"
 #include "cryptopp/pkcspad.h"
@@ -21,7 +24,7 @@
 namespace
 {
 template<typename Hash>
-class IdentityHash final : public CryptoPP::HashTransformation
+class IdentityHash : public CryptoPP::HashTransformation
 {
 public:
 	static constexpr std::size_t DIGESTSIZE = Hash::DIGESTSIZE;
@@ -48,11 +51,20 @@ private:
 	std::array<char, DIGESTSIZE> digest;
 };
 
+template<typename Hash>
+class IdentityHashNoIdentity final : public IdentityHash<Hash> {};
+
 using IdentitySHA512 = IdentityHash<CryptoPP::SHA512>;
 using IdentitySHA384 = IdentityHash<CryptoPP::SHA384>;
 using IdentitySHA256 = IdentityHash<CryptoPP::SHA256>;
 using IdentitySHA1 = IdentityHash<CryptoPP::SHA1>;
 using IdentityMD5 = IdentityHash<CryptoPP::Weak::MD5>;
+
+using IdentitySHA512NoIdentity = IdentityHashNoIdentity<CryptoPP::SHA512>;
+using IdentitySHA384NoIdentity = IdentityHashNoIdentity<CryptoPP::SHA384>;
+using IdentitySHA256NoIdentity = IdentityHashNoIdentity<CryptoPP::SHA256>;
+using IdentitySHA1NoIdentity = IdentityHashNoIdentity<CryptoPP::SHA1>;
+using IdentityMD5NoIdentity = IdentityHashNoIdentity<CryptoPP::Weak::MD5>;
 
 template<typename Verifier>
 bool verify_signature_impl(Verifier& verifier,
@@ -95,8 +107,15 @@ bool verify_rsa_pkcs1v15_signature(const CryptoPP::RSA::PublicKey& public_key,
 	std::span<const std::byte> message_digest,
 	std::span<const std::byte> encrypted_digest)
 {
-	typename CryptoPP::RSASS<CryptoPP::PKCS1v15, Hash>::Verifier verifier(public_key);
-	return verify_signature_impl(verifier, message_digest, encrypted_digest);
+	typename CryptoPP::RSASS<CryptoPP::PKCS1v15, IdentityHash<Hash>>
+		::Verifier verifier(public_key);
+	if (verify_signature_impl(verifier, message_digest, encrypted_digest))
+		return true;
+
+	typename CryptoPP::RSASS<CryptoPP::PKCS1v15, IdentityHashNoIdentity<Hash>>
+		::Verifier no_identity_verifier(public_key);
+	return verify_signature_impl(
+		no_identity_verifier, message_digest, encrypted_digest);
 }
 
 } //namespace
@@ -126,8 +145,88 @@ template<> const CryptoPP::byte CryptoPP::PKCS_DigestDecoration<IdentityMD5>::de
 template<> const unsigned int CryptoPP::PKCS_DigestDecoration<IdentityMD5>::length
 	= sizeof(PKCS_DigestDecoration<IdentityMD5>::decoration);
 
+template<> const CryptoPP::byte CryptoPP::PKCS_DigestDecoration<IdentitySHA512NoIdentity>::decoration[]{0};
+template<> const unsigned int CryptoPP::PKCS_DigestDecoration<IdentitySHA512NoIdentity>::length = 0;
+template<> const CryptoPP::byte CryptoPP::PKCS_DigestDecoration<IdentitySHA384NoIdentity>::decoration[]{ 0 };
+template<> const unsigned int CryptoPP::PKCS_DigestDecoration<IdentitySHA384NoIdentity>::length = 0;
+template<> const CryptoPP::byte CryptoPP::PKCS_DigestDecoration<IdentitySHA256NoIdentity>::decoration[]{ 0 };
+template<> const unsigned int CryptoPP::PKCS_DigestDecoration<IdentitySHA256NoIdentity>::length = 0;
+template<> const CryptoPP::byte CryptoPP::PKCS_DigestDecoration<IdentitySHA1NoIdentity>::decoration[]{ 0 };
+template<> const unsigned int CryptoPP::PKCS_DigestDecoration<IdentitySHA1NoIdentity>::length = 0;
+template<> const CryptoPP::byte CryptoPP::PKCS_DigestDecoration<IdentityMD5NoIdentity>::decoration[]{ 0 };
+template<> const unsigned int CryptoPP::PKCS_DigestDecoration<IdentityMD5NoIdentity>::length = 0;
+
 namespace pe_bliss::security::pkcs7
 {
+
+namespace
+{
+
+bool verify_rsa_signature(CryptoPP::ArraySource& key_bytes,
+	std::span<const std::byte> message_digest,
+	std::span<const std::byte> encrypted_digest,
+	digest_algorithm digest_alg)
+{
+	CryptoPP::RSA::PublicKey public_key;
+	public_key.BERDecodePublicKey(key_bytes, false, 0u);
+	switch (digest_alg)
+	{
+	case digest_algorithm::sha512:
+		return verify_rsa_pkcs1v15_signature<CryptoPP::SHA512>(public_key,
+			message_digest, encrypted_digest);
+	case digest_algorithm::sha384:
+		return verify_rsa_pkcs1v15_signature<CryptoPP::SHA384>(public_key,
+			message_digest, encrypted_digest);
+	case digest_algorithm::sha256:
+		return verify_rsa_pkcs1v15_signature<CryptoPP::SHA256>(public_key,
+			message_digest, encrypted_digest);
+	case digest_algorithm::sha1:
+		return verify_rsa_pkcs1v15_signature<CryptoPP::SHA1>(public_key,
+			message_digest, encrypted_digest);
+	case digest_algorithm::md5:
+		return verify_rsa_pkcs1v15_signature<CryptoPP::Weak::MD5>(public_key,
+			message_digest, encrypted_digest);
+	default:
+		break;
+	}
+
+	throw pe_error(signature_validator_errc::unsupported_signature_algorithm);
+}
+
+bool verify_ecdsa_signature(CryptoPP::ArraySource& key_bytes,
+	std::span<const std::byte> message_digest,
+	std::span<const std::byte> encrypted_digest,
+	const std::span<const std::byte>* signature_algorithm_parameters)
+{
+	CryptoPP::OID oid;
+	CryptoPP::ArraySource signature_algorithm_parameters_bytes(
+		reinterpret_cast<const CryptoPP::byte*>(signature_algorithm_parameters->data()),
+		signature_algorithm_parameters->size(), true);
+	oid.BERDecode(signature_algorithm_parameters_bytes);
+
+	CryptoPP::DL_Keys_ECDSA<CryptoPP::ECP>::PublicKey pk;
+	CryptoPP::ECP::Point q;
+	CryptoPP::DL_GroupParameters_EC<CryptoPP::ECP> params(oid);
+	if (!params.GetCurve().DecodePoint(q, key_bytes, key_bytes.TotalBytesRetrievable()))
+		throw pe_error(signature_validator_errc::invalid_signature);
+
+	pk.Initialize(params, q);
+
+	CryptoPP::ECDSA<CryptoPP::ECP, IdentitySHA256>::Verifier verifier(pk);
+
+	CryptoPP::SecByteBlock signature(verifier.SignatureLength());
+	CryptoPP::DSAConvertSignatureFormat(signature, signature.size(), CryptoPP::DSA_P1363,
+		reinterpret_cast<const CryptoPP::byte*>(encrypted_digest.data()),
+		encrypted_digest.size(), CryptoPP::DSA_DER);
+
+	return verifier.VerifyMessage(
+		reinterpret_cast<const CryptoPP::byte*>(message_digest.data()),
+		message_digest.size(),
+		signature,
+		signature.size());
+}
+
+} //namespace
 
 std::error_code make_error_code(signature_validator_errc e) noexcept
 {
@@ -138,7 +237,8 @@ bool verify_signature(std::span<const std::byte> raw_public_key,
 	std::span<const std::byte> message_digest,
 	std::span<const std::byte> encrypted_digest,
 	digest_algorithm digest_alg,
-	digest_encryption_algorithm encryption_alg)
+	digest_encryption_algorithm encryption_alg,
+	const std::span<const std::byte>* signature_algorithm_parameters)
 {
 	try
 	{
@@ -148,28 +248,14 @@ bool verify_signature(std::span<const std::byte> raw_public_key,
 
 		if (encryption_alg == digest_encryption_algorithm::rsa)
 		{
-			CryptoPP::RSA::PublicKey public_key;
-			public_key.BERDecodePublicKey(key_bytes, false, 0u);
-			switch (digest_alg)
-			{
-			case digest_algorithm::sha512:
-				return verify_rsa_pkcs1v15_signature<IdentitySHA512>(public_key,
-					message_digest, encrypted_digest);
-			case digest_algorithm::sha384:
-				return verify_rsa_pkcs1v15_signature<IdentitySHA384>(public_key,
-					message_digest, encrypted_digest);
-			case digest_algorithm::sha256:
-				return verify_rsa_pkcs1v15_signature<IdentitySHA256>(public_key,
-					message_digest, encrypted_digest);
-			case digest_algorithm::sha1:
-				return verify_rsa_pkcs1v15_signature<IdentitySHA1>(public_key,
-					message_digest, encrypted_digest);
-			case digest_algorithm::md5:
-				return verify_rsa_pkcs1v15_signature<IdentityMD5>(public_key,
-					message_digest, encrypted_digest);
-			default:
-				break;
-			}
+			return verify_rsa_signature(key_bytes,
+				message_digest, encrypted_digest, digest_alg);
+		}
+
+		if (encryption_alg == digest_encryption_algorithm::ecdsa)
+		{
+			return verify_ecdsa_signature(key_bytes,
+				message_digest, encrypted_digest, signature_algorithm_parameters);
 		}
 	}
 	catch (const CryptoPP::Exception&)

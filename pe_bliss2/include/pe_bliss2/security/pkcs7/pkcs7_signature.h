@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <optional>
 #include <span>
 #include <system_error>
 #include <type_traits>
@@ -23,7 +24,8 @@ bool verify_signature(std::span<const std::byte> raw_public_key,
 	std::span<const std::byte> message_digest,
 	std::span<const std::byte> encrypted_digest,
 	digest_algorithm digest_alg,
-	digest_encryption_algorithm encryption_alg);
+	digest_encryption_algorithm encryption_alg,
+	const std::span<const std::byte>* signature_algorithm_parameters);
 
 } //namespace pe_bliss::security::pkcs7
 

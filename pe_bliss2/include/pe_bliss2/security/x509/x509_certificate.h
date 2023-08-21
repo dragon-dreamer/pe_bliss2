@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "pe_bliss2/security/crypto_algorithms.h"
 
 #include "simple_asn1/crypto/x509/types.h"
@@ -36,6 +38,12 @@ public:
 	const range_type& get_public_key() const noexcept
 	{
 		return data_.tbs_cert.pki.subject_publickey.container;
+	}
+
+	[[nodiscard]]
+	const std::optional<range_type>& get_signature_algorithm_parameters() const noexcept
+	{
+		return data_.tbs_cert.pki.algorithm.parameters;
 	}
 
 	[[nodiscard]]
