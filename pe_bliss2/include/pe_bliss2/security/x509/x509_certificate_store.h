@@ -69,6 +69,7 @@ private:
 		}
 	};
 
+private:
 	std::unordered_map<sn_with_issuer, Certificate,
 		sn_with_issuer_hash> serial_number_to_certificate_;
 };
