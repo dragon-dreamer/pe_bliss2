@@ -225,6 +225,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\resource_directory_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\resource_reader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\resource_writer_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\security\buffer_hash_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\x509_certificate_store_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\x509_certificate_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security_directory_loader_tests.cpp" />

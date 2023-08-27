@@ -360,6 +360,9 @@
     <ClCompile Include="tests\pe_bliss2\directories\security\x509_certificate_store_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2\directories\security</Filter>
     </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\security\buffer_hash_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories\security</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">
