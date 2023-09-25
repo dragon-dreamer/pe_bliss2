@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <exception>
 #include <string>
@@ -10,8 +11,12 @@
 
 #include "buffers/input_buffer_stateful_wrapper.h"
 
+#include "cryptopp/cryptlib.h"
+
 #include "pe_bliss2/detail/packed_serialization.h"
 #include "pe_bliss2/pe_error.h"
+
+#include "utilities/generic_error.h"
 
 namespace
 {
@@ -103,7 +108,7 @@ void update_hash(buffers::input_buffer_interface& buf, std::size_t from, std::si
 {
 	update_hash_impl(buf, from, to, [&state](
 		const CryptoPP::byte* data, std::size_t size, std::size_t offset) {
-		state.update(data, offset, size);
+		state.update(reinterpret_cast<const std::byte*>(data), offset, size);
 	});
 }
 
@@ -114,37 +119,38 @@ void update_hash(buffers::input_buffer_interface& buf, std::size_t from, std::si
 		const CryptoPP::byte* data, std::size_t size, std::size_t offset) {
 		hash.Update(data, size);
 		if (state)
-			state->update(data, offset, size);
+			state->update(reinterpret_cast<const std::byte*>(data), offset, size);
 	});
 }
 
 page_hash_state::page_hash_state(CryptoPP::HashTransformation& hash,
-	std::size_t page_size)
+	std::size_t page_size) noexcept
 	: hash_(hash)
 	, page_size_(page_size)
 {
+	assert(page_size);
 }
 
-void page_hash_state::update(const CryptoPP::byte* data,
+void page_hash_state::update(const std::byte* data,
 	std::size_t offset, std::size_t size)
 {
 	last_offset_ = (std::max)(last_offset_, offset + size);
 
 	if (!current_size_)
-		next_page_offset_ = offset;
+		next_page_offset_ = offset - skipped_bytes_;
 
 	std::size_t data_offset = 0u;
 	while (size)
 	{
-		const auto remaining_bytes = page_size_ - current_size_;
+		const auto remaining_bytes = page_size_ - current_size_ - skipped_bytes_;
 		if (size < remaining_bytes)
 		{
-			hash_.Update(data + data_offset, size);
+			hash_.Update(reinterpret_cast<const CryptoPP::byte*>(data + data_offset), size);
 			current_size_ += size;
 			return;
 		}
 
-		hash_.Update(data + data_offset, remaining_bytes);
+		hash_.Update(reinterpret_cast<const CryptoPP::byte*>(data + data_offset), remaining_bytes);
 		current_size_ += remaining_bytes;
 		offset += remaining_bytes;
 		data_offset += remaining_bytes;
@@ -164,8 +170,11 @@ std::byte* page_hash_state::add_blank_page(std::size_t offset)
 		page_hashes_.data() + pos);
 }
 
-void page_hash_state::add_skipped_bytes(std::size_t skipped_bytes) noexcept
+void page_hash_state::add_skipped_bytes(std::size_t skipped_bytes)
 {
+	if (skipped_bytes_ + current_size_ + skipped_bytes > page_size_)
+		throw pe_error(utilities::generic_errc::buffer_overrun);
+
 	skipped_bytes_ += skipped_bytes;
 }
 

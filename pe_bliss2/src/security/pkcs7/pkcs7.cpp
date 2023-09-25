@@ -5,8 +5,6 @@
 #include <string>
 #include <system_error>
 
-#include "buffers/input_memory_buffer.h"
-
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/buffer_hash.h"
 

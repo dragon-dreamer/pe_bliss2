@@ -4,10 +4,14 @@
 #include <optional>
 #include <system_error>
 #include <type_traits>
+#include <vector>
 
 #include "buffers/input_buffer_interface.h"
 
-#include "cryptopp/cryptlib.h"
+namespace CryptoPP
+{
+class HashTransformation;
+} //namespace CryptoPP
 
 namespace pe_bliss::security
 {
@@ -21,13 +25,13 @@ class page_hash_state final
 {
 public:
 	explicit page_hash_state(CryptoPP::HashTransformation& hash,
-		std::size_t page_size);
+		std::size_t page_size) noexcept;
 
-	void update(const CryptoPP::byte* data, std::size_t offset, std::size_t size);
+	void update(const std::byte* data, std::size_t offset, std::size_t size);
 
 	void next_page();
 
-	void add_skipped_bytes(std::size_t skipped_bytes) noexcept;
+	void add_skipped_bytes(std::size_t skipped_bytes);
 
 	[[nodiscard]]
 	std::vector<std::byte> get_page_hashes() && noexcept;
