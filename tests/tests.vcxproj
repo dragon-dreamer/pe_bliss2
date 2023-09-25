@@ -93,7 +93,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories);$(SimpleAsn1Dir);$(CryptoPPDir)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -114,7 +114,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories);$(SimpleAsn1Dir);$(CryptoPPDir)</AdditionalIncludeDirectories>
       <ControlFlowGuard>Guard</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -134,7 +134,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories);$(SimpleAsn1Dir);$(CryptoPPDir)</AdditionalIncludeDirectories>
       <ControlFlowGuard>
       </ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -155,7 +155,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories);$(SimpleAsn1Dir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)\..\buffers\include;$(ProjectDir)\..\utilities\include;$(ProjectDir)\..\pe_bliss2\include;$(ProjectDir)\..\external\googletest\googletest\include;$(ProjectDir)\..\external\googletest\googlemock\include;$(ProjectDir)\..\external\googletest\googletest;$(ProjectDir)\..\external\googletest\googlemock;$(BoostDir);%(AdditionalIncludeDirectories);$(SimpleAsn1Dir);$(CryptoPPDir)</AdditionalIncludeDirectories>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -226,6 +226,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\resource_reader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\resource_writer_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\buffer_hash_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\security\hash_helpers_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\x509_certificate_store_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\x509_certificate_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security_directory_loader_tests.cpp" />
