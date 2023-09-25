@@ -33,6 +33,8 @@ struct encryption_and_hash_algorithm
 {
 	digest_encryption_algorithm encryption_alg{ digest_encryption_algorithm::unknown };
 	std::optional<digest_algorithm> hash_alg;
+	friend bool operator==(const encryption_and_hash_algorithm&,
+		const encryption_and_hash_algorithm&) noexcept = default;
 };
 
 [[nodiscard]]
@@ -43,9 +45,9 @@ encryption_and_hash_algorithm get_digest_encryption_algorithm(
 	std::span<const std::uint32_t> range) noexcept;
 
 bool algorithm_id_equals(const asn1::crypto::algorithm_identifier<vector_range_type>& l,
-	const asn1::crypto::algorithm_identifier<vector_range_type>& r);
+	const asn1::crypto::algorithm_identifier<vector_range_type>& r) noexcept;
 
 bool algorithm_id_equals(const asn1::crypto::algorithm_identifier<span_range_type>& l,
-	const asn1::crypto::algorithm_identifier<span_range_type>& r);
+	const asn1::crypto::algorithm_identifier<span_range_type>& r) noexcept;
 
 } //namespace pe_bliss::security

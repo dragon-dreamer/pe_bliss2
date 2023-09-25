@@ -48,14 +48,14 @@ encryption_and_hash_algorithm get_digest_encryption_algorithm(std::span<const st
 }
 
 bool algorithm_id_equals(const asn1::crypto::algorithm_identifier<vector_range_type>& l,
-	const asn1::crypto::algorithm_identifier<vector_range_type>& r)
+	const asn1::crypto::algorithm_identifier<vector_range_type>& r) noexcept
 {
 	return l.algorithm == r.algorithm
 		&& l.parameters == r.parameters;
 }
 
 bool algorithm_id_equals(const asn1::crypto::algorithm_identifier<span_range_type>& l,
-	const asn1::crypto::algorithm_identifier<span_range_type>& r)
+	const asn1::crypto::algorithm_identifier<span_range_type>& r) noexcept
 {
 	if (l.algorithm != r.algorithm)
 		return false;
