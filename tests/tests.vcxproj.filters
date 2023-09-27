@@ -369,6 +369,12 @@
     <ClCompile Include="tests\pe_bliss2\directories\security\crypto_algorithms_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2\directories\security</Filter>
     </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\security\signer_info_ref_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories\security</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\directories\security\attribute_map_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2\directories\security</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">
