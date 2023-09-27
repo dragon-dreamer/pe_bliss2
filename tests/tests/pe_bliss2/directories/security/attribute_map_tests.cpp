@@ -10,6 +10,7 @@
 
 #include "simple_asn1/crypto/algorithms.h"
 #include "simple_asn1/crypto/pkcs7/oids.h"
+#include "simple_asn1/decode.h"
 
 using namespace pe_bliss::security;
 using namespace pe_bliss::security::pkcs7;
@@ -136,4 +137,39 @@ TYPED_TEST(AttributeMapTests, GetSpecificAttribute)
 		ASSERT_TRUE(result);
 		ASSERT_TRUE(std::ranges::equal(*result, TestFixture::test_data1));
 	}
+}
+
+TYPED_TEST(AttributeMapTests, VerifyMessageDigestAbsentAttribute)
+{
+	typename TestFixture::map_type map{};
+	ASSERT_FALSE(verify_message_digest_attribute({}, map));
+}
+
+TYPED_TEST(AttributeMapTests, VerifyMessageDigestInvalidAttribute)
+{
+	typename TestFixture::map_type map{};
+	const std::vector<std::uint32_t> oid_message_digest(
+		asn1::crypto::pkcs7::oid_message_digest.cbegin(),
+		asn1::crypto::pkcs7::oid_message_digest.cend());
+	// Invalid ASN.1 OCTET STRING
+	map.get_map().try_emplace(oid_message_digest, TestFixture::test_single_data);
+
+	ASSERT_THROW((void)verify_message_digest_attribute({}, map), asn1::parse_error);
+}
+
+TYPED_TEST(AttributeMapTests, VerifyMessageDigestAttribute)
+{
+	typename TestFixture::map_type map{};
+	const std::vector<std::uint32_t> oid_message_digest(
+		asn1::crypto::pkcs7::oid_message_digest.cbegin(),
+		asn1::crypto::pkcs7::oid_message_digest.cend());
+	const std::vector<std::byte> message_digest{
+		std::byte{4}, //ASN.1 OCTET STRING type
+		std::byte{2}, //length
+		std::byte{5}, std::byte{15} /* value */ };
+	const std::vector<typename TestFixture::range_type> single_message_digest{ message_digest };
+	map.get_map().try_emplace(oid_message_digest, single_message_digest);
+
+	ASSERT_FALSE(verify_message_digest_attribute({}, map));
+	ASSERT_TRUE(verify_message_digest_attribute(std::span(message_digest).subspan(2), map));
 }
