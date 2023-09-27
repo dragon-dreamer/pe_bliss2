@@ -1,6 +1,5 @@
 #pragma once
 
-#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -15,12 +14,6 @@
 
 namespace pe_bliss::security::pkcs7
 {
-
-namespace impl
-{
-[[nodiscard]]
-span_range_type decode_octet_string(span_range_type source);
-} //namespace impl
 
 template<typename RangeType, typename ContentInfo>
 class [[nodiscard]] pkcs7
@@ -114,19 +107,6 @@ std::vector<std::byte> calculate_message_digest(
 	const Signer& signer)
 {
 	return signer.calculate_message_digest(signature.get_raw_signed_content());
-}
-
-template<typename RangeType>
-[[nodiscard]]
-bool verify_message_digest_attribute(std::span<const std::byte> calculated_message_digest,
-	const attribute_map<RangeType>& signer_authenticated_attributes)
-{
-	auto message_digest = signer_authenticated_attributes.get_message_digest();
-	if (!message_digest)
-		return false;
-	return std::ranges::equal(
-		impl::decode_octet_string(*message_digest),
-		calculated_message_digest);
 }
 
 } //namespace pe_bliss::security::pkcs7

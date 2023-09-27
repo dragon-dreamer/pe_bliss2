@@ -4,6 +4,8 @@
 #include <system_error>
 
 #include "simple_asn1/crypto/pkcs7/oids.h"
+#include "simple_asn1/der_decode.h"
+#include "simple_asn1/spec.h"
 
 #include "pe_bliss2/pe_error.h"
 
@@ -100,6 +102,16 @@ std::optional<span_range_type> attribute_map<RangeType>::get_signing_time() cons
 {
 	return get_attribute(asn1::crypto::pkcs7::oid_signing_time);
 }
+
+namespace impl
+{
+span_range_type decode_octet_string(span_range_type source)
+{
+	return asn1::der::decode<span_range_type, asn1::spec::octet_string<>>(
+		source.begin(), source.end());
+}
+} //namespace impl
+
 
 template class attribute_map<span_range_type>;
 template class attribute_map<vector_range_type>;

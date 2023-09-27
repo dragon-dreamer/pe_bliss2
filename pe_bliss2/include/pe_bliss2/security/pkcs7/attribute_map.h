@@ -1,6 +1,8 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
+#include <cstddef>
 #include <optional>
 #include <span>
 #include <system_error>
@@ -71,6 +73,25 @@ public:
 private:
 	attribute_map_type<RangeType> map_;
 };
+
+namespace impl
+{
+[[nodiscard]]
+span_range_type decode_octet_string(span_range_type source);
+} //namespace impl
+
+template<typename RangeType>
+[[nodiscard]]
+bool verify_message_digest_attribute(std::span<const std::byte> calculated_message_digest,
+	const attribute_map<RangeType>& signer_authenticated_attributes)
+{
+	auto message_digest = signer_authenticated_attributes.get_message_digest();
+	if (!message_digest)
+		return false;
+	return std::ranges::equal(
+		impl::decode_octet_string(*message_digest),
+		calculated_message_digest);
+}
 
 } //namespace pe_bliss::security::pkcs7
 

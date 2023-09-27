@@ -1049,9 +1049,6 @@
     <ClCompile Include="src\security\image_hash.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
-    <ClCompile Include="src\security\pkcs7\pkcs7.cpp">
-      <Filter>Source Files\security\pkcs7</Filter>
-    </ClCompile>
     <ClCompile Include="src\security\pkcs7\pkcs7_format_validator.cpp">
       <Filter>Source Files\security\pkcs7</Filter>
     </ClCompile>
