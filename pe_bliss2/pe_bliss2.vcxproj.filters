@@ -726,6 +726,12 @@
     <ClInclude Include="include\pe_bliss2\security\authenticode_format_validator_errc.h">
       <Filter>Header Files\security</Filter>
     </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\pkcs7\attribute_map.h">
+      <Filter>Header Files\security\pkcs7</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\pkcs7\signer_info_ref.h">
+      <Filter>Header Files\security\pkcs7</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\address_converter.cpp">
@@ -1075,6 +1081,12 @@
     </ClCompile>
     <ClCompile Include="src\security\authenticode_timestamp_signature_format_validator.cpp">
       <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\pkcs7\attribute_map.cpp">
+      <Filter>Source Files\security\pkcs7</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\pkcs7\signer_info_ref.cpp">
+      <Filter>Source Files\security\pkcs7</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

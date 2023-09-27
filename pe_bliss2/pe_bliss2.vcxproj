@@ -184,9 +184,11 @@
     <ClInclude Include="include\pe_bliss2\security\crypto_algorithms.h" />
     <ClInclude Include="include\pe_bliss2\security\hash_helpers.h" />
     <ClInclude Include="include\pe_bliss2\security\image_hash.h" />
+    <ClInclude Include="include\pe_bliss2\security\pkcs7\attribute_map.h" />
     <ClInclude Include="include\pe_bliss2\security\pkcs7\pkcs7.h" />
     <ClInclude Include="include\pe_bliss2\security\pkcs7\pkcs7_format_validator.h" />
     <ClInclude Include="include\pe_bliss2\security\pkcs7\pkcs7_signature.h" />
+    <ClInclude Include="include\pe_bliss2\security\pkcs7\signer_info_ref.h" />
     <ClInclude Include="include\pe_bliss2\security\security_directory.h" />
     <ClInclude Include="include\pe_bliss2\security\security_directory_loader.h" />
     <ClInclude Include="include\pe_bliss2\security\x509\x509_certificate.h" />
@@ -315,6 +317,7 @@
     <ClCompile Include="src\security\crypto_algorithms.cpp" />
     <ClCompile Include="src\security\hash_helpers.cpp" />
     <ClCompile Include="src\security\image_hash.cpp" />
+    <ClCompile Include="src\security\pkcs7\attribute_map.cpp" />
     <ClCompile Include="src\security\pkcs7\buffer_hash.cpp" />
     <ClCompile Include="src\security\pkcs7\pkcs7.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
@@ -324,6 +327,7 @@
     </ClCompile>
     <ClCompile Include="src\security\pkcs7\pkcs7_format_validator.cpp" />
     <ClCompile Include="src\security\pkcs7\pkcs7_signature.cpp" />
+    <ClCompile Include="src\security\pkcs7\signer_info_ref.cpp" />
     <ClCompile Include="src\security\security_directory_loader.cpp" />
     <ClCompile Include="src\tls\tls_directory.cpp" />
     <ClCompile Include="src\tls\tls_directory_builder.cpp" />
