@@ -351,6 +351,7 @@ consteval auto merge_with_newer_products()
 		product_mapping{ 0, 30147, product_type::visual_studio_2019_16_11_21 },
 		product_mapping{ 0, 30148, product_type::visual_studio_2019_16_11_24 },
 		product_mapping{ 0, 30151, product_type::visual_studio_2019_16_11_27 },
+		product_mapping{ 0, 30152, product_type::visual_studio_2019_16_11_30 },
 		product_mapping{ 0, 30401, product_type::visual_studio_2022_17_0_0_preview2 },
 		product_mapping{ 0, 30423, product_type::visual_studio_2022_17_0_0_preview3_1 },
 		product_mapping{ 0, 30528, product_type::visual_studio_2022_17_0_0_preview4_0 },
@@ -396,7 +397,13 @@ consteval auto merge_with_newer_products()
 		product_mapping{ 0, 32532, product_type::visual_studio_2022_17_6_0 },
 		product_mapping{ 0, 32534, product_type::visual_studio_2022_17_6_3 },
 		product_mapping{ 0, 32535, product_type::visual_studio_2022_17_6_4 },
+		product_mapping{ 0, 32537, product_type::visual_studio_2022_17_6_5 },
 		product_mapping{ 0, 32705, product_type::visual_studio_2022_17_7_0_preview1_0 },
+		product_mapping{ 0, 32820, product_type::visual_studio_2022_17_7_0_preview3_0 },
+		product_mapping{ 0, 32822, product_type::visual_studio_2022_17_7_0 },
+		product_mapping{ 0, 32824, product_type::visual_studio_2022_17_7_4 },
+		product_mapping{ 0, 32919, product_type::visual_studio_2022_17_8_0_preview1_0 },
+		product_mapping{ 0, 33030, product_type::visual_studio_2022_17_8_0_preview2_0 },
 	};
 
 	std::array<product_mapping,
@@ -667,6 +674,7 @@ std::string_view compid_database::product_type_to_string(product_type type) noex
 	case visual_studio_2019_16_11_21: return "Visual Studio 2019 16.11.21";
 	case visual_studio_2019_16_11_24: return "Visual Studio 2019 16.11.24";
 	case visual_studio_2019_16_11_27: return "Visual Studio 2019 16.11.27";
+	case visual_studio_2019_16_11_30: return "Visual Studio 2019 16.11.30";
 	case visual_studio_2022_17_0_0_preview2: return "Visual Studio 2022 17.0.0 Preview 2";
 	case visual_studio_2022_17_0_0_preview3_1: return "Visual Studio 2022 17.0.0 Preview 3.1";
 	case visual_studio_2022_17_0_0_preview4_0: return "Visual Studio 2022 17.0.0 Preview 4.0";
@@ -712,7 +720,13 @@ std::string_view compid_database::product_type_to_string(product_type type) noex
 	case visual_studio_2022_17_6_0: return "Visual Studio 2022 17.6.0";
 	case visual_studio_2022_17_6_3: return "Visual Studio 2022 17.6.3";
 	case visual_studio_2022_17_6_4: return "Visual Studio 2022 17.6.4";
+	case visual_studio_2022_17_6_5: return "Visual Studio 2022 17.6.5";
 	case visual_studio_2022_17_7_0_preview1_0: return "Visual Studio 2022 17.7.0 Preview 1.0";
+	case visual_studio_2022_17_7_0_preview3_0: return "Visual Studio 2022 17.7.0 Preview 3.0";
+	case visual_studio_2022_17_7_0: return "Visual Studio 2022 17.7.0";
+	case visual_studio_2022_17_7_4: return "Visual Studio 2022 17.7.4";
+	case visual_studio_2022_17_8_0_preview1_0: return "Visual Studio 2022 17.8.0 Preview 1.0";
+	case visual_studio_2022_17_8_0_preview2_0: return "Visual Studio 2022 17.8.0 Preview 2.0";
 	case unmarked_object: return "Unmarked object";
 	case cvtpgd: return "CVTPGD";
 	case cvtpgd_1: return "CVTPGD 1";
