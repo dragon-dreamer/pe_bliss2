@@ -8,9 +8,12 @@
 #include <utility>
 #include <vector>
 
+#include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/byte_range_types.h"
 #include "pe_bliss2/security/pkcs7/attribute_map.h"
 #include "pe_bliss2/security/pkcs7/signer_info_ref.h"
+
+#include "utilities/generic_error.h"
 
 namespace pe_bliss::security::pkcs7
 {
@@ -59,7 +62,7 @@ public:
 	}
 
 	[[nodiscard]]
-	std::array<span_range_type, 1u> get_raw_signed_content() const noexcept
+	std::array<span_range_type, 1u> get_raw_signed_content() const
 		requires(contains_cms_signer_info)
 	{
 		//content_info_.data.content_info.info.raw includes TAGGED and
@@ -68,19 +71,24 @@ public:
 		//is a valid ASN.1 DER.
 		const auto& raw = content_info_.data.content_info.info.raw;
 		std::uint8_t skip_bytes = 2u; //1 tag byte + 1 length byte for TAGGED
-		if (std::to_integer<std::uint8_t>(raw[1]) > 0x80u)
-			skip_bytes += std::to_integer<std::uint8_t>(raw[1]) & 0x7fu;
+		if (raw.size() < 2)
+			throw pe_error(utilities::generic_errc::buffer_overrun);
+		const auto tagged_length_byte = std::to_integer<std::uint8_t>(raw[1]);
+		if (tagged_length_byte > 0x80u)
+			skip_bytes += tagged_length_byte & 0x7fu;
 
 		skip_bytes += 1u; //1 tag byte for octet_string_with
-		if (std::to_integer<std::uint8_t>(raw[skip_bytes]) > 0x80u)
-			skip_bytes += std::to_integer<std::uint8_t>(raw[skip_bytes]) & 0x7fu;
+		if (raw.size() < skip_bytes + 1)
+			throw pe_error(utilities::generic_errc::buffer_overrun);
+		const auto octet_string_length_byte = std::to_integer<std::uint8_t>(
+			raw[skip_bytes]);
+		if (octet_string_length_byte > 0x80u)
+			skip_bytes += octet_string_length_byte & 0x7fu;
 		skip_bytes += 1u; //1 length byte for octet_string_with
 
-		span_range_type range{
-			content_info_.data.content_info.info.raw.begin() + skip_bytes,
-			content_info_.data.content_info.info.raw.end()
-		};
-		return { range };
+		if (raw.size() < skip_bytes + 1)
+			throw pe_error(utilities::generic_errc::buffer_overrun);
+		return { span_range_type{ raw.begin() + skip_bytes, raw.end() } };
 	}
 
 public:
