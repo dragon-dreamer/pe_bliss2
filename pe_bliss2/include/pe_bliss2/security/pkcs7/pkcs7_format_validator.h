@@ -8,7 +8,6 @@
 #include <type_traits>
 
 #include "pe_bliss2/error_list.h"
-#include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/pkcs7/pkcs7.h"
 
@@ -18,7 +17,6 @@
 
 namespace pe_bliss::security::pkcs7
 {
-
 enum class pkcs7_format_validator_errc
 {
 	invalid_signed_data_oid,

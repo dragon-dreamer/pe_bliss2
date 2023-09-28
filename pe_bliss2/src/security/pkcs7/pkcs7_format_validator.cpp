@@ -3,6 +3,8 @@
 #include <string>
 #include <system_error>
 
+#include "pe_bliss2/pe_error.h"
+
 #include "simple_asn1/crypto/crypto_common_spec.h"
 #include "simple_asn1/der_decode.h"
 #include "simple_asn1/spec.h"
