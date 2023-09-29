@@ -2,6 +2,8 @@
 
 #include <optional>
 #include <string>
+#include <system_error>
+#include <type_traits>
 #include <utility>
 #include <variant>
 
@@ -11,6 +13,13 @@
 
 namespace pe_bliss::security
 {
+
+enum class authenticode_program_info_errc
+{
+	invalid_program_info_asn1
+};
+
+std::error_code make_error_code(authenticode_program_info_errc) noexcept;
 
 template<typename RangeType>
 class [[nodiscard]] authenticode_program_info
@@ -54,3 +63,9 @@ std::optional<authenticode_program_info<RangeType>> get_program_info(
 	const pkcs7::attribute_map<RangeType>& authenticated_attrs);
 
 } //namespace pe_bliss::security
+
+namespace std
+{
+template<>
+struct is_error_code_enum<pe_bliss::security::authenticode_program_info_errc> : true_type {};
+} //namespace std

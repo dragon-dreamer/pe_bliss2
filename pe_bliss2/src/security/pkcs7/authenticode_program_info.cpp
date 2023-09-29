@@ -1,16 +1,53 @@
 #include "pe_bliss2/security/authenticode_program_info.h"
 
+#include <cstddef>
+#include <exception>
+#include <string>
+#include <system_error>
+
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/byte_range_types.h"
 
 #include "simple_asn1/crypto/pkcs7/authenticode/spec.h"
 #include "simple_asn1/crypto/pkcs7/authenticode/oids.h"
+#include "simple_asn1/crypto/pkcs7/authenticode/types.h"
 #include "simple_asn1/der_decode.h"
 
 #include "utilities/variant_helpers.h"
 
+namespace
+{
+struct authenticode_program_info_error_category : std::error_category
+{
+	const char* name() const noexcept override
+	{
+		return "authenticode_program_info";
+	}
+
+	std::string message(int ev) const override
+	{
+		using enum pe_bliss::security::authenticode_program_info_errc;
+		switch (static_cast<pe_bliss::security::authenticode_program_info_errc>(ev))
+		{
+		case invalid_program_info_asn1:
+			return "Invalid authenticode program info ASN.1 format";
+		default:
+			return {};
+		}
+	}
+};
+
+const authenticode_program_info_error_category authenticode_program_info_error_category_instance;
+
+} //namespace
+
 namespace pe_bliss::security
 {
+
+std::error_code make_error_code(authenticode_program_info_errc e) noexcept
+{
+	return { static_cast<int>(e), authenticode_program_info_error_category_instance };
+}
 
 template<typename RangeType>
 std::optional<authenticode_program_info<RangeType>> get_program_info(
@@ -22,9 +59,22 @@ std::optional<authenticode_program_info<RangeType>> get_program_info(
 		asn1::crypto::pkcs7::authenticode::oid_spc_sp_opus_info);
 	if (info)
 	{
-		//TODO: check return value
-		asn1::der::decode<asn1::spec::crypto::pkcs7::authenticode::spc_sp_opus_info>(
-			info->begin(), info->end(), result.emplace().get_underlying_info());
+		try
+		{
+			auto end = asn1::der::decode<asn1::spec::crypto::pkcs7::authenticode::spc_sp_opus_info>(
+				info->begin(), info->end(), result.emplace().get_underlying_info());
+
+			while (end != info->end())
+			{
+				if (*end++ != std::byte{})
+					throw pe_error(authenticode_program_info_errc::invalid_program_info_asn1);
+			}
+		}
+		catch (const asn1::parse_error&)
+		{
+			std::throw_with_nested(pe_error(
+				authenticode_program_info_errc::invalid_program_info_asn1));
+		}
 	}
 
 	return result;
