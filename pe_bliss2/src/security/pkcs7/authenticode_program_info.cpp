@@ -1,4 +1,4 @@
-#include "pe_bliss2/security/authenticode_pkcs7.h"
+#include "pe_bliss2/security/authenticode_program_info.h"
 
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/byte_range_types.h"
@@ -13,16 +13,10 @@ namespace pe_bliss::security
 {
 
 template<typename RangeType>
-span_range_type authenticode_pkcs7<RangeType>::get_image_hash() const noexcept
-{
-	return this->get_content_info().data.content_info.content.digest.value.digest;
-}
-
-template<typename RangeType>
-std::optional<program_info<RangeType>> get_program_info(
+std::optional<authenticode_program_info<RangeType>> get_program_info(
 	const pkcs7::attribute_map<RangeType>& authenticated_attrs)
 {
-	std::optional<program_info<RangeType>> result;
+	std::optional<authenticode_program_info<RangeType>> result;
 
 	const auto info = authenticated_attrs.get_attribute(
 		asn1::crypto::pkcs7::authenticode::oid_spc_sp_opus_info);
@@ -37,7 +31,7 @@ std::optional<program_info<RangeType>> get_program_info(
 }
 
 template<typename RangeType>
-program_info<RangeType>::string_type program_info<RangeType>
+authenticode_program_info<RangeType>::string_type authenticode_program_info<RangeType>
 	::get_more_info_url() const noexcept
 {
 	string_type result;
@@ -60,7 +54,7 @@ program_info<RangeType>::string_type program_info<RangeType>
 }
 
 template<typename RangeType>
-program_info<RangeType>::string_type program_info<RangeType>
+authenticode_program_info<RangeType>::string_type authenticode_program_info<RangeType>
 	::get_program_name() const noexcept
 {
 	string_type result;
@@ -76,15 +70,12 @@ program_info<RangeType>::string_type program_info<RangeType>
 	return result;
 }
 
-template class authenticode_pkcs7<span_range_type>;
-template class authenticode_pkcs7<vector_range_type>;
+template class authenticode_program_info<span_range_type>;
+template class authenticode_program_info<vector_range_type>;
 
-template class program_info<span_range_type>;
-template class program_info<vector_range_type>;
-
-template std::optional<program_info<span_range_type>> get_program_info(
+template std::optional<authenticode_program_info<span_range_type>> get_program_info(
 	const pkcs7::attribute_map<span_range_type>& unauthenticated_attrs);
-template std::optional<program_info<vector_range_type>> get_program_info(
+template std::optional<authenticode_program_info<vector_range_type>> get_program_info(
 	const pkcs7::attribute_map<vector_range_type>& unauthenticated_attrs);
 
 } //namespace pe_bliss::security
