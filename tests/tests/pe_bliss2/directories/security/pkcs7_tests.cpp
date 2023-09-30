@@ -34,7 +34,7 @@ public:
 	using pkcs7_type = typename T::type;
 
 public:
-	pkcs7_type message;
+	pkcs7_type message{};
 };
 
 template<typename RangeType>

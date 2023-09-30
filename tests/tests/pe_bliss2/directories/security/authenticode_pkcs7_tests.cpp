@@ -20,7 +20,7 @@ public:
 	using authenticode_pkcs7_type = authenticode_pkcs7<range_type>;
 
 public:
-	authenticode_pkcs7_type message;
+	authenticode_pkcs7_type message{};
 };
 
 using tested_range_types = ::testing::Types<

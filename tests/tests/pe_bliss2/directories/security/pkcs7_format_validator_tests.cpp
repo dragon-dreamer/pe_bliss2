@@ -66,7 +66,7 @@ public:
 	}
 
 public:
-	pkcs7_type message;
+	pkcs7_type message{};
 };
 
 template<typename RangeType>
