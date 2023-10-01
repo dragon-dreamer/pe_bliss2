@@ -1,10 +1,12 @@
 #include "pe_bliss2/security/pkcs7/pkcs7_signature.h"
 
+#include <algorithm>
 #include <array>
 #include <cassert>
 #include <cstddef>
 #include <cstring>
 #include <exception>
+#include <iterator>
 #include <string>
 #include <system_error>
 
@@ -15,6 +17,7 @@
 #include "cryptopp/eccrypto.h"
 #include "cryptopp/filters.h"
 #include "cryptopp/md5.h"
+#include "cryptopp/oids.h"
 #include "cryptopp/pkcspad.h"
 #include "cryptopp/rsa.h"
 #include "cryptopp/sha.h"
@@ -162,30 +165,59 @@ namespace pe_bliss::security::pkcs7
 namespace
 {
 
-bool verify_rsa_signature(CryptoPP::ArraySource& key_bytes,
+std::size_t get_expected_digest_size(digest_algorithm digest_alg) noexcept
+{
+	switch (digest_alg)
+	{
+	case digest_algorithm::sha512:
+		return CryptoPP::SHA512::DIGESTSIZE;
+	case digest_algorithm::sha384:
+		return CryptoPP::SHA384::DIGESTSIZE;
+	case digest_algorithm::sha256:
+		return CryptoPP::SHA256::DIGESTSIZE;
+	case digest_algorithm::sha1:
+		return CryptoPP::SHA1::DIGESTSIZE;
+	case digest_algorithm::md5:
+		return CryptoPP::Weak::MD5::DIGESTSIZE;
+	default:
+		return 0u;
+	}
+}
+
+signature_verification_result verify_rsa_signature(CryptoPP::ArraySource& key_bytes,
 	std::span<const std::byte> message_digest,
 	std::span<const std::byte> encrypted_digest,
 	digest_algorithm digest_alg)
 {
+	if (get_expected_digest_size(digest_alg) != message_digest.size())
+		throw pe_error(signature_validator_errc::invalid_signature);
+
 	CryptoPP::RSA::PublicKey public_key;
 	public_key.BERDecodePublicKey(key_bytes, false, 0u);
+	signature_verification_result result;
+	result.key_size = public_key.GetModulus().BitCount();
 	switch (digest_alg)
 	{
 	case digest_algorithm::sha512:
-		return verify_rsa_pkcs1v15_signature<CryptoPP::SHA512>(public_key,
+		result.valid = verify_rsa_pkcs1v15_signature<CryptoPP::SHA512>(public_key,
 			message_digest, encrypted_digest);
+		return result;
 	case digest_algorithm::sha384:
-		return verify_rsa_pkcs1v15_signature<CryptoPP::SHA384>(public_key,
+		result.valid = verify_rsa_pkcs1v15_signature<CryptoPP::SHA384>(public_key,
 			message_digest, encrypted_digest);
+		return result;
 	case digest_algorithm::sha256:
-		return verify_rsa_pkcs1v15_signature<CryptoPP::SHA256>(public_key,
+		result.valid = verify_rsa_pkcs1v15_signature<CryptoPP::SHA256>(public_key,
 			message_digest, encrypted_digest);
+		return result;
 	case digest_algorithm::sha1:
-		return verify_rsa_pkcs1v15_signature<CryptoPP::SHA1>(public_key,
+		result.valid = verify_rsa_pkcs1v15_signature<CryptoPP::SHA1>(public_key,
 			message_digest, encrypted_digest);
+		return result;
 	case digest_algorithm::md5:
-		return verify_rsa_pkcs1v15_signature<CryptoPP::Weak::MD5>(public_key,
+		result.valid = verify_rsa_pkcs1v15_signature<CryptoPP::Weak::MD5>(public_key,
 			message_digest, encrypted_digest);
+		return result;
 	default:
 		break;
 	}
@@ -193,15 +225,111 @@ bool verify_rsa_signature(CryptoPP::ArraySource& key_bytes,
 	throw pe_error(signature_validator_errc::unsupported_signature_algorithm);
 }
 
-bool verify_ecdsa_signature(CryptoPP::ArraySource& key_bytes,
+namespace
+{
+
+ecc_curve get_ecc_curve(const CryptoPP::OID& oid)
+{
+	using enum ecc_curve;
+	static constexpr std::array<ecc_curve, 24u> curves{
+		sm2p256v1,
+		sm2encrypt_recommendedParameters,
+		secp192r1,
+		secp256r1,
+		brainpoolP160r1,
+		brainpoolP192r1,
+		brainpoolP224r1,
+		brainpoolP256r1,
+		brainpoolP320r1,
+		brainpoolP384r1,
+		brainpoolP512r1,
+		secp112r1,
+		secp112r2,
+		secp160r1,
+		secp160k1,
+		secp256k1,
+		secp128r1,
+		secp128r2,
+		secp160r2,
+		secp192k1,
+		secp224k1,
+		secp224r1,
+		secp384r1,
+		secp521r1
+	};
+
+	//this array must be sorted by OID
+	static const std::array<CryptoPP::OID, 24u> ecc_oids{
+		CryptoPP::ASN1::sm2p256v1(),
+		CryptoPP::ASN1::sm2encrypt_recommendedParameters(),
+		CryptoPP::ASN1::secp192r1(),
+		CryptoPP::ASN1::secp256r1(),
+		CryptoPP::ASN1::brainpoolP160r1(),
+		CryptoPP::ASN1::brainpoolP192r1(),
+		CryptoPP::ASN1::brainpoolP224r1(),
+		CryptoPP::ASN1::brainpoolP256r1(),
+		CryptoPP::ASN1::brainpoolP320r1(),
+		CryptoPP::ASN1::brainpoolP384r1(),
+		CryptoPP::ASN1::brainpoolP512r1(),
+		CryptoPP::ASN1::secp112r1(),
+		CryptoPP::ASN1::secp112r2(),
+		CryptoPP::ASN1::secp160r1(),
+		CryptoPP::ASN1::secp160k1(),
+		CryptoPP::ASN1::secp256k1(),
+		CryptoPP::ASN1::secp128r1(),
+		CryptoPP::ASN1::secp128r2(),
+		CryptoPP::ASN1::secp160r2(),
+		CryptoPP::ASN1::secp192k1(),
+		CryptoPP::ASN1::secp224k1(),
+		CryptoPP::ASN1::secp224r1(),
+		CryptoPP::ASN1::secp384r1(),
+		CryptoPP::ASN1::secp521r1()
+	};
+
+	const auto it = std::lower_bound(ecc_oids.cbegin(), ecc_oids.cend(), oid);
+	if (it == ecc_oids.cend() || *it != oid)
+		return ecc_curve::unknown;
+
+	return curves.at(std::distance(ecc_oids.cbegin(), it));
+}
+
+template<typename Hash>
+bool vericy_ecdsa_signature(const CryptoPP::DL_Keys_ECDSA<CryptoPP::ECP>::PublicKey& pk,
+	std::span<const std::byte> message_digest,
+	std::span<const std::byte> encrypted_digest)
+{
+	typename CryptoPP::ECDSA<CryptoPP::ECP, Hash>::Verifier verifier(pk);
+
+	CryptoPP::SecByteBlock signature(verifier.SignatureLength());
+	CryptoPP::DSAConvertSignatureFormat(signature, signature.size(), CryptoPP::DSA_P1363,
+		reinterpret_cast<const CryptoPP::byte*>(encrypted_digest.data()),
+		encrypted_digest.size(), CryptoPP::DSA_DER);
+	
+	return verifier.VerifyMessage(
+		reinterpret_cast<const CryptoPP::byte*>(message_digest.data()),
+		message_digest.size(),
+		signature,
+		signature.size());
+}
+
+} //namespace
+
+signature_verification_result verify_ecdsa_signature(CryptoPP::ArraySource& key_bytes,
 	std::span<const std::byte> message_digest,
 	std::span<const std::byte> encrypted_digest,
-	const std::span<const std::byte>* signature_algorithm_parameters)
+	digest_algorithm digest_alg,
+	std::span<const std::byte> signature_algorithm_parameters)
 {
+	if (get_expected_digest_size(digest_alg) != message_digest.size())
+		throw pe_error(signature_validator_errc::invalid_signature);
+
+	if (signature_algorithm_parameters.empty())
+		throw pe_error(signature_validator_errc::invalid_signature);
+
 	CryptoPP::OID oid;
 	CryptoPP::ArraySource signature_algorithm_parameters_bytes(
-		reinterpret_cast<const CryptoPP::byte*>(signature_algorithm_parameters->data()),
-		signature_algorithm_parameters->size(), true);
+		reinterpret_cast<const CryptoPP::byte*>(signature_algorithm_parameters.data()),
+		signature_algorithm_parameters.size(), true);
 	oid.BERDecode(signature_algorithm_parameters_bytes);
 
 	CryptoPP::DL_Keys_ECDSA<CryptoPP::ECP>::PublicKey pk;
@@ -212,18 +340,22 @@ bool verify_ecdsa_signature(CryptoPP::ArraySource& key_bytes,
 
 	pk.Initialize(params, q);
 
-	CryptoPP::ECDSA<CryptoPP::ECP, IdentitySHA256>::Verifier verifier(pk);
+	signature_verification_result result;
+	result.curve = get_ecc_curve(oid);
 
-	CryptoPP::SecByteBlock signature(verifier.SignatureLength());
-	CryptoPP::DSAConvertSignatureFormat(signature, signature.size(), CryptoPP::DSA_P1363,
-		reinterpret_cast<const CryptoPP::byte*>(encrypted_digest.data()),
-		encrypted_digest.size(), CryptoPP::DSA_DER);
+	switch (digest_alg)
+	{
+	case digest_algorithm::sha1:
+		result.valid = vericy_ecdsa_signature<IdentitySHA1>(pk, message_digest, encrypted_digest);
+		break;
+	case digest_algorithm::sha256:
+		result.valid = vericy_ecdsa_signature<IdentitySHA256>(pk, message_digest, encrypted_digest);
+		break;
+	default:
+		throw pe_error(signature_validator_errc::invalid_signature);
+	}
 
-	return verifier.VerifyMessage(
-		reinterpret_cast<const CryptoPP::byte*>(message_digest.data()),
-		message_digest.size(),
-		signature,
-		signature.size());
+	return result;
 }
 
 } //namespace
@@ -233,13 +365,16 @@ std::error_code make_error_code(signature_validator_errc e) noexcept
 	return { static_cast<int>(e), signature_validator_error_category_instance };
 }
 
-bool verify_signature(std::span<const std::byte> raw_public_key,
+signature_verification_result verify_signature(std::span<const std::byte> raw_public_key,
 	std::span<const std::byte> message_digest,
 	std::span<const std::byte> encrypted_digest,
 	digest_algorithm digest_alg,
 	digest_encryption_algorithm encryption_alg,
-	const std::span<const std::byte>* signature_algorithm_parameters)
+	std::span<const std::byte> signature_algorithm_parameters)
 {
+	if (message_digest.empty() || encrypted_digest.empty() || raw_public_key.empty())
+		throw pe_error(signature_validator_errc::invalid_signature);
+
 	try
 	{
 		CryptoPP::ArraySource key_bytes(
@@ -255,7 +390,8 @@ bool verify_signature(std::span<const std::byte> raw_public_key,
 		if (encryption_alg == digest_encryption_algorithm::ecdsa)
 		{
 			return verify_ecdsa_signature(key_bytes,
-				message_digest, encrypted_digest, signature_algorithm_parameters);
+				message_digest, encrypted_digest, digest_alg,
+				signature_algorithm_parameters);
 		}
 	}
 	catch (const CryptoPP::Exception&)

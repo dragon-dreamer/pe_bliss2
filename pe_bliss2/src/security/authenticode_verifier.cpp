@@ -171,7 +171,7 @@ bool validate_signature_impl(
 			signer.get_encrypted_digest(),
 			signer.get_digest_algorithm(),
 			signer.get_digest_encryption_algorithm().encryption_alg,
-			signature_algorithm_parameters ? &*signature_algorithm_parameters : nullptr);
+			signature_algorithm_parameters ? *signature_algorithm_parameters : span_range_type{});
 	}
 	catch (const std::exception&)
 	{
