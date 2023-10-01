@@ -307,6 +307,7 @@
     <ClInclude Include="tests\pe_bliss2\bytes_to_va_fixture_base.h" />
     <ClInclude Include="tests\pe_bliss2\byte_container_fixture_base.h" />
     <ClInclude Include="tests\pe_bliss2\directories\arm_common_exception_helpers.h" />
+    <ClInclude Include="tests\pe_bliss2\directories\security\hex_string_helpers.h" />
     <ClInclude Include="tests\pe_bliss2\image_helper.h" />
     <ClInclude Include="tests\pe_bliss2\input_buffer_mock.h" />
     <ClInclude Include="tests\pe_bliss2\output_buffer_mock.h" />

@@ -1,6 +1,5 @@
 #include "pe_bliss2/security/pkcs7/pkcs7_signature.h"
 
-#include <charconv>
 #include <cstddef>
 #include <cstdint>
 #include <vector>
@@ -8,6 +7,8 @@
 #include "gtest/gtest.h"
 
 #include "pe_bliss2/pe_error.h"
+
+#include "tests/pe_bliss2/directories/security/hex_string_helpers.h"
 
 using namespace pe_bliss::security;
 using namespace pe_bliss::security::pkcs7;
@@ -40,21 +41,6 @@ TEST(Pkcs7SignatureTests, UnknownHashAlgorithm)
 		digest_algorithm::unknown,
 		digest_encryption_algorithm::ecdsa, data), pe_bliss::pe_error);
 }
-
-namespace
-{
-std::vector<std::byte> hex_string_to_bytes(std::string_view data)
-{
-	std::vector<std::byte> result(data.size() / 2);
-	const char* begin = data.data();
-	for (std::size_t i = 0; i != data.size(); i += 2u, begin += 2u) {
-		std::uint8_t value{};
-		std::from_chars(begin, begin + 2u, value, 16u);
-		result[i / 2u] = std::byte{ value };
-	}
-	return result;
-}
-} //namespace
 
 TEST(Pkcs7SignatureTests, RsaSha256Valid)
 {

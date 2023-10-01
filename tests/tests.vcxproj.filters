@@ -428,5 +428,8 @@
     <ClInclude Include="tests\pe_bliss2\directories\arm_common_exception_helpers.h">
       <Filter>Source Files\tests\pe_bliss2\directories</Filter>
     </ClInclude>
+    <ClInclude Include="tests\pe_bliss2\directories\security\hex_string_helpers.h">
+      <Filter>Source Files\tests\pe_bliss2\directories\security</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
