@@ -51,8 +51,8 @@ struct hash_calculator_error_category : std::error_category
 			return "Invalid security directory offset";
 		case invalid_section_data:
 			return "Invalid section data";
-		case too_big_page_hash_buffer:
-			return "Too big page hash buffer";
+		case page_hashes_data_too_big:
+			return "Page hashes data is too big and will not fit the buffer";
 		default:
 			return {};
 		}
@@ -128,7 +128,7 @@ void try_init_page_hash_state(
 	if (total_page_hashes_size > options.max_page_hashes_size
 		|| total_page_hashes_size / page_count != single_page_hash_size)
 	{
-		result.page_hash_errc = hash_calculator_errc::too_big_page_hash_buffer;
+		result.page_hash_errc = hash_calculator_errc::page_hashes_data_too_big;
 		return;
 	}
 
@@ -240,7 +240,7 @@ void calculate_hash_impl(const image::image& instance,
 	if (remaining_size)
 	{
 		auto overlay_buf = instance.get_overlay().data();
-		update_hash(*overlay_buf, 0, remaining_size, hash);
+		update_hash(*overlay_buf, 0u, remaining_size, hash);
 	}
 
 	result.image_hash.resize(hash.DigestSize());

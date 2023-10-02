@@ -18,7 +18,7 @@ enum class hash_calculator_errc
 {
 	invalid_security_directory_offset,
 	invalid_section_data,
-	too_big_page_hash_buffer
+	page_hashes_data_too_big
 };
 
 std::error_code make_error_code(hash_calculator_errc) noexcept;
