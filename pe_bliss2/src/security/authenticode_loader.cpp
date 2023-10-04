@@ -1,13 +1,16 @@
 #include "pe_bliss2/security/authenticode_loader.h"
 
 #include <array>
+#include <cstddef>
 #include <exception>
+#include <span>
 #include <string>
 #include <vector>
 
 #include "buffers/input_memory_buffer.h"
 
 #include "pe_bliss2/pe_error.h"
+#include "pe_bliss2/security/asn1_decode_helper.h"
 #include "pe_bliss2/security/byte_range_types.h"
 
 #include "simple_asn1/crypto/pkcs7/authenticode/oids.h"
@@ -31,10 +34,12 @@ struct authenticode_directory_loader_error_category : std::error_category
 		{
 		case unsupported_certificate_type:
 			return "Unsupported security certificate type";
-		case unable_to_read_der:
-			return "Unable to read the PKCS7 Authenticode DER";
+		case invalid_authenticode_asn1_der:
+			return "Unable to read the PKCS7 Authenticode ASN.1 DER";
 		case buffer_is_not_contiguous:
 			return "PKCS7 Authenticode DER buffer is not contiguous";
+		case virtual_authenticode_asn1_der_data:
+			return "Authenticode ASN.1 DER data can not be virtual";
 		default:
 			return {};
 		}
@@ -77,41 +82,32 @@ authenticode_pkcs7<RangeType> load_authenticode_signature(
 {
 	authenticode_pkcs7<RangeType> result;
 	const auto size = buffer.size();
-	const auto* data = buffer.get_raw_data(0, size);
-	try
-	{
-		if constexpr (std::is_same_v<RangeType, span_range_type>)
-		{
-			if (!data)
-				throw pe_error(authenticode_loader_errc::buffer_is_not_contiguous);
+	if (!size)
+		throw pe_error(authenticode_loader_errc::invalid_authenticode_asn1_der);
 
-			//TODO: check for trailing garbage (nullbytes in the end are allowed)
-			asn1::der::decode<asn1::spec::crypto::pkcs7::authenticode::content_info>(
-				data, data + size, result.get_content_info());
-		}
-		else
-		{
-			if (data)
-			{
-				//TODO: check for trailing garbage
-				asn1::der::decode<asn1::spec::crypto::pkcs7::authenticode::content_info>(
-					data, data + size, result.get_content_info());
-			}
-			else
-			{
-				std::vector<std::byte> copied_data;
-				copied_data.resize(size);
-				buffer.read(0, size, copied_data.data());
-				//TODO: check for trailing garbage
-				asn1::der::decode<asn1::spec::crypto::pkcs7::authenticode::content_info>(
-					copied_data.cbegin(), copied_data.cend(), result.get_content_info());
-			}
-		}
-	}
-	catch (const asn1::parse_error&)
+	const auto* data = buffer.get_raw_data(0, size);
+
+	[[maybe_unused]] std::vector<std::byte> copied_data;
+	if constexpr (std::is_same_v<RangeType, span_range_type>)
 	{
-		std::throw_with_nested(pe_error(authenticode_loader_errc::unable_to_read_der));
+		if (!data)
+			throw pe_error(authenticode_loader_errc::buffer_is_not_contiguous);
 	}
+	else
+	{
+		if (!data)
+		{
+			copied_data.resize(size);
+			if (size != buffer.read(0, size, copied_data.data()))
+				throw pe_error(authenticode_loader_errc::virtual_authenticode_asn1_der_data);
+			data = copied_data.data();
+		}
+	}
+
+	decode_asn1_check_tail<
+		authenticode_loader_errc::invalid_authenticode_asn1_der,
+		asn1::spec::crypto::pkcs7::authenticode::content_info>(
+			std::span(data, data + size), result.get_content_info());
 
 	return result;
 }

@@ -9,6 +9,7 @@
 
 #include "pe_bliss2/detail/security/image_security_directory.h"
 #include "pe_bliss2/security/authenticode_pkcs7.h"
+#include "pe_bliss2/security/pkcs7/attribute_map.h"
 
 namespace pe_bliss::security
 {
@@ -16,8 +17,9 @@ namespace pe_bliss::security
 enum class authenticode_loader_errc
 {
 	unsupported_certificate_type = 1,
-	unable_to_read_der,
-	buffer_is_not_contiguous
+	invalid_authenticode_asn1_der,
+	buffer_is_not_contiguous,
+	virtual_authenticode_asn1_der_data
 };
 
 std::error_code make_error_code(authenticode_loader_errc) noexcept;
