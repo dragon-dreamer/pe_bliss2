@@ -227,6 +227,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\resource_writer_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\attribute_map_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\authenticode_format_validator_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\security\authenticode_loader_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\authenticode_page_hashes_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\authenticode_pkcs7_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\authenticode_program_info_tests.cpp" />
