@@ -15,7 +15,7 @@ namespace pe_bliss::security
 
 enum class buffer_hash_errc
 {
-	unsupported_hash_algorithm
+	unsupported_hash_algorithm = 1
 };
 
 std::error_code make_error_code(buffer_hash_errc) noexcept;

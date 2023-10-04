@@ -19,7 +19,7 @@ namespace pe_bliss::security::pkcs7
 {
 enum class pkcs7_format_validator_errc
 {
-	invalid_signed_data_oid,
+	invalid_signed_data_oid = 1,
 	invalid_signed_data_version,
 	invalid_signer_count,
 	non_matching_digest_algorithm,

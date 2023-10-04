@@ -16,7 +16,7 @@ namespace pe_bliss::security
 
 enum class hash_calculator_errc
 {
-	invalid_security_directory_offset,
+	invalid_security_directory_offset = 1,
 	invalid_section_data,
 	page_hashes_data_too_big
 };

@@ -19,7 +19,7 @@ namespace pe_bliss::security::pkcs7
 
 enum class attribute_map_errc
 {
-	absent_attribute_value,
+	absent_attribute_value = 1,
 	multiple_attribute_values
 };
 

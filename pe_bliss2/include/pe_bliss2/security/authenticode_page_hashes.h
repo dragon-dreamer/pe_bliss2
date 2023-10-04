@@ -15,7 +15,7 @@ namespace pe_bliss::security
 
 enum class authenticode_page_hashes_errc
 {
-	invalid_authenticode_page_hashes_asn1,
+	invalid_authenticode_page_hashes_asn1 = 1
 };
 
 std::error_code make_error_code(authenticode_page_hashes_errc) noexcept;

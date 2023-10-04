@@ -18,7 +18,7 @@ namespace pe_bliss::security::pkcs7
 
 enum class signer_info_ref_errc
 {
-	duplicate_attribute_oid,
+	duplicate_attribute_oid = 1,
 	absent_authenticated_attributes
 };
 

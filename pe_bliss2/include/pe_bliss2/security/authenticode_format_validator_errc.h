@@ -8,7 +8,7 @@ namespace pe_bliss::security
 
 enum class authenticode_format_validator_errc
 {
-	invalid_content_info_oid,
+	invalid_content_info_oid = 1,
 	invalid_type_value_type,
 	non_matching_type_value_digest_algorithm
 };

@@ -13,7 +13,7 @@ namespace pe_bliss::security::pkcs7
 
 enum class signature_validator_errc
 {
-	invalid_signature,
+	invalid_signature = 1,
 	unsupported_signature_algorithm
 };
 

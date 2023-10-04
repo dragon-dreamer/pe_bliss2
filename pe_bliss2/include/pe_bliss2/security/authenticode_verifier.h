@@ -27,7 +27,7 @@ namespace pe_bliss::security
 
 enum class authenticode_verifier_errc
 {
-	unsupported_digest_algorithm,
+	unsupported_digest_algorithm = 1,
 	unsupported_digest_encryption_algorithm,
 	absent_certificates,
 	duplicate_certificates,

@@ -18,7 +18,7 @@ namespace pe_bliss::security
 
 enum class hash_helpers_errc
 {
-	unable_to_read_data
+	unable_to_read_data = 1
 };
 
 class page_hash_state final

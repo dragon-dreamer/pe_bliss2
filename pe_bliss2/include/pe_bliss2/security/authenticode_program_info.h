@@ -16,7 +16,7 @@ namespace pe_bliss::security
 
 enum class authenticode_program_info_errc
 {
-	invalid_program_info_asn1
+	invalid_program_info_asn1 = 1
 };
 
 std::error_code make_error_code(authenticode_program_info_errc) noexcept;
