@@ -733,7 +733,10 @@
       <Filter>Header Files\security\pkcs7</Filter>
     </ClInclude>
     <ClInclude Include="include\pe_bliss2\security\authenticode_program_info.h">
-      <Filter>Header Files\security\pkcs7</Filter>
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\asn1_decode_helper.h">
+      <Filter>Header Files\security</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1086,7 +1089,7 @@
       <Filter>Source Files\security\pkcs7</Filter>
     </ClCompile>
     <ClCompile Include="src\security\pkcs7\authenticode_program_info.cpp">
-      <Filter>Source Files\security\pkcs7</Filter>
+      <Filter>Source Files\security</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

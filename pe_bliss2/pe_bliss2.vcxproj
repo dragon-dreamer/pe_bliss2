@@ -171,6 +171,7 @@
     <ClInclude Include="include\pe_bliss2\section\section_search.h" />
     <ClInclude Include="include\pe_bliss2\section\section_table.h" />
     <ClInclude Include="include\pe_bliss2\section\section_table_validator.h" />
+    <ClInclude Include="include\pe_bliss2\security\asn1_decode_helper.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_format_validator.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_format_validator_errc.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_loader.h" />
