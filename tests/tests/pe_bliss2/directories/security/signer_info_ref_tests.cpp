@@ -9,6 +9,7 @@
 #include "gtest/gtest.h"
 
 #include "pe_bliss2/pe_error.h"
+#include "pe_bliss2/security/byte_range_types.h"
 
 #include "simple_asn1/crypto/algorithms.h"
 #include "simple_asn1/crypto/pkcs7/oids.h"

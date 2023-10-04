@@ -9,6 +9,7 @@
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/security/authenticode_format_validator_errc.h"
 #include "pe_bliss2/security/authenticode_pkcs7.h"
+#include "pe_bliss2/security/byte_range_types.h"
 #include "pe_bliss2/security/pkcs7/pkcs7_format_validator.h"
 
 #include "simple_asn1/crypto/pkcs7/authenticode/oids.h"

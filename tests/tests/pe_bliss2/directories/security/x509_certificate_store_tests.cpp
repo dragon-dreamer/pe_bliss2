@@ -5,11 +5,11 @@
 
 #include "gtest/gtest.h"
 
-#include "simple_asn1/crypto/algorithms.h"
-#include "simple_asn1/crypto/x509/types.h"
-
 #include "pe_bliss2/security/byte_range_types.h"
 #include "pe_bliss2/security/x509/x509_certificate.h"
+
+#include "simple_asn1/crypto/algorithms.h"
+#include "simple_asn1/crypto/x509/types.h"
 
 using namespace pe_bliss::security;
 using namespace pe_bliss::security::x509;
