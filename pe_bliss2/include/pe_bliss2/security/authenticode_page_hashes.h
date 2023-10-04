@@ -1,6 +1,8 @@
 #pragma once
 
 #include <optional>
+#include <system_error>
+#include <type_traits>
 
 #include "pe_bliss2/security/authenticode_pkcs7.h"
 #include "pe_bliss2/security/byte_range_types.h"
@@ -10,6 +12,13 @@
 
 namespace pe_bliss::security
 {
+
+enum class authenticode_page_hashes_errc
+{
+	invalid_authenticode_page_hashes_asn1,
+};
+
+std::error_code make_error_code(authenticode_page_hashes_errc) noexcept;
 
 template<typename RangeType>
 class [[nodiscard]] authenticode_page_hashes
@@ -47,3 +56,9 @@ std::optional<authenticode_page_hashes<TargetRangeType>> get_page_hashes(
 	const authenticode_pkcs7<RangeType>& authenticode);
 
 } //namespace pe_bliss::security
+
+namespace std
+{
+template<>
+struct is_error_code_enum<pe_bliss::security::authenticode_page_hashes_errc> : true_type {};
+} //namespace std

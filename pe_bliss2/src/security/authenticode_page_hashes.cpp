@@ -2,19 +2,50 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <string>
+#include <system_error>
 #include <variant>
 
+#include "pe_bliss2/security/asn1_decode_helper.h"
 #include "pe_bliss2/security/byte_range_types.h"
 
 #include "simple_asn1/crypto/pkcs7/authenticode/oids.h"
 #include "simple_asn1/crypto/pkcs7/authenticode/spec.h"
 #include "simple_asn1/crypto/pkcs7/authenticode/types.h"
-#include "simple_asn1/der_decode.h"
 
 #include "utilities/variant_helpers.h"
 
+namespace
+{
+struct authenticode_page_hashes_error_category : std::error_category
+{
+	const char* name() const noexcept override
+	{
+		return "authenticode_page_hashes";
+	}
+
+	std::string message(int ev) const override
+	{
+		using enum pe_bliss::security::authenticode_page_hashes_errc;
+		switch (static_cast<pe_bliss::security::authenticode_page_hashes_errc>(ev))
+		{
+		case invalid_authenticode_page_hashes_asn1:
+			return "Invalid authenticode page hashes ASN.1 format";
+		default:
+			return {};
+		}
+	}
+};
+
+const authenticode_page_hashes_error_category authenticode_page_hashes_error_category_instance;
+} //namespace
+
 namespace pe_bliss::security
 {
+std::error_code make_error_code(authenticode_page_hashes_errc e) noexcept
+{
+	return { static_cast<int>(e), authenticode_page_hashes_error_category_instance };
+}
 
 namespace
 {
@@ -39,6 +70,8 @@ std::size_t get_hash_digest_size(digest_algorithm algorithm) noexcept
 {
 	switch (algorithm)
 	{
+	case digest_algorithm::md5:
+		return 16u;
 	case digest_algorithm::sha1:
 		return 20u;
 	case digest_algorithm::sha256:
@@ -59,8 +92,12 @@ bool authenticode_page_hashes<RangeType>::is_valid(digest_algorithm alg) const n
 	if (!is_valid_impl(page_hashes_))
 		return false;
 
+	const auto hash_digest_size = get_hash_digest_size(alg);
+	if (!hash_digest_size)
+		return false;
+
 	const auto size = page_hashes_[0].hashes[0].size();
-	return size && (size % (get_hash_digest_size(alg) + 4u)) == 0u;
+	return size && (size % (hash_digest_size + 4u)) == 0u;
 }
 
 template<typename RangeType>
@@ -93,11 +130,10 @@ std::optional<authenticode_page_hashes<TargetRangeType>> get_page_hashes(
 			if (std::ranges::equal(obj.class_id,
 				asn1::crypto::pkcs7::authenticode::page_hashes_class_id))
 			{
-				auto& hashes = result.emplace();
-				//TODO: check return value
-				asn1::der::decode<asn1::spec::crypto::pkcs7::authenticode::spc_attribute_page_hashes>(
-					obj.serialized_data.begin(), obj.serialized_data.end(),
-					hashes.get_underlying_struct());
+				decode_asn1_check_tail<
+					authenticode_page_hashes_errc::invalid_authenticode_page_hashes_asn1,
+					asn1::spec::crypto::pkcs7::authenticode::spc_attribute_page_hashes>(
+						obj.serialized_data, result.emplace().get_underlying_struct());
 			}
 		}
 	}, *file);
