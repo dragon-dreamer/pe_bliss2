@@ -29,8 +29,8 @@ struct authenticode_page_hashes_error_category : std::error_category
 		using enum pe_bliss::security::authenticode_page_hashes_errc;
 		switch (static_cast<pe_bliss::security::authenticode_page_hashes_errc>(ev))
 		{
-		case invalid_authenticode_page_hashes_asn1:
-			return "Invalid authenticode page hashes ASN.1 format";
+		case invalid_authenticode_page_hashes_asn1_der:
+			return "Invalid authenticode page hashes ASN.1 DER format";
 		default:
 			return {};
 		}
@@ -131,7 +131,7 @@ std::optional<authenticode_page_hashes<TargetRangeType>> get_page_hashes(
 				asn1::crypto::pkcs7::authenticode::page_hashes_class_id))
 			{
 				decode_asn1_check_tail<
-					authenticode_page_hashes_errc::invalid_authenticode_page_hashes_asn1,
+					authenticode_page_hashes_errc::invalid_authenticode_page_hashes_asn1_der,
 					asn1::spec::crypto::pkcs7::authenticode::spc_attribute_page_hashes>(
 						obj.serialized_data, result.emplace().get_underlying_struct());
 			}

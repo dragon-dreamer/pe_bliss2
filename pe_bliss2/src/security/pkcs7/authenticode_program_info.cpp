@@ -28,8 +28,8 @@ struct authenticode_program_info_error_category : std::error_category
 		using enum pe_bliss::security::authenticode_program_info_errc;
 		switch (static_cast<pe_bliss::security::authenticode_program_info_errc>(ev))
 		{
-		case invalid_program_info_asn1:
-			return "Invalid authenticode program info ASN.1 format";
+		case invalid_program_info_asn1_der:
+			return "Invalid authenticode program info ASN.1 DER format";
 		default:
 			return {};
 		}
@@ -59,7 +59,7 @@ std::optional<authenticode_program_info<RangeType>> get_program_info(
 	if (info)
 	{
 		decode_asn1_check_tail<
-			authenticode_program_info_errc::invalid_program_info_asn1,
+			authenticode_program_info_errc::invalid_program_info_asn1_der,
 			asn1::spec::crypto::pkcs7::authenticode::spc_sp_opus_info>(
 				*info, result.emplace().get_underlying_info());
 	}
