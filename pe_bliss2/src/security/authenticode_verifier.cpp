@@ -378,7 +378,7 @@ authenticode_check_status<RangeType> verify_authenticode_full(
 		return result;
 	}
 
-	const auto nested_signatures = load_nested_signatures(unauthenticated_attributes);
+	const auto nested_signatures = load_nested_signatures<RangeType>(unauthenticated_attributes);
 	result.nested.reserve(nested_signatures.size());
 	for (const auto& nested_signature : nested_signatures)
 		verify_authenticode(nested_signature, instance, opts, result.nested.emplace_back());

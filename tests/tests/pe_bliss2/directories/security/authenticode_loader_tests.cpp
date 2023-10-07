@@ -34,8 +34,32 @@ public:
 	pkcs7::attribute_map<range_type> map;
 };
 
+template<typename TargetRangeType, typename SourceRangeType>
+struct RangeTypes
+{
+	using target_range_type = TargetRangeType;
+	using source_range_type = SourceRangeType;
+};
+
+template<typename T>
+class NestedAuthenticodeLoaderTest : public testing::Test
+{
+public:
+	using target_range_type = typename T::target_range_type;
+	using source_range_type = typename T::source_range_type;
+
+public:
+	pkcs7::attribute_map<source_range_type> map;
+};
+
 using tested_range_types = ::testing::Types<
 	vector_range_type, span_range_type>;
+
+using tested_nested_range_types = ::testing::Types<
+	RangeTypes<vector_range_type, span_range_type>,
+	RangeTypes<vector_range_type, vector_range_type>,
+	RangeTypes<span_range_type, span_range_type>,
+	RangeTypes<span_range_type, vector_range_type>>;
 
 constexpr std::array<std::uint8_t, 7024u> valid_authenticode{
 	0x30, 0x82, 0x1b, 0x6b, 0x06, 0x09, 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x07, 0x02, 0xa0,
@@ -481,6 +505,7 @@ constexpr std::array<std::uint8_t, 7024u> valid_authenticode{
 } //namespace
 
 TYPED_TEST_SUITE(AuthenticodeLoaderTest, tested_range_types);
+TYPED_TEST_SUITE(NestedAuthenticodeLoaderTest, tested_nested_range_types);
 
 TYPED_TEST(AuthenticodeLoaderTest, ContiguousBufferInvalid)
 {
@@ -578,16 +603,16 @@ TYPED_TEST(AuthenticodeLoaderTest, UnsupportedCertificateType)
 	}, authenticode_loader_errc::unsupported_certificate_type);
 }
 
-TYPED_TEST(AuthenticodeLoaderTest, LoadNestedSignaturesEmpty)
+TYPED_TEST(NestedAuthenticodeLoaderTest, LoadNestedSignaturesEmpty)
 {
-	using range_type = typename TestFixture::range_type;
-	auto result = load_nested_signatures<range_type>(this->map);
+	using target_range_type = typename TestFixture::target_range_type;
+	auto result = load_nested_signatures<target_range_type>(this->map);
 	ASSERT_TRUE(result.empty());
 }
 
-TYPED_TEST(AuthenticodeLoaderTest, LoadNestedSignaturesValid)
+TYPED_TEST(NestedAuthenticodeLoaderTest, LoadNestedSignaturesValid)
 {
-	using range_type = typename TestFixture::range_type;
+	using target_range_type = typename TestFixture::target_range_type;
 
 	const std::vector<std::uint32_t> oid_nested_signature_attribute(
 		asn1::crypto::pkcs7::authenticode::oid_nested_signature_attribute.cbegin(),
@@ -597,11 +622,11 @@ TYPED_TEST(AuthenticodeLoaderTest, LoadNestedSignaturesValid)
 		reinterpret_cast<const std::byte*>(valid_authenticode.data())
 			+ valid_authenticode.size()
 	};
-	const std::vector<range_type> attr_data{
+	const std::vector<typename TestFixture::source_range_type> attr_data{
 		valid_authenticode_copy, valid_authenticode_copy };
 	this->map.get_map().try_emplace(oid_nested_signature_attribute, attr_data);
 
-	auto result = load_nested_signatures<range_type>(this->map);
+	auto result = load_nested_signatures<target_range_type>(this->map);
 	ASSERT_EQ(result.size(), 2u);
 	ASSERT_EQ(result[0].get_signer_count(), 1u);
 	ASSERT_EQ(result[0].get_signer(0u).get_digest_algorithm(), digest_algorithm::sha256);
@@ -609,9 +634,9 @@ TYPED_TEST(AuthenticodeLoaderTest, LoadNestedSignaturesValid)
 	ASSERT_EQ(result[1].get_signer(0u).get_digest_algorithm(), digest_algorithm::sha256);
 }
 
-TYPED_TEST(AuthenticodeLoaderTest, LoadNestedSignaturesInvalid)
+TYPED_TEST(NestedAuthenticodeLoaderTest, LoadNestedSignaturesInvalid)
 {
-	using range_type = typename TestFixture::range_type;
+	using target_range_type = typename TestFixture::target_range_type;
 
 	const std::vector<std::uint32_t> oid_nested_signature_attribute(
 		asn1::crypto::pkcs7::authenticode::oid_nested_signature_attribute.cbegin(),
@@ -622,11 +647,11 @@ TYPED_TEST(AuthenticodeLoaderTest, LoadNestedSignaturesInvalid)
 			+ valid_authenticode.size()
 	};
 	const std::vector<std::byte> invalid_authenticode{ std::byte{1} };
-	const std::vector<range_type> attr_data{
+	const std::vector<typename TestFixture::source_range_type> attr_data{
 		valid_authenticode_copy, invalid_authenticode };
 	this->map.get_map().try_emplace(oid_nested_signature_attribute, attr_data);
 
 	expect_throw_pe_error([this] {
-		(void)load_nested_signatures<range_type>(this->map);
+		(void)load_nested_signatures<target_range_type>(this->map);
 	}, authenticode_loader_errc::invalid_authenticode_asn1_der);
 }

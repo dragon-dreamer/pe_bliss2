@@ -38,9 +38,9 @@ authenticode_pkcs7<RangeType> load_authenticode_signature(
 	const detail::security::win_certificate& certificate_info);
 
 // Double-signing support
-template<typename RangeType>
+template<typename TargetRangeType, typename RangeType>
 [[nodiscard]]
-std::vector<authenticode_pkcs7<RangeType>> load_nested_signatures(
+std::vector<authenticode_pkcs7<TargetRangeType>> load_nested_signatures(
 	const pkcs7::attribute_map<RangeType>& unauthenticated_attributes);
 
 } //namespace pe_bliss::security
