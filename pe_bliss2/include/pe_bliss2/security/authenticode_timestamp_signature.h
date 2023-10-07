@@ -54,7 +54,7 @@ private:
 
 template<typename TargetRangeType, typename RangeType>
 [[nodiscard]]
-std::optional<authenticode_timestamp_signature<TargetRangeType>> get_timestamp_signature(
+std::optional<authenticode_timestamp_signature<TargetRangeType>> load_timestamp_signature(
 	const pkcs7::attribute_map<RangeType>& unauthenticated_attrs);
 
 } //namespace pe_bliss::security

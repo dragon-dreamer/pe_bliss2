@@ -13,7 +13,7 @@ namespace pe_bliss::security
 {
 
 template<typename TargetRangeType, typename RangeType>
-std::optional<authenticode_timestamp_signature<TargetRangeType>> get_timestamp_signature(
+std::optional<authenticode_timestamp_signature<TargetRangeType>> load_timestamp_signature(
 	const pkcs7::attribute_map<RangeType>& unauthenticated_attrs)
 {
 	std::optional<authenticode_timestamp_signature<TargetRangeType>> result;
@@ -69,16 +69,16 @@ std::optional<authenticode_timestamp_signature<TargetRangeType>> get_timestamp_s
 
 template class authenticode_timestamp_signature<span_range_type>;
 template class authenticode_timestamp_signature<vector_range_type>;
-template std::optional<authenticode_timestamp_signature<span_range_type>> get_timestamp_signature<
+template std::optional<authenticode_timestamp_signature<span_range_type>> load_timestamp_signature<
 	span_range_type>(
 		const pkcs7::attribute_map<span_range_type>& unauthenticated_attrs);
-template std::optional<authenticode_timestamp_signature<vector_range_type>> get_timestamp_signature<
+template std::optional<authenticode_timestamp_signature<vector_range_type>> load_timestamp_signature<
 	vector_range_type>(
 		const pkcs7::attribute_map<vector_range_type>& unauthenticated_attrs);
-template std::optional<authenticode_timestamp_signature<span_range_type>> get_timestamp_signature<
+template std::optional<authenticode_timestamp_signature<span_range_type>> load_timestamp_signature<
 	span_range_type>(
 		const pkcs7::attribute_map<vector_range_type>& unauthenticated_attrs);
-template std::optional<authenticode_timestamp_signature<vector_range_type>> get_timestamp_signature<
+template std::optional<authenticode_timestamp_signature<vector_range_type>> load_timestamp_signature<
 	vector_range_type>(
 		const pkcs7::attribute_map<span_range_type>& unauthenticated_attrs);
 
