@@ -12,11 +12,11 @@
 namespace pe_bliss::security
 {
 
-template<typename RangeType>
-std::optional<authenticode_timestamp_signature<RangeType>> get_timestamp_signature(
+template<typename TargetRangeType, typename RangeType>
+std::optional<authenticode_timestamp_signature<TargetRangeType>> get_timestamp_signature(
 	const pkcs7::attribute_map<RangeType>& unauthenticated_attrs)
 {
-	std::optional<authenticode_timestamp_signature<RangeType>> result;
+	std::optional<authenticode_timestamp_signature<TargetRangeType>> result;
 
 	auto raw_signature = unauthenticated_attrs.get_attribute(
 		asn1::crypto::pkcs9::oid_timestamp_token);
@@ -38,14 +38,14 @@ std::optional<authenticode_timestamp_signature<RangeType>> get_timestamp_signatu
 		{
 			asn1::der::decode<cms_info_spec_ms_bug_workaround_type>(
 				raw_signature->begin(), raw_signature->end(), underlying_variant
-				.template emplace<typename authenticode_timestamp_signature<RangeType>
+				.template emplace<typename authenticode_timestamp_signature<TargetRangeType>
 					::cms_info_ms_bug_workaround_type>().get_content_info());
 		}
 		catch (const asn1::parse_error&)
 		{
 			asn1::der::decode<cms_info_spec_type>(
 				raw_signature->begin(), raw_signature->end(), underlying_variant
-				.template emplace<typename authenticode_timestamp_signature<RangeType>
+				.template emplace<typename authenticode_timestamp_signature<TargetRangeType>
 					::cms_info_type>().get_content_info());
 		}
 
@@ -60,7 +60,7 @@ std::optional<authenticode_timestamp_signature<RangeType>> get_timestamp_signatu
 		auto& underlying_variant = result.emplace().get_underlying_type();
 		asn1::der::decode<asn1::spec::crypto::pkcs7::signer_info>(
 			raw_signature->begin(), raw_signature->end(), underlying_variant
-			.template emplace<typename authenticode_timestamp_signature<RangeType>
+			.template emplace<typename authenticode_timestamp_signature<TargetRangeType>
 				::signer_info_type>());
 	}
 
@@ -69,9 +69,17 @@ std::optional<authenticode_timestamp_signature<RangeType>> get_timestamp_signatu
 
 template class authenticode_timestamp_signature<span_range_type>;
 template class authenticode_timestamp_signature<vector_range_type>;
-template std::optional<authenticode_timestamp_signature<span_range_type>> get_timestamp_signature(
-	const pkcs7::attribute_map<span_range_type>& unauthenticated_attrs);
-template std::optional<authenticode_timestamp_signature<vector_range_type>> get_timestamp_signature(
-	const pkcs7::attribute_map<vector_range_type>& unauthenticated_attrs);
+template std::optional<authenticode_timestamp_signature<span_range_type>> get_timestamp_signature<
+	span_range_type>(
+		const pkcs7::attribute_map<span_range_type>& unauthenticated_attrs);
+template std::optional<authenticode_timestamp_signature<vector_range_type>> get_timestamp_signature<
+	vector_range_type>(
+		const pkcs7::attribute_map<vector_range_type>& unauthenticated_attrs);
+template std::optional<authenticode_timestamp_signature<span_range_type>> get_timestamp_signature<
+	span_range_type>(
+		const pkcs7::attribute_map<vector_range_type>& unauthenticated_attrs);
+template std::optional<authenticode_timestamp_signature<vector_range_type>> get_timestamp_signature<
+	vector_range_type>(
+		const pkcs7::attribute_map<span_range_type>& unauthenticated_attrs);
 
 } //namespace pe_bliss::security
