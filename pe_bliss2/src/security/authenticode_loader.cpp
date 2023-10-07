@@ -20,11 +20,11 @@
 namespace
 {
 
-struct authenticode_directory_loader_error_category : std::error_category
+struct authenticode_loader_error_category : std::error_category
 {
 	const char* name() const noexcept override
 	{
-		return "authenticode_directory_loader";
+		return "authenticode_loader";
 	}
 
 	std::string message(int ev) const override
@@ -46,7 +46,7 @@ struct authenticode_directory_loader_error_category : std::error_category
 	}
 };
 
-const authenticode_directory_loader_error_category authenticode_directory_loader_error_category_instance;
+const authenticode_loader_error_category authenticode_loader_error_category_instance;
 
 } //namespace
 
@@ -55,7 +55,7 @@ namespace pe_bliss::security
 
 std::error_code make_error_code(authenticode_loader_errc e) noexcept
 {
-	return { static_cast<int>(e), authenticode_directory_loader_error_category_instance };
+	return { static_cast<int>(e), authenticode_loader_error_category_instance };
 }
 
 template<typename TargetRangeType, typename RangeType>
