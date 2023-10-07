@@ -1,6 +1,8 @@
 #pragma once
 
 #include <optional>
+#include <system_error>
+#include <type_traits>
 #include <variant>
 
 #include "pe_bliss2/security/pkcs7/pkcs7.h"
@@ -11,6 +13,13 @@
 
 namespace pe_bliss::security
 {
+
+enum class timestamp_signature_loader_errc
+{
+	invalid_timestamp_signature_asn1_der = 1
+};
+
+std::error_code make_error_code(timestamp_signature_loader_errc) noexcept;
 
 template<typename RangeType>
 using authenticode_signature_cms_info_ms_bug_workaround_type
@@ -58,3 +67,9 @@ std::optional<authenticode_timestamp_signature<TargetRangeType>> load_timestamp_
 	const pkcs7::attribute_map<RangeType>& unauthenticated_attrs);
 
 } //namespace pe_bliss::security
+
+namespace std
+{
+template<>
+struct is_error_code_enum<pe_bliss::security::timestamp_signature_loader_errc> : true_type {};
+} //namespace std
