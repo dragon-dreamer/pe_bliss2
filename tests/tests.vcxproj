@@ -231,6 +231,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\security\authenticode_page_hashes_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\authenticode_pkcs7_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\authenticode_program_info_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\security\authenticode_timestamp_signature_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\buffer_hash_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\crypto_algorithms_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\hash_helpers_tests.cpp" />
