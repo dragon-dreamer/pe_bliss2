@@ -134,4 +134,17 @@ template class signer_info_base<vector_range_type,
 	asn1::crypto::pkcs7::cms::signer_info<vector_range_type>,
 	const asn1::crypto::pkcs7::cms::signer_info<vector_range_type>&>;
 
+template class signer_info_base<span_range_type,
+	asn1::crypto::pkcs7::signer_info<span_range_type>,
+	asn1::crypto::pkcs7::signer_info<span_range_type>>;
+template class signer_info_base<vector_range_type,
+	asn1::crypto::pkcs7::signer_info<vector_range_type>,
+	asn1::crypto::pkcs7::signer_info<vector_range_type>>;
+template class signer_info_base<span_range_type,
+	asn1::crypto::pkcs7::cms::signer_info<span_range_type>,
+	asn1::crypto::pkcs7::cms::signer_info<span_range_type>>;
+template class signer_info_base<vector_range_type,
+	asn1::crypto::pkcs7::cms::signer_info<vector_range_type>,
+	asn1::crypto::pkcs7::cms::signer_info<vector_range_type>>;
+
 } //namespace pe_bliss::security::pkcs7

@@ -105,7 +105,7 @@ std::optional<authenticode_timestamp_signature<TargetRangeType>> load_timestamp_
 			asn1::spec::crypto::pkcs7::signer_info>(
 				*raw_signature, underlying_variant
 				.template emplace<typename authenticode_timestamp_signature<TargetRangeType>
-				::signer_info_type>());
+				::signer_info_type>().get_underlying());
 	}
 
 	return result;

@@ -35,6 +35,10 @@ public:
 	{
 	}
 
+	constexpr signer_info_base()
+		requires(std::is_default_constructible_v<UnderlyingType>)
+	{}
+
 public:
 	[[nodiscard]]
 	int get_version() const noexcept
@@ -82,6 +86,13 @@ public:
 		return signer_info_ref_;
 	}
 
+	[[nodiscard]]
+	signer_info_type& get_underlying() noexcept
+		requires(!std::is_const_v<std::remove_reference_t<UnderlyingType>>)
+	{
+		return signer_info_ref_;
+	}
+
 private:
 	UnderlyingType signer_info_ref_;
 };
@@ -95,6 +106,15 @@ public:
 		::signer_info_base;
 };
 
+template<typename RangeType, typename SignerInfoType>
+class [[nodiscard]] signer_info_owning_base
+	: public signer_info_base<RangeType, SignerInfoType, SignerInfoType>
+{
+public:
+	using signer_info_base<RangeType, SignerInfoType, SignerInfoType>
+		::signer_info_base;
+};
+
 template<typename RangeType>
 struct cert_issuer_and_serial_number
 {
@@ -102,13 +122,13 @@ struct cert_issuer_and_serial_number
 	const RangeType* serial_number;
 };
 
-template<typename RangeType>
-class [[nodiscard]] signer_info_ref_pkcs7 : public signer_info_ref_base<
-	RangeType, asn1::crypto::pkcs7::signer_info<RangeType>>
+namespace impl
+{
+template<typename RangeType, typename Base>
+class [[nodiscard]] signer_info_pkcs7_base : public Base
 {
 public:
-	using signer_info_ref_base<RangeType,
-		asn1::crypto::pkcs7::signer_info<RangeType>>::signer_info_ref_base;
+	using Base::Base;
 
 public:
 	[[nodiscard]]
@@ -121,6 +141,36 @@ public:
 		};
 	}
 };
+} //namespace impl
+
+template<typename RangeType>
+class [[nodiscard]] signer_info_pkcs7 : public impl::signer_info_pkcs7_base<
+	RangeType, signer_info_owning_base<RangeType, asn1::crypto::pkcs7::signer_info<RangeType>>>
+{
+public:
+	using impl::signer_info_pkcs7_base<
+		RangeType, signer_info_owning_base<RangeType,
+		asn1::crypto::pkcs7::signer_info<RangeType>>>::signer_info_pkcs7_base;
+};
+
+template<typename RangeType>
+class [[nodiscard]] signer_info_ref_pkcs7 : public impl::signer_info_pkcs7_base<
+	RangeType, signer_info_ref_base<RangeType, asn1::crypto::pkcs7::signer_info<RangeType>>>
+{
+public:
+	using impl::signer_info_pkcs7_base<
+		RangeType, signer_info_ref_base<RangeType,
+		asn1::crypto::pkcs7::signer_info<RangeType>>>::signer_info_pkcs7_base;
+
+	signer_info_ref_pkcs7(const signer_info_pkcs7<RangeType>& owner) noexcept
+		: impl::signer_info_pkcs7_base<
+			RangeType, signer_info_ref_base<RangeType,
+			asn1::crypto::pkcs7::signer_info<RangeType>>>(owner.get_underlying())
+	{}
+};
+
+template<typename RangeType>
+signer_info_ref_pkcs7(signer_info_pkcs7<RangeType>) -> signer_info_ref_pkcs7<RangeType>;
 
 template<typename RangeType>
 class [[nodiscard]] signer_info_ref_cms : public signer_info_ref_base<

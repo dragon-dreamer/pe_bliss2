@@ -6,9 +6,9 @@
 #include <variant>
 
 #include "pe_bliss2/security/pkcs7/pkcs7.h"
+#include "pe_bliss2/security/pkcs7/signer_info.h"
 
 #include "simple_asn1/crypto/pkcs7/cms/types.h"
-#include "simple_asn1/crypto/pkcs7/types.h"
 #include "simple_asn1/crypto/tst/types.h"
 
 namespace pe_bliss::security
@@ -36,7 +36,7 @@ template<typename RangeType>
 class [[nodiscard]] authenticode_timestamp_signature
 {
 public:
-	using signer_info_type = asn1::crypto::pkcs7::signer_info<RangeType>;
+	using signer_info_type = pkcs7::signer_info_pkcs7<RangeType>;
 	using cms_info_ms_bug_workaround_type
 		= authenticode_signature_cms_info_ms_bug_workaround_type<RangeType>;
 	using cms_info_type

@@ -188,6 +188,19 @@ template<typename RangeType>
 [[nodiscard]]
 timestamp_signature_check_status<RangeType> verify_timestamp_signature(
 	const RangeType& authenticode_encrypted_digest,
+	const pkcs7::signer_info_pkcs7<RangeType>& timestamp_signer,
+	const pkcs7::attribute_map<RangeType>& timestamp_authenticated_attributes,
+	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store) {
+	return verify_timestamp_signature(authenticode_encrypted_digest,
+		pkcs7::signer_info_ref_pkcs7(timestamp_signer),
+		timestamp_authenticated_attributes,
+		cert_store);
+}
+
+template<typename RangeType>
+[[nodiscard]]
+timestamp_signature_check_status<RangeType> verify_timestamp_signature(
+	const RangeType& authenticode_encrypted_digest,
 	const authenticode_signature_cms_info_ms_bug_workaround_type<RangeType>& signature);
 
 template<typename RangeType>

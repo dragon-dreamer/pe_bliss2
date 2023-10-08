@@ -142,7 +142,7 @@ TYPED_TEST(TimestampSignatureLoaderTest, LoadTimestampCounterSignature)
 		const auto* underlying = std::get_if<typename authenticode_timestamp_signature<
 			typename TestFixture::target_range_type>::signer_info_type>(&result->get_underlying_type());
 		ASSERT_NE(underlying, nullptr);
-		ASSERT_EQ(underlying->version, 15);
+		ASSERT_EQ(underlying->get_version(), 15);
 
 		this->map.get_map().clear();
 		signer_info.emplace_back(std::byte{}); //Add trailing nullbyte
