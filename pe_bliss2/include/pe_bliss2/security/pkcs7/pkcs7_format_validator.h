@@ -10,6 +10,7 @@
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/pkcs7/pkcs7.h"
+#include "pe_bliss2/security/pkcs7/signer_info_ref.h"
 
 #include "simple_asn1/crypto/pkcs7/oids.h"
 #include "simple_asn1/crypto/crypto_common_types.h"
@@ -49,6 +50,15 @@ namespace impl
 constexpr std::int32_t signer_info_version = 1u;
 } //namespace impl
 
+
+template<typename RangeType, typename SignerInfoType>
+void validate(const signer_info_ref_base<RangeType, SignerInfoType>& signer_info,
+	error_list& errors)
+{
+	if (signer_info.get_version() != impl::signer_info_version)
+		errors.add_error(pkcs7_format_validator_errc::invalid_signer_info_version);
+}
+
 template<typename RangeType, typename ContextType>
 void validate(const pe_bliss::security::pkcs7::pkcs7<RangeType, ContextType>& signature,
 	error_list& errors, std::int32_t signed_data_ver = signed_data_version)
@@ -67,17 +77,16 @@ void validate(const pe_bliss::security::pkcs7::pkcs7<RangeType, ContextType>& si
 	}
 	else
 	{
-		for (std::size_t i = 0; i != content_info.data.signer_infos.size(); ++i)
+		for (std::size_t i = 0; i != signature.get_signer_count(); ++i)
 		{
-			const auto& signer_info = content_info.data.signer_infos[i];
+			const auto& signer_info = signature.get_signer(i);
 			if (!algorithm_id_equals(content_info.data.digest_algorithms[i],
-				signer_info.digest_algorithm))
+				signer_info.get_underlying().digest_algorithm))
 			{
 				errors.add_error(pkcs7_format_validator_errc::non_matching_digest_algorithm);
 			}
 
-			if (signer_info.version != impl::signer_info_version)
-				errors.add_error(pkcs7_format_validator_errc::invalid_signer_info_version);
+			validate(signer_info, errors);
 		}
 	}
 }

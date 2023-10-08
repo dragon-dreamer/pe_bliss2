@@ -37,6 +37,12 @@ public:
 
 public:
 	[[nodiscard]]
+	int get_version() const noexcept
+	{
+		return signer_info_ref_.version;
+	}
+
+	[[nodiscard]]
 	digest_algorithm get_digest_algorithm() const noexcept
 	{
 		return pe_bliss::security::get_digest_algorithm(signer_info_ref_
