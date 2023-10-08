@@ -249,9 +249,6 @@ TYPED_TEST(TimestampSignatureLoaderTest, LoadMicrosoftCmsSignature)
 		  std::byte{0}, //SET_OF length
 	};
 
-	for (int i = 0; i != signer_info.size(); ++i)
-		std::cout << std::hex << std::setw(2) << std::setfill('0') << (std::uint32_t)signer_info[i] << ' ';
-
 	for (int i = 0; i < 2; ++i)
 	{
 		const std::vector<typename TestFixture::source_range_type> attr_data{ signer_info };
