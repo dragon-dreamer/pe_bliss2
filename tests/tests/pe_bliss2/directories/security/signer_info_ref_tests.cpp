@@ -1,4 +1,4 @@
-#include "pe_bliss2/security/pkcs7/signer_info_ref.h"
+#include "pe_bliss2/security/pkcs7/signer_info.h"
 
 #include <algorithm>
 #include <array>

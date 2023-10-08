@@ -729,7 +729,7 @@
     <ClInclude Include="include\pe_bliss2\security\pkcs7\attribute_map.h">
       <Filter>Header Files\security\pkcs7</Filter>
     </ClInclude>
-    <ClInclude Include="include\pe_bliss2\security\pkcs7\signer_info_ref.h">
+    <ClInclude Include="include\pe_bliss2\security\pkcs7\signer_info.h">
       <Filter>Header Files\security\pkcs7</Filter>
     </ClInclude>
     <ClInclude Include="include\pe_bliss2\security\authenticode_program_info.h">
@@ -1085,7 +1085,7 @@
     <ClCompile Include="src\security\pkcs7\attribute_map.cpp">
       <Filter>Source Files\security\pkcs7</Filter>
     </ClCompile>
-    <ClCompile Include="src\security\pkcs7\signer_info_ref.cpp">
+    <ClCompile Include="src\security\pkcs7\signer_info.cpp">
       <Filter>Source Files\security\pkcs7</Filter>
     </ClCompile>
     <ClCompile Include="src\security\pkcs7\authenticode_program_info.cpp">

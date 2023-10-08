@@ -16,21 +16,21 @@
 namespace pe_bliss::security::pkcs7
 {
 
-enum class signer_info_ref_errc
+enum class signer_info_errc
 {
 	duplicate_attribute_oid = 1,
 	absent_authenticated_attributes
 };
 
-std::error_code make_error_code(signer_info_ref_errc) noexcept;
+std::error_code make_error_code(signer_info_errc) noexcept;
 
-template<typename RangeType, typename SignerInfoType>
-class [[nodiscard]] signer_info_ref_base
+template<typename RangeType, typename SignerInfoType, typename UnderlyingType>
+class [[nodiscard]] signer_info_base
 {
 public:
 	using signer_info_type = SignerInfoType;
 
-	constexpr signer_info_ref_base(const signer_info_type& signer_info_ref) noexcept
+	constexpr signer_info_base(UnderlyingType signer_info_ref) noexcept
 		: signer_info_ref_(signer_info_ref)
 	{
 	}
@@ -83,7 +83,16 @@ public:
 	}
 
 private:
-	const signer_info_type& signer_info_ref_;
+	UnderlyingType signer_info_ref_;
+};
+
+template<typename RangeType, typename SignerInfoType>
+class [[nodiscard]] signer_info_ref_base
+	: public signer_info_base<RangeType, SignerInfoType, const SignerInfoType&>
+{
+public:
+	using signer_info_base<RangeType, SignerInfoType, const SignerInfoType&>
+		::signer_info_base;
 };
 
 template<typename RangeType>
@@ -144,5 +153,5 @@ public:
 namespace std
 {
 template<>
-struct is_error_code_enum<pe_bliss::security::pkcs7::signer_info_ref_errc> : true_type {};
+struct is_error_code_enum<pe_bliss::security::pkcs7::signer_info_errc> : true_type {};
 } //namespace std

@@ -11,7 +11,7 @@
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/byte_range_types.h"
 #include "pe_bliss2/security/pkcs7/attribute_map.h"
-#include "pe_bliss2/security/pkcs7/signer_info_ref.h"
+#include "pe_bliss2/security/pkcs7/signer_info.h"
 
 #include "utilities/generic_error.h"
 
