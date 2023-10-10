@@ -2,21 +2,68 @@
 
 #include <algorithm>
 #include <optional>
+#include <variant>
 
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/authenticode_format_validator_errc.h"
 #include "pe_bliss2/security/byte_range_types.h"
 #include "pe_bliss2/security/pkcs7/pkcs7_format_validator.h"
+#include "pe_bliss2/security/pkcs7/signer_info.h"
 
 #include "simple_asn1/crypto/crypto_common_types.h"
 #include "simple_asn1/crypto/pkcs7/types.h"
 #include "simple_asn1/crypto/pkcs9/oids.h"
+
+#include "utilities/variant_helpers.h"
+
+namespace
+{
+
+struct authenticode_timestamp_signature_format_validator_error_category : std::error_category
+{
+	const char* name() const noexcept override
+	{
+		return "authenticode_timestamp_signature_format_validator";
+	}
+
+	std::string message(int ev) const override
+	{
+		using enum pe_bliss::security::authenticode_timestamp_signature_format_validator_errc;
+		switch (static_cast<pe_bliss::security::authenticode_timestamp_signature_format_validator_errc>(ev))
+		{
+		case invalid_tst_info_version:
+			return "Invalid TSTInfo version number (must be 1)";
+		case invalid_tst_info_accuracy_value:
+			return "Invalid TSTInfo Accuracy value";
+		default:
+			return {};
+		}
+	}
+};
+
+const authenticode_timestamp_signature_format_validator_error_category
+	authenticode_timestamp_signature_format_validator_category_instance;
+
+} //namespace
 
 namespace pe_bliss::security
 {
 
 namespace
 {
+
+void validate_accuracy(const std::optional<int>& value,
+	error_list& errors)
+{
+	if (!value.has_value())
+		return;
+
+	if (*value < 1 || *value > 999)
+	{
+		errors.add_error(
+			authenticode_timestamp_signature_format_validator_errc::invalid_tst_info_accuracy_value);
+	}
+}
 
 template<typename T>
 void validate_autenticode_timestamp_format_impl(
@@ -40,10 +87,28 @@ void validate_autenticode_timestamp_format_impl(
 		errors.add_error(authenticode_format_validator_errc::invalid_content_info_oid);
 	}
 
-	//TODO: validate tst_info fields better
+	const auto& tst_info = signed_data_content_info.info.value;
+	static constexpr std::int32_t tst_info_version = 1u;
+	if (tst_info.version != tst_info_version)
+	{
+		errors.add_error(
+			authenticode_timestamp_signature_format_validator_errc::invalid_tst_info_version);
+	}
+
+	if (tst_info.accuracy_val.has_value())
+	{
+		validate_accuracy(tst_info.accuracy_val->millis, errors);
+		validate_accuracy(tst_info.accuracy_val->micros, errors);
+	}
 }
 
 } //namespace
+
+std::error_code make_error_code(authenticode_timestamp_signature_format_validator_errc e) noexcept
+{
+	return { static_cast<int>(e),
+		authenticode_timestamp_signature_format_validator_category_instance };
+}
 
 template<typename RangeType>
 void validate_autenticode_timestamp_format(
@@ -78,6 +143,22 @@ void validate_autenticode_timestamp_format(
 	}
 }
 
+template<typename RangeType>
+void validate_autenticode_timestamp_format(
+	const authenticode_timestamp_signature<RangeType>& signature,
+	error_list& errors)
+{
+	std::visit(utilities::overloaded{
+		[&errors](const pkcs7::signer_info_pkcs7<RangeType>& underlying) {
+			return validate_autenticode_timestamp_format(
+				underlying.get_authenticated_attributes(), errors);
+		},
+		[&errors](const auto& underlying) {
+			return validate_autenticode_timestamp_format(underlying, errors);
+		}
+	}, signature.get_underlying_type());
+}
+
 template void validate_autenticode_timestamp_format<span_range_type>(
 	const authenticode_signature_cms_info_ms_bug_workaround_type<span_range_type>& signature,
 	error_list& errors);
@@ -96,6 +177,13 @@ template void validate_autenticode_timestamp_format<span_range_type>(
 	error_list& errors);
 template void validate_autenticode_timestamp_format<vector_range_type>(
 	const pkcs7::attribute_map<vector_range_type>& authenticated_attributes,
+	error_list& errors);
+
+template void validate_autenticode_timestamp_format<span_range_type>(
+	const authenticode_timestamp_signature<span_range_type>& authenticated_attributes,
+	error_list& errors);
+template void validate_autenticode_timestamp_format<vector_range_type>(
+	const authenticode_timestamp_signature<vector_range_type>& authenticated_attributes,
 	error_list& errors);
 
 } //namespace pe_bliss::security
