@@ -29,8 +29,6 @@ enum class authenticode_verifier_errc
 {
 	unsupported_digest_algorithm = 1,
 	unsupported_digest_encryption_algorithm,
-	absent_certificates,
-	duplicate_certificates,
 	absent_signing_cert,
 	absent_signing_cert_issuer_and_sn,
 	invalid_page_hash_format,
@@ -119,22 +117,6 @@ struct [[nodiscard]] authenticode_check_status
 			&& std::ranges::all_of(nested, [](const auto& v) { return !!v; });
 	}
 };
-
-template<typename RangeType>
-[[nodiscard]]
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
-	const authenticode_pkcs7<RangeType>& authenticode,
-	error_list* errors);
-template<typename RangeType>
-[[nodiscard]]
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
-	const authenticode_signature_cms_info_ms_bug_workaround_type<RangeType>& signature,
-	error_list* warnings);
-template<typename RangeType>
-[[nodiscard]]
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
-	const authenticode_signature_cms_info_type<RangeType>& signature,
-	error_list* warnings);
 
 struct [[nodiscard]] authenticode_verification_options final
 {

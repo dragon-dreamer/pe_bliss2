@@ -6,6 +6,7 @@
 #include <system_error>
 
 #include "pe_bliss2/pe_error.h"
+#include "pe_bliss2/security/authenticode_certificate_store.h"
 #include "pe_bliss2/security/authenticode_format_validator.h"
 #include "pe_bliss2/security/authenticode_loader.h"
 #include "pe_bliss2/security/authenticode_page_hashes.h"
@@ -34,10 +35,6 @@ struct authenticode_verifier_error_category : std::error_category
 			return "Unsupported digest (hash) algorithm";
 		case unsupported_digest_encryption_algorithm:
 			return "Unable digest encryption alrogithm";
-		case absent_certificates:
-			return "No certificates are present in the Authenticode signature";
-		case duplicate_certificates:
-			return "Duplicate certificates are present in the Authenticode signature";
 		case absent_signing_cert:
 			return "Signing certificate is absent";
 		case absent_signing_cert_issuer_and_sn:
@@ -62,47 +59,6 @@ namespace pe_bliss::security
 
 namespace
 {
-
-template<typename RangeType, typename Signature>
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store_impl(
-	const Signature& signature,
-	error_list* warnings)
-{
-	x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> store;
-
-	const auto& content_info_data = signature.get_content_info().data;
-	const auto& certificates = content_info_data.certificates;
-	if (!certificates || certificates->empty())
-	{
-		if (warnings)
-		{
-			warnings->add_error(
-				authenticode_verifier_errc::absent_certificates);
-		}
-		return store;
-	}
-
-	store.reserve(certificates->size());
-	for (const auto& cert : *certificates)
-	{
-		std::visit([&store, warnings](const auto& contained_cert) {
-			if constexpr (std::is_same_v<decltype(contained_cert),
-				const asn1::crypto::x509::certificate<RangeType>&>)
-			{
-				if (!store.add_certificate(contained_cert))
-				{
-					if (warnings)
-					{
-						warnings->add_error(
-							authenticode_verifier_errc::duplicate_certificates);
-					}
-				}
-			}
-		}, cert);
-	}
-
-	return store;
-}
 
 template<typename Signer>
 bool get_hash_and_signature_algorithms(
@@ -194,30 +150,6 @@ bool verify_message_digest(const Signature& signature,
 	const auto message_digest = pkcs7::calculate_message_digest(signature, signer);
 	return pkcs7::verify_message_digest_attribute(message_digest,
 		authenticated_attributes);
-}
-
-template<typename RangeType>
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
-	const authenticode_pkcs7<RangeType>& authenticode,
-	error_list* warnings)
-{
-	return build_certificate_store_impl<RangeType>(authenticode, warnings);
-}
-
-template<typename RangeType>
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
-	const authenticode_signature_cms_info_ms_bug_workaround_type<RangeType>& signature,
-	error_list* warnings)
-{
-	return build_certificate_store_impl<RangeType>(signature, warnings);
-}
-
-template<typename RangeType>
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
-	const authenticode_signature_cms_info_type<RangeType>& signature,
-	error_list* warnings)
-{
-	return build_certificate_store_impl<RangeType>(signature, warnings);
 }
 
 template<typename RangeType>
@@ -556,33 +488,6 @@ template void verify_valid_format_timestamp_signature<vector_range_type>(
 	const vector_range_type& authenticode_encrypted_digest,
 	const x509::x509_certificate_store<x509::x509_certificate_ref<vector_range_type>>& cert_store,
 	timestamp_signature_check_status<vector_range_type>& result);
-
-template x509::x509_certificate_store<x509::x509_certificate_ref<span_range_type>>
-build_certificate_store<span_range_type>(
-	const authenticode_pkcs7<span_range_type>& authenticode,
-	error_list* errors);
-template x509::x509_certificate_store<x509::x509_certificate_ref<vector_range_type>>
-build_certificate_store<vector_range_type>(
-	const authenticode_pkcs7<vector_range_type>& authenticode,
-	error_list* errors);
-
-template x509::x509_certificate_store<x509::x509_certificate_ref<span_range_type>>
-build_certificate_store<span_range_type>(
-	const authenticode_signature_cms_info_ms_bug_workaround_type<span_range_type>& signature,
-	error_list* warnings);
-template x509::x509_certificate_store<x509::x509_certificate_ref<vector_range_type>>
-build_certificate_store<vector_range_type>(
-	const authenticode_signature_cms_info_ms_bug_workaround_type<vector_range_type>& signature,
-	error_list* warnings);
-
-template x509::x509_certificate_store<x509::x509_certificate_ref<span_range_type>>
-build_certificate_store<span_range_type>(
-	const authenticode_signature_cms_info_type<span_range_type>& signature,
-	error_list* warnings);
-template x509::x509_certificate_store<x509::x509_certificate_ref<vector_range_type>>
-build_certificate_store<vector_range_type>(
-	const authenticode_signature_cms_info_type<vector_range_type>& signature,
-	error_list* warnings);
 
 template void verify_authenticode<span_range_type>(
 	const authenticode_pkcs7<span_range_type>& authenticode,
