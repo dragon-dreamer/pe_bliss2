@@ -22,6 +22,7 @@ template<typename RangeType, typename ContentInfo>
 class [[nodiscard]] pkcs7
 {
 public:
+	using range_type = RangeType;
 	using content_info_type = ContentInfo;
 	static constexpr bool contains_pkcs7_signer_info
 		= std::convertible_to<decltype(std::declval<content_info_type>()
