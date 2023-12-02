@@ -29,8 +29,6 @@ enum class authenticode_verifier_errc
 {
 	unsupported_digest_algorithm = 1,
 	unsupported_digest_encryption_algorithm,
-	absent_signing_cert,
-	absent_signing_cert_issuer_and_sn,
 	invalid_page_hash_format,
 	signature_hash_and_digest_algorithm_mismatch
 };
@@ -172,19 +170,6 @@ template<typename RangeType>
 timestamp_signature_check_status<RangeType> verify_timestamp_signature(
 	const RangeType& authenticode_encrypted_digest,
 	const authenticode_signature_cms_info_ms_bug_workaround_type<RangeType>& signature);
-
-template<typename RangeType>
-bool validate_signature(
-	const pkcs7::signer_info_ref_pkcs7<RangeType>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store,
-	error_list& errors,
-	std::exception_ptr& processing_error);
-template<typename RangeType>
-bool validate_signature(
-	const pkcs7::signer_info_ref_cms<RangeType>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store,
-	error_list& errors,
-	std::exception_ptr& processing_error);
 
 template<typename RangeType>
 void verify_valid_format_timestamp_signature(

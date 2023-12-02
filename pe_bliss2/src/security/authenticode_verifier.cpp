@@ -15,6 +15,7 @@
 #include "pe_bliss2/security/buffer_hash.h"
 #include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/pkcs7/pkcs7_format_validator.h"
+#include "pe_bliss2/security/signature_verifier.h"
 
 namespace
 {
@@ -35,10 +36,6 @@ struct authenticode_verifier_error_category : std::error_category
 			return "Unsupported digest (hash) algorithm";
 		case unsupported_digest_encryption_algorithm:
 			return "Unable digest encryption alrogithm";
-		case absent_signing_cert:
-			return "Signing certificate is absent";
-		case absent_signing_cert_issuer_and_sn:
-			return "Signing certificate issuer and serial number are absent";
 		case invalid_page_hash_format:
 			return "Invalid page hash format";
 		case signature_hash_and_digest_algorithm_mismatch:
@@ -92,49 +89,6 @@ bool get_hash_and_signature_algorithms(
 	return true;
 }
 
-template<typename Signer, typename RangeType>
-bool validate_signature_impl(
-	const Signer& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store,
-	error_list& errors,
-	std::exception_ptr& processing_error)
-{
-	auto issuer_and_sn = signer.get_signer_certificate_issuer_and_serial_number();
-	if (!issuer_and_sn.serial_number || !issuer_and_sn.issuer)
-	{
-		errors.add_error(authenticode_verifier_errc::absent_signing_cert_issuer_and_sn);
-		return false;
-	}
-
-	const auto* signing_cert = cert_store.find_certificate(
-		*issuer_and_sn.serial_number,
-		*issuer_and_sn.issuer);
-	if (!signing_cert)
-	{
-		errors.add_error(authenticode_verifier_errc::absent_signing_cert);
-		return false;
-	}
-
-	try
-	{
-		std::optional<span_range_type> signature_algorithm_parameters;
-		if (auto params = signing_cert->get_signature_algorithm_parameters(); params)
-			signature_algorithm_parameters = *params;
-
-		return pkcs7::verify_signature(
-			signing_cert->get_public_key(),
-			signer.calculate_authenticated_attributes_digest(),
-			signer.get_encrypted_digest(),
-			signer.get_digest_algorithm(),
-			signer.get_digest_encryption_algorithm().encryption_alg,
-			signature_algorithm_parameters ? *signature_algorithm_parameters : span_range_type{});
-	}
-	catch (const std::exception&)
-	{
-		processing_error = std::current_exception();
-		return false;
-	}
-}
 } //namespace
 
 std::error_code make_error_code(authenticode_verifier_errc e) noexcept
@@ -205,7 +159,7 @@ void verify_valid_format_authenticode(
 		return;
 	}
 
-	result.signature_valid = validate_signature(signer, result.cert_store.value(),
+	result.signature_valid = verify_signature(signer, result.cert_store.value(),
 		result.authenticode_format_errors, result.authenticode_processing_error);
 }
 
@@ -241,26 +195,6 @@ void verify_authenticode(const authenticode_pkcs7<RangeType>& authenticode,
 		authenticode, &result.certificate_store_warnings);
 	verify_valid_format_authenticode(
 		authenticode, signer, authenticated_attributes, instance, opts, result);
-}
-
-template<typename RangeType>
-bool validate_signature(
-	const pkcs7::signer_info_ref_pkcs7<RangeType>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store,
-	error_list& errors,
-	std::exception_ptr& processing_error)
-{
-	return validate_signature_impl(signer, cert_store, errors, processing_error);
-}
-
-template<typename RangeType>
-bool validate_signature(
-	const pkcs7::signer_info_ref_cms<RangeType>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store,
-	error_list& errors,
-	std::exception_ptr& processing_error)
-{
-	return validate_signature_impl(signer, cert_store, errors, processing_error);
 }
 
 template<typename RangeType>
@@ -323,7 +257,7 @@ timestamp_signature_check_status<RangeType> verify_timestamp_signature(
 	result.hash_valid = pkcs7::verify_message_digest_attribute(message_digest,
 		timestamp_authenticated_attributes);
 
-	result.signature_valid = validate_signature(timestamp_signer,
+	result.signature_valid = verify_signature(timestamp_signer,
 		cert_store, result.authenticode_format_errors,
 		result.authenticode_processing_error);
 	return result;
@@ -412,30 +346,9 @@ void verify_valid_format_timestamp_signature(
 		return;
 	}
 
-	result.signature_valid = validate_signature(signer, cert_store,
+	result.signature_valid = verify_signature(signer, cert_store,
 		result.authenticode_format_errors, result.authenticode_processing_error);
 }
-
-template bool validate_signature<span_range_type>(
-	const pkcs7::signer_info_ref_pkcs7<span_range_type>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<span_range_type>>& cert_store,
-	error_list& errors,
-	std::exception_ptr& processing_error);
-template bool validate_signature<vector_range_type>(
-	const pkcs7::signer_info_ref_pkcs7<vector_range_type>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<vector_range_type>>& cert_store,
-	error_list& errors,
-	std::exception_ptr& processing_error);
-template bool validate_signature<span_range_type>(
-	const pkcs7::signer_info_ref_cms<span_range_type>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<span_range_type>>& cert_store,
-	error_list& errors,
-	std::exception_ptr& processing_error);
-template bool validate_signature<vector_range_type>(
-	const pkcs7::signer_info_ref_cms<vector_range_type>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<vector_range_type>>& cert_store,
-	error_list& errors,
-	std::exception_ptr& processing_error);
 
 template timestamp_signature_check_status<span_range_type>
 verify_timestamp_signature<span_range_type>(
