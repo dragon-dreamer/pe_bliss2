@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <exception>
@@ -310,6 +311,31 @@ image_hash_result calculate_hash(digest_algorithm algorithm,
 
 	calculate_hash_impl(instance, *get_hash(image_hash),
 		result, page_hash_opts, get_hash(page_hash));
+	return result;
+}
+
+image_hash_verification_result verify_image_hash(span_range_type image_hash,
+	digest_algorithm digest_alg, const image::image& instance,
+	const std::optional<span_range_type>& page_hashes,
+	const std::optional<page_hash_options>& page_hash_options)
+{
+	assert(!!page_hashes == !!page_hash_options);
+
+	image_hash_verification_result result;
+
+	image_hash_result hash_result;
+	if (page_hashes && page_hash_options)
+	{
+		hash_result = calculate_hash(digest_alg, instance, &*page_hash_options);
+		result.page_hashes_check_errc = hash_result.page_hash_errc;
+		result.page_hashes_valid = std::ranges::equal(hash_result.page_hashes, *page_hashes);
+	}
+	else
+	{
+		hash_result = calculate_hash(digest_alg, instance);
+	}
+
+	result.image_hash_valid = std::ranges::equal(hash_result.image_hash, image_hash);
 	return result;
 }
 

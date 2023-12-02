@@ -42,12 +42,13 @@ std::error_code make_error_code(authenticode_verifier_errc) noexcept;
 template<typename RangeType>
 struct [[nodiscard]] authenticode_check_status_base
 {
+	//TODO: add signature key size?
 	error_list authenticode_format_errors;
 	error_list certificate_store_warnings;
 	std::exception_ptr authenticode_processing_error;
 	std::optional<bool> image_hash_valid;
 	std::optional<bool> page_hashes_valid;
-	std::optional<std::error_code> page_hashes_check_errc;
+	std::error_code page_hashes_check_errc;
 	std::optional<bool> message_digest_valid;
 	std::optional<bool> signature_valid;
 	std::optional<digest_algorithm> image_digest_alg;
@@ -68,7 +69,7 @@ struct [[nodiscard]] authenticode_check_status_base
 			&& *image_hash_valid
 			&& *message_digest_valid
 			&& *signature_valid
-			&& (!page_hashes_check_errc || !*page_hashes_check_errc)
+			&& !page_hashes_check_errc
 			&& (!page_hashes_valid || *page_hashes_valid);
 	}
 };
@@ -118,19 +119,6 @@ struct [[nodiscard]] authenticode_check_status
 			&& std::ranges::all_of(nested, [](const auto& v) { return !!v; });
 	}
 };
-
-struct [[nodiscard]] image_hash_verification_result
-{
-	bool image_hash_valid{};
-	std::optional<bool> page_hashes_valid;
-	std::optional<std::error_code> page_hashes_check_errc;
-};
-
-[[nodiscard]]
-image_hash_verification_result verify_image_hash(span_range_type image_hash,
-	digest_algorithm digest_alg, const image::image& instance,
-	const std::optional<span_range_type>& page_hashes,
-	const std::optional<page_hash_options>& page_hash_options);
 
 template<typename RangeType>
 [[nodiscard]]

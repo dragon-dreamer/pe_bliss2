@@ -186,30 +186,6 @@ std::error_code make_error_code(authenticode_verifier_errc e) noexcept
 	return { static_cast<int>(e), authenticode_verifier_error_category_instance };
 }
 
-image_hash_verification_result verify_image_hash(span_range_type image_hash,
-	digest_algorithm digest_alg, const image::image& instance,
-	const std::optional<span_range_type>& page_hashes,
-	const std::optional<page_hash_options>& page_hash_options)
-{
-	image_hash_verification_result result;
-
-	image_hash_result hash_result;
-	if (page_hashes && page_hash_options)
-	{
-		hash_result = calculate_hash(digest_alg, instance, &*page_hash_options);
-		if (hash_result.page_hash_errc)
-			result.page_hashes_check_errc = hash_result.page_hash_errc;
-		result.page_hashes_valid = std::ranges::equal(hash_result.page_hashes, *page_hashes);
-	}
-	else
-	{
-		hash_result = calculate_hash(digest_alg, instance);
-	}
-
-	result.image_hash_valid = std::ranges::equal(hash_result.image_hash, image_hash);
-	return result;
-}
-
 template<typename Signature, typename Signer, typename RangeType>
 bool verify_message_digest(const Signature& signature,
 	const Signer& signer,
