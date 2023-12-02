@@ -46,6 +46,18 @@ public:
 		return &it->second;
 	}
 
+	[[nodiscard]]
+	std::size_t size() const noexcept
+	{
+		return serial_number_to_certificate_.size();
+	}
+
+	[[nodiscard]]
+	bool empty() const noexcept
+	{
+		return serial_number_to_certificate_.empty();
+	}
+
 private:
 	struct sn_with_issuer
 	{
