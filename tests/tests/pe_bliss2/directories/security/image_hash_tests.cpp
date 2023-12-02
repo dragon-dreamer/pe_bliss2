@@ -357,3 +357,62 @@ TEST(ImageHashTest, ValidImageWithPageHashesWithFullSectionsWithExtraOverlayMaxP
 			"d007000057e886e90fe59442a5fd45b4e97c9803"
 			"1409000000000000000000000000000000000000"));
 }
+
+TEST(ImageHashTest, VerifyImageHashInvalid)
+{
+	pe_bliss::image::image image;
+	init_headers(image);
+	init_section_data(image);
+	init_full_section_data(image);
+	init_overlay(image, 1u);
+
+	const auto result = verify_image_hash(hex_string_to_bytes("1234"),
+		digest_algorithm::sha384, image, {}, {});
+	ASSERT_FALSE(result);
+	ASSERT_FALSE(result.image_hash_valid);
+	ASSERT_FALSE(result.page_hashes_valid);
+	ASSERT_FALSE(result.page_hashes_check_errc);
+}
+
+TEST(ImageHashTest, VerifyImageHashValid)
+{
+	pe_bliss::image::image image;
+	init_headers(image);
+	init_section_data(image);
+	init_full_section_data(image);
+	init_overlay(image, 1u);
+
+	const auto result = verify_image_hash(hex_string_to_bytes(
+		"aed257a4db567ae6bb4110677b49e57e794797ac6e958618c3fd931cd2e7e8caff6ead3e09a"
+		"29708c2823a15daf2c073"),
+		digest_algorithm::sha384, image, {}, {});
+	ASSERT_TRUE(result);
+	ASSERT_TRUE(result.image_hash_valid);
+	ASSERT_FALSE(result.page_hashes_valid);
+	ASSERT_FALSE(result.page_hashes_check_errc);
+}
+
+TEST(ImageHashTest, VerifyImageHashValidWithPageHashes)
+{
+	pe_bliss::image::image image;
+	init_headers(image);
+	init_section_data(image);
+	init_full_section_data(image);
+	init_overlay(image, 1u);
+
+	const auto result = verify_image_hash(hex_string_to_bytes(
+		"aed257a4db567ae6bb4110677b49e57e794797ac6e958618c3fd931cd2e7e8caff6ead3e09a"
+		"29708c2823a15daf2c073"),
+		digest_algorithm::sha384, image, hex_string_to_bytes(
+			"000000009cda80b77c3b6e70e27439645064d448"
+			"e8030000754ff93a26f7795a509aa45ccadfbf71"
+			"d007000057e886e90fe59442a5fd45b4e97c9803"
+			"1409000000000000000000000000000000000000"),
+		page_hash_options{
+			.algorithm = digest_algorithm::md5,
+			.max_page_hashes_size = 80u });
+	ASSERT_TRUE(result);
+	ASSERT_TRUE(result.image_hash_valid);
+	ASSERT_TRUE(result.page_hashes_valid);
+	ASSERT_FALSE(result.page_hashes_check_errc);
+}
