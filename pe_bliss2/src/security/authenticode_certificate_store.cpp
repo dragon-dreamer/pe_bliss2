@@ -52,7 +52,7 @@ x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certif
 	{
 		std::visit([&store, warnings](const auto& contained_cert) {
 			if constexpr (std::is_same_v<decltype(contained_cert),
-			const asn1::crypto::x509::certificate<RangeType>&>)
+				const asn1::crypto::x509::certificate<RangeType>&>)
 			{
 				if (!store.add_certificate(contained_cert))
 				{
