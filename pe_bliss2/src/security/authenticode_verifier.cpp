@@ -159,8 +159,7 @@ void verify_valid_format_authenticode(
 		return;
 	}
 
-	result.signature_valid = verify_signature(signer, result.cert_store.value(),
-		result.authenticode_format_errors, result.authenticode_processing_error);
+	result.signature_result = verify_signature(signer, result.cert_store.value());
 }
 
 template<typename RangeType>
@@ -257,9 +256,8 @@ timestamp_signature_check_status<RangeType> verify_timestamp_signature(
 	result.hash_valid = pkcs7::verify_message_digest_attribute(message_digest,
 		timestamp_authenticated_attributes);
 
-	result.signature_valid = verify_signature(timestamp_signer,
-		cert_store, result.authenticode_format_errors,
-		result.authenticode_processing_error);
+	result.signature_result = verify_signature(timestamp_signer,
+		cert_store);
 	return result;
 }
 
@@ -346,8 +344,7 @@ void verify_valid_format_timestamp_signature(
 		return;
 	}
 
-	result.signature_valid = verify_signature(signer, cert_store,
-		result.authenticode_format_errors, result.authenticode_processing_error);
+	result.signature_result = verify_signature(signer, cert_store);
 }
 
 template timestamp_signature_check_status<span_range_type>

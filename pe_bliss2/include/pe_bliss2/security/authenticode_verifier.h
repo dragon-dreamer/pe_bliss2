@@ -15,6 +15,7 @@
 #include "pe_bliss2/security/image_hash.h"
 #include "pe_bliss2/security/pkcs7/pkcs7.h"
 #include "pe_bliss2/security/pkcs7/pkcs7_signature.h"
+#include "pe_bliss2/security/signature_verifier.h"
 #include "pe_bliss2/security/x509/x509_certificate.h"
 #include "pe_bliss2/security/x509/x509_certificate_store.h"
 
@@ -38,7 +39,6 @@ std::error_code make_error_code(authenticode_verifier_errc) noexcept;
 template<typename RangeType>
 struct [[nodiscard]] authenticode_check_status_base
 {
-	//TODO: add signature key size?
 	error_list authenticode_format_errors;
 	error_list certificate_store_warnings;
 	std::exception_ptr authenticode_processing_error;
@@ -46,7 +46,7 @@ struct [[nodiscard]] authenticode_check_status_base
 	std::optional<bool> page_hashes_valid;
 	std::error_code page_hashes_check_errc;
 	std::optional<bool> message_digest_valid;
-	std::optional<bool> signature_valid;
+	std::optional<signature_verification_result> signature_result;
 	std::optional<digest_algorithm> image_digest_alg;
 	std::optional<digest_encryption_algorithm> digest_encryption_alg;
 	std::optional<asn1::utc_time> signing_time;
@@ -61,10 +61,10 @@ struct [[nodiscard]] authenticode_check_status_base
 			&& !authenticode_processing_error
 			&& image_hash_valid
 			&& message_digest_valid
-			&& signature_valid
+			&& signature_result
 			&& *image_hash_valid
 			&& *message_digest_valid
-			&& *signature_valid
+			&& *signature_result
 			&& !page_hashes_check_errc
 			&& (!page_hashes_valid || *page_hashes_valid);
 	}
@@ -81,7 +81,7 @@ struct [[nodiscard]] timestamp_signature_check_status
 	std::optional<digest_algorithm> digest_alg;
 	std::optional<digest_algorithm> imprint_digest_alg;
 	std::optional<digest_encryption_algorithm> digest_encryption_alg;
-	std::optional<bool> signature_valid;
+	std::optional<signature_verification_result> signature_result;
 	std::variant<std::monostate, asn1::utc_time, asn1::generalized_time> signing_time;
 
 	std::optional<x509::x509_certificate_store<
@@ -95,8 +95,8 @@ struct [[nodiscard]] timestamp_signature_check_status
 			&& hash_valid
 			&& *hash_valid
 			&& (!message_digest_valid || *message_digest_valid)
-			&& signature_valid
-			&& *signature_valid
+			&& signature_result
+			&& *signature_result
 			&& !std::holds_alternative<std::monostate>(signing_time);
 	}
 };
