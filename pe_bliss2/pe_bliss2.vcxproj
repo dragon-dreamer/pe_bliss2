@@ -205,12 +205,6 @@
     <ClInclude Include="include\pe_bliss2\tls\tls_directory_loader.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="include\pe_bliss2\security\authenticode_timestamp_signature.cpp">
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
-    </ClCompile>
     <ClCompile Include="src\address_converter.cpp" />
     <ClCompile Include="src\bound_import\bound_import_directory_builder.cpp" />
     <ClCompile Include="src\bound_import\bound_import_directory_loader.cpp" />
@@ -313,6 +307,12 @@
     <ClCompile Include="src\security\authenticode_loader.cpp" />
     <ClCompile Include="src\security\authenticode_format_validator.cpp" />
     <ClCompile Include="src\security\authenticode_page_hashes.cpp" />
+    <ClCompile Include="src\security\authenticode_timestamp_signature.cpp">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <ClCompile Include="src\security\authenticode_timestamp_signature_format_validator.cpp" />
     <ClCompile Include="src\security\authenticode_timestamp_verifier.cpp" />
     <ClCompile Include="src\security\authenticode_verifier.cpp" />

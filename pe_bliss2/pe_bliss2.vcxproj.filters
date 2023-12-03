@@ -1085,9 +1085,6 @@
     <ClCompile Include="src\security\authenticode_page_hashes.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
-    <ClCompile Include="include\pe_bliss2\security\authenticode_timestamp_signature.cpp">
-      <Filter>Source Files\security</Filter>
-    </ClCompile>
     <ClCompile Include="src\security\authenticode_format_validator_errc.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
@@ -1110,6 +1107,9 @@
       <Filter>Source Files\security</Filter>
     </ClCompile>
     <ClCompile Include="src\security\authenticode_timestamp_verifier.cpp">
+      <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\authenticode_timestamp_signature.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
   </ItemGroup>
