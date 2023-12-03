@@ -66,7 +66,7 @@ signature_verification_result verify_signature_impl(
 	try
 	{
 		span_range_type signature_algorithm_parameters;
-		if (const auto params = signing_cert->get_signature_algorithm_parameters(); params)
+		if (const auto& params = signing_cert->get_signature_algorithm_parameters(); params)
 			signature_algorithm_parameters = *params;
 
 		result.pkcs7_result = pkcs7::verify_signature(
