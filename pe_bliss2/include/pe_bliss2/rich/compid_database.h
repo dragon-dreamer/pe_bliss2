@@ -149,6 +149,7 @@ public:
 		visual_studio_2019_16_11_24,
 		visual_studio_2019_16_11_27,
 		visual_studio_2019_16_11_30,
+		visual_studio_2019_16_11_32,
 		visual_studio_2022_17_0_0_preview2,
 		visual_studio_2022_17_0_0_preview3_1,
 		visual_studio_2022_17_0_0_preview4_0,
@@ -201,8 +202,14 @@ public:
 		visual_studio_2022_17_7_0_preview3_0,
 		visual_studio_2022_17_7_0,
 		visual_studio_2022_17_7_4,
+		visual_studio_2022_17_7_5,
 		visual_studio_2022_17_8_0_preview1_0,
 		visual_studio_2022_17_8_0_preview2_0,
+		visual_studio_2022_17_8_0_preview3_0,
+		visual_studio_2022_17_8_0_preview5_0,
+		visual_studio_2022_17_8_0_preview6_0,
+		visual_studio_2022_17_8_0,
+		visual_studio_2022_17_9_0_preview1_0,
 		unmarked_object,
 		cvtpgd, //CVTPGD tool
 		cvtpgd_1, //CVTPGD tool
