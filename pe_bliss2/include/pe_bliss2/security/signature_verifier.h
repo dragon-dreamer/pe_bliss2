@@ -7,6 +7,7 @@
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/security/pkcs7/pkcs7.h"
 #include "pe_bliss2/security/pkcs7/pkcs7_signature.h"
+#include "pe_bliss2/security/pkcs7/signer_info.h"
 #include "pe_bliss2/security/x509/x509_certificate.h"
 #include "pe_bliss2/security/x509/x509_certificate_store.h"
 

@@ -114,7 +114,7 @@ std::vector<std::byte> signer_info_base<RangeType, SignerInfoType, UnderlyingTyp
 
 	// Replace ASN.1 IMPLICIT TAGGED tag with SET_OF
 	const std::array<std::byte, 1u> replaced_byte{
-		static_cast<std::byte>(asn1::spec::crypto::pkcs7::unauthenticated_attributes::tag())
+		static_cast<std::byte>(asn1::spec::crypto::pkcs7::authenticated_attributes::tag())
 	};
 
 	return calculate_hash(get_digest_algorithm(),
