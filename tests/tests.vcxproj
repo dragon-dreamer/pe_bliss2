@@ -241,6 +241,7 @@
     <ClCompile Include="tests\pe_bliss2\directories\security\pkcs7_format_validator_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\pkcs7_signature_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\pkcs7_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\directories\security\signature_verifier_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\signer_info_ref_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\x509_certificate_store_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\directories\security\x509_certificate_tests.cpp" />
