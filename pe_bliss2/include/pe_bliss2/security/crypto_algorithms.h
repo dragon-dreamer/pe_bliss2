@@ -72,6 +72,7 @@ bool get_hash_and_signature_algorithms(
 	digest_alg = signer.get_digest_algorithm();
 	const auto [signature_alg, digest_alg_from_encryption]
 		= signer.get_digest_encryption_algorithm();
+	digest_encryption_alg = signature_alg;
 	bool valid = true;
 	if (digest_alg == digest_algorithm::unknown)
 	{
@@ -91,7 +92,6 @@ bool get_hash_and_signature_algorithms(
 			crypto_algorithm_errc::signature_hash_and_digest_algorithm_mismatch);
 		valid = false;
 	}
-	digest_encryption_alg = signature_alg;
 	return valid;
 }
 
