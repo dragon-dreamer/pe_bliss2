@@ -2,11 +2,50 @@
 
 #include <algorithm>
 #include <array>
+#include <string>
+#include <system_error>
 
 #include "simple_asn1/crypto/algorithms.h"
 
+namespace
+{
+
+struct crypto_algorithm_error_category : std::error_category
+{
+	const char* name() const noexcept override
+	{
+		return "crypto_algorithm";
+	}
+
+	std::string message(int ev) const override
+	{
+		using enum pe_bliss::security::crypto_algorithm_errc;
+		switch (static_cast<pe_bliss::security::crypto_algorithm_errc>(ev))
+		{
+		case unsupported_digest_algorithm:
+			return "Unsupported digest (hash) algorithm";
+		case unsupported_digest_encryption_algorithm:
+			return "Unable digest encryption alrogithm";
+		case signature_hash_and_digest_algorithm_mismatch:
+			return "Signature algorithm includes a hash algorithm ID"
+				" which does not match the signed specified hash algorithm";
+		default:
+			return {};
+		}
+	}
+};
+
+const crypto_algorithm_error_category crypto_algorithm_error_category_instance;
+
+} //namespace
+
 namespace pe_bliss::security
 {
+
+std::error_code make_error_code(crypto_algorithm_errc e) noexcept
+{
+	return { static_cast<int>(e), crypto_algorithm_error_category_instance };
+}
 
 digest_algorithm get_digest_algorithm(std::span<const std::uint32_t> range) noexcept
 {

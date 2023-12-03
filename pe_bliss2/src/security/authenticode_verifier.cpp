@@ -32,15 +32,8 @@ struct authenticode_verifier_error_category : std::error_category
 		using enum pe_bliss::security::authenticode_verifier_errc;
 		switch (static_cast<pe_bliss::security::authenticode_verifier_errc>(ev))
 		{
-		case unsupported_digest_algorithm:
-			return "Unsupported digest (hash) algorithm";
-		case unsupported_digest_encryption_algorithm:
-			return "Unable digest encryption alrogithm";
 		case invalid_page_hash_format:
 			return "Invalid page hash format";
-		case signature_hash_and_digest_algorithm_mismatch:
-			return "Signature algorithm includes a hash algorithm ID"
-				" which does not match the signed specified hash algorithm";
 		default:
 			return {};
 		}
@@ -53,43 +46,6 @@ const authenticode_verifier_error_category authenticode_verifier_error_category_
 
 namespace pe_bliss::security
 {
-
-namespace
-{
-
-template<typename Signer>
-bool get_hash_and_signature_algorithms(
-	const Signer& signer,
-	digest_algorithm& digest_alg,
-	digest_encryption_algorithm& digest_encryption_alg,
-	error_list& errors)
-{
-	digest_alg = signer.get_digest_algorithm();
-	auto [signature_alg, digest_alg_from_encryption]
-		= signer.get_digest_encryption_algorithm();
-	if (digest_alg == digest_algorithm::unknown)
-	{
-		errors.add_error(authenticode_verifier_errc::unsupported_digest_algorithm);
-		return false;
-	}
-
-	if (digest_encryption_alg == digest_encryption_algorithm::unknown)
-	{
-		errors.add_error(authenticode_verifier_errc::unsupported_digest_encryption_algorithm);
-		return false;
-	}
-
-	if (digest_alg_from_encryption && digest_alg_from_encryption != digest_alg)
-	{
-		errors.add_error(
-			authenticode_verifier_errc::signature_hash_and_digest_algorithm_mismatch);
-		return false;
-	}
-	digest_encryption_alg = signature_alg;
-	return true;
-}
-
-} //namespace
 
 std::error_code make_error_code(authenticode_verifier_errc e) noexcept
 {

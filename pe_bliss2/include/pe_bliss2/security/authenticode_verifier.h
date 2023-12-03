@@ -28,10 +28,7 @@ namespace pe_bliss::security
 
 enum class authenticode_verifier_errc
 {
-	unsupported_digest_algorithm = 1,
-	unsupported_digest_encryption_algorithm,
-	invalid_page_hash_format,
-	signature_hash_and_digest_algorithm_mismatch
+	invalid_page_hash_format = 1
 };
 
 std::error_code make_error_code(authenticode_verifier_errc) noexcept;
