@@ -46,8 +46,9 @@ signature_verification_result verify_signature_impl(
 {
 	signature_verification_result result;
 
-	auto issuer_and_sn = signer.get_signer_certificate_issuer_and_serial_number();
-	if (!issuer_and_sn.serial_number || !issuer_and_sn.issuer)
+	const auto issuer_and_sn = signer.get_signer_certificate_issuer_and_serial_number();
+	if (!issuer_and_sn.serial_number || !issuer_and_sn.issuer
+		|| (issuer_and_sn.serial_number->empty() && issuer_and_sn.issuer->empty()))
 	{
 		result.errors.add_error(signature_verifier_errc::absent_signing_cert_issuer_and_sn);
 		return result;
@@ -65,7 +66,7 @@ signature_verification_result verify_signature_impl(
 	try
 	{
 		span_range_type signature_algorithm_parameters;
-		if (auto params = signing_cert->get_signature_algorithm_parameters(); params)
+		if (const auto params = signing_cert->get_signature_algorithm_parameters(); params)
 			signature_algorithm_parameters = *params;
 
 		result.pkcs7_result = pkcs7::verify_signature(
