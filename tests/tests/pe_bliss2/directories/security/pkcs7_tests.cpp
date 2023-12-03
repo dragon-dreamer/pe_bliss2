@@ -6,6 +6,7 @@
 
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/byte_range_types.h"
+#include "pe_bliss2/security/pkcs7/message_digest.h"
 #include "pe_bliss2/security/pkcs7/signer_info.h"
 
 #include "simple_asn1/crypto/algorithms.h"

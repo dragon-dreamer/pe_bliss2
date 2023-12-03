@@ -6,7 +6,6 @@
 #include <concepts>
 #include <span>
 #include <utility>
-#include <vector>
 
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/byte_range_types.h"
@@ -108,14 +107,5 @@ public:
 private:
 	content_info_type content_info_;
 };
-
-template<typename RangeType, typename ContentInfo, typename Signer>
-[[nodiscard]]
-std::vector<std::byte> calculate_message_digest(
-	const pkcs7<RangeType, ContentInfo>& signature,
-	const Signer& signer)
-{
-	return signer.calculate_message_digest(signature.get_raw_signed_content());
-}
 
 } //namespace pe_bliss::security::pkcs7
