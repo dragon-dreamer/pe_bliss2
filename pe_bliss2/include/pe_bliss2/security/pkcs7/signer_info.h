@@ -28,6 +28,7 @@ template<typename RangeType, typename SignerInfoType, typename UnderlyingType>
 class [[nodiscard]] signer_info_base
 {
 public:
+	using range_type = RangeType;
 	using signer_info_type = SignerInfoType;
 
 	constexpr signer_info_base(UnderlyingType signer_info_ref) noexcept
