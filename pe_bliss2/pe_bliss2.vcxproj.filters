@@ -744,11 +744,11 @@
     <ClInclude Include="include\pe_bliss2\security\signature_verifier.h">
       <Filter>Header Files\security</Filter>
     </ClInclude>
-    <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_verifier.h">
-      <Filter>Source Files\security</Filter>
-    </ClInclude>
     <ClInclude Include="include\pe_bliss2\security\pkcs7\message_digest.h">
       <Filter>Header Files\security\pkcs7</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_verifier.h">
+      <Filter>Header Files\security</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
