@@ -1,4 +1,4 @@
-#include "pe_bliss2/security/authenticode_timestamp_verifier.h"
+#include "pe_bliss2/security/authenticode_timestamp_signature_verifier.h"
 
 #include <algorithm>
 #include <array>

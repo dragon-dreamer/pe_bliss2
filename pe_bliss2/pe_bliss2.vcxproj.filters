@@ -747,7 +747,7 @@
     <ClInclude Include="include\pe_bliss2\security\pkcs7\message_digest.h">
       <Filter>Header Files\security\pkcs7</Filter>
     </ClInclude>
-    <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_verifier.h">
+    <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_signature_verifier.h">
       <Filter>Header Files\security</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1106,7 +1106,7 @@
     <ClCompile Include="src\security\signature_verifier.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
-    <ClCompile Include="src\security\authenticode_timestamp_verifier.cpp">
+    <ClCompile Include="src\security\authenticode_timestamp_signature_verifier.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
     <ClCompile Include="src\security\authenticode_timestamp_signature.cpp">
