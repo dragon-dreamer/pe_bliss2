@@ -203,20 +203,22 @@ timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 		cert_store);
 }
 
-template<typename RangeType1 = span_range_type, typename RangeType2, typename RangeType3>
+template<typename RangeType1 = span_range_type, typename RangeType2>
 timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 	const RangeType2& authenticode_encrypted_digest,
-	const authenticode_signature_cms_info_ms_bug_workaround_type<RangeType3>& signature)
+	const authenticode_signature_cms_info_ms_bug_workaround_type<RangeType1>& signature)
 {
-	return impl::verify_timestamp_signature_impl<RangeType1>(authenticode_encrypted_digest, signature);
+	return impl::verify_timestamp_signature_impl<RangeType1>(
+		authenticode_encrypted_digest, signature);
 }
 
-template<typename RangeType1 = span_range_type, typename RangeType2, typename RangeType3>
+template<typename RangeType1 = span_range_type, typename RangeType2>
 timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 	const RangeType2& authenticode_encrypted_digest,
-	const authenticode_signature_cms_info_type<RangeType3>& signature)
+	const authenticode_signature_cms_info_type<RangeType1>& signature)
 {
-	return impl::verify_timestamp_signature_impl<RangeType1>(authenticode_encrypted_digest, signature);
+	return impl::verify_timestamp_signature_impl<RangeType1>(
+		authenticode_encrypted_digest, signature);
 }
 
 template<typename RangeType>
