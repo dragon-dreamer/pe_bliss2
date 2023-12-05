@@ -1106,9 +1106,6 @@
     <ClCompile Include="src\security\signature_verifier.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
-    <ClCompile Include="src\security\authenticode_timestamp_signature_verifier.cpp">
-      <Filter>Source Files\security</Filter>
-    </ClCompile>
     <ClCompile Include="src\security\authenticode_timestamp_signature.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>

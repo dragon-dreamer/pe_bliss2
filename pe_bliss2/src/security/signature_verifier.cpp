@@ -1,10 +1,7 @@
 #include "pe_bliss2/security/signature_verifier.h"
 
 #include <exception>
-#include <optional>
 #include <string>
-
-#include "pe_bliss2/security/pkcs7/pkcs7_signature.h"
 
 namespace pe_bliss::security
 {

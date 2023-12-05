@@ -87,7 +87,7 @@ public:
 			: invalid_raw_authenticated_attributes;
 	}
 
-	static void check_signing_time(const timestamp_signature_check_status<range_type>& result)
+	static void check_signing_time(const timestamp_signature_check_status<span_range_type>& result)
 	{
 		const auto* signing_time = std::get_if<asn1::utc_time>(&result.signing_time);
 		ASSERT_NE(signing_time, nullptr);

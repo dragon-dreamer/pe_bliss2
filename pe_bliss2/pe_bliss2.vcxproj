@@ -314,7 +314,6 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <ClCompile Include="src\security\authenticode_timestamp_signature_format_validator.cpp" />
-    <ClCompile Include="src\security\authenticode_timestamp_signature_verifier.cpp" />
     <ClCompile Include="src\security\authenticode_verifier.cpp" />
     <ClCompile Include="src\security\crypto_algorithms.cpp" />
     <ClCompile Include="src\security\hash_helpers.cpp" />

@@ -18,11 +18,11 @@ std::vector<std::byte> calculate_message_digest(
 	return signer.calculate_message_digest(signature.get_raw_signed_content());
 }
 
-template<typename RangeType, typename ContentInfo, typename Signer>
+template<typename RangeType1, typename ContentInfo, typename Signer, typename RangeType2>
 [[nodiscard]]
-bool verify_message_digest(const pkcs7<RangeType, ContentInfo>& signature,
+bool verify_message_digest(const pkcs7<RangeType1, ContentInfo>& signature,
 	const Signer& signer,
-	const attribute_map<RangeType>& authenticated_attributes)
+	const attribute_map<RangeType2>& authenticated_attributes)
 {
 	const auto message_digest = calculate_message_digest(signature, signer);
 	return verify_message_digest_attribute(message_digest,
