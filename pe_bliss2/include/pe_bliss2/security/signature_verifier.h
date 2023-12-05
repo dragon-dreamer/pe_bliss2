@@ -39,14 +39,70 @@ struct [[nodiscard]] signature_verification_result
 	}
 };
 
-template<typename RangeType>
+namespace impl
+{
+template<typename Signer, typename RangeType>
+signature_verification_result verify_signature_impl(
+	const Signer& signer,
+	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store)
+{
+	signature_verification_result result;
+
+	const auto issuer_and_sn = signer.get_signer_certificate_issuer_and_serial_number();
+	if (!issuer_and_sn.serial_number || !issuer_and_sn.issuer
+		|| (issuer_and_sn.serial_number->empty() && issuer_and_sn.issuer->empty()))
+	{
+		result.errors.add_error(signature_verifier_errc::absent_signing_cert_issuer_and_sn);
+		return result;
+	}
+
+	const auto* signing_cert = cert_store.find_certificate(
+		*issuer_and_sn.serial_number,
+		*issuer_and_sn.issuer);
+	if (!signing_cert)
+	{
+		result.errors.add_error(signature_verifier_errc::absent_signing_cert);
+		return result;
+	}
+
+	try
+	{
+		span_range_type signature_algorithm_parameters;
+		if (const auto& params = signing_cert->get_signature_algorithm_parameters(); params)
+			signature_algorithm_parameters = *params;
+
+		result.pkcs7_result = pkcs7::verify_signature(
+			signing_cert->get_public_key(),
+			signer.calculate_authenticated_attributes_digest(),
+			signer.get_encrypted_digest(),
+			signer.get_digest_algorithm(),
+			signer.get_digest_encryption_algorithm().encryption_alg,
+			signature_algorithm_parameters);
+	}
+	catch (const std::exception&)
+	{
+		result.errors.add_error(signature_verifier_errc::unable_to_verify_signature);
+		result.processing_error = std::current_exception();
+	}
+	return result;
+}
+} //namespace impl
+
+template<typename RangeType1, typename RangeType2>
 signature_verification_result verify_signature(
-	const pkcs7::signer_info_ref_pkcs7<RangeType>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store);
-template<typename RangeType>
+	const pkcs7::signer_info_ref_pkcs7<RangeType1>& signer,
+	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType2>>& cert_store)
+{
+	return impl::verify_signature_impl(signer, cert_store);
+}
+
+template<typename RangeType1, typename RangeType2>
 signature_verification_result verify_signature(
-	const pkcs7::signer_info_ref_cms<RangeType>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store);
+	const pkcs7::signer_info_ref_cms<RangeType1>& signer,
+	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType2>>& cert_store)
+{
+	return impl::verify_signature_impl(signer, cert_store);
+}
 
 } //namespace pe_bliss::security
 
