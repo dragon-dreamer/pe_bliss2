@@ -44,11 +44,19 @@ timestamp_signature_check_status<RangeType> verify_timestamp_signature(
 
 	const auto message_digest = timestamp_signer.calculate_message_digest(
 		std::array<span_range_type, 1u>{ authenticode_encrypted_digest });
-	result.hash_valid = pkcs7::verify_message_digest_attribute(message_digest,
-		timestamp_authenticated_attributes);
+	try
+	{
+		result.hash_valid = pkcs7::verify_message_digest_attribute(message_digest,
+			timestamp_authenticated_attributes);
+	}
+	catch (const std::exception&)
+	{
+		result.authenticode_format_errors.add_error(
+			pkcs7::pkcs7_format_validator_errc::invalid_message_digest);
+		return result;
+	}
 
-	result.signature_result = verify_signature(timestamp_signer,
-		cert_store);
+	result.signature_result = verify_signature(timestamp_signer, cert_store);
 	return result;
 }
 
