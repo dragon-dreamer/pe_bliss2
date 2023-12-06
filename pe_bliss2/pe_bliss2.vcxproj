@@ -180,6 +180,7 @@
     <ClInclude Include="include\pe_bliss2\security\authenticode_pkcs7.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_program_info.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_signature.h" />
+    <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_signature_check_status.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_signature_format_validator.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_signature_verifier.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_verifier.h" />
