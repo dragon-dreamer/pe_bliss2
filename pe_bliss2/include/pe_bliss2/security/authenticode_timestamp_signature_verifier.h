@@ -8,6 +8,7 @@
 #include <variant>
 
 #include "pe_bliss2/error_list.h"
+#include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/authenticode_certificate_store.h"
 #include "pe_bliss2/security/authenticode_timestamp_signature.h"
 #include "pe_bliss2/security/authenticode_timestamp_signature_format_validator.h"
@@ -31,7 +32,6 @@ struct [[nodiscard]] timestamp_signature_check_status
 {
 	error_list authenticode_format_errors;
 	error_list certificate_store_warnings;
-	std::exception_ptr authenticode_processing_error;
 	std::optional<bool> hash_valid;
 	std::optional<bool> message_digest_valid;
 	std::optional<digest_algorithm> digest_alg;
@@ -47,7 +47,6 @@ struct [[nodiscard]] timestamp_signature_check_status
 	explicit operator bool() const noexcept
 	{
 		return !authenticode_format_errors.has_errors()
-			&& !authenticode_processing_error
 			&& hash_valid
 			&& *hash_valid
 			&& (!message_digest_valid || *message_digest_valid)
@@ -83,20 +82,24 @@ void verify_valid_format_timestamp_signature_impl(
 	imprint_digest_algorithm = get_digest_algorithm(imprint.hash_algorithm.algorithm.container);
 	if (imprint_digest_algorithm == digest_algorithm::unknown)
 	{
+		result.authenticode_format_errors.add_error(
+			crypto_algorithm_errc::unsupported_digest_algorithm);
 		return;
 	}
 
+	const auto calculated_hash = calculate_hash(imprint_digest_algorithm,
+		std::array<span_range_type, 1u>{ authenticode_encrypted_digest });
+	result.hash_valid = std::ranges::equal(calculated_hash, imprint.hashed_message);
+
 	try
 	{
-		const auto calculated_hash = calculate_hash(imprint_digest_algorithm,
-			std::array<span_range_type, 1u>{ authenticode_encrypted_digest });
-		result.hash_valid = std::ranges::equal(calculated_hash, imprint.hashed_message);
 		result.message_digest_valid = verify_message_digest(signature,
 			signer, authenticated_attributes);
 	}
 	catch (const std::exception&)
 	{
-		result.authenticode_processing_error = std::current_exception();
+		result.authenticode_format_errors.add_error(
+			pkcs7::pkcs7_format_validator_errc::invalid_message_digest);
 		return;
 	}
 
