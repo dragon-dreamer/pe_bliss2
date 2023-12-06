@@ -13,6 +13,7 @@
 #include "pe_bliss2/security/authenticode_timestamp_signature.h"
 #include "pe_bliss2/security/authenticode_timestamp_signature_format_validator.h"
 #include "pe_bliss2/security/buffer_hash.h"
+#include "pe_bliss2/security/byte_range_types.h"
 #include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/pkcs7/attribute_map.h"
 #include "pe_bliss2/security/pkcs7/message_digest.h"
@@ -23,6 +24,8 @@
 #include "pe_bliss2/security/x509/x509_certificate_store.h"
 
 #include "simple_asn1/types.h"
+
+#include "utilities/variant_helpers.h"
 
 namespace pe_bliss::security
 {
@@ -200,7 +203,7 @@ timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 	const pkcs7::signer_info_pkcs7<RangeType3>& timestamp_signer,
 	const pkcs7::attribute_map<RangeType4>& timestamp_authenticated_attributes,
 	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType5>>& cert_store) {
-	return verify_timestamp_signature(authenticode_encrypted_digest,
+	return verify_timestamp_signature<RangeType1>(authenticode_encrypted_digest,
 		pkcs7::signer_info_ref_pkcs7(timestamp_signer),
 		timestamp_authenticated_attributes,
 		cert_store);
@@ -252,7 +255,53 @@ void verify_valid_format_timestamp_signature(
 		cert_store, result);
 }
 
-//TODO: add generic function which will load the signature and check it
-//using the correct overload
+template<typename RangeType1, typename RangeType2, typename RangeType3,
+	typename RangeType4>
+timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
+	const RangeType2& authenticode_encrypted_digest,
+	const pe_bliss::security::authenticode_timestamp_signature<RangeType3>& signature,
+	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType4>>& cert_store)
+{
+	using ts_sign_type = pe_bliss::security
+		::authenticode_timestamp_signature<RangeType3>;
+	return std::visit(utilities::overloaded(
+		[&authenticode_encrypted_digest, &cert_store](
+			const typename ts_sign_type::signer_info_type& sign) {
+			return verify_timestamp_signature<RangeType1>(
+				authenticode_encrypted_digest, sign,
+				sign.get_authenticated_attributes(), cert_store);
+		},
+		[&authenticode_encrypted_digest](const auto& sign) {
+			return verify_timestamp_signature<RangeType1>(
+				authenticode_encrypted_digest, sign);
+		}
+	), signature.get_underlying_type());
+}
+
+template<typename RangeType1, typename RangeType2, typename RangeType3,
+	typename RangeType4>
+std::optional<timestamp_signature_check_status<RangeType1>> verify_timestamp_signature(
+	const RangeType2& authenticode_encrypted_digest,
+	const pkcs7::attribute_map<RangeType3>& unauthenticated_attributes,
+	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType4>>& cert_store)
+{
+	const auto signature = pe_bliss::security::load_timestamp_signature<span_range_type>(
+		unauthenticated_attributes);
+	if (!signature)
+		return {};
+
+	return verify_timestamp_signature<RangeType1>(authenticode_encrypted_digest,
+		*signature, cert_store);
+}
+
+template<typename RangeType1, typename RangeType2, typename RangeType3>
+std::optional<timestamp_signature_check_status<RangeType1>> verify_timestamp_signature(
+	const authenticode_pkcs7<RangeType2>& authenticode,
+	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType3>>& cert_store)
+{
+	const auto& signer = authenticode.get_signer(0);
+	return verify_timestamp_signature<RangeType1>(signer.get_encrypted_digest(),
+		signer.get_unauthenticated_attributes(), cert_store);
+}
 
 } //namespace pe_bliss::security
