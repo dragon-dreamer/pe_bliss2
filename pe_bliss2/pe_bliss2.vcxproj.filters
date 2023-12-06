@@ -753,6 +753,9 @@
     <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_signature_check_status.h">
       <Filter>Header Files\security</Filter>
     </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\authenticode_check_status.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\address_converter.cpp">
@@ -1110,6 +1113,9 @@
       <Filter>Source Files\security</Filter>
     </ClCompile>
     <ClCompile Include="src\security\authenticode_timestamp_signature.cpp">
+      <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\authenticode_check_status.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
   </ItemGroup>

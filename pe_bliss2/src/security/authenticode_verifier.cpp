@@ -2,8 +2,6 @@
 
 #include <cstdint>
 #include <optional>
-#include <string>
-#include <system_error>
 
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/authenticode_certificate_store.h"
@@ -18,40 +16,8 @@
 #include "pe_bliss2/security/pkcs7/pkcs7_format_validator.h"
 #include "pe_bliss2/security/signature_verifier.h"
 
-namespace
-{
-
-struct authenticode_verifier_error_category : std::error_category
-{
-	const char* name() const noexcept override
-	{
-		return "authenticode_verifier";
-	}
-
-	std::string message(int ev) const override
-	{
-		using enum pe_bliss::security::authenticode_verifier_errc;
-		switch (static_cast<pe_bliss::security::authenticode_verifier_errc>(ev))
-		{
-		case invalid_page_hash_format:
-			return "Invalid page hash format";
-		default:
-			return {};
-		}
-	}
-};
-
-const authenticode_verifier_error_category authenticode_verifier_error_category_instance;
-
-} //namespace
-
 namespace pe_bliss::security
 {
-
-std::error_code make_error_code(authenticode_verifier_errc e) noexcept
-{
-	return { static_cast<int>(e), authenticode_verifier_error_category_instance };
-}
 
 template<typename RangeType>
 void verify_valid_format_authenticode(
@@ -102,6 +68,7 @@ void verify_valid_format_authenticode(
 	}
 	catch (const std::exception&)
 	{
+		//TODO: replace with error codes
 		result.authenticode_processing_error = std::current_exception();
 		return;
 	}

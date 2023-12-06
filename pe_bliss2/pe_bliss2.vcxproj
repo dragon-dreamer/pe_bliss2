@@ -173,6 +173,7 @@
     <ClInclude Include="include\pe_bliss2\section\section_table_validator.h" />
     <ClInclude Include="include\pe_bliss2\security\asn1_decode_helper.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_certificate_store.h" />
+    <ClInclude Include="include\pe_bliss2\security\authenticode_check_status.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_format_validator.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_format_validator_errc.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_loader.h" />
@@ -304,6 +305,7 @@
     <ClCompile Include="src\section\section_table.cpp" />
     <ClCompile Include="src\section\section_table_validator.cpp" />
     <ClCompile Include="src\security\authenticode_certificate_store.cpp" />
+    <ClCompile Include="src\security\authenticode_check_status.cpp" />
     <ClCompile Include="src\security\authenticode_format_validator_errc.cpp" />
     <ClCompile Include="src\security\authenticode_loader.cpp" />
     <ClCompile Include="src\security\authenticode_format_validator.cpp" />
