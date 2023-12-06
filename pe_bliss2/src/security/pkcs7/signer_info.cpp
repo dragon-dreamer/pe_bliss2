@@ -112,6 +112,9 @@ std::vector<std::byte> signer_info_base<RangeType, SignerInfoType, UnderlyingTyp
 
 	span_range_type raw_attributes = signer_info_ref_.authenticated_attributes->raw;
 
+	if (raw_attributes.size() < 1u)
+		throw pe_error(signer_info_errc::absent_authenticated_attributes);
+
 	// Replace ASN.1 IMPLICIT TAGGED tag with SET_OF
 	const std::array<std::byte, 1u> replaced_byte{
 		static_cast<std::byte>(asn1::spec::crypto::pkcs7::authenticated_attributes::tag())
