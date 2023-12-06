@@ -65,6 +65,14 @@ public:
 			},
 			.values = this->valid_oid_data
 		});
+
+		authenticated_attributes.emplace_back(
+			asn1::crypto::pkcs7::attribute<RangeType>{
+			.type = asn1::decoded_object_identifier{
+				.container = oid_signing_time
+			},
+			.values = this->signing_time_data
+		});
 	}
 
 public:
@@ -197,7 +205,8 @@ public:
 			: this->invalid_raw_authenticated_attributes;
 	}
 
-	static void check_signing_time(const timestamp_signature_check_status<span_range_type>& result)
+	template<typename SignatureCheckResult>
+	static void check_signing_time(const SignatureCheckResult& result)
 	{
 		const auto* signing_time = std::get_if<asn1::utc_time>(&result.signing_time);
 		ASSERT_NE(signing_time, nullptr);
@@ -381,6 +390,39 @@ TYPED_TEST(AuthenticodeTimestampPkcs7SignatureVerifierTest, Valid)
 
 	result.signing_time = std::monostate{};
 	ASSERT_FALSE(result);
+}
+
+TYPED_TEST(AuthenticodeTimestampPkcs7SignatureVerifierTest, ValidWrappedSignature)
+{
+	using range_type = typename TestFixture::range_type;
+
+	this->init_algorithms();
+	this->init_signing_certificate();
+	this->add_raw_authenticated_attributes(true);
+
+	AuthenticodeTimestampSignatureVerifierTestBase<range_type>::init_authenticated_attributes(
+		this->signer.get_underlying().authenticated_attributes->value,
+		this->valid_and_correct_message_digest_data);
+
+	pe_bliss::security::authenticode_timestamp_signature<range_type> wrapped_signature;
+	wrapped_signature.get_underlying_type() = this->signer;
+
+	auto result = verify_timestamp_signature<range_type>(this->encrypted_digest,
+		wrapped_signature, this->cert_store);
+	ASSERT_TRUE(result);
+	expect_contains_errors(result.authenticode_format_errors);
+	expect_contains_errors(result.certificate_store_warnings);
+	ASSERT_TRUE(result.hash_valid);
+	ASSERT_TRUE(*result.hash_valid);
+	ASSERT_FALSE(result.message_digest_valid);
+	ASSERT_EQ(result.digest_alg, digest_algorithm::sha256);
+	ASSERT_FALSE(result.imprint_digest_alg);
+	ASSERT_EQ(result.digest_encryption_alg, digest_encryption_algorithm::rsa);
+	ASSERT_TRUE(result.signature_result);
+	ASSERT_TRUE(*result.signature_result);
+	expect_contains_errors(result.signature_result->errors);
+	this->check_signing_time(result);
+	ASSERT_FALSE(result.cert_store);
 }
 
 namespace
@@ -832,6 +874,44 @@ TYPED_TEST(AuthenticodeTimestampCmsSignatureVerifierTest, Valid)
 	this->set_valid_raw_authenticated_attributes_and_encrypted_digest();
 
 	const auto result = this->verify();
+	ASSERT_TRUE(result);
+	expect_contains_errors(result.authenticode_format_errors);
+	expect_contains_errors(result.certificate_store_warnings);
+	ASSERT_TRUE(result.message_digest_valid);
+	ASSERT_TRUE(*result.message_digest_valid);
+	ASSERT_TRUE(result.hash_valid);
+	ASSERT_TRUE(*result.hash_valid);
+	ASSERT_EQ(result.digest_alg, digest_algorithm::sha256);
+	ASSERT_EQ(result.imprint_digest_alg, digest_algorithm::sha1);
+	ASSERT_EQ(result.digest_encryption_alg, digest_encryption_algorithm::rsa);
+	ASSERT_TRUE(result.signature_result);
+	ASSERT_TRUE(*result.signature_result);
+	this->check_signing_time(result);
+	this->check_cert_store(result.cert_store);
+}
+
+TYPED_TEST(AuthenticodeTimestampCmsSignatureVerifierTest, ValidWrappedSignature)
+{
+	using range_type = typename TestFixture::range_type;
+
+	this->add_signed_data_oid();
+	this->add_signed_data_version();
+	this->add_signer_info_and_algorithm();
+	this->add_tst_data_oid();
+	this->add_tst_data_version();
+	this->add_signing_time();
+	this->add_imprint_algorithm(true);
+	this->add_raw_signed_content();
+	this->init_signing_certificate();
+	this->init_authenticated_attributes(this->valid_and_correct_message_digest_data);
+	this->set_valid_raw_authenticated_attributes_and_encrypted_digest();
+
+	pe_bliss::security::authenticode_timestamp_signature<range_type> wrapped_signature;
+	wrapped_signature.get_underlying_type() = this->signature;
+
+	auto result = verify_timestamp_signature<range_type>(this->encrypted_digest,
+		wrapped_signature, x509::x509_certificate_store<x509::x509_certificate_ref<range_type>>{});
+
 	ASSERT_TRUE(result);
 	expect_contains_errors(result.authenticode_format_errors);
 	expect_contains_errors(result.certificate_store_warnings);
