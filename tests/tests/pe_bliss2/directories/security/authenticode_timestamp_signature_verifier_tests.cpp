@@ -547,7 +547,7 @@ public:
 	}
 
 	template <typename RangeType2>
-	static void check_signing_time(const timestamp_signature_check_status<RangeType2>& result)
+	static void check_signing_time(const authenticode_timestamp_signature_check_status<RangeType2>& result)
 	{
 		const auto* signing_time = std::get_if<asn1::generalized_time>(&result.signing_time);
 		ASSERT_NE(signing_time, nullptr);

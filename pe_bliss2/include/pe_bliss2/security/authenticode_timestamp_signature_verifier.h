@@ -42,7 +42,7 @@ void verify_valid_format_timestamp_signature_impl(
 	const pkcs7::attribute_map<RangeType2>& authenticated_attributes,
 	const RangeType3& authenticode_encrypted_digest,
 	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType4>>& cert_store,
-	timestamp_signature_check_status<RangeType5>& result)
+	authenticode_timestamp_signature_check_status<RangeType5>& result)
 {
 	auto& digest_alg = result.digest_alg.emplace();
 	auto& digest_encryption_alg = result.digest_encryption_alg.emplace();
@@ -83,12 +83,12 @@ void verify_valid_format_timestamp_signature_impl(
 }
 
 template<typename RangeType1, typename RangeType2, typename Signature>
-timestamp_signature_check_status<RangeType1> verify_timestamp_signature_impl(
+authenticode_timestamp_signature_check_status<RangeType1> verify_timestamp_signature_impl(
 	const RangeType2& authenticode_encrypted_digest,
 	const Signature& signature)
 {
 	static constexpr std::int32_t cms_info_version = 3u;
-	timestamp_signature_check_status<RangeType1> result;
+	authenticode_timestamp_signature_check_status<RangeType1> result;
 
 	validate_autenticode_timestamp_format(signature, result.authenticode_format_errors);
 	if (result.authenticode_format_errors.has_errors())
@@ -128,13 +128,13 @@ timestamp_signature_check_status<RangeType1> verify_timestamp_signature_impl(
 
 template<typename RangeType1 = span_range_type, typename RangeType2,
 	typename RangeType3, typename RangeType4, typename RangeType5>
-timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
+authenticode_timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 	const RangeType2& authenticode_encrypted_digest,
 	const pkcs7::signer_info_ref_pkcs7<RangeType3>& timestamp_signer,
 	const pkcs7::attribute_map<RangeType4>& timestamp_authenticated_attributes,
 	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType5>>& cert_store)
 {
-	timestamp_signature_check_status<RangeType1> result;
+	authenticode_timestamp_signature_check_status<RangeType1> result;
 
 	auto& digest_alg = result.digest_alg.emplace();
 	auto& digest_encryption_alg = result.digest_encryption_alg.emplace();
@@ -171,7 +171,7 @@ timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 
 template<typename RangeType1 = span_range_type, typename RangeType2,
 	typename RangeType3, typename RangeType4, typename RangeType5>
-timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
+authenticode_timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 	const RangeType2& authenticode_encrypted_digest,
 	const pkcs7::signer_info_pkcs7<RangeType3>& timestamp_signer,
 	const pkcs7::attribute_map<RangeType4>& timestamp_authenticated_attributes,
@@ -183,7 +183,7 @@ timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 }
 
 template<typename RangeType1 = span_range_type, typename RangeType2>
-timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
+authenticode_timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 	const RangeType2& authenticode_encrypted_digest,
 	const authenticode_signature_cms_info_ms_bug_workaround_type<RangeType1>& signature)
 {
@@ -192,7 +192,7 @@ timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 }
 
 template<typename RangeType1 = span_range_type, typename RangeType2>
-timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
+authenticode_timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 	const RangeType2& authenticode_encrypted_digest,
 	const authenticode_signature_cms_info_type<RangeType1>& signature)
 {
@@ -207,7 +207,7 @@ void verify_valid_format_timestamp_signature(
 	const pkcs7::attribute_map<RangeType>& authenticated_attributes,
 	const RangeType& authenticode_encrypted_digest,
 	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store,
-	timestamp_signature_check_status<RangeType>& result)
+	authenticode_timestamp_signature_check_status<RangeType>& result)
 {
 	impl::verify_valid_format_timestamp_signature_impl(signature,
 		signer, authenticated_attributes, authenticode_encrypted_digest,
@@ -221,7 +221,7 @@ void verify_valid_format_timestamp_signature(
 	const pkcs7::attribute_map<RangeType>& authenticated_attributes,
 	const RangeType& authenticode_encrypted_digest,
 	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store,
-	timestamp_signature_check_status<RangeType>& result)
+	authenticode_timestamp_signature_check_status<RangeType>& result)
 {
 	impl::verify_valid_format_timestamp_signature_impl(signature,
 		signer, authenticated_attributes, authenticode_encrypted_digest,
@@ -230,7 +230,7 @@ void verify_valid_format_timestamp_signature(
 
 template<typename RangeType1, typename RangeType2, typename RangeType3,
 	typename RangeType4>
-timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
+authenticode_timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 	const RangeType2& authenticode_encrypted_digest,
 	const pe_bliss::security::authenticode_timestamp_signature<RangeType3>& signature,
 	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType4>>& cert_store)
@@ -253,7 +253,7 @@ timestamp_signature_check_status<RangeType1> verify_timestamp_signature(
 
 template<typename RangeType1, typename RangeType2, typename RangeType3,
 	typename RangeType4>
-std::optional<timestamp_signature_check_status<RangeType1>> verify_timestamp_signature(
+std::optional<authenticode_timestamp_signature_check_status<RangeType1>> verify_timestamp_signature(
 	const RangeType2& authenticode_encrypted_digest,
 	const pkcs7::attribute_map<RangeType3>& unauthenticated_attributes,
 	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType4>>& cert_store)
@@ -268,7 +268,7 @@ std::optional<timestamp_signature_check_status<RangeType1>> verify_timestamp_sig
 }
 
 template<typename RangeType1, typename RangeType2, typename RangeType3>
-std::optional<timestamp_signature_check_status<RangeType1>> verify_timestamp_signature(
+std::optional<authenticode_timestamp_signature_check_status<RangeType1>> verify_timestamp_signature(
 	const authenticode_pkcs7<RangeType2>& authenticode,
 	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType3>>& cert_store)
 {

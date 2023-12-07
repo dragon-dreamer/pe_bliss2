@@ -15,7 +15,7 @@ namespace pe_bliss::security
 {
 
 template<typename RangeType>
-struct [[nodiscard]] timestamp_signature_check_status
+struct [[nodiscard]] authenticode_timestamp_signature_check_status
 {
 	error_list authenticode_format_errors;
 	error_list certificate_store_warnings;
