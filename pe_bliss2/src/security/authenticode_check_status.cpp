@@ -20,6 +20,8 @@ struct authenticode_verifier_error_category : std::error_category
 		{
 		case invalid_page_hash_format:
 			return "Invalid page hash format";
+		case invalid_image_format_for_hashing:
+			return "Image format is invalid, and it is impossible to compute its hash";
 		default:
 			return {};
 		}

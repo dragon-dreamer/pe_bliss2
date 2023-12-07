@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <exception>
 #include <optional>
 #include <system_error>
 #include <type_traits>
@@ -18,7 +17,8 @@ namespace pe_bliss::security
 
 enum class authenticode_verifier_errc
 {
-	invalid_page_hash_format = 1
+	invalid_page_hash_format = 1,
+	invalid_image_format_for_hashing
 };
 
 std::error_code make_error_code(authenticode_verifier_errc) noexcept;
@@ -28,7 +28,6 @@ struct [[nodiscard]] authenticode_check_status_base
 {
 	error_list authenticode_format_errors;
 	error_list certificate_store_warnings;
-	std::exception_ptr authenticode_processing_error;
 	std::optional<bool> image_hash_valid;
 	std::optional<bool> page_hashes_valid;
 	std::error_code page_hashes_check_errc;
@@ -45,7 +44,6 @@ struct [[nodiscard]] authenticode_check_status_base
 	explicit operator bool() const noexcept
 	{
 		return !authenticode_format_errors.has_errors()
-			&& !authenticode_processing_error
 			&& image_hash_valid
 			&& message_digest_valid
 			&& signature_result

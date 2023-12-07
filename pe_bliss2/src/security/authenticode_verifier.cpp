@@ -63,13 +63,23 @@ void verify_valid_format_authenticode(
 		result.page_hashes_valid = hash_result.page_hashes_valid;
 		if (!result.page_hashes_check_errc)
 			result.page_hashes_check_errc = hash_result.page_hashes_check_errc;
+	}
+	catch (const std::exception&)
+	{
+		result.authenticode_format_errors.add_error(
+			authenticode_verifier_errc::invalid_image_format_for_hashing);
+		return;
+	}
+
+	try
+	{
 		result.message_digest_valid = verify_message_digest(authenticode,
 			signer, authenticated_attributes);
 	}
 	catch (const std::exception&)
 	{
-		//TODO: replace with error codes
-		result.authenticode_processing_error = std::current_exception();
+		result.authenticode_format_errors.add_error(
+			pkcs7::pkcs7_format_validator_errc::invalid_message_digest);
 		return;
 	}
 
@@ -140,7 +150,6 @@ authenticode_check_status<RangeType> verify_authenticode_full(
 
 	return result;
 }
-
 
 template void verify_valid_format_authenticode<span_range_type>(
 	const authenticode_pkcs7<span_range_type>& authenticode,
