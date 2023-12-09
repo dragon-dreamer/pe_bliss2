@@ -6,6 +6,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "pe_bliss2/security/authenticode_timestamp_signature_check_status.h"
 #include "pe_bliss2/error_list.h"
 #include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/signature_verifier.h"
@@ -40,6 +41,9 @@ struct [[nodiscard]] authenticode_check_status_base
 	std::optional<x509::x509_certificate_store<
 		x509::x509_certificate_ref<RangeType>>> cert_store;
 
+	std::optional<authenticode_timestamp_signature_check_status<RangeType>>
+		timestamp_signature_result;
+
 	[[nodiscard]]
 	explicit operator bool() const noexcept
 	{
@@ -51,7 +55,8 @@ struct [[nodiscard]] authenticode_check_status_base
 			&& *message_digest_valid
 			&& *signature_result
 			&& !page_hashes_check_errc
-			&& (!page_hashes_valid || *page_hashes_valid);
+			&& (!page_hashes_valid || *page_hashes_valid)
+			&& (!timestamp_signature_result || *timestamp_signature_result);
 	}
 };
 

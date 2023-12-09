@@ -7,6 +7,7 @@
 #include "pe_bliss2/security/authenticode_page_hashes.h"
 #include "pe_bliss2/security/authenticode_pkcs7.h"
 #include "pe_bliss2/security/authenticode_timestamp_signature_format_validator.h"
+#include "pe_bliss2/security/authenticode_timestamp_signature_verifier.h"
 #include "pe_bliss2/security/buffer_hash.h"
 #include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/image_hash.h"
@@ -26,18 +27,20 @@ namespace pe_bliss::security
 struct [[nodiscard]] authenticode_verification_options final
 {
 	page_hash_options page_hash_opts;
+	bool verify_timestamp_signature = true;
 };
 
 // Requires cert_store to be set inside authenticode_check_status_base
 template<typename RangeType1, typename RangeType2,
-	typename RangeType3, typename RangeType4>
+	typename RangeType3, typename RangeType4, typename RangeType5 = span_range_type>
 void verify_valid_format_authenticode(
 	const authenticode_pkcs7<RangeType1>& authenticode,
 	const pkcs7::signer_info_ref_pkcs7<RangeType2>& signer,
 	const pkcs7::attribute_map<RangeType3>& authenticated_attributes,
 	const image::image& instance,
 	const authenticode_verification_options& opts,
-	authenticode_check_status_base<RangeType4>& result)
+	authenticode_check_status_base<RangeType4>& result,
+	const pkcs7::attribute_map<RangeType5>* unauthenticated_attributes = nullptr)
 {
 	auto& digest_alg = result.image_digest_alg.emplace();
 	auto& digest_encryption_alg = result.digest_encryption_alg.emplace();
@@ -94,13 +97,38 @@ void verify_valid_format_authenticode(
 	}
 
 	result.signature_result = verify_signature(signer, result.cert_store.value());
+
+	if (!opts.verify_timestamp_signature)
+		return;
+
+	try
+	{
+		if (unauthenticated_attributes)
+		{
+			result.timestamp_signature_result = verify_timestamp_signature<RangeType4>(
+				authenticode.get_signer(0).get_encrypted_digest(),
+				*unauthenticated_attributes, result.cert_store.value());
+		}
+		else
+		{
+			result.timestamp_signature_result = verify_timestamp_signature<RangeType4>(
+				authenticode.get_signer(0).get_encrypted_digest(),
+				signer.get_unauthenticated_attributes(),
+				result.cert_store.value());
+		}
+	}
+	catch (const pe_error& e)
+	{
+		result.authenticode_format_errors.add_error(e.code());
+	}
 }
 
-template<typename RangeType>
+template<typename RangeType, typename RangeType2 = span_range_type>
 void verify_authenticode(const authenticode_pkcs7<RangeType>& authenticode,
 	const image::image& instance,
 	const authenticode_verification_options& opts,
-	authenticode_check_status_base<RangeType>& result)
+	authenticode_check_status_base<RangeType>& result,
+	const pkcs7::attribute_map<RangeType2>* unauthenticated_attributes = nullptr)
 {
 	validate_autenticode_format(authenticode, result.authenticode_format_errors);
 	if (result.authenticode_format_errors.has_errors())
@@ -127,7 +155,8 @@ void verify_authenticode(const authenticode_pkcs7<RangeType>& authenticode,
 	result.cert_store = build_certificate_store(
 		authenticode, &result.certificate_store_warnings);
 	verify_valid_format_authenticode(
-		authenticode, signer, authenticated_attributes, instance, opts, result);
+		authenticode, signer, authenticated_attributes,
+		instance, opts, result, unauthenticated_attributes);
 }
 
 template<typename RangeType>
@@ -138,21 +167,27 @@ authenticode_check_status<RangeType> verify_authenticode_full(
 	const authenticode_verification_options& opts = {})
 {
 	authenticode_check_status<RangeType> result;
-	verify_authenticode(authenticode, instance, opts, result.root);
+
+	const auto& content_info = authenticode.get_content_info();
+	pkcs7::attribute_map<RangeType> unauthenticated_attributes;
+	if (content_info.data.signer_infos.size() == 1u)
+	{
+		const auto& signer = authenticode.get_signer(0u);
+		try
+		{
+			unauthenticated_attributes = signer.get_unauthenticated_attributes();
+		}
+		catch (const pe_error& e)
+		{
+			result.root.authenticode_format_errors.add_error(e.code());
+			return result;
+		}
+	}
+
+	verify_authenticode(authenticode, instance, opts,
+		result.root, &unauthenticated_attributes);
 	if (!result.root)
 		return result;
-
-	const auto& signer = authenticode.get_signer(0u);
-	pkcs7::attribute_map<RangeType> unauthenticated_attributes;
-	try
-	{
-		unauthenticated_attributes = signer.get_unauthenticated_attributes();
-	}
-	catch (const pe_error& e)
-	{
-		result.root.authenticode_format_errors.add_error(e.code());
-		return result;
-	}
 
 	const auto nested_signatures = load_nested_signatures<RangeType>(unauthenticated_attributes);
 	result.nested.reserve(nested_signatures.size());
