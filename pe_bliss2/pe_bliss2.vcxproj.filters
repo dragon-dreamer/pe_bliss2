@@ -1085,9 +1085,6 @@
     <ClCompile Include="src\security\crypto_algorithms.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
-    <ClCompile Include="src\security\authenticode_verifier.cpp">
-      <Filter>Source Files\security</Filter>
-    </ClCompile>
     <ClCompile Include="src\security\authenticode_page_hashes.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
