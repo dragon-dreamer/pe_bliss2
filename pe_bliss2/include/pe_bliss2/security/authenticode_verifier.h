@@ -8,6 +8,7 @@
 #include "pe_bliss2/security/authenticode_pkcs7.h"
 #include "pe_bliss2/security/authenticode_timestamp_signature_format_validator.h"
 #include "pe_bliss2/security/authenticode_timestamp_signature_verifier.h"
+#include "pe_bliss2/security/authenticode_verification_options.h"
 #include "pe_bliss2/security/buffer_hash.h"
 #include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/image_hash.h"
@@ -23,12 +24,6 @@ namespace pe_bliss::image { class image; }
 
 namespace pe_bliss::security
 {
-
-struct [[nodiscard]] authenticode_verification_options final
-{
-	page_hash_options page_hash_opts;
-	bool verify_timestamp_signature = true;
-};
 
 // Requires cert_store to be set inside authenticode_check_status_base
 template<typename RangeType1, typename RangeType2,

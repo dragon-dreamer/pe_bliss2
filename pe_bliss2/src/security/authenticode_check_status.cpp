@@ -22,6 +22,10 @@ struct authenticode_verifier_error_category : std::error_category
 			return "Invalid page hash format";
 		case invalid_image_format_for_hashing:
 			return "Image format is invalid, and it is impossible to compute its hash";
+		case image_security_directory_has_errors:
+			return "Image security directory has errors";
+		case invalid_authenticode_signature_format:
+			return "Image Authenticode signature format is invalid";
 		default:
 			return {};
 		}

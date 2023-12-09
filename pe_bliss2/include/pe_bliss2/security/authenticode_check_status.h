@@ -19,7 +19,9 @@ namespace pe_bliss::security
 enum class authenticode_verifier_errc
 {
 	invalid_page_hash_format = 1,
-	invalid_image_format_for_hashing
+	invalid_image_format_for_hashing,
+	image_security_directory_has_errors,
+	invalid_authenticode_signature_format
 };
 
 std::error_code make_error_code(authenticode_verifier_errc) noexcept;

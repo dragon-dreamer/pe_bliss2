@@ -184,11 +184,13 @@
     <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_signature_check_status.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_signature_format_validator.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_timestamp_signature_verifier.h" />
+    <ClInclude Include="include\pe_bliss2\security\authenticode_verification_options.h" />
     <ClInclude Include="include\pe_bliss2\security\authenticode_verifier.h" />
     <ClInclude Include="include\pe_bliss2\security\buffer_hash.h" />
     <ClInclude Include="include\pe_bliss2\security\byte_range_types.h" />
     <ClInclude Include="include\pe_bliss2\security\crypto_algorithms.h" />
     <ClInclude Include="include\pe_bliss2\security\hash_helpers.h" />
+    <ClInclude Include="include\pe_bliss2\security\image_authenticode_verifier.h" />
     <ClInclude Include="include\pe_bliss2\security\image_hash.h" />
     <ClInclude Include="include\pe_bliss2\security\pkcs7\attribute_map.h" />
     <ClInclude Include="include\pe_bliss2\security\pkcs7\message_digest.h" />
@@ -319,6 +321,7 @@
     <ClCompile Include="src\security\authenticode_timestamp_signature_format_validator.cpp" />
     <ClCompile Include="src\security\crypto_algorithms.cpp" />
     <ClCompile Include="src\security\hash_helpers.cpp" />
+    <ClCompile Include="src\security\image_authenticode_verifier.cpp" />
     <ClCompile Include="src\security\image_hash.cpp" />
     <ClCompile Include="src\security\pkcs7\attribute_map.cpp" />
     <ClCompile Include="src\security\pkcs7\authenticode_program_info.cpp" />
