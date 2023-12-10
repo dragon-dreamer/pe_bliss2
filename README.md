@@ -118,13 +118,18 @@ The library compiles and passes tests with the following compilers:
     - Basic headers support (read-only, unit-tested)
   - Security directory (Authenticode)
     - Raw descriptors and certificate data (read-only, unit-tested)
-    - Authenticode signature (not unit-tested)
+    - Authenticode signature (unit-tested)
       - Loading the signature
       - Image hash verification
       - Message digest verification
-      - RSA signature verification
+      - Authenticode signature verification
       - Double-signing support
       - Image page hashes verification
+      - Loading timestamp counter-signature (all formats)
+      - Timestamp signature verification
+      - Authenticode program info
+      - Hash algorithms supported: `MD5`, `SHA1`, `SHA256`, `SHA384`, `SHA512`
+      - Signature algorithms supported: `RSA`, `ECDSA` (`SHA1` and `SHA256`, all curves)
 - Address conversions (RVA/VA/file offsets, unit-tested)
 - Overlay at the end of file parsing (unit-tested)
 - Simple console dumper of PE/PE+ files (no extended configuration yet)
@@ -134,7 +139,6 @@ The library compiles and passes tests with the following compilers:
   - MUI resource support
   - Full security directory support (authenticode)
     - X.509 chain verification
-    - Timestamp countersignature verification
     - Special signers
   - Import redirects (apisetschema.dll)
 - Medium priority
