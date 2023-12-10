@@ -22,27 +22,30 @@ target_sources(tests
 	PRIVATE
 		main.cpp
 		tests/buffers/buffer_copy_tests.cpp
+		tests/buffers/buffer_helpers.h
+		tests/buffers/input_buffer_helpers.h
 		tests/buffers/input_buffer_section_tests.cpp
 		tests/buffers/input_container_buffer_tests.cpp
 		tests/buffers/input_memory_buffer_tests.cpp
 		tests/buffers/input_stream_buffer_tests.cpp
 		tests/buffers/input_virtual_buffer_tests.cpp
+		tests/buffers/output_buffer_helpers.h
 		tests/buffers/output_memory_buffer_tests.cpp
 		tests/buffers/output_memory_ref_buffer_tests.cpp
 		tests/buffers/output_stream_buffer_tests.cpp
 		tests/buffers/ref_buffer_tests.cpp
-		tests/buffers/buffer_helpers.h
-		tests/buffers/input_buffer_helpers.h
-		tests/buffers/output_buffer_helpers.h
 		tests/pe_bliss2/address_converter_tests.cpp
 		tests/pe_bliss2/bit_stream_tests.cpp
 		tests/pe_bliss2/buffer_to_va_tests.cpp
+		tests/pe_bliss2/bytes_to_va_fixture_base.h
 		tests/pe_bliss2/bytes_to_va_tests.cpp
 		tests/pe_bliss2/byte_array_from_va_tests.cpp
+		tests/pe_bliss2/byte_container_fixture_base.h
 		tests/pe_bliss2/byte_vector_from_va_tests.cpp
 		tests/pe_bliss2/checksum_tests.cpp
 		tests/pe_bliss2/compid_database_tests.cpp
 		tests/pe_bliss2/data_directories_tests.cpp
+		tests/pe_bliss2/directories
 		tests/pe_bliss2/dos_header_tests.cpp
 		tests/pe_bliss2/dos_stub_tests.cpp
 		tests/pe_bliss2/endian_convert_tests.cpp
@@ -50,13 +53,16 @@ target_sources(tests
 		tests/pe_bliss2/file_header_tests.cpp
 		tests/pe_bliss2/image_builder_tests.cpp
 		tests/pe_bliss2/image_helper.cpp
+		tests/pe_bliss2/image_helper.h
 		tests/pe_bliss2/image_loader_tests.cpp
 		tests/pe_bliss2/image_section_search_tests.cpp
 		tests/pe_bliss2/image_shannon_entropy_tests.cpp
 		tests/pe_bliss2/image_signature_tests.cpp
 		tests/pe_bliss2/image_tests.cpp
+		tests/pe_bliss2/input_buffer_mock.h
 		tests/pe_bliss2/load_config_loader_tests.cpp
 		tests/pe_bliss2/optional_header_tests.cpp
+		tests/pe_bliss2/output_buffer_mock.h
 		tests/pe_bliss2/overlay_tests.cpp
 		tests/pe_bliss2/packed_byte_array_tests.cpp
 		tests/pe_bliss2/packed_byte_vector_tests.cpp
@@ -65,6 +71,7 @@ target_sources(tests
 		tests/pe_bliss2/packed_serialization_tests.cpp
 		tests/pe_bliss2/packed_struct_tests.cpp
 		tests/pe_bliss2/packed_utf16_string_tests.cpp
+		tests/pe_bliss2/pe_error_helper.h
 		tests/pe_bliss2/pe_error_tests.cpp
 		tests/pe_bliss2/rich_header_tests.cpp
 		tests/pe_bliss2/rva_file_offset_converter_tests.cpp
@@ -78,18 +85,13 @@ target_sources(tests
 		tests/pe_bliss2/string_to_va_tests.cpp
 		tests/pe_bliss2/struct_from_va_tests.cpp
 		tests/pe_bliss2/struct_to_va_tests.cpp
-		tests/pe_bliss2/bytes_to_va_fixture_base.h
-		tests/pe_bliss2/byte_container_fixture_base.h
-		tests/pe_bliss2/image_helper.h
-		tests/pe_bliss2/input_buffer_mock.h
-		tests/pe_bliss2/output_buffer_mock.h
-		tests/pe_bliss2/pe_error_helper.h
 		tests/pe_bliss2/test_structs.h
 		tests/pe_bliss2/directories/accelerator_table_loader_tests.cpp
 		tests/pe_bliss2/directories/accelerator_table_tests.cpp
 		tests/pe_bliss2/directories/arm64_exception_directory_tests.cpp
 		tests/pe_bliss2/directories/arm64_exception_loader_tests.cpp
 		tests/pe_bliss2/directories/arm_common_exceptions_loader_tests.cpp
+		tests/pe_bliss2/directories/arm_common_exception_helpers.h
 		tests/pe_bliss2/directories/arm_common_unwind_info_tests.cpp
 		tests/pe_bliss2/directories/arm_exception_directory_tests.cpp
 		tests/pe_bliss2/directories/arm_exception_loader_tests.cpp
@@ -119,6 +121,7 @@ target_sources(tests
 		tests/pe_bliss2/directories/resource_directory_tests.cpp
 		tests/pe_bliss2/directories/resource_reader_tests.cpp
 		tests/pe_bliss2/directories/resource_writer_tests.cpp
+		tests/pe_bliss2/directories/security
 		tests/pe_bliss2/directories/security_directory_loader_tests.cpp
 		tests/pe_bliss2/directories/string_table_reader_writer_tests.cpp
 		tests/pe_bliss2/directories/string_table_tests.cpp
@@ -128,7 +131,29 @@ target_sources(tests
 		tests/pe_bliss2/directories/version_info_tests.cpp
 		tests/pe_bliss2/directories/x64_exceptions_loader_tests.cpp
 		tests/pe_bliss2/directories/x64_exception_directory_tests.cpp
-		tests/pe_bliss2/directories/arm_common_exception_helpers.h
+		tests/pe_bliss2/directories/security/attribute_map_tests.cpp
+		tests/pe_bliss2/directories/security/authenticode_certificate_store_tests.cpp
+		tests/pe_bliss2/directories/security/authenticode_format_validator_tests.cpp
+		tests/pe_bliss2/directories/security/authenticode_loader_tests.cpp
+		tests/pe_bliss2/directories/security/authenticode_page_hashes_tests.cpp
+		tests/pe_bliss2/directories/security/authenticode_pkcs7_tests.cpp
+		tests/pe_bliss2/directories/security/authenticode_program_info_tests.cpp
+		tests/pe_bliss2/directories/security/authenticode_timestamp_signature_format_validator_tests.cpp
+		tests/pe_bliss2/directories/security/authenticode_timestamp_signature_tests.cpp
+		tests/pe_bliss2/directories/security/authenticode_timestamp_signature_verifier_tests.cpp
+		tests/pe_bliss2/directories/security/buffer_hash_tests.cpp
+		tests/pe_bliss2/directories/security/crypto_algorithms_tests.cpp
+		tests/pe_bliss2/directories/security/hash_helpers_tests.cpp
+		tests/pe_bliss2/directories/security/hex_string_helpers.h
+		tests/pe_bliss2/directories/security/image_hash_tests.cpp
+		tests/pe_bliss2/directories/security/non_contiguous_buffer.h
+		tests/pe_bliss2/directories/security/pkcs7_format_validator_tests.cpp
+		tests/pe_bliss2/directories/security/pkcs7_signature_tests.cpp
+		tests/pe_bliss2/directories/security/pkcs7_tests.cpp
+		tests/pe_bliss2/directories/security/signature_verifier_tests.cpp
+		tests/pe_bliss2/directories/security/signer_info_ref_tests.cpp
+		tests/pe_bliss2/directories/security/x509_certificate_store_tests.cpp
+		tests/pe_bliss2/directories/security/x509_certificate_tests.cpp
 		tests/utilities/math_tests.cpp
 		tests/utilities/range_helpers_tests.cpp
 		tests/utilities/safe_uint_tests.cpp

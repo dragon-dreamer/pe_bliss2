@@ -173,23 +173,36 @@ target_sources(pe_bliss2
 		include/pe_bliss2/section/section_search.h
 		include/pe_bliss2/section/section_table.h
 		include/pe_bliss2/section/section_table_validator.h
+		include/pe_bliss2/security/asn1_decode_helper.h
+		include/pe_bliss2/security/authenticode_certificate_store.h
+		include/pe_bliss2/security/authenticode_check_status.h
 		include/pe_bliss2/security/authenticode_format_validator.h
+		include/pe_bliss2/security/authenticode_format_validator_errc.h
 		include/pe_bliss2/security/authenticode_loader.h
 		include/pe_bliss2/security/authenticode_page_hashes.h
 		include/pe_bliss2/security/authenticode_pkcs7.h
+		include/pe_bliss2/security/authenticode_program_info.h
+		include/pe_bliss2/security/authenticode_timestamp_signature.h
+		include/pe_bliss2/security/authenticode_timestamp_signature_check_status.h
+		include/pe_bliss2/security/authenticode_timestamp_signature_format_validator.h
+		include/pe_bliss2/security/authenticode_timestamp_signature_verifier.h
+		include/pe_bliss2/security/authenticode_verification_options.h
 		include/pe_bliss2/security/authenticode_verifier.h
 		include/pe_bliss2/security/buffer_hash.h
 		include/pe_bliss2/security/byte_range_types.h
 		include/pe_bliss2/security/crypto_algorithms.h
 		include/pe_bliss2/security/hash_helpers.h
+		include/pe_bliss2/security/image_authenticode_verifier.h
 		include/pe_bliss2/security/image_hash.h
-		include/pe_bliss2/security/pkcs7
 		include/pe_bliss2/security/security_directory.h
 		include/pe_bliss2/security/security_directory_loader.h
-		include/pe_bliss2/security/x509
+		include/pe_bliss2/security/signature_verifier.h
+		include/pe_bliss2/security/pkcs7/attribute_map.h
+		include/pe_bliss2/security/pkcs7/message_digest.h
 		include/pe_bliss2/security/pkcs7/pkcs7.h
 		include/pe_bliss2/security/pkcs7/pkcs7_format_validator.h
 		include/pe_bliss2/security/pkcs7/pkcs7_signature.h
+		include/pe_bliss2/security/pkcs7/signer_info.h
 		include/pe_bliss2/security/x509/x509_certificate.h
 		include/pe_bliss2/security/x509/x509_certificate_store.h
 		include/pe_bliss2/tls/tls_directory-inl.h
@@ -294,21 +307,26 @@ target_sources(pe_bliss2
 		src/section/section_search.cpp
 		src/section/section_table.cpp
 		src/section/section_table_validator.cpp
+		src/security/authenticode_certificate_store.cpp
+		src/security/authenticode_check_status.cpp
 		src/security/authenticode_format_validator.cpp
+		src/security/authenticode_format_validator_errc.cpp
 		src/security/authenticode_loader.cpp
 		src/security/authenticode_page_hashes.cpp
-		src/security/authenticode_pkcs7.cpp
-		src/security/authenticode_verifier.cpp
+		src/security/authenticode_timestamp_signature.cpp
+		src/security/authenticode_timestamp_signature_format_validator.cpp
 		src/security/crypto_algorithms.cpp
 		src/security/hash_helpers.cpp
+		src/security/image_authenticode_verifier.cpp
 		src/security/image_hash.cpp
-		src/security/pkcs7
 		src/security/security_directory_loader.cpp
-		src/security/x509
+		src/security/signature_verifier.cpp
+		src/security/pkcs7/attribute_map.cpp
+		src/security/pkcs7/authenticode_program_info.cpp
 		src/security/pkcs7/buffer_hash.cpp
-		src/security/pkcs7/pkcs7.cpp
 		src/security/pkcs7/pkcs7_format_validator.cpp
 		src/security/pkcs7/pkcs7_signature.cpp
+		src/security/pkcs7/signer_info.cpp
 		src/tls/tls_directory.cpp
 		src/tls/tls_directory_builder.cpp
 		src/tls/tls_directory_loader.cpp
@@ -318,5 +336,6 @@ target_link_libraries(pe_bliss2 PUBLIC buffers utilities pugixml SimpleAsn1Lib c
 
 if(MSVC)
 	target_compile_options(pe_bliss2 PRIVATE "/MP")
+	set_source_files_properties(src/security/authenticode_timestamp_signature.cpp PROPERTIES COMPILE_FLAGS /bigobj)
 endif()
 
