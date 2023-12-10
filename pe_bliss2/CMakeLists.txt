@@ -313,6 +313,7 @@ target_sources(pe_bliss2
 		src/security/authenticode_format_validator_errc.cpp
 		src/security/authenticode_loader.cpp
 		src/security/authenticode_page_hashes.cpp
+		src/security/authenticode_program_info.cpp
 		src/security/authenticode_timestamp_signature.cpp
 		src/security/authenticode_timestamp_signature_format_validator.cpp
 		src/security/crypto_algorithms.cpp
@@ -322,7 +323,6 @@ target_sources(pe_bliss2
 		src/security/security_directory_loader.cpp
 		src/security/signature_verifier.cpp
 		src/security/pkcs7/attribute_map.cpp
-		src/security/pkcs7/authenticode_program_info.cpp
 		src/security/pkcs7/buffer_hash.cpp
 		src/security/pkcs7/pkcs7_format_validator.cpp
 		src/security/pkcs7/pkcs7_signature.cpp

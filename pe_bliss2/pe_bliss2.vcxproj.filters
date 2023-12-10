@@ -1106,9 +1106,6 @@
     <ClCompile Include="src\security\pkcs7\signer_info.cpp">
       <Filter>Source Files\security\pkcs7</Filter>
     </ClCompile>
-    <ClCompile Include="src\security\pkcs7\authenticode_program_info.cpp">
-      <Filter>Source Files\security</Filter>
-    </ClCompile>
     <ClCompile Include="src\security\authenticode_certificate_store.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
@@ -1122,6 +1119,9 @@
       <Filter>Source Files\security</Filter>
     </ClCompile>
     <ClCompile Include="src\security\image_authenticode_verifier.cpp">
+      <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\authenticode_program_info.cpp">
       <Filter>Source Files\security</Filter>
     </ClCompile>
   </ItemGroup>

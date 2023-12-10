@@ -312,6 +312,7 @@
     <ClCompile Include="src\security\authenticode_loader.cpp" />
     <ClCompile Include="src\security\authenticode_format_validator.cpp" />
     <ClCompile Include="src\security\authenticode_page_hashes.cpp" />
+    <ClCompile Include="src\security\authenticode_program_info.cpp" />
     <ClCompile Include="src\security\authenticode_timestamp_signature.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/bigobj %(AdditionalOptions)</AdditionalOptions>
@@ -324,7 +325,6 @@
     <ClCompile Include="src\security\image_authenticode_verifier.cpp" />
     <ClCompile Include="src\security\image_hash.cpp" />
     <ClCompile Include="src\security\pkcs7\attribute_map.cpp" />
-    <ClCompile Include="src\security\pkcs7\authenticode_program_info.cpp" />
     <ClCompile Include="src\security\pkcs7\buffer_hash.cpp" />
     <ClCompile Include="src\security\pkcs7\pkcs7_format_validator.cpp" />
     <ClCompile Include="src\security\pkcs7\pkcs7_signature.cpp" />
