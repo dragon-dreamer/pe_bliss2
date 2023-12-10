@@ -25,12 +25,12 @@ public:
 	using map_type = attribute_map<range_type>;
 
 public:
-	static const inline std::vector<std::uint32_t> test_attr{ 1, 2, 3 };
-	static const inline std::vector<std::uint32_t> test_attr2{ 1, 2, 3, 4, 5 };
-	static const inline std::vector<std::byte> test_data1{ std::byte{1}, std::byte{2} };
-	static const inline std::vector<std::byte> test_data2{ std::byte{5}, std::byte{7} };
-	static const inline std::vector<range_type> test_single_data{ test_data1 };
-	static const inline std::vector<range_type> test_multiple_data{ test_data1, test_data2 };
+	const std::vector<std::uint32_t> test_attr{ 1, 2, 3 };
+	const std::vector<std::uint32_t> test_attr2{ 1, 2, 3, 4, 5 };
+	const std::vector<std::byte> test_data1{ std::byte{1}, std::byte{2} };
+	const std::vector<std::byte> test_data2{ std::byte{5}, std::byte{7} };
+	const std::vector<range_type> test_single_data{ test_data1 };
+	const std::vector<range_type> test_multiple_data{ test_data1, test_data2 };
 };
 
 using tested_range_types = ::testing::Types<

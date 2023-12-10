@@ -222,7 +222,7 @@ TYPED_TEST(SignerInfoRefPkcs7Test, GetSignerCertificateIssuerAndSerialNumber)
 		ASSERT_EQ(result.serial_number, &std::get<asn1::crypto::pkcs7::issuer_and_serial_number<
 			typename TestFixture::range_type>>(this->signer_info.sid).serial_number);
 
-		this->signer_info.sid.emplace<1>();
+		this->signer_info.sid.template emplace<1>();
 		result = this->signer_info_ref
 			.get_signer_certificate_issuer_and_serial_number();
 		ASSERT_EQ(result.issuer, nullptr);

@@ -36,9 +36,7 @@ public:
 	{
 	}
 
-	constexpr signer_info_base()
-		requires(std::is_default_constructible_v<UnderlyingType>)
-	{}
+	constexpr signer_info_base() = default;
 
 public:
 	[[nodiscard]]
@@ -82,14 +80,13 @@ public:
 
 public:
 	[[nodiscard]]
-	const signer_info_type& get_underlying() const noexcept
+	const auto& get_underlying() const noexcept
 	{
 		return signer_info_ref_;
 	}
 
 	[[nodiscard]]
-	signer_info_type& get_underlying() noexcept
-		requires(!std::is_const_v<std::remove_reference_t<UnderlyingType>>)
+	auto& get_underlying() noexcept
 	{
 		return signer_info_ref_;
 	}

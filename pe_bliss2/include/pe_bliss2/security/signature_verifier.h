@@ -21,6 +21,17 @@ enum class signature_verifier_errc
 	unable_to_verify_signature
 };
 
+} //namespace pe_bliss::security
+
+namespace std
+{
+template<>
+struct is_error_code_enum<pe_bliss::security::signature_verifier_errc> : true_type {};
+} //namespace std
+
+namespace pe_bliss::security
+{
+
 std::error_code make_error_code(signature_verifier_errc) noexcept;
 
 struct [[nodiscard]] signature_verification_result
@@ -105,9 +116,3 @@ signature_verification_result verify_signature(
 }
 
 } //namespace pe_bliss::security
-
-namespace std
-{
-template<>
-struct is_error_code_enum<pe_bliss::security::signature_verifier_errc> : true_type {};
-} //namespace std

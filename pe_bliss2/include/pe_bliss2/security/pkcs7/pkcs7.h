@@ -24,10 +24,10 @@ public:
 	using range_type = RangeType;
 	using content_info_type = ContentInfo;
 	static constexpr bool contains_pkcs7_signer_info
-		= std::convertible_to<decltype(std::declval<content_info_type>()
+		= std::convertible_to<typename decltype(std::declval<content_info_type>()
 			.data.signer_infos)::value_type, signer_info_ref_pkcs7<RangeType>>;
 	static constexpr bool contains_cms_signer_info
-		= std::convertible_to<decltype(std::declval<content_info_type>()
+		= std::convertible_to<typename decltype(std::declval<content_info_type>()
 			.data.signer_infos)::value_type, signer_info_ref_cms<RangeType>>;
 
 public:
@@ -78,7 +78,7 @@ public:
 			skip_bytes += tagged_length_byte & 0x7fu;
 
 		skip_bytes += 1u; //1 tag byte for octet_string_with
-		if (raw.size() < skip_bytes + 1)
+		if (raw.size() < skip_bytes + 1u)
 			throw pe_error(utilities::generic_errc::buffer_overrun);
 		const auto octet_string_length_byte = std::to_integer<std::uint8_t>(
 			raw[skip_bytes]);
@@ -86,7 +86,7 @@ public:
 			skip_bytes += octet_string_length_byte & 0x7fu;
 		skip_bytes += 1u; //1 length byte for octet_string_with
 
-		if (raw.size() < skip_bytes + 1)
+		if (raw.size() < skip_bytes + 1u)
 			throw pe_error(utilities::generic_errc::buffer_overrun);
 		return { span_range_type{ raw.begin() + skip_bytes, raw.end() } };
 	}

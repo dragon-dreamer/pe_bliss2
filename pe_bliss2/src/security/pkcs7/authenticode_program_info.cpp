@@ -68,7 +68,7 @@ std::optional<authenticode_program_info<RangeType>> get_program_info(
 }
 
 template<typename RangeType>
-authenticode_program_info<RangeType>::string_type authenticode_program_info<RangeType>
+typename authenticode_program_info<RangeType>::string_type authenticode_program_info<RangeType>
 	::get_more_info_url() const noexcept
 {
 	string_type result;
@@ -91,7 +91,7 @@ authenticode_program_info<RangeType>::string_type authenticode_program_info<Rang
 }
 
 template<typename RangeType>
-authenticode_program_info<RangeType>::string_type authenticode_program_info<RangeType>
+typename authenticode_program_info<RangeType>::string_type authenticode_program_info<RangeType>
 	::get_program_name() const noexcept
 {
 	string_type result;

@@ -158,7 +158,7 @@ public:
 
 	::testing::StrictMock<hash_transformation_mock> transform;
 	page_hash_state state{ transform, page_size };
-	static constexpr std::array<std::byte, 1> dummy_data{};
+	static constexpr std::array<std::byte, 2048> dummy_data{};
 };
 } //namespace
 

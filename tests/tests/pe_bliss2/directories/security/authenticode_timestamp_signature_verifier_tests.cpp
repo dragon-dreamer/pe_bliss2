@@ -52,7 +52,7 @@ public:
 	{
 		authenticated_attributes.emplace_back(
 			asn1::crypto::pkcs7::attribute<RangeType>{
-			.type = asn1::decoded_object_identifier{
+			.type = asn1::decoded_object_identifier<std::vector<std::uint32_t>>{
 				.container = oid_message_digest
 			},
 			.values = message_digest
@@ -60,7 +60,7 @@ public:
 
 		authenticated_attributes.emplace_back(
 			asn1::crypto::pkcs7::attribute<RangeType>{
-			.type = asn1::decoded_object_identifier{
+			.type = asn1::decoded_object_identifier<std::vector<std::uint32_t>>{
 				.container = oid_content_type
 			},
 			.values = this->valid_oid_data
@@ -68,7 +68,7 @@ public:
 
 		authenticated_attributes.emplace_back(
 			asn1::crypto::pkcs7::attribute<RangeType>{
-			.type = asn1::decoded_object_identifier{
+			.type = asn1::decoded_object_identifier<std::vector<std::uint32_t>>{
 				.container = oid_signing_time
 			},
 			.values = this->signing_time_data

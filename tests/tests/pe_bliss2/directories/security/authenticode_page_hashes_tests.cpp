@@ -140,7 +140,7 @@ TYPED_TEST(AuthenticodePageHashesTests, GetPageHashesSerializedObjectOidMismatch
 {
 	auto& file = this->authenticode.get_content_info()
 		.data.content_info.content.type_value.value.value.file.emplace();
-	auto& obj = file.emplace<asn1::crypto::pkcs7::authenticode::spc_serialized_object<
+	auto& obj = file.template emplace<asn1::crypto::pkcs7::authenticode::spc_serialized_object<
 		typename TestFixture::source_range_type>>();
 	const std::vector<std::byte> value{ std::byte{1}, std::byte{2} };
 	obj.class_id = value;
@@ -152,7 +152,7 @@ TYPED_TEST(AuthenticodePageHashesTests, GetPageHashesSerializedObjectInvalidAsn1
 {
 	auto& file = this->authenticode.get_content_info()
 		.data.content_info.content.type_value.value.value.file.emplace();
-	auto& obj = file.emplace<asn1::crypto::pkcs7::authenticode::spc_serialized_object<
+	auto& obj = file.template emplace<asn1::crypto::pkcs7::authenticode::spc_serialized_object<
 		typename TestFixture::source_range_type>>();
 	const std::vector<std::byte> value{
 		asn1::crypto::pkcs7::authenticode::page_hashes_class_id.cbegin(),
@@ -167,7 +167,7 @@ TYPED_TEST(AuthenticodePageHashesTests, GetPageHashesSerializedObjectValid)
 {
 	auto& file = this->authenticode.get_content_info()
 		.data.content_info.content.type_value.value.value.file.emplace();
-	auto& obj = file.emplace<asn1::crypto::pkcs7::authenticode::spc_serialized_object<
+	auto& obj = file.template emplace<asn1::crypto::pkcs7::authenticode::spc_serialized_object<
 		typename TestFixture::source_range_type>>();
 	const std::vector<std::byte> value{
 		asn1::crypto::pkcs7::authenticode::page_hashes_class_id.cbegin(),
@@ -210,7 +210,7 @@ TYPED_TEST(AuthenticodePageHashesTests, GetPageHashesSerializedObjectAsn1Trailin
 {
 	auto& file = this->authenticode.get_content_info()
 		.data.content_info.content.type_value.value.value.file.emplace();
-	auto& obj = file.emplace<asn1::crypto::pkcs7::authenticode::spc_serialized_object<
+	auto& obj = file.template emplace<asn1::crypto::pkcs7::authenticode::spc_serialized_object<
 		typename TestFixture::source_range_type>>();
 	const std::vector<std::byte> value{
 		asn1::crypto::pkcs7::authenticode::page_hashes_class_id.cbegin(),

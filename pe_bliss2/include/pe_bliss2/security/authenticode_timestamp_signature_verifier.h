@@ -87,7 +87,6 @@ authenticode_timestamp_signature_check_status<RangeType1> verify_timestamp_signa
 	const RangeType2& authenticode_encrypted_digest,
 	const Signature& signature)
 {
-	static constexpr std::int32_t cms_info_version = 3u;
 	authenticode_timestamp_signature_check_status<RangeType1> result;
 
 	validate_autenticode_timestamp_format(signature, result.authenticode_format_errors);
@@ -237,7 +236,7 @@ authenticode_timestamp_signature_check_status<RangeType1> verify_timestamp_signa
 {
 	using ts_sign_type = pe_bliss::security
 		::authenticode_timestamp_signature<RangeType3>;
-	return std::visit(utilities::overloaded(
+	return std::visit(utilities::overloaded{
 		[&authenticode_encrypted_digest, &cert_store](
 			const typename ts_sign_type::signer_info_type& sign) {
 			return verify_timestamp_signature<RangeType1>(
@@ -248,7 +247,7 @@ authenticode_timestamp_signature_check_status<RangeType1> verify_timestamp_signa
 			return verify_timestamp_signature<RangeType1>(
 				authenticode_encrypted_digest, sign);
 		}
-	), signature.get_underlying_type());
+		}, signature.get_underlying_type());
 }
 
 template<typename RangeType1, typename RangeType2, typename RangeType3,

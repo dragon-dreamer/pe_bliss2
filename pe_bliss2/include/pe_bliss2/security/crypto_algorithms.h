@@ -21,6 +21,17 @@ enum class crypto_algorithm_errc
 	signature_hash_and_digest_algorithm_mismatch
 };
 
+} //namespace pe_bliss::security
+
+namespace std
+{
+template<>
+struct is_error_code_enum<pe_bliss::security::crypto_algorithm_errc> : true_type {};
+} //namespace std
+
+namespace pe_bliss::security
+{
+
 std::error_code make_error_code(crypto_algorithm_errc) noexcept;
 
 enum class digest_algorithm
@@ -96,9 +107,3 @@ bool get_hash_and_signature_algorithms(
 }
 
 } //namespace pe_bliss::security
-
-namespace std
-{
-template<>
-struct is_error_code_enum<pe_bliss::security::crypto_algorithm_errc> : true_type {};
-} //namespace std
