@@ -1,5 +1,6 @@
 #include "pe_bliss2/security/x509/x509_certificate_store.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <vector>
 
@@ -21,7 +22,7 @@ class X509CertificateStoreTests : public testing::Test
 {
 public:
 	using range_type = T;
-	using cert_type = x509_certificate_ref<range_type>;
+	using cert_type = x509_certificate<range_type>;
 };
 
 using tested_types = ::testing::Types<vector_range_type, span_range_type>;
@@ -64,10 +65,16 @@ TYPED_TEST(X509CertificateStoreTests, AddFind)
 
 	const auto* found1 = store.find_certificate(sn1, issuer1);
 	ASSERT_NE(found1, nullptr);
-	ASSERT_EQ(&found1->get_raw_data(), &cert1);
+	ASSERT_TRUE(std::ranges::equal(found1->get_raw_data().tbs_cert.issuer.raw,
+		cert1.tbs_cert.issuer.raw));
+	ASSERT_TRUE(std::ranges::equal(found1->get_raw_data().tbs_cert.serial_number,
+		cert1.tbs_cert.serial_number));
 	const auto* found2 = store.find_certificate(sn2, issuer2);
 	ASSERT_NE(found2, nullptr);
-	ASSERT_EQ(&found2->get_raw_data(), &cert2);
+	ASSERT_TRUE(std::ranges::equal(found2->get_raw_data().tbs_cert.issuer.raw,
+		cert2.tbs_cert.issuer.raw));
+	ASSERT_TRUE(std::ranges::equal(found2->get_raw_data().tbs_cert.serial_number,
+		cert2.tbs_cert.serial_number));
 
 	ASSERT_EQ(store.find_certificate(sn2, issuer1), nullptr);
 	ASSERT_EQ(store.find_certificate(sn1, issuer2), nullptr);

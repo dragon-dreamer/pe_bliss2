@@ -28,7 +28,7 @@ struct [[nodiscard]] authenticode_timestamp_signature_check_status
 	std::variant<std::monostate, asn1::utc_time, asn1::generalized_time> signing_time;
 
 	std::optional<x509::x509_certificate_store<
-		x509::x509_certificate_ref<RangeType>>> cert_store;
+		x509::x509_certificate<RangeType>>> cert_store;
 
 	[[nodiscard]]
 	explicit operator bool() const noexcept

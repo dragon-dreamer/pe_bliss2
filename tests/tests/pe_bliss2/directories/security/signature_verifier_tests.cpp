@@ -25,7 +25,7 @@ class SignatureVerifierTest : public testing::Test
 public:
 	using signer_info_ref_type = T;
 	using range_type = typename signer_info_ref_type::range_type;
-	using cert_store_type = x509::x509_certificate_store<x509::x509_certificate_ref<range_type>>;
+	using cert_store_type = x509::x509_certificate_store<x509::x509_certificate<range_type>>;
 
 public:
 	static void set_issuer_and_sn(asn1::crypto::pkcs7::signer_info<range_type>& info)
@@ -51,11 +51,12 @@ public:
 		certificate.tbs_cert.issuer.raw = raw_issuer;
 		certificate.tbs_cert.serial_number = serial_number;
 		cert_store.add_certificate(certificate);
+		certificate_in_store = &cert_store.find_certificate(serial_number, raw_issuer)->get_raw_data();
 	}
 
 	void set_rsa1_signer_data(bool valid_hash)
 	{
-		certificate.tbs_cert.pki.subject_publickey.container = valid_rsa1_public_key;
+		certificate_in_store->tbs_cert.pki.subject_publickey.container = valid_rsa1_public_key;
 		signer_info.digest_algorithm.algorithm.container.assign(
 			asn1::crypto::hash::id_sha256.begin(),
 			asn1::crypto::hash::id_sha256.end());
@@ -70,8 +71,8 @@ public:
 
 	void set_ecdsa_signature_params()
 	{
-		certificate.tbs_cert.pki.subject_publickey.container = valid_ecdsa_public_key;
-		certificate.tbs_cert.pki.algorithm.parameters
+		certificate_in_store->tbs_cert.pki.subject_publickey.container = valid_ecdsa_public_key;
+		certificate_in_store->tbs_cert.pki.algorithm.parameters
 			.emplace(valid_ecdsa_signature_params);
 		signer_info.digest_algorithm.algorithm.container.assign(
 			asn1::crypto::hash::id_sha256.begin(),
@@ -80,7 +81,7 @@ public:
 			asn1::crypto::pki::id_ec_public_key.begin(),
 			asn1::crypto::pki::id_ec_public_key.end());
 		signer_info.encrypted_digest = valid_ecdsa_encrypted_digest;
-		signer_info.authenticated_attributes.emplace().raw = 
+		signer_info.authenticated_attributes.emplace().raw =
 			valid_raw_authenticated_attributes;
 	}
 
@@ -89,6 +90,7 @@ public:
 	typename signer_info_ref_type::signer_info_type signer_info{};
 	signer_info_ref_type signer_info_ref{ signer_info };
 	asn1::crypto::x509::certificate<range_type> certificate;
+	asn1::crypto::x509::certificate<range_type>* certificate_in_store{ &certificate };
 
 	static const inline auto valid_rsa1_public_key{
 		hex_string_to_bytes("3048024100a6cd37607143d9057b5c433041d5f1e00dbc344a4c0e5049acfa31eb09"

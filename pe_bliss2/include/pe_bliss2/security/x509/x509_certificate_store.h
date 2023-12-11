@@ -30,7 +30,8 @@ public:
 	bool add_certificate(Certificate&& certificate)
 	{
 		return serial_number_to_certificate_.emplace(
-			sn_with_issuer{ certificate.get_serial_number(), certificate.get_raw_issuer() },
+			sn_with_issuer<range_type>{ certificate.get_serial_number(),
+				certificate.get_raw_issuer() },
 			std::move(certificate)).second;
 	}
 
@@ -39,8 +40,20 @@ public:
 		span_range_type raw_issuer) const
 	{
 		auto it = serial_number_to_certificate_.find(
-			sn_with_issuer{ serial_number, raw_issuer });
+			sn_with_issuer<span_range_type>{ serial_number, raw_issuer });
 		if (it == serial_number_to_certificate_.cend())
+			return nullptr;
+
+		return &it->second;
+	}
+
+	[[nodiscard]]
+	Certificate* find_certificate(span_range_type serial_number,
+		span_range_type raw_issuer)
+	{
+		auto it = serial_number_to_certificate_.find(
+			sn_with_issuer<span_range_type>{ serial_number, raw_issuer });
+		if (it == serial_number_to_certificate_.end())
 			return nullptr;
 
 		return &it->second;
@@ -59,31 +72,41 @@ public:
 	}
 
 private:
-	struct sn_with_issuer
+	template<typename SnIssuerRangeType>
+	struct sn_with_issuer final
 	{
-		span_range_type serial_number;
-		span_range_type raw_issuer;
+		SnIssuerRangeType serial_number;
+		SnIssuerRangeType raw_issuer;
+	};
 
-		friend bool operator==(const sn_with_issuer& l, const sn_with_issuer& r) noexcept
+	struct sn_with_issuer_equal final
+	{
+		template<typename T1, typename T2>
+		constexpr bool operator()(const T1& l, const T2& r) const noexcept
 		{
 			return std::ranges::equal(l.serial_number, r.serial_number)
 				&& std::ranges::equal(l.raw_issuer, r.raw_issuer);
 		}
+
+		using is_transparent = void;
 	};
 
-	struct sn_with_issuer_hash
+	struct sn_with_issuer_hash final
 	{
-		std::size_t operator()(const sn_with_issuer& data) const
+		template<typename SnIssuerRangeType>
+		std::size_t operator()(const sn_with_issuer<SnIssuerRangeType>& data) const
 		{
 			std::size_t hash = utilities::range_hash{}(data.serial_number);
 			utilities::hash_combine(hash, utilities::range_hash{}(data.raw_issuer));
 			return hash;
 		}
+
+		using is_transparent = void;
 	};
 
 private:
-	std::unordered_map<sn_with_issuer, Certificate,
-		sn_with_issuer_hash> serial_number_to_certificate_;
+	std::unordered_map<sn_with_issuer<range_type>, Certificate,
+		sn_with_issuer_hash, sn_with_issuer_equal> serial_number_to_certificate_;
 };
 
 } //namespace pe_bliss::security::x509

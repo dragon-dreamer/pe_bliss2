@@ -23,19 +23,19 @@ std::error_code make_error_code(certificate_store_errc) noexcept;
 
 template<typename RangeType>
 [[nodiscard]]
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
+x509::x509_certificate_store<x509::x509_certificate<RangeType>> build_certificate_store(
 	const authenticode_pkcs7<RangeType>& authenticode,
 	error_list* errors);
 
 template<typename RangeType>
 [[nodiscard]]
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
+x509::x509_certificate_store<x509::x509_certificate<RangeType>> build_certificate_store(
 	const authenticode_signature_cms_info_ms_bug_workaround_type<RangeType>& signature,
 	error_list* warnings);
 
 template<typename RangeType>
 [[nodiscard]]
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
+x509::x509_certificate_store<x509::x509_certificate<RangeType>> build_certificate_store(
 	const authenticode_signature_cms_info_type<RangeType>& signature,
 	error_list* warnings);
 

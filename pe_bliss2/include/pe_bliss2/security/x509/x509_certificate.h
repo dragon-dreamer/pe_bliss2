@@ -61,7 +61,13 @@ public:
 
 public:
 	[[nodiscard]]
-	const RawCertificateData& get_raw_data() const noexcept
+	const auto& get_raw_data() const noexcept
+	{
+		return data_;
+	}
+
+	[[nodiscard]]
+	auto& get_raw_data() noexcept
 	{
 		return data_;
 	}
@@ -73,5 +79,8 @@ private:
 template<typename RangeType>
 using x509_certificate_ref = x509_certificate_base<RangeType,
 	const asn1::crypto::x509::certificate<RangeType>&>;
+template<typename RangeType>
+using x509_certificate = x509_certificate_base<RangeType,
+	asn1::crypto::x509::certificate<RangeType>>;
 
 } //namespace pe_bliss::security::x509

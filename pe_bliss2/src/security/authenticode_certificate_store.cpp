@@ -31,11 +31,11 @@ struct certificate_store_error_category : std::error_category
 const certificate_store_error_category certificate_store_error_category_instance;
 
 template<typename RangeType, typename Signature>
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store_impl(
+x509::x509_certificate_store<x509::x509_certificate<RangeType>> build_certificate_store_impl(
 	const Signature& signature,
 	error_list* warnings)
 {
-	x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> store;
+	x509::x509_certificate_store<x509::x509_certificate<RangeType>> store;
 
 	const auto& content_info_data = signature.get_content_info().data;
 	const auto& certificates = content_info_data.certificates;
@@ -76,7 +76,7 @@ std::error_code make_error_code(certificate_store_errc e) noexcept
 }
 
 template<typename RangeType>
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
+x509::x509_certificate_store<x509::x509_certificate<RangeType>> build_certificate_store(
 	const authenticode_pkcs7<RangeType>& authenticode,
 	error_list* warnings)
 {
@@ -84,7 +84,7 @@ x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certif
 }
 
 template<typename RangeType>
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
+x509::x509_certificate_store<x509::x509_certificate<RangeType>> build_certificate_store(
 	const authenticode_signature_cms_info_ms_bug_workaround_type<RangeType>& signature,
 	error_list* warnings)
 {
@@ -92,36 +92,36 @@ x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certif
 }
 
 template<typename RangeType>
-x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>> build_certificate_store(
+x509::x509_certificate_store<x509::x509_certificate<RangeType>> build_certificate_store(
 	const authenticode_signature_cms_info_type<RangeType>& signature,
 	error_list* warnings)
 {
 	return build_certificate_store_impl<RangeType>(signature, warnings);
 }
 
-template x509::x509_certificate_store<x509::x509_certificate_ref<span_range_type>>
+template x509::x509_certificate_store<x509::x509_certificate<span_range_type>>
 build_certificate_store<span_range_type>(
 	const authenticode_pkcs7<span_range_type>& authenticode,
 	error_list* errors);
-template x509::x509_certificate_store<x509::x509_certificate_ref<vector_range_type>>
+template x509::x509_certificate_store<x509::x509_certificate<vector_range_type>>
 build_certificate_store<vector_range_type>(
 	const authenticode_pkcs7<vector_range_type>& authenticode,
 	error_list* errors);
 
-template x509::x509_certificate_store<x509::x509_certificate_ref<span_range_type>>
+template x509::x509_certificate_store<x509::x509_certificate<span_range_type>>
 build_certificate_store<span_range_type>(
 	const authenticode_signature_cms_info_ms_bug_workaround_type<span_range_type>& signature,
 	error_list* warnings);
-template x509::x509_certificate_store<x509::x509_certificate_ref<vector_range_type>>
+template x509::x509_certificate_store<x509::x509_certificate<vector_range_type>>
 build_certificate_store<vector_range_type>(
 	const authenticode_signature_cms_info_ms_bug_workaround_type<vector_range_type>& signature,
 	error_list* warnings);
 
-template x509::x509_certificate_store<x509::x509_certificate_ref<span_range_type>>
+template x509::x509_certificate_store<x509::x509_certificate<span_range_type>>
 build_certificate_store<span_range_type>(
 	const authenticode_signature_cms_info_type<span_range_type>& signature,
 	error_list* warnings);
-template x509::x509_certificate_store<x509::x509_certificate_ref<vector_range_type>>
+template x509::x509_certificate_store<x509::x509_certificate<vector_range_type>>
 build_certificate_store<vector_range_type>(
 	const authenticode_signature_cms_info_type<vector_range_type>& signature,
 	error_list* warnings);

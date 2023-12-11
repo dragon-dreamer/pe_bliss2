@@ -55,7 +55,7 @@ namespace impl
 template<typename Signer, typename RangeType>
 signature_verification_result verify_signature_impl(
 	const Signer& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType>>& cert_store)
+	const x509::x509_certificate_store<x509::x509_certificate<RangeType>>& cert_store)
 {
 	signature_verification_result result;
 
@@ -102,7 +102,7 @@ signature_verification_result verify_signature_impl(
 template<typename RangeType1, typename RangeType2>
 signature_verification_result verify_signature(
 	const pkcs7::signer_info_ref_pkcs7<RangeType1>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType2>>& cert_store)
+	const x509::x509_certificate_store<x509::x509_certificate<RangeType2>>& cert_store)
 {
 	return impl::verify_signature_impl(signer, cert_store);
 }
@@ -110,7 +110,7 @@ signature_verification_result verify_signature(
 template<typename RangeType1, typename RangeType2>
 signature_verification_result verify_signature(
 	const pkcs7::signer_info_ref_cms<RangeType1>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate_ref<RangeType2>>& cert_store)
+	const x509::x509_certificate_store<x509::x509_certificate<RangeType2>>& cert_store)
 {
 	return impl::verify_signature_impl(signer, cert_store);
 }

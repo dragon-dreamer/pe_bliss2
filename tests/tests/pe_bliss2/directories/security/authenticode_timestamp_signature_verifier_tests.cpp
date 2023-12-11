@@ -223,7 +223,7 @@ public:
 	pkcs7::signer_info_pkcs7<range_type> signer{};
 	static const inline std::vector encrypted_digest{ std::byte{'a'}, std::byte{'b'} };
 	asn1::crypto::x509::certificate<range_type> certificate;
-	x509::x509_certificate_store<x509::x509_certificate_ref<range_type>> cert_store;
+	x509::x509_certificate_store<x509::x509_certificate<range_type>> cert_store;
 };
 
 using pkcs7_tested_range_types = ::testing::Types<
@@ -910,7 +910,7 @@ TYPED_TEST(AuthenticodeTimestampCmsSignatureVerifierTest, ValidWrappedSignature)
 	wrapped_signature.get_underlying_type() = this->signature;
 
 	auto result = verify_timestamp_signature<range_type>(this->encrypted_digest,
-		wrapped_signature, x509::x509_certificate_store<x509::x509_certificate_ref<range_type>>{});
+		wrapped_signature, x509::x509_certificate_store<x509::x509_certificate<range_type>>{});
 
 	ASSERT_TRUE(result);
 	expect_contains_errors(result.authenticode_format_errors);

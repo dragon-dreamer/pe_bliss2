@@ -41,7 +41,7 @@ struct [[nodiscard]] authenticode_check_status_base
 	std::optional<asn1::utc_time> signing_time;
 
 	std::optional<x509::x509_certificate_store<
-		x509::x509_certificate_ref<RangeType>>> cert_store;
+		x509::x509_certificate<RangeType>>> cert_store;
 
 	std::optional<authenticode_timestamp_signature_check_status<RangeType>>
 		timestamp_signature_result;
