@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/authenticode_certificate_store.h"
 #include "pe_bliss2/security/authenticode_check_status.h"
 #include "pe_bliss2/security/authenticode_format_validator.h"
@@ -45,9 +46,19 @@ void verify_valid_format_authenticode(
 		return;
 	}
 
-	const auto page_hashes = get_page_hashes<span_range_type>(authenticode);
+	std::optional<authenticode_page_hashes<span_range_type>> page_hashes;
 	std::optional<page_hash_options> page_hash_opts;
 	std::optional<span_range_type> raw_page_hashes;
+	try
+	{
+		page_hashes = get_page_hashes<span_range_type>(authenticode);
+	}
+	catch (const pe_error&)
+	{
+		result.page_hashes_check_errc
+			= authenticode_verifier_errc::invalid_page_hash_format;
+	}
+
 	while (page_hashes)
 	{
 		if (!page_hashes->is_valid(digest_alg))
