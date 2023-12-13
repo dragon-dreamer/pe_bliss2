@@ -141,6 +141,8 @@ target_sources(tests
 		tests/pe_bliss2/directories/security/authenticode_timestamp_signature_format_validator_tests.cpp
 		tests/pe_bliss2/directories/security/authenticode_timestamp_signature_tests.cpp
 		tests/pe_bliss2/directories/security/authenticode_timestamp_signature_verifier_tests.cpp
+		tests/pe_bliss2/directories/security/authenticode_timestamp_signature_verifier_tests.cpp
+		tests/pe_bliss2/directories/security/authenticode_verifier_tests.cpp
 		tests/pe_bliss2/directories/security/buffer_hash_tests.cpp
 		tests/pe_bliss2/directories/security/crypto_algorithms_tests.cpp
 		tests/pe_bliss2/directories/security/hash_helpers_tests.cpp
