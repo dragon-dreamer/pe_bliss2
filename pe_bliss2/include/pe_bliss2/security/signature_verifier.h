@@ -52,10 +52,10 @@ struct [[nodiscard]] signature_verification_result
 
 namespace impl
 {
-template<typename Signer, typename RangeType>
+template<typename Signer, typename Cert>
 signature_verification_result verify_signature_impl(
 	const Signer& signer,
-	const x509::x509_certificate_store<x509::x509_certificate<RangeType>>& cert_store)
+	const x509::x509_certificate_store<Cert>& cert_store)
 {
 	signature_verification_result result;
 
@@ -99,18 +99,18 @@ signature_verification_result verify_signature_impl(
 }
 } //namespace impl
 
-template<typename RangeType1, typename RangeType2>
+template<typename RangeType1, typename Cert>
 signature_verification_result verify_signature(
 	const pkcs7::signer_info_ref_pkcs7<RangeType1>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate<RangeType2>>& cert_store)
+	const x509::x509_certificate_store<Cert>& cert_store)
 {
 	return impl::verify_signature_impl(signer, cert_store);
 }
 
-template<typename RangeType1, typename RangeType2>
+template<typename RangeType1, typename Cert>
 signature_verification_result verify_signature(
 	const pkcs7::signer_info_ref_cms<RangeType1>& signer,
-	const x509::x509_certificate_store<x509::x509_certificate<RangeType2>>& cert_store)
+	const x509::x509_certificate_store<Cert>& cert_store)
 {
 	return impl::verify_signature_impl(signer, cert_store);
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "pe_bliss2/pe_error.h"
 #include "pe_bliss2/security/authenticode_certificate_store.h"
 #include "pe_bliss2/security/authenticode_check_status.h"
@@ -111,13 +113,13 @@ void verify_valid_format_authenticode(
 	{
 		if (unauthenticated_attributes)
 		{
-			result.timestamp_signature_result = verify_timestamp_signature<RangeType4>(
+			result.timestamp_signature_result = verify_timestamp_signature_ex<RangeType4>(
 				authenticode.get_signer(0).get_encrypted_digest(),
 				*unauthenticated_attributes, result.cert_store.value());
 		}
 		else
 		{
-			result.timestamp_signature_result = verify_timestamp_signature<RangeType4>(
+			result.timestamp_signature_result = verify_timestamp_signature_ex<RangeType4>(
 				authenticode.get_signer(0).get_encrypted_digest(),
 				signer.get_unauthenticated_attributes(),
 				result.cert_store.value());
@@ -129,8 +131,8 @@ void verify_valid_format_authenticode(
 	}
 }
 
-template<typename RangeType, typename RangeType2 = span_range_type>
-void verify_authenticode(const authenticode_pkcs7<RangeType>& authenticode,
+template<typename Authenticode, typename RangeType, typename RangeType2 = span_range_type>
+void verify_authenticode(Authenticode&& authenticode,
 	const image::image& instance,
 	const authenticode_verification_options& opts,
 	authenticode_check_status_base<RangeType>& result,
@@ -163,19 +165,21 @@ void verify_authenticode(const authenticode_pkcs7<RangeType>& authenticode,
 	verify_valid_format_authenticode(
 		authenticode, signer, authenticated_attributes,
 		instance, opts, result, unauthenticated_attributes);
+	result.signature = std::forward<Authenticode>(authenticode);
 }
 
-template<typename RangeType>
+template<typename Authenticode>
 [[nodiscard]]
-authenticode_check_status<RangeType> verify_authenticode_full(
-	const authenticode_pkcs7<RangeType>& authenticode,
+authenticode_check_status<typename std::remove_cvref_t<Authenticode>::range_type> verify_authenticode_full(
+	Authenticode&& authenticode,
 	const image::image& instance,
 	const authenticode_verification_options& opts = {})
 {
-	authenticode_check_status<RangeType> result;
+	using range_type = typename std::remove_cvref_t<Authenticode>::range_type;
+	authenticode_check_status<range_type> result;
 
 	const auto& content_info = authenticode.get_content_info();
-	pkcs7::attribute_map<RangeType> unauthenticated_attributes;
+	pkcs7::attribute_map<range_type> unauthenticated_attributes;
 	if (content_info.data.signer_infos.size() == 1u)
 	{
 		const auto& signer = authenticode.get_signer(0u);
@@ -190,15 +194,16 @@ authenticode_check_status<RangeType> verify_authenticode_full(
 		}
 	}
 
-	verify_authenticode(authenticode, instance, opts,
-		result.root, &unauthenticated_attributes);
-	if (!result.root)
-		return result;
-
-	const auto nested_signatures = load_nested_signatures<RangeType>(unauthenticated_attributes);
+	auto nested_signatures = load_nested_signatures<range_type>(unauthenticated_attributes);
 	result.nested.reserve(nested_signatures.size());
-	for (const auto& nested_signature : nested_signatures)
-		verify_authenticode(nested_signature, instance, opts, result.nested.emplace_back());
+	for (auto& nested_signature : nested_signatures)
+	{
+		verify_authenticode(std::move(nested_signature),
+			instance, opts, result.nested.emplace_back());
+	}
+
+	verify_authenticode(std::forward<Authenticode>(authenticode), instance, opts,
+		result.root, &unauthenticated_attributes);
 
 	return result;
 }

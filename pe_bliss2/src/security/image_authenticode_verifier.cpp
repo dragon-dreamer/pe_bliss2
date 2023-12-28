@@ -51,6 +51,9 @@ std::optional<image_authenticode_check_status> verify_authenticode(
 
 	try
 	{
+		//This will not load the signature if sec_dir.get_entries()[0].get_certificate().data()
+		//is not copied. Data needs to be copied by calling `copied_data()` or by setting
+		//the `eager_overlay_data_copy` option to `true` when loading the image.
 		authenticode = load_authenticode_signature<span_range_type>(
 			*sec_dir.get_entries()[0].get_certificate().data());
 	}
@@ -69,8 +72,8 @@ std::optional<image_authenticode_check_status> verify_authenticode(
 		return optional_result;
 	}
 
-	result.authenticode_status = verify_authenticode_full<span_range_type>(
-		authenticode, instance, opts);
+	result.authenticode_status = verify_authenticode_full(
+		std::move(authenticode), instance, opts);
 	return optional_result;
 }
 

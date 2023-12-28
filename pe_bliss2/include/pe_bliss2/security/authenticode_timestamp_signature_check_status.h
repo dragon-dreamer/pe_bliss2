@@ -4,6 +4,7 @@
 #include <variant>
 
 #include "pe_bliss2/error_list.h"
+#include "pe_bliss2/security/authenticode_timestamp_signature.h"
 #include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/signature_verifier.h"
 #include "pe_bliss2/security/x509/x509_certificate.h"
@@ -41,6 +42,13 @@ struct [[nodiscard]] authenticode_timestamp_signature_check_status
 			&& *signature_result
 			&& !std::holds_alternative<std::monostate>(signing_time);
 	}
+};
+
+template<typename RangeType>
+struct [[nodiscard]] authenticode_timestamp_signature_check_status_ex
+	: public authenticode_timestamp_signature_check_status<RangeType>
+{
+	std::optional<authenticode_timestamp_signature<RangeType>> signature;
 };
 
 } //namespace pe_bliss::security

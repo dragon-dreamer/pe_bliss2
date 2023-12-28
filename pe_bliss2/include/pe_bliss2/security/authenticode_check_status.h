@@ -6,8 +6,9 @@
 #include <type_traits>
 #include <vector>
 
-#include "pe_bliss2/security/authenticode_timestamp_signature_check_status.h"
 #include "pe_bliss2/error_list.h"
+#include "pe_bliss2/security/authenticode_pkcs7.h"
+#include "pe_bliss2/security/authenticode_timestamp_signature_check_status.h"
 #include "pe_bliss2/security/crypto_algorithms.h"
 #include "pe_bliss2/security/signature_verifier.h"
 #include "pe_bliss2/security/x509/x509_certificate.h"
@@ -42,8 +43,9 @@ struct [[nodiscard]] authenticode_check_status_base
 
 	std::optional<x509::x509_certificate_store<
 		x509::x509_certificate<RangeType>>> cert_store;
+	std::optional<authenticode_pkcs7<RangeType>> signature;
 
-	std::optional<authenticode_timestamp_signature_check_status<RangeType>>
+	std::optional<authenticode_timestamp_signature_check_status_ex<RangeType>>
 		timestamp_signature_result;
 
 	[[nodiscard]]
