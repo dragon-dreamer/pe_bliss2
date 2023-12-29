@@ -171,12 +171,27 @@ template<typename RangeType>
 signer_info_ref_pkcs7(signer_info_pkcs7<RangeType>) -> signer_info_ref_pkcs7<RangeType>;
 
 template<typename RangeType>
+class [[nodiscard]] signer_info_cms : public signer_info_owning_base<
+	RangeType, asn1::crypto::pkcs7::cms::signer_info<RangeType>>
+{
+public:
+	using signer_info_owning_base<
+		RangeType, asn1::crypto::pkcs7::cms::signer_info<RangeType>>::signer_info_owning_base;
+};
+
+template<typename RangeType>
 class [[nodiscard]] signer_info_ref_cms : public signer_info_ref_base<
 	RangeType, asn1::crypto::pkcs7::cms::signer_info<RangeType>>
 {
 public:
 	using signer_info_ref_base<RangeType,
 		asn1::crypto::pkcs7::cms::signer_info<RangeType>>::signer_info_ref_base;
+
+	signer_info_ref_cms(const signer_info_cms<RangeType>& owner) noexcept
+		: signer_info_ref_base<
+			RangeType, asn1::crypto::pkcs7::cms::signer_info<RangeType>>(
+				owner.get_underlying())
+	{}
 
 public:
 	[[nodiscard]]
@@ -195,6 +210,9 @@ public:
 		};
 	}
 };
+
+template<typename RangeType>
+signer_info_ref_cms(signer_info_cms<RangeType>) -> signer_info_ref_cms<RangeType>;
 
 } //namespace pe_bliss::security::pkcs7
 
