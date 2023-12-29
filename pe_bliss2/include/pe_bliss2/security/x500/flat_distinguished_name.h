@@ -19,8 +19,7 @@ namespace pe_bliss::security::x500
 
 enum class distinguished_name_errc
 {
-	duplicate_dn_attributes = 1,
-	invalid_rdn_attribute_value
+	invalid_rdn_attribute_value = 1
 };
 
 std::error_code make_error_code(distinguished_name_errc) noexcept;
@@ -31,6 +30,16 @@ class [[nodiscard]] flat_distinguished_name
 public:
 	using range_type = RangeType;
 	using directory_string_type = std::variant<std::string, std::u16string, std::u32string>;
+
+	struct comparer final
+	{
+		using is_transparent = void;
+
+		template<typename T1, typename T2>
+		constexpr bool operator()(const T1& l, const T2& r) const noexcept;
+	};
+
+	using map_type = std::multimap<std::vector<std::uint32_t>, range_type, comparer>;
 
 public:
 	explicit flat_distinguished_name(
@@ -64,6 +73,8 @@ public:
 	}
 
 public:
+	// Methods below return the first found attribute value.
+	// Duplicates are allowed.
 	[[nodiscard]]
 	std::optional<directory_string_type> get_common_name() const;
 	[[nodiscard]]
@@ -93,19 +104,17 @@ public:
 	[[nodiscard]]
 	std::optional<directory_string_type> get_pseudonim() const;
 
+public:
+	[[nodiscard]]
+	const map_type& get_map() const noexcept
+	{
+		return parts_;
+	}
+
 private:
 	void build(const std::vector<asn1::crypto::relative_distinguished_name_type<range_type>>& dn);
 
 private:
-	struct comparer final
-	{
-		using is_transparent = void;
-
-		template<typename T1, typename T2>
-		constexpr bool operator()(const T1& l, const T2& r) const noexcept;
-	};
-
-	using map_type = std::map<std::vector<std::uint32_t>, range_type, comparer>;
 	map_type parts_;
 };
 

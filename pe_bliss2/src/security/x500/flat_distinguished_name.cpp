@@ -26,8 +26,6 @@ struct distinguished_name_error_category : std::error_category
 		using enum pe_bliss::security::x500::distinguished_name_errc;
 		switch (static_cast<pe_bliss::security::x500::distinguished_name_errc>(ev))
 		{
-		case duplicate_dn_attributes:
-			return "Distinguished name has duplicate attributes";
 		case invalid_rdn_attribute_value:
 			return "Relative distinguished name attribute value ASN.1 DER is not valid";
 		default:
@@ -120,10 +118,7 @@ void flat_distinguished_name<RangeType>::build(
 	for (const asn1::crypto::relative_distinguished_name_type<range_type>& rdn : dn)
 	{
 		for (const asn1::crypto::attribute_value_assertion<range_type>& attr : rdn)
-		{
-			if (!parts_.try_emplace(attr.attribute_type.container, attr.attribute_value).second)
-				throw pe_error(distinguished_name_errc::duplicate_dn_attributes);
-		}
+			parts_.emplace(attr.attribute_type.container, attr.attribute_value);
 	}
 }
 

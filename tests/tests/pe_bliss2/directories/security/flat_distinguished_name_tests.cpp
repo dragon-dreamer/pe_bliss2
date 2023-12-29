@@ -22,10 +22,10 @@ public:
 
 public:
 	template<typename DN>
-	void test(const DN& dn) const
+	void test(const DN& dn, bool with_duplicates = false) const
 	{
 		ASSERT_FALSE(dn.empty());
-		ASSERT_EQ(dn.size(), 4u);
+		ASSERT_EQ(dn.size(), 4u + with_duplicates);
 
 		std::optional<std::string> country_name;
 		ASSERT_NO_THROW(country_name = dn.get_country_name());
@@ -69,7 +69,7 @@ public:
 			auto& level = issuer.emplace_back();
 			level.push_back({
 				.attribute_type = asn1::crypto::object_identifier_type {
-					.container = {2,5,4,8}
+					.container = {2,5,4,10}
 				}
 			});
 		}
@@ -148,5 +148,6 @@ TYPED_TEST(FlatDistinguishedNameTests, FromCmsWithDuplicates)
 		.issuer.value;
 	this->fill(issuer, true);
 
-	ASSERT_THROW((void)(typename TestFixture::dn_type{ info }), pe_bliss::pe_error);
+	const typename TestFixture::dn_type dn{ info };
+	this->test(dn, true);
 }
