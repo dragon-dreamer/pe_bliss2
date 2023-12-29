@@ -5,6 +5,8 @@
 
 #include "gtest/gtest.h"
 
+#include "pe_bliss2/security/x500/flat_distinguished_name.h"
+
 #include "simple_asn1/crypto/algorithms.h"
 #include "simple_asn1/crypto/x509/types.h"
 
@@ -43,4 +45,18 @@ TEST(X509CertificateTests, X509CertificateRef)
 		asn1::crypto::pki::id_sha1_with_rsa.end() };
 	ASSERT_EQ(ref.get_public_key_algorithm().encryption_alg, digest_encryption_algorithm::rsa);
 	ASSERT_EQ(ref.get_public_key_algorithm().hash_alg, digest_algorithm::sha1);
+}
+
+TEST(X509CertificateTests, EmptyDN)
+{
+	using range_type = std::vector<std::byte>;
+	asn1::crypto::x509::certificate<range_type> cert{};
+
+	x509_certificate_ref<range_type> ref(cert);
+
+	auto issuer_dn = ref.get_issuer();
+	auto subject_dn = ref.get_subject();
+
+	ASSERT_TRUE(issuer_dn.empty());
+	ASSERT_TRUE(subject_dn.empty());
 }
