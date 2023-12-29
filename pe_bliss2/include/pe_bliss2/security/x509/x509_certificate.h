@@ -4,8 +4,15 @@
 #include <utility>
 
 #include "pe_bliss2/security/crypto_algorithms.h"
+#include "pe_bliss2/security/x500/flat_distinguished_name.h"
 
 #include "simple_asn1/crypto/x509/types.h"
+
+namespace pe_bliss::security::x500
+{
+template<typename RangeType>
+class flat_distinguished_name;
+} //namespace pe_bliss::security::x500
 
 namespace pe_bliss::security::x509
 {
@@ -57,6 +64,18 @@ public:
 	encryption_and_hash_algorithm get_public_key_algorithm() const noexcept
 	{
 		return get_digest_encryption_algorithm(data_.tbs_cert.pki.algorithm.algorithm.container);
+	}
+
+	template<typename DN = x500::flat_distinguished_name<range_type>>
+	[[nodiscard]] DN get_issuer() const
+	{
+		return DN(data_.tbs_cert.issuer.value);
+	}
+
+	template<typename DN = x500::flat_distinguished_name<range_type>>
+	[[nodiscard]] DN get_subject() const
+	{
+		return DN(data_.tbs_cert.subject);
 	}
 
 public:

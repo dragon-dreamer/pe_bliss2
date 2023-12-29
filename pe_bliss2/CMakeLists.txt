@@ -203,6 +203,7 @@ target_sources(pe_bliss2
 		include/pe_bliss2/security/pkcs7/pkcs7_format_validator.h
 		include/pe_bliss2/security/pkcs7/pkcs7_signature.h
 		include/pe_bliss2/security/pkcs7/signer_info.h
+		include/pe_bliss2/security/x500/flat_distinguished_name.h
 		include/pe_bliss2/security/x509/x509_certificate.h
 		include/pe_bliss2/security/x509/x509_certificate_store.h
 		include/pe_bliss2/tls/tls_directory-inl.h
@@ -327,6 +328,7 @@ target_sources(pe_bliss2
 		src/security/pkcs7/pkcs7_format_validator.cpp
 		src/security/pkcs7/pkcs7_signature.cpp
 		src/security/pkcs7/signer_info.cpp
+		src/security/x500/flat_distinguished_name.cpp
 		src/tls/tls_directory.cpp
 		src/tls/tls_directory_builder.cpp
 		src/tls/tls_directory_loader.cpp

@@ -201,6 +201,7 @@
     <ClInclude Include="include\pe_bliss2\security\security_directory.h" />
     <ClInclude Include="include\pe_bliss2\security\security_directory_loader.h" />
     <ClInclude Include="include\pe_bliss2\security\signature_verifier.h" />
+    <ClInclude Include="include\pe_bliss2\security\x500\flat_distinguished_name.h" />
     <ClInclude Include="include\pe_bliss2\security\x509\x509_certificate.h" />
     <ClInclude Include="include\pe_bliss2\security\x509\x509_certificate_store.h" />
     <ClInclude Include="include\pe_bliss2\tls\tls_directory-inl.h" />
@@ -331,6 +332,7 @@
     <ClCompile Include="src\security\pkcs7\signer_info.cpp" />
     <ClCompile Include="src\security\security_directory_loader.cpp" />
     <ClCompile Include="src\security\signature_verifier.cpp" />
+    <ClCompile Include="src\security\x500\flat_distinguished_name.cpp" />
     <ClCompile Include="src\tls\tls_directory.cpp" />
     <ClCompile Include="src\tls\tls_directory_builder.cpp" />
     <ClCompile Include="src\tls\tls_directory_loader.cpp" />

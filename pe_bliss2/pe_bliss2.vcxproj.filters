@@ -196,6 +196,12 @@
     <Filter Include="Header Files\security\x509">
       <UniqueIdentifier>{e95ebe8a-edb2-4c75-bb29-c5924e43e653}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\security\x500">
+      <UniqueIdentifier>{e5e8685a-91c7-4b12-b1df-931a6869544d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\security\x500">
+      <UniqueIdentifier>{b68dd4af-9bc1-494a-837b-d08bac9cb602}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pe_bliss2\address_converter.h">
@@ -762,6 +768,9 @@
     <ClInclude Include="include\pe_bliss2\security\authenticode_verification_options.h">
       <Filter>Header Files\security</Filter>
     </ClInclude>
+    <ClInclude Include="include\pe_bliss2\security\x500\flat_distinguished_name.h">
+      <Filter>Header Files\security\x500</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\address_converter.cpp">
@@ -1123,6 +1132,9 @@
     </ClCompile>
     <ClCompile Include="src\security\authenticode_program_info.cpp">
       <Filter>Source Files\security</Filter>
+    </ClCompile>
+    <ClCompile Include="src\security\x500\flat_distinguished_name.cpp">
+      <Filter>Source Files\security\x500</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
