@@ -19,6 +19,7 @@ jobs:
       matrix:
         # ubuntu-latest-clang does not compile due to https://github.com/actions/runner-images/issues/8659
         name: [ubuntu-latest-gcc, ubuntu20-clang, windows-latest-cl]
+        build_type: [Release]
         include:
           - name: windows-latest-cl
             os: windows-latest
