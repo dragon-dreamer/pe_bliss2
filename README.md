@@ -2,6 +2,8 @@
 
 ## The most advanced and thorough library to read and write Portable executable files
 
+[![CMake build ans test on multiple platforms](https://github.com/dragon-dreamer/pe_bliss2/actions/workflows/cmake-multi-platform.yml/badge.svg?branch=main)](https://github.com/dragon-dreamer/pe_bliss2/actions/workflows/cmake-multi-platform.yml)
+
 The [Portable executable](https://en.wikipedia.org/wiki/Portable_Executable) is a popular executable file format, which is extensively used in Windows family operating systems. It is as well utilized by the X-Box, EFI and some other environments. The **PE Bliss 2** library is a successor of the old and unsupported [PE Bliss](https://code.google.com/archive/p/portable-executable-library/) library.
 
 The library is aimed at being able to provide as much information about the PE file as possible, while being robust and keeping track of possible parsing or format errors and irregularities.
