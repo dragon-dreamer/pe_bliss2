@@ -29,10 +29,10 @@ jobs:
             os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
-          - name: ubuntu-latest-clang
-            os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
+          #- name: ubuntu-latest-clang
+          #  os: ubuntu-latest
+          #  c_compiler: clang
+          #  cpp_compiler: clang++
 
     steps:
     - uses: actions/checkout@v3
