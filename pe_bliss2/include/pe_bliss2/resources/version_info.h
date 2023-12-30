@@ -2,12 +2,12 @@
 
 #include <compare>
 #include <cstdint>
-#ifdef __cpp_lib_format
+#if defined(__cpp_lib_format) && !defined(_LIBCPP_HAS_NO_INCOMPLETE_FORMAT)
 #	include <format>
-#else //__cpp_lib_format
+#else //__cpp_lib_format && !_LIBCPP_HAS_NO_INCOMPLETE_FORMAT
 #	include <cstdio>
 #	include <cwchar>
-#endif //__cpp_lib_format
+#endif //__cpp_lib_format && !_LIBCPP_HAS_NO_INCOMPLETE_FORMAT
 #include <functional>
 #include <optional>
 #include <string>
@@ -211,7 +211,7 @@ private:
 		std::uint32_t ms, std::uint32_t ls)
 	{
 		const auto ver = version_from_components(ms, ls);
-#ifdef __cpp_lib_format
+#if defined(__cpp_lib_format) && !defined(_LIBCPP_HAS_NO_INCOMPLETE_FORMAT)
 		if constexpr (std::is_same_v<CharType, char>)
 		{
 			return std::format("{}.{}.{}.{}", ver.major,
@@ -222,7 +222,7 @@ private:
 			return std::format(L"{}.{}.{}.{}", ver.major,
 				ver.minor, ver.build, ver.revision);
 		}
-#else //__cpp_lib_format
+#else //__cpp_lib_format && !_LIBCPP_HAS_NO_INCOMPLETE_FORMAT
 		CharType buf[64]{};
 		if constexpr (std::is_same_v<CharType, char>)
 		{
