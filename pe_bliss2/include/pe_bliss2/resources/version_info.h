@@ -2,12 +2,13 @@
 
 #include <compare>
 #include <cstdint>
-#if defined(__cpp_lib_format) && !defined(_LIBCPP_HAS_NO_INCOMPLETE_FORMAT)
+#include <version>
+#if defined(__cpp_lib_format) && !defined(_LIBCPP_HAS_NO_INCOMPLETE_FORMAT) && __cpp_lib_format >= 201907L
 #	include <format>
-#else //__cpp_lib_format && !_LIBCPP_HAS_NO_INCOMPLETE_FORMAT
+#else
 #	include <cstdio>
 #	include <cwchar>
-#endif //__cpp_lib_format && !_LIBCPP_HAS_NO_INCOMPLETE_FORMAT
+#endif
 #include <functional>
 #include <optional>
 #include <string>
@@ -211,7 +212,7 @@ private:
 		std::uint32_t ms, std::uint32_t ls)
 	{
 		const auto ver = version_from_components(ms, ls);
-#if defined(__cpp_lib_format) && !defined(_LIBCPP_HAS_NO_INCOMPLETE_FORMAT)
+#if defined(__cpp_lib_format) && !defined(_LIBCPP_HAS_NO_INCOMPLETE_FORMAT) && __cpp_lib_format >= 201907L
 		if constexpr (std::is_same_v<CharType, char>)
 		{
 			return std::format("{}.{}.{}.{}", ver.major,
@@ -222,7 +223,7 @@ private:
 			return std::format(L"{}.{}.{}.{}", ver.major,
 				ver.minor, ver.build, ver.revision);
 		}
-#else //__cpp_lib_format && !_LIBCPP_HAS_NO_INCOMPLETE_FORMAT
+#else
 		CharType buf[64]{};
 		if constexpr (std::is_same_v<CharType, char>)
 		{
@@ -235,7 +236,7 @@ private:
 				ver.major, ver.minor, ver.build, ver.revision);
 		}
 		return buf;
-#endif //__cpp_lib_format
+#endif
 	}
 };
 
