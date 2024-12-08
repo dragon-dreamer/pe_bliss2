@@ -86,6 +86,7 @@ target_sources(tests
 		tests/pe_bliss2/struct_from_va_tests.cpp
 		tests/pe_bliss2/struct_to_va_tests.cpp
 		tests/pe_bliss2/test_structs.h
+		tests/pe_bliss2/trustlet_policy_metadata_tests.cpp
 		tests/pe_bliss2/directories/accelerator_table_loader_tests.cpp
 		tests/pe_bliss2/directories/accelerator_table_tests.cpp
 		tests/pe_bliss2/directories/arm64_exception_directory_tests.cpp

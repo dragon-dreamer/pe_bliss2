@@ -48,9 +48,9 @@ void decode_policy_string(const image::image& instance,
 		buffers::input_buffer_stateful_wrapper_ref str_data_wrapper(*str_data);
 		str.deserialize(str_data_wrapper, false);
 	}
-	catch (const pe_error& e)
+	catch (const std::system_error&)
 	{
-		entry.add_error(e.code());
+		entry.add_error(trustlet_policy_errc::invalid_string_address);
 	}
 }
 
@@ -112,6 +112,7 @@ void decode_policy_value(const image::image& instance,
 
 	default:
 		entry.add_error(trustlet_policy_errc::unsupported_entry_type);
+		break;
 	}
 }
 } //namespace

@@ -291,6 +291,7 @@
     <ClCompile Include="tests\pe_bliss2\string_to_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\struct_from_va_tests.cpp" />
     <ClCompile Include="tests\pe_bliss2\struct_to_va_tests.cpp" />
+    <ClCompile Include="tests\pe_bliss2\trustlet_policy_metadata_tests.cpp" />
     <ClCompile Include="tests\utilities\math_tests.cpp" />
     <ClCompile Include="tests\utilities\range_helpers_tests.cpp" />
     <ClCompile Include="tests\utilities\safe_uint_tests.cpp" />
