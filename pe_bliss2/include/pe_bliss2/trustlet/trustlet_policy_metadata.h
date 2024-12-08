@@ -27,35 +27,35 @@ std::error_code make_error_code(trustlet_policy_errc) noexcept;
 
 enum class image_policy_entry_type
 {
-    none = detail::trustlet::image_policy_entry_type::none,
-    boolean = detail::trustlet::image_policy_entry_type::boolean,
-    int8 = detail::trustlet::image_policy_entry_type::int8,
-    uint8 = detail::trustlet::image_policy_entry_type::uint8,
-    int16 = detail::trustlet::image_policy_entry_type::int16,
-    uint16 = detail::trustlet::image_policy_entry_type::uint16,
-    int32 = detail::trustlet::image_policy_entry_type::int32,
-    uint32 = detail::trustlet::image_policy_entry_type::uint32,
-    int64 = detail::trustlet::image_policy_entry_type::int64,
-    uint64 = detail::trustlet::image_policy_entry_type::uint64,
-    ansi_string = detail::trustlet::image_policy_entry_type::ansi_string,
-    unicode_string = detail::trustlet::image_policy_entry_type::unicode_string,
-    overriden = detail::trustlet::image_policy_entry_type::overriden
+    none = detail::trustlet::image_policy_entry_type_none,
+    boolean = detail::trustlet::image_policy_entry_type_boolean,
+    int8 = detail::trustlet::image_policy_entry_type_int8,
+    uint8 = detail::trustlet::image_policy_entry_type_uint8,
+    int16 = detail::trustlet::image_policy_entry_type_int16,
+    uint16 = detail::trustlet::image_policy_entry_type_uint16,
+    int32 = detail::trustlet::image_policy_entry_type_int32,
+    uint32 = detail::trustlet::image_policy_entry_type_uint32,
+    int64 = detail::trustlet::image_policy_entry_type_int64,
+    uint64 = detail::trustlet::image_policy_entry_type_uint64,
+    ansi_string = detail::trustlet::image_policy_entry_type_ansi_string,
+    unicode_string = detail::trustlet::image_policy_entry_type_unicode_string,
+    overriden = detail::trustlet::image_policy_entry_type_overriden
 };
 
 enum class image_policy_id
 {
-    none = detail::trustlet::image_policy_id::none,
-    etw = detail::trustlet::image_policy_id::etw,
-    debug = detail::trustlet::image_policy_id::debug,
-    crash_dump = detail::trustlet::image_policy_id::crash_dump,
-    crash_dump_key = detail::trustlet::image_policy_id::crash_dump_key,
-    crash_dump_key_guid = detail::trustlet::image_policy_id::crash_dump_key_guid,
-    parent_sd = detail::trustlet::image_policy_id::parent_sd,
-    parent_sd_rev = detail::trustlet::image_policy_id::parent_sd_rev,
-    svn = detail::trustlet::image_policy_id::svn,
-    device_id = detail::trustlet::image_policy_id::device_id,
-    capability = detail::trustlet::image_policy_id::capability,
-    scenario_id = detail::trustlet::image_policy_id::scenario_id
+    none = detail::trustlet::image_policy_id_none,
+    etw = detail::trustlet::image_policy_id_etw,
+    debug = detail::trustlet::image_policy_id_debug,
+    crash_dump = detail::trustlet::image_policy_id_crash_dump,
+    crash_dump_key = detail::trustlet::image_policy_id_crash_dump_key,
+    crash_dump_key_guid = detail::trustlet::image_policy_id_crash_dump_key_guid,
+    parent_sd = detail::trustlet::image_policy_id_parent_sd,
+    parent_sd_rev = detail::trustlet::image_policy_id_parent_sd_rev,
+    svn = detail::trustlet::image_policy_id_svn,
+    device_id = detail::trustlet::image_policy_id_device_id,
+    capability = detail::trustlet::image_policy_id_capability,
+    scenario_id = detail::trustlet::image_policy_id_scenario_id
 };
 
 class [[nodiscard]] trustlet_policy_entry

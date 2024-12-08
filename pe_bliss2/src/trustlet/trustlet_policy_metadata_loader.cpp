@@ -199,8 +199,7 @@ std::optional<trustlet_policy_metadata_details> load_trustlet_policy_metadata(
 		}
 
 		const auto& entry_descriptor = entry.get_descriptor().get();
-		if (static_cast<std::uint32_t>(entry_descriptor.policy_id) == 0
-			&& static_cast<std::uint32_t>(entry_descriptor.type) == 0
+		if (entry_descriptor.policy_id == 0 && entry_descriptor.type == 0
 			&& entry_descriptor.value == 0)
 		{
 			metadata.get_entries().pop_back();

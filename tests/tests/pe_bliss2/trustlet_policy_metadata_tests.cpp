@@ -63,28 +63,28 @@ constexpr auto example_metadata_bytes = std::to_array<std::uint8_t>({
 	1, 0, 0, 0, 0, 0, 0, 0, //version
 	application_id, 0, 0, 0, 0, 0, 0, 0,
 	//entry 1
-	static_cast<std::uint8_t>(detail::trustlet::image_policy_entry_type::boolean), 0, 0, 0,
-	static_cast<std::uint8_t>(detail::trustlet::image_policy_id::etw), 0, 0, 0,
+	static_cast<std::uint8_t>(detail::trustlet::image_policy_entry_type_boolean), 0, 0, 0,
+	static_cast<std::uint8_t>(detail::trustlet::image_policy_id_etw), 0, 0, 0,
 	1, 0, 0, 0, 0, 0, 0, 0,
 	//entry 2
-	static_cast<std::uint8_t>(detail::trustlet::image_policy_entry_type::ansi_string), 0, 0, 0,
-	static_cast<std::uint8_t>(detail::trustlet::image_policy_id::crash_dump_key_guid), 0, 0, 0,
+	static_cast<std::uint8_t>(detail::trustlet::image_policy_entry_type_ansi_string), 0, 0, 0,
+	static_cast<std::uint8_t>(detail::trustlet::image_policy_id_crash_dump_key_guid), 0, 0, 0,
 	trustlet_c_string_offset, 0x00, 0x02, 0x50, 0, 0, 0, 0, //VA
 	//entry 3
-	static_cast<std::uint8_t>(detail::trustlet::image_policy_entry_type::unicode_string), 0, 0, 0,
-	static_cast<std::uint8_t>(detail::trustlet::image_policy_id::device_id), 0, 0, 0,
+	static_cast<std::uint8_t>(detail::trustlet::image_policy_entry_type_unicode_string), 0, 0, 0,
+	static_cast<std::uint8_t>(detail::trustlet::image_policy_id_device_id), 0, 0, 0,
 	trustlet_utf16_c_string_offset, 0x00, 0x02, 0x50, 0, 0, 0, 0, //VA
 	//entry 4
-	static_cast<std::uint8_t>(detail::trustlet::image_policy_entry_type::ansi_string), 0, 0, 0,
-	static_cast<std::uint8_t>(detail::trustlet::image_policy_id::parent_sd), 0, 0, 0,
+	static_cast<std::uint8_t>(detail::trustlet::image_policy_entry_type_ansi_string), 0, 0, 0,
+	static_cast<std::uint8_t>(detail::trustlet::image_policy_id_parent_sd), 0, 0, 0,
 	1, 0, 0, 0, 0, 0, 0, 1, //invalid VA
 	//entry 5
 	100, 0, 0, 0, // invalid type
-	static_cast<std::uint8_t>(detail::trustlet::image_policy_id::debug), 0, 0, 0,
+	static_cast<std::uint8_t>(detail::trustlet::image_policy_id_debug), 0, 0, 0,
 	1, 0, 0, 0, 0, 0, 0, 1, //invalid VA
 	//entry 6
-	static_cast<std::uint8_t>(detail::trustlet::image_policy_entry_type::uint16), 0, 0, 0,
-	static_cast<std::uint8_t>(detail::trustlet::image_policy_id::scenario_id), 0, 0, 0,
+	static_cast<std::uint8_t>(detail::trustlet::image_policy_entry_type_uint16), 0, 0, 0,
+	static_cast<std::uint8_t>(detail::trustlet::image_policy_id_scenario_id), 0, 0, 0,
 	1, 2, 3, 4, 5, 6, 7, 8,
 	//entry 7 (final)
 	0, 0, 0, 0,
