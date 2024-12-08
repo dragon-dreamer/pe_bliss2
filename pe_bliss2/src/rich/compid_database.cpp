@@ -410,7 +410,39 @@ consteval auto merge_with_newer_products()
 		product_mapping{ 0, 33128, product_type::visual_studio_2022_17_8_0_preview5_0 },
 		product_mapping{ 0, 33129, product_type::visual_studio_2022_17_8_0_preview6_0 },
 		product_mapping{ 0, 33130, product_type::visual_studio_2022_17_8_0 },
+		product_mapping{ 0, 33133, product_type::visual_studio_2022_17_8_3 },
+		product_mapping{ 0, 33134, product_type::visual_studio_2022_17_8_5 },
+		product_mapping{ 0, 33135, product_type::visual_studio_2022_17_8_6 },
 		product_mapping{ 0, 33218, product_type::visual_studio_2022_17_9_0_preview1_0 },
+		product_mapping{ 0, 33321, product_type::visual_studio_2022_17_9_0_preview2_0 },
+		product_mapping{ 0, 33428, product_type::visual_studio_2022_17_9_0_preview4_0 },
+		product_mapping{ 0, 33519, product_type::visual_studio_2022_17_9_0 },
+		product_mapping{ 0, 33520, product_type::visual_studio_2022_17_9_1 },
+		product_mapping{ 0, 33521, product_type::visual_studio_2022_17_9_2 },
+		product_mapping{ 0, 33522, product_type::visual_studio_2022_17_9_3 },
+		product_mapping{ 0, 33523, product_type::visual_studio_2022_17_9_7 },
+		product_mapping{ 0, 33617, product_type::visual_studio_2022_17_10_0_preview2_0 },
+		product_mapping{ 0, 33721, product_type::visual_studio_2022_17_10_0_preview3_0 },
+		product_mapping{ 0, 33807, product_type::visual_studio_2022_17_10_0_preview4_0 },
+		product_mapping{ 0, 33808, product_type::visual_studio_2022_17_10_0 },
+		product_mapping{ 0, 33811, product_type::visual_studio_2022_17_10_3 },
+		product_mapping{ 0, 33812, product_type::visual_studio_2022_17_10_4 },
+		product_mapping{ 0, 33813, product_type::visual_studio_2022_17_10_5 },
+		product_mapping{ 0, 33901, product_type::visual_studio_2022_17_11_0_preview_1_1 },
+		product_mapping{ 0, 33923, product_type::visual_studio_2022_17_11_0_preview_2_1 },
+		product_mapping{ 0, 34021, product_type::visual_studio_2022_17_11_0_preview_4_0 },
+		product_mapping{ 0, 34117, product_type::visual_studio_2022_17_11_0_preview_6_0 },
+		product_mapping{ 0, 34119, product_type::visual_studio_2022_17_11_0_preview_7_0 },
+		product_mapping{ 0, 34120, product_type::visual_studio_2022_17_11_0 },
+		product_mapping{ 0, 34123, product_type::visual_studio_2022_17_11_5 },
+		product_mapping{ 0, 34226, product_type::visual_studio_2022_17_12_0_preview_1_0 },
+		product_mapping{ 0, 34321, product_type::visual_studio_2022_17_12_0_preview_2_1 },
+		product_mapping{ 0, 34430, product_type::visual_studio_2022_17_12_0_preview_3_0 },
+		product_mapping{ 0, 34431, product_type::visual_studio_2022_17_12_0_preview_4_0 },
+		product_mapping{ 0, 34432, product_type::visual_studio_2022_17_12_0_preview_5_0 },
+		product_mapping{ 0, 34433, product_type::visual_studio_2022_17_12_1 },
+		product_mapping{ 0, 34435, product_type::visual_studio_2022_17_12_2 },
+		product_mapping{ 0, 34604, product_type::visual_studio_2022_17_13_0_preview_1_0 },
 	};
 
 	std::array<product_mapping,
@@ -740,7 +772,39 @@ std::string_view compid_database::product_type_to_string(product_type type) noex
 	case visual_studio_2022_17_8_0_preview5_0: return "Visual Studio 2022 17.8.0 Preview 5.0";
 	case visual_studio_2022_17_8_0_preview6_0: return "Visual Studio 2022 17.8.0 Preview 6.0";
 	case visual_studio_2022_17_8_0: return "Visual Studio 2022 17.8.0";
+	case visual_studio_2022_17_8_3: return "Visual Studio 2022 17.8.3";
+	case visual_studio_2022_17_8_5: return "Visual Studio 2022 17.8.5";
+	case visual_studio_2022_17_8_6: return "Visual Studio 2022 17.8.6";
 	case visual_studio_2022_17_9_0_preview1_0: return "Visual Studio 2022 17.9.0 Preview 1.0";
+	case visual_studio_2022_17_9_0_preview2_0: return "Visual Studio 2022 17.9.0 Preview 2.0";
+	case visual_studio_2022_17_9_0_preview4_0: return "Visual Studio 2022 17.9.0 Preview 4.0";
+	case visual_studio_2022_17_9_0: return "Visual Studio 2022 17.9.0";
+	case visual_studio_2022_17_9_1: return "Visual Studio 2022 17.9.1";
+	case visual_studio_2022_17_9_2: return "Visual Studio 2022 17.9.2";
+	case visual_studio_2022_17_9_3: return "Visual Studio 2022 17.9.3";
+	case visual_studio_2022_17_9_7: return "Visual Studio 2022 17.9.7";
+	case visual_studio_2022_17_10_0_preview2_0: return "Visual Studio 2022 17.10.0 Preview 2.0";
+	case visual_studio_2022_17_10_0_preview3_0: return "Visual Studio 2022 17.10.0 Preview 3.0";
+	case visual_studio_2022_17_10_0_preview4_0: return "Visual Studio 2022 17.10.0 Preview 4.0";
+	case visual_studio_2022_17_10_0: return "Visual Studio 2022 17.10.0";
+	case visual_studio_2022_17_10_3: return "Visual Studio 2022 17.10.3";
+	case visual_studio_2022_17_10_4: return "Visual Studio 2022 17.10.4";
+	case visual_studio_2022_17_10_5: return "Visual Studio 2022 17.10.5";
+	case visual_studio_2022_17_11_0_preview_1_1: return "Visual Studio 2022 17.11.0 Preview 1.1";
+	case visual_studio_2022_17_11_0_preview_2_1: return "Visual Studio 2022 17.11.0 Preview 2.1";
+	case visual_studio_2022_17_11_0_preview_4_0: return "Visual Studio 2022 17.11.0 Preview 4.0";
+	case visual_studio_2022_17_11_0_preview_6_0: return "Visual Studio 2022 17.11.0 Preview 6.0";
+	case visual_studio_2022_17_11_0_preview_7_0: return "Visual Studio 2022 17.11.0 Preview 7.0";
+	case visual_studio_2022_17_11_0: return "Visual Studio 2022 17.11.0";
+	case visual_studio_2022_17_11_5: return "Visual Studio 2022 17.11.5";
+	case visual_studio_2022_17_12_0_preview_1_0: return "Visual Studio 2022 17.12.0 Preview 1.0";
+	case visual_studio_2022_17_12_0_preview_2_1: return "Visual Studio 2022 17.12.0 Preview 2.1";
+	case visual_studio_2022_17_12_0_preview_3_0: return "Visual Studio 2022 17.12.0 Preview 3.0";
+	case visual_studio_2022_17_12_0_preview_4_0: return "Visual Studio 2022 17.12.0 Preview 4.0";
+	case visual_studio_2022_17_12_0_preview_5_0: return "Visual Studio 2022 17.12.0 Preview 5.0";
+	case visual_studio_2022_17_12_1: return "Visual Studio 2022 17.12.1";
+	case visual_studio_2022_17_12_2: return "Visual Studio 2022 17.12.2";
+	case visual_studio_2022_17_13_0_preview_1_0: return "Visual Studio 2022 17.13.0 Preview 1.0";
 	case unmarked_object: return "Unmarked object";
 	case cvtpgd: return "CVTPGD";
 	case cvtpgd_1: return "CVTPGD 1";
