@@ -132,6 +132,7 @@ The library compiles and passes tests with the following compilers:
       - Authenticode program info
       - Hash algorithms supported: `MD5`, `SHA1`, `SHA256`, `SHA384`, `SHA512`
       - Signature algorithms supported: `RSA`, `ECDSA` (`SHA1` and `SHA256`, all curves)
+  - Trustlet metadata policy (read-only, unit-tested)
 - Address conversions (RVA/VA/file offsets, unit-tested)
 - Overlay at the end of file parsing (unit-tested)
 - Simple console dumper of PE/PE+ files (no extended configuration yet)
@@ -151,7 +152,6 @@ The library compiles and passes tests with the following compilers:
   - .NET streams and tables support (read-only)
   - .NET resources support (read-only)
   - .NET strong name signatures (read-only)
-  - Trustlets
   - App Manifest tokens verification
 - Low proirity
   - Unit tests for exports modification code
