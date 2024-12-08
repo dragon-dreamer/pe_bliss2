@@ -79,6 +79,7 @@ target_sources(pe_bliss2
 		include/pe_bliss2/detail/rich/rich_header_utils.h
 		include/pe_bliss2/detail/security/image_security_directory.h
 		include/pe_bliss2/detail/tls/image_tls_directory.h
+		include/pe_bliss2/detail/trustlet/image_policy_metadata.h
 		include/pe_bliss2/dos/dos_header.h
 		include/pe_bliss2/dos/dos_header_errc.h
 		include/pe_bliss2/dos/dos_header_validator.h
@@ -210,6 +211,8 @@ target_sources(pe_bliss2
 		include/pe_bliss2/tls/tls_directory.h
 		include/pe_bliss2/tls/tls_directory_builder.h
 		include/pe_bliss2/tls/tls_directory_loader.h
+		include/pe_bliss2/trustlet/trustlet_policy_metadata.h
+		include/pe_bliss2/trustlet/trustlet_policy_metadata_loader.h
 	PRIVATE
 		src/address_converter.cpp
 		src/error_list.cpp
@@ -332,6 +335,8 @@ target_sources(pe_bliss2
 		src/tls/tls_directory.cpp
 		src/tls/tls_directory_builder.cpp
 		src/tls/tls_directory_loader.cpp
+		src/trustlet/trustlet_policy_metadata.cpp
+		src/trustlet/trustlet_policy_metadata_loader.cpp
 )
 
 target_link_libraries(pe_bliss2 PUBLIC buffers utilities pugixml SimpleAsn1Lib cryptopp)
@@ -340,4 +345,3 @@ if(MSVC)
 	target_compile_options(pe_bliss2 PRIVATE "/MP")
 	set_source_files_properties(src/security/authenticode_timestamp_signature.cpp PROPERTIES COMPILE_FLAGS /bigobj)
 endif()
-

@@ -209,6 +209,8 @@
     <ClInclude Include="include\pe_bliss2\tls\tls_directory.h" />
     <ClInclude Include="include\pe_bliss2\tls\tls_directory_builder.h" />
     <ClInclude Include="include\pe_bliss2\tls\tls_directory_loader.h" />
+    <ClInclude Include="include\pe_bliss2\trustlet\trustlet_policy_metadata.h" />
+    <ClInclude Include="include\pe_bliss2\trustlet\trustlet_policy_metadata_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\address_converter.cpp" />
@@ -337,6 +339,8 @@
     <ClCompile Include="src\tls\tls_directory.cpp" />
     <ClCompile Include="src\tls\tls_directory_builder.cpp" />
     <ClCompile Include="src\tls\tls_directory_loader.cpp" />
+    <ClCompile Include="src\trustlet\trustlet_policy_metadata.cpp" />
+    <ClCompile Include="src\trustlet\trustlet_policy_metadata_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\buffers\buffers.vcxproj">
