@@ -68,6 +68,7 @@
     <ClInclude Include="include\pe_bliss2\detail\rich\rich_header_utils.h" />
     <ClInclude Include="include\pe_bliss2\detail\security\image_security_directory.h" />
     <ClInclude Include="include\pe_bliss2\detail\tls\image_tls_directory.h" />
+    <ClInclude Include="include\pe_bliss2\detail\trustlet\image_policy_metadata.h" />
     <ClInclude Include="include\pe_bliss2\dos\dos_header.h" />
     <ClInclude Include="include\pe_bliss2\dos\dos_header_errc.h" />
     <ClInclude Include="include\pe_bliss2\dos\dos_header_validator.h" />

@@ -202,6 +202,9 @@
     <Filter Include="Source Files\security\x500">
       <UniqueIdentifier>{b68dd4af-9bc1-494a-837b-d08bac9cb602}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\detail\trustlet">
+      <UniqueIdentifier>{5f0f01b5-aeb1-472a-b37e-7b4813891ace}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\pe_bliss2\address_converter.h">
@@ -770,6 +773,9 @@
     </ClInclude>
     <ClInclude Include="include\pe_bliss2\security\x500\flat_distinguished_name.h">
       <Filter>Header Files\security\x500</Filter>
+    </ClInclude>
+    <ClInclude Include="include\pe_bliss2\detail\trustlet\image_policy_metadata.h">
+      <Filter>Header Files\detail\trustlet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
