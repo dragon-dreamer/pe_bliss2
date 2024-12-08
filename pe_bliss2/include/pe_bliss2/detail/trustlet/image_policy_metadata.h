@@ -90,7 +90,11 @@ struct image_policy_entry
 struct image_policy_metadata
 {
     std::uint8_t version;
-    std::uint8_t reserved0[7];
+    // Keep simple items for padding instead of array,
+    // because boost::pfr does not handle arrays
+    std::uint32_t reserved0;
+    std::uint16_t reserved1;
+    std::uint8_t reserved2;
     std::uint64_t application_id;
     // image_policy_entry policies[];
 };
