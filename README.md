@@ -143,11 +143,11 @@ The library compiles and passes tests with the following compilers:
   - Full security directory support (authenticode)
     - X.509 chain verification
     - Special signers
+    - Extended key usages
   - Import redirects (apisetschema.dll)
 - Medium priority
   - Menu resource support
   - Dialogs resource support
-  - CMake project and cross-platform compilation support
   - More features to console_dumper
   - .NET streams and tables support (read-only)
   - .NET resources support (read-only)
