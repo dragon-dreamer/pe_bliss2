@@ -40,8 +40,6 @@ struct version_info_reader_error_category : std::error_category
 			return "Child version info block read error";
 		case unknown_value_type:
 			return "Unknown version info block value type";
-		case invalid_string_value_length:
-			return "Actual string value length is smaller than version info block value length";
 		case block_tree_is_too_deep:
 			return "Version block tree is too deep";
 		default:
@@ -204,8 +202,12 @@ bool version_info_from_resource_impl(
 				{
 					auto& value = block.get_value().emplace<packed_utf16_c_string>();
 					value.deserialize(buf, options.allow_virtual_data, value_length);
-					if (value.data_size() != value_length)
-						block.add_error(version_info_reader_errc::invalid_string_value_length);
+					if (value.data_size() < value_length)
+					{
+						// Extra nullbytes at the end of the string - omit them and
+						// advance the buffer to the end of the value
+						buf.advance_rpos(value_length - value.data_size());
+					}
 				}
 				break;
 			default:

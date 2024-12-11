@@ -25,7 +25,6 @@ enum class version_info_reader_errc
 	excessive_data_in_buffer,
 	child_read_error,
 	unknown_value_type,
-	invalid_string_value_length,
 	block_tree_is_too_deep
 };
 
