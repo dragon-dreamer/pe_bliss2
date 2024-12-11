@@ -206,7 +206,8 @@ bool version_info_from_resource_impl(
 					{
 						// Extra nullbytes at the end of the string - omit them and
 						// advance the buffer to the end of the value
-						buf.advance_rpos(value_length - value.data_size());
+						buf.advance_rpos(static_cast<std::int32_t>(
+							value_length - value.data_size()));
 					}
 				}
 				break;
