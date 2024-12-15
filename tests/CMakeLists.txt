@@ -60,6 +60,7 @@ target_sources(tests
 		tests/pe_bliss2/image_signature_tests.cpp
 		tests/pe_bliss2/image_tests.cpp
 		tests/pe_bliss2/input_buffer_mock.h
+		tests/pe_bliss2/format_detector_tests.cpp
 		tests/pe_bliss2/load_config_loader_tests.cpp
 		tests/pe_bliss2/optional_header_tests.cpp
 		tests/pe_bliss2/output_buffer_mock.h

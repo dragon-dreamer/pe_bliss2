@@ -426,6 +426,9 @@
     <ClCompile Include="tests\pe_bliss2\trustlet_policy_metadata_tests.cpp">
       <Filter>Source Files\tests\pe_bliss2</Filter>
     </ClCompile>
+    <ClCompile Include="tests\pe_bliss2\format_detector_tests.cpp">
+      <Filter>Source Files\tests\pe_bliss2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tests\buffers\input_buffer_helpers.h">
