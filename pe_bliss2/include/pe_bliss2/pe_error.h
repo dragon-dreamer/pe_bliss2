@@ -57,6 +57,12 @@ public:
 		return static_cast<bool>(ec_);
 	}
 
+	[[nodiscard]]
+	bool has_error() const noexcept
+	{
+		return ec_.value() != 0;
+	}
+
 private:
 	std::error_code ec_;
 };
