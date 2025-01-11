@@ -76,9 +76,9 @@ std::optional<typename flat_distinguished_name<RangeType>::directory_string_type
 	{
 		try
 		{
-			const auto str = asn1::der::decode<asn1::crypto::directory_string,
+			auto str = asn1::der::decode<asn1::crypto::directory_string,
 				asn1::spec::crypto::directory_string<"RDN">>(it->second.begin(), it->second.end());
-			std::visit([&result](auto& moved) { result = std::move(moved); }, std::move(str));
+			std::visit([&result](auto&& moved) { result = std::move(moved); }, std::move(str));
 		}
 		catch (const asn1::parse_error&)
 		{
