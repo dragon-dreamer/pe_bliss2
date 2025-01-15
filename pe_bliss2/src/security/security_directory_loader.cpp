@@ -116,6 +116,12 @@ std::optional<security_directory_details> load(const image::image& instance,
 
 		size -= descriptor_size;
 		auto entry_size = entry.get_descriptor()->length;
+		if (!entry_size)
+		{
+			directory.get_entries().pop_back();
+			return result;
+		}
+
 		if (entry_size < descriptor_size)
 		{
 			entry.add_error(security_directory_loader_errc::invalid_entry_size);
